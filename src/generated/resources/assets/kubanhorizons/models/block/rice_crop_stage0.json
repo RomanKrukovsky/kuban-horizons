@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "kubanhorizons:block/rice_crop_stage0"
+  }
+}

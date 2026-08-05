@@ -41,6 +41,16 @@ public final class KHBlocks {
                             .sound(SoundType.CROP)
                             .pushReaction(PushReaction.DESTROY));
 
+    /** Рис (затопленная культура). */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock> RICE_CROP =
+            BLOCKS.registerBlock("rice_crop", dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock::new,
+                    p -> p.mapColor(MapColor.PLANT)
+                            .noCollision()
+                            .randomTicks()
+                            .instabreak()
+                            .sound(SoundType.CROP)
+                            .pushReaction(PushReaction.DESTROY));
+
     /** Чайный куст (многолетний, многосборный). */
     public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock> TEA_BUSH =
             BLOCKS.registerBlock("tea_bush", dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock::new,

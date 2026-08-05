@@ -9,6 +9,15 @@
     "kubanhorizons:oil_cake": {
       "chance": 0.5
     },
+    "kubanhorizons:rice": {
+      "chance": 0.3
+    },
+    "kubanhorizons:rice_panicle": {
+      "chance": 0.5
+    },
+    "kubanhorizons:rice_seedlings": {
+      "chance": 0.3
+    },
     "kubanhorizons:sunflower_head": {
       "chance": 0.65
     },

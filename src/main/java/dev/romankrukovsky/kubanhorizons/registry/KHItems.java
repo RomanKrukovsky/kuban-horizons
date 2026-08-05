@@ -62,6 +62,30 @@ public final class KHItems {
             ITEMS.registerSimpleItem("grilled_corn",
                     p -> p.food(KHFoods.GRILLED_CORN));
 
+    // --- Цепочка риса ---
+
+    /** Рассада риса: посадка в затопленный чек. */
+    public static final DeferredItem<Item> RICE_SEEDLINGS =
+            ITEMS.registerItem("rice_seedlings",
+                    p -> new BlockItem(KHBlocks.RICE_CROP.get(), p),
+                    p -> p.useItemDescriptionPrefix());
+
+    /** Необрушенный рис (урожай). */
+    public static final DeferredItem<Item> RICE_PANICLE =
+            ITEMS.registerSimpleItem("rice_panicle");
+
+    /** Рис (крупа) — еда-ингредиент. */
+    public static final DeferredItem<Item> RICE =
+            ITEMS.registerSimpleItem("rice",
+                    p -> p.food(KHFoods.RICE));
+
+    /** Отварной рис — готовая еда в миске. */
+    public static final DeferredItem<Item> COOKED_RICE =
+            ITEMS.registerSimpleItem("cooked_rice",
+                    p -> p.stacksTo(16)
+                            .food(KHFoods.COOKED_RICE)
+                            .usingConvertsTo(Items.BOWL));
+
     // --- Цепочка чая ---
 
     /** Саженец чайного куста. */

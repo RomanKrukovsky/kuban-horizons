@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "kubanhorizons:rice",
+    "kubanhorizons:rice",
+    "minecraft:bowl"
+  ],
+  "result": {
+    "id": "kubanhorizons:cooked_rice"
+  }
+}

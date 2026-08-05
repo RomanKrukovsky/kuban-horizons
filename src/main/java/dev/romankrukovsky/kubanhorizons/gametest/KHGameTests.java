@@ -68,6 +68,8 @@ public final class KHGameTests {
         register("irrigation_hydrates_farmland", KHGameTests::testIrrigationHydratesFarmland, 400);
         register("corn_full_growth", KHGameTests::testCornFullGrowth, 600);
         register("tea_bush_pick_regrows", KHGameTests::testTeaBushPick, 300);
+        register("rice_grows_in_water", KHGameTests::testRiceGrowsInWater, 600);
+        register("rice_requires_water", KHGameTests::testRiceRequiresWater, 200);
     }
 
     private KHGameTests() {
@@ -343,6 +345,57 @@ public final class KHGameTests {
                     helper.assertBlockProperty(bushPos,
                             dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock.AGE, 1);
                     helper.assertItemEntityPresent(KHItems.TEA_LEAVES.get(), bushPos, 2.0);
+                })
+                .thenSucceed();
+    }
+
+    // --- Тесты риса ---
+
+    /** Рис в затопленном чеке растёт до зрелости. */
+    private static void testRiceGrowsInWater(GameTestHelper helper) {
+        BlockPos ricePos = new BlockPos(1, 2, 1);
+        helper.setBlock(ricePos.below(), Blocks.DIRT);
+        helper.setBlock(ricePos, KHBlocks.RICE_CROP.get().defaultBlockState());
+
+        helper.onEachTick(() -> {
+            ServerLevel level = helper.getLevel();
+            BlockPos abs = helper.absolutePos(ricePos);
+            BlockState state = level.getBlockState(abs);
+            if (state.is(KHBlocks.RICE_CROP.get())) {
+                state.randomTick(level, abs, level.getRandom());
+            }
+        });
+
+        helper.succeedWhen(() -> helper.assertBlockProperty(ricePos,
+                dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock.AGE,
+                dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock.MAX_AGE));
+    }
+
+    /** Без воды молодой рис не растёт (randomTick не двигает стадию). */
+    private static void testRiceRequiresWater(GameTestHelper helper) {
+        BlockPos ricePos = new BlockPos(1, 2, 1);
+        helper.setBlock(ricePos.below(), Blocks.DIRT);
+        // Осушенный рис: WATERLOGGED=false выставляем напрямую.
+        helper.setBlock(ricePos, KHBlocks.RICE_CROP.get().defaultBlockState()
+                .setValue(dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock.WATERLOGGED, false)
+                .setValue(dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock.AGE, 3));
+        // Незрелый без воды сломался бы canSurvive — проверяем логику
+        // randomTick на зрелом, затем прямой вызов на молодом состоянии.
+        helper.startSequence()
+                .thenExecute(() -> {
+                    ServerLevel level = helper.getLevel();
+                    BlockPos abs = helper.absolutePos(ricePos);
+                    // 50 принудительных randomTick на сухом блоке.
+                    BlockState dryYoung = KHBlocks.RICE_CROP.get().defaultBlockState()
+                            .setValue(dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock.WATERLOGGED, false)
+                            .setValue(dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock.AGE, 0);
+                    for (int i = 0; i < 50; i++) {
+                        dryYoung.randomTick(level, abs, level.getRandom());
+                    }
+                    // Блок в мире не должен был вырасти (randomTick сухого
+                    // состояния — no-op).
+                    helper.assertBlockProperty(ricePos,
+                            dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock.AGE, 3);
                 })
                 .thenSucceed();
     }

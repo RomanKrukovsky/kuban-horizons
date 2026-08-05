@@ -33,6 +33,7 @@ final class KHTranslations {
         add("block.kubanhorizons.water_intake", "Water Intake", "Водозабор");
         add("block.kubanhorizons.corn_crop", "Corn", "Кукуруза");
         add("block.kubanhorizons.tea_bush", "Tea Bush", "Чайный куст");
+        add("block.kubanhorizons.rice_crop", "Rice", "Рис");
 
         // --- Предметы ---
         add("item.kubanhorizons.sunflower_seeds", "Sunflower Seeds", "Семечки подсолнечника");
@@ -46,6 +47,10 @@ final class KHTranslations {
         add("item.kubanhorizons.grilled_corn", "Grilled Corn", "Печёная кукуруза");
         add("item.kubanhorizons.tea_sapling", "Tea Sapling", "Саженец чая");
         add("item.kubanhorizons.tea_leaves", "Tea Leaves", "Чайный лист");
+        add("item.kubanhorizons.rice_seedlings", "Rice Seedlings", "Рассада риса");
+        add("item.kubanhorizons.rice_panicle", "Rice Panicle", "Рисовая метёлка");
+        add("item.kubanhorizons.rice", "Rice", "Рис");
+        add("item.kubanhorizons.cooked_rice", "Bowl of Cooked Rice", "Миска отварного риса");
 
         // --- Сообщения ---
         add("message.kubanhorizons.soil_probe.result",

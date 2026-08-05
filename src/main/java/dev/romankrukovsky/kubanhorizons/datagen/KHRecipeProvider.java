@@ -88,6 +88,21 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_corn_cob", this.has(KHItems.CORN_COB.get()))
                 .save(this.output);
 
+        // Метёлка → рис (крупа).
+        this.shapeless(RecipeCategory.MISC, KHItems.RICE.get(), 1)
+                .requires(KHItems.RICE_PANICLE.get())
+                .group("kubanhorizons:rice")
+                .unlockedBy("has_rice_panicle", this.has(KHItems.RICE_PANICLE.get()))
+                .save(this.output);
+
+        // Отварной рис: рис + миска в жарке недоступен; варка = крафт с миской.
+        this.shapeless(RecipeCategory.FOOD, KHItems.COOKED_RICE.get(), 1)
+                .requires(KHItems.RICE.get())
+                .requires(KHItems.RICE.get())
+                .requires(Items.BOWL)
+                .unlockedBy("has_rice", this.has(KHItems.RICE.get()))
+                .save(this.output);
+
         // Жареные семечки — жарка в печи/коптильне/на костре.
         cooking(SmeltingRecipe::new, 200, "smelting");
         cooking(SmokingRecipe::new, 100, "smoking");

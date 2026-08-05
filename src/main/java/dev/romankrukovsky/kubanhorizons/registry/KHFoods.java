@@ -30,6 +30,18 @@ public final class KHFoods {
             .saturationModifier(0.6F)
             .build();
 
+    /** Сырая рисовая крупа: съедобна, но почти бесполезна. */
+    public static final FoodProperties RICE = new FoodProperties.Builder()
+            .nutrition(1)
+            .saturationModifier(0.1F)
+            .build();
+
+    /** Отварной рис: сытная основа. */
+    public static final FoodProperties COOKED_RICE = new FoodProperties.Builder()
+            .nutrition(7)
+            .saturationModifier(0.55F)
+            .build();
+
     private KHFoods() {
     }
 }

@@ -56,6 +56,18 @@ public final class KHLootTableProvider extends LootTableProvider {
             // Чайный куст: при разрушении — саженец (лист собирается ПКМ).
             add(KHBlocks.TEA_BUSH.get(),
                     createSingleItemTable(KHItems.TEA_SAPLING.get()));
+
+            // Рис: зрелый — метёлки + рассада; незрелый — рассада.
+            LootItemCondition.Builder ripeRice = LootItemBlockStatePropertyCondition
+                    .hasBlockStateProperties(KHBlocks.RICE_CROP.get())
+                    .setProperties(StatePropertiesPredicate.Builder.properties()
+                            .hasProperty(dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock.AGE,
+                                    dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock.MAX_AGE));
+            add(KHBlocks.RICE_CROP.get(), this.createCropDrops(
+                    KHBlocks.RICE_CROP.get(),
+                    KHItems.RICE_PANICLE.get(),
+                    KHItems.RICE_SEEDLINGS.get(),
+                    ripeRice));
         }
 
         private void addDoubleCropDrops(Block crop, net.minecraft.world.item.Item product,
