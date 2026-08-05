@@ -63,6 +63,9 @@ public final class KHGameTests {
         register("fertility_depletes_on_harvest", KHGameTests::testFertilityDepletion, 200);
         register("fertility_compost_restores", KHGameTests::testFertilityCompost, 200);
         register("fertility_rotation_gentler", KHGameTests::testFertilityRotation, 200);
+        register("irrigation_channel_fills", KHGameTests::testIrrigationFills, 400);
+        register("irrigation_channel_dries", KHGameTests::testIrrigationDries, 400);
+        register("irrigation_hydrates_farmland", KHGameTests::testIrrigationHydratesFarmland, 400);
     }
 
     private KHGameTests() {
@@ -353,6 +356,78 @@ public final class KHGameTests {
         helper.assertTrue(rotated > mono,
                 "Севооборот должен беречь почву: моно=" + mono + ", ротация=" + rotated);
         helper.succeed();
+    }
+
+    // --- Тесты орошения ---
+
+    /** Желоба заполняются водой от активного водозабора. */
+    private static void testIrrigationFills(GameTestHelper helper) {
+        BlockPos water = new BlockPos(0, 1, 0);
+        BlockPos intake = new BlockPos(1, 1, 0);
+        helper.setBlock(water, Blocks.WATER);
+        helper.setBlock(intake, KHBlocks.WATER_INTAKE.get());
+        for (int i = 0; i < 3; i++) {
+            helper.setBlock(new BlockPos(2 + i, 1, 0), KHBlocks.IRRIGATION_CHANNEL.get());
+        }
+
+        helper.succeedWhen(() -> {
+            helper.assertBlockProperty(intake,
+                    dev.romankrukovsky.kubanhorizons.irrigation.WaterIntakeBlock.ACTIVE, true);
+            for (int i = 0; i < 3; i++) {
+                helper.assertBlockProperty(new BlockPos(2 + i, 1, 0),
+                        dev.romankrukovsky.kubanhorizons.irrigation.IrrigationChannelBlock.DISTANCE, i + 1);
+            }
+        });
+    }
+
+    /** При удалении водозабора желоба осушаются. */
+    private static void testIrrigationDries(GameTestHelper helper) {
+        BlockPos water = new BlockPos(0, 1, 0);
+        BlockPos intake = new BlockPos(1, 1, 0);
+        BlockPos channel = new BlockPos(2, 1, 0);
+        helper.setBlock(water, Blocks.WATER);
+        helper.setBlock(intake, KHBlocks.WATER_INTAKE.get());
+        helper.setBlock(channel, KHBlocks.IRRIGATION_CHANNEL.get());
+
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertBlockProperty(channel,
+                        dev.romankrukovsky.kubanhorizons.irrigation.IrrigationChannelBlock.DISTANCE, 1))
+                .thenExecute(() -> {
+                    helper.setBlock(intake, Blocks.AIR);
+                    helper.setBlock(water, Blocks.AIR);
+                })
+                .thenWaitUntil(() -> helper.assertBlockProperty(channel,
+                        dev.romankrukovsky.kubanhorizons.irrigation.IrrigationChannelBlock.DISTANCE, 0))
+                .thenSucceed();
+    }
+
+    /** Заполненный желоб увлажняет соседнюю грядку (moisture 7). */
+    private static void testIrrigationHydratesFarmland(GameTestHelper helper) {
+        BlockPos water = new BlockPos(0, 1, 0);
+        BlockPos intake = new BlockPos(1, 1, 0);
+        BlockPos channel = new BlockPos(2, 1, 0);
+        BlockPos farmland = new BlockPos(3, 1, 0);
+        helper.setBlock(water, Blocks.WATER);
+        helper.setBlock(intake, KHBlocks.WATER_INTAKE.get());
+        helper.setBlock(channel, KHBlocks.IRRIGATION_CHANNEL.get());
+        helper.setBlock(farmland.below(), Blocks.DIRT);
+        helper.setBlock(farmland, Blocks.FARMLAND.defaultBlockState()
+                .setValue(net.minecraft.world.level.block.FarmlandBlock.MOISTURE, 0));
+
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertBlockProperty(channel,
+                        dev.romankrukovsky.kubanhorizons.irrigation.IrrigationChannelBlock.DISTANCE, 1))
+                .thenExecute(() -> {
+                    // Форсируем randomTick грядки: в реальной игре это
+                    // происходит естественно; в тесте — детерминированно.
+                    ServerLevel level = helper.getLevel();
+                    BlockPos abs = helper.absolutePos(farmland);
+                    BlockState state = level.getBlockState(abs);
+                    state.randomTick(level, abs, level.getRandom());
+                })
+                .thenExecuteAfter(2, () -> helper.assertBlockProperty(farmland,
+                        net.minecraft.world.level.block.FarmlandBlock.MOISTURE, 7))
+                .thenSucceed();
     }
 
     // --- Реестры ---

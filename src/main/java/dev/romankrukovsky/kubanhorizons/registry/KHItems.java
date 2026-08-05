@@ -58,6 +58,14 @@ public final class KHItems {
     public static final DeferredItem<BlockItem> OIL_PRESS =
             ITEMS.registerSimpleBlockItem("oil_press", KHBlocks.OIL_PRESS);
 
+    /** Оросительный желоб (предмет). */
+    public static final DeferredItem<BlockItem> IRRIGATION_CHANNEL =
+            ITEMS.registerSimpleBlockItem("irrigation_channel", KHBlocks.IRRIGATION_CHANNEL);
+
+    /** Водозабор (предмет). */
+    public static final DeferredItem<BlockItem> WATER_INTAKE =
+            ITEMS.registerSimpleBlockItem("water_intake", KHBlocks.WATER_INTAKE);
+
     private KHItems() {
     }
 

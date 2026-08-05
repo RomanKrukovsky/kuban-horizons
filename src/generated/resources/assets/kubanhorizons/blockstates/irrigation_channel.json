@@ -1,0 +1,43 @@
+{
+  "variants": {
+    "distance=0": {
+      "model": "kubanhorizons:block/irrigation_channel_dry"
+    },
+    "distance=1": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    },
+    "distance=10": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    },
+    "distance=11": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    },
+    "distance=12": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    },
+    "distance=2": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    },
+    "distance=3": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    },
+    "distance=4": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    },
+    "distance=5": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    },
+    "distance=6": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    },
+    "distance=7": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    },
+    "distance=8": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    },
+    "distance=9": {
+      "model": "kubanhorizons:block/irrigation_channel_filled"
+    }
+  }
+}

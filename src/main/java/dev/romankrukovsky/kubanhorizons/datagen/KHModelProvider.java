@@ -2,8 +2,11 @@ package dev.romankrukovsky.kubanhorizons.datagen;
 
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
 import dev.romankrukovsky.kubanhorizons.crop.SunflowerCropBlock;
+import dev.romankrukovsky.kubanhorizons.irrigation.IrrigationChannelBlock;
+import dev.romankrukovsky.kubanhorizons.irrigation.WaterIntakeBlock;
 import dev.romankrukovsky.kubanhorizons.registry.KHBlocks;
 import dev.romankrukovsky.kubanhorizons.registry.KHItems;
+import dev.romankrukovsky.kubanhorizons.util.KHIds;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
@@ -39,6 +42,8 @@ public final class KHModelProvider extends ModelProvider {
         // Маслопресс: ориентируемый куб с уникальными текстурами.
         blockModels.createHorizontallyRotatedBlock(KHBlocks.OIL_PRESS.get(), TexturedModel.ORIENTABLE);
 
+        registerIrrigation(blockModels);
+
         // Плоские предметы.
         itemModels.generateFlatItem(KHItems.SUNFLOWER_SEEDS.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.SUNFLOWER_HEAD.get(), ModelTemplates.FLAT_ITEM);
@@ -46,6 +51,29 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.OIL_CAKE.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.ROASTED_SUNFLOWER_SEEDS.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.SOIL_PROBE.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+    }
+
+    /**
+     * Блоки орошения: модели написаны вручную (нестандартная геометрия
+     * желоба — допустимое исключение AD-005), blockstates и item-модели
+     * генерируются здесь.
+     */
+    private void registerIrrigation(BlockModelGenerators blockModels) {
+        Block channel = KHBlocks.IRRIGATION_CHANNEL.get();
+        Identifier dry = KHIds.of("block/irrigation_channel_dry");
+        Identifier filled = KHIds.of("block/irrigation_channel_filled");
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(channel)
+                .with(PropertyDispatch.initial(IrrigationChannelBlock.DISTANCE)
+                        .generate(distance -> plainVariant(distance > 0 ? filled : dry))));
+        blockModels.registerSimpleItemModel(channel.asItem(), dry);
+
+        Block intake = KHBlocks.WATER_INTAKE.get();
+        Identifier idle = KHIds.of("block/water_intake");
+        Identifier active = KHIds.of("block/water_intake_active");
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(intake)
+                .with(PropertyDispatch.initial(WaterIntakeBlock.ACTIVE)
+                        .generate(isActive -> plainVariant(isActive ? active : idle))));
+        blockModels.registerSimpleItemModel(intake.asItem(), idle);
     }
 
     private void registerSunflowerCrop(BlockModelGenerators blockModels) {

@@ -31,6 +31,24 @@ public final class KHBlocks {
                             .sound(SoundType.CROP)
                             .pushReaction(PushReaction.DESTROY));
 
+    /** Деревянный оросительный желоб. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.irrigation.IrrigationChannelBlock> IRRIGATION_CHANNEL =
+            BLOCKS.registerBlock("irrigation_channel",
+                    dev.romankrukovsky.kubanhorizons.irrigation.IrrigationChannelBlock::new,
+                    p -> p.mapColor(MapColor.WOOD)
+                            .strength(2.0F)
+                            .sound(SoundType.WOOD)
+                            .noOcclusion());
+
+    /** Водозабор — источник оросительной сети. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.irrigation.WaterIntakeBlock> WATER_INTAKE =
+            BLOCKS.registerBlock("water_intake",
+                    dev.romankrukovsky.kubanhorizons.irrigation.WaterIntakeBlock::new,
+                    p -> p.mapColor(MapColor.STONE)
+                            .strength(3.0F)
+                            .sound(SoundType.STONE)
+                            .noOcclusion());
+
     /** Маслопресс — первое перерабатывающее устройство мода. */
     public static final DeferredBlock<OilPressBlock> OIL_PRESS =
             BLOCKS.registerBlock("oil_press", OilPressBlock::new,

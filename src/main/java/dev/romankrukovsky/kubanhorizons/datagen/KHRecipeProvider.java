@@ -52,6 +52,25 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_sunflower_seeds", this.has(KHItems.SUNFLOWER_SEEDS.get()))
                 .save(this.output);
 
+        // Оросительный желоб: доски корытом (4 шт.).
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.IRRIGATION_CHANNEL.get(), 4)
+                .pattern("P P")
+                .pattern("PPP")
+                .define('P', net.minecraft.tags.ItemTags.PLANKS)
+                .unlockedBy("has_planks", this.has(net.minecraft.tags.ItemTags.PLANKS))
+                .save(this.output);
+
+        // Водозабор: камень + железная решётка (ведро как символ забора воды).
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.WATER_INTAKE.get())
+                .pattern("I I")
+                .pattern("SBS")
+                .pattern("SSS")
+                .define('I', Items.IRON_BARS)
+                .define('S', Items.STONE)
+                .define('B', Items.BUCKET)
+                .unlockedBy("has_bucket", this.has(Items.BUCKET))
+                .save(this.output);
+
         // Почвенный щуп: медный стержень.
         this.shaped(RecipeCategory.TOOLS, KHItems.SOIL_PROBE.get())
                 .pattern("C")

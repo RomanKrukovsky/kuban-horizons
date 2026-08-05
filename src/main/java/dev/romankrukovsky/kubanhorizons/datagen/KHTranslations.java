@@ -29,6 +29,8 @@ final class KHTranslations {
         // --- Блоки ---
         add("block.kubanhorizons.sunflower_crop", "Sunflower Crop", "Подсолнечник");
         add("block.kubanhorizons.oil_press", "Oil Press", "Маслопресс");
+        add("block.kubanhorizons.irrigation_channel", "Irrigation Channel", "Оросительный желоб");
+        add("block.kubanhorizons.water_intake", "Water Intake", "Водозабор");
 
         // --- Предметы ---
         add("item.kubanhorizons.sunflower_seeds", "Sunflower Seeds", "Семечки подсолнечника");

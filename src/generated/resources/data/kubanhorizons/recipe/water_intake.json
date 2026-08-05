@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "B": "minecraft:bucket",
+    "I": "minecraft:iron_bars",
+    "S": "minecraft:stone"
+  },
+  "pattern": [
+    "I I",
+    "SBS",
+    "SSS"
+  ],
+  "result": {
+    "id": "kubanhorizons:water_intake"
+  }
+}

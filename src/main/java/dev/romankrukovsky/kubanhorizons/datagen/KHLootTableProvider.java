@@ -41,6 +41,8 @@ public final class KHLootTableProvider extends LootTableProvider {
         @Override
         protected void generate() {
             dropSelf(KHBlocks.OIL_PRESS.get());
+            dropSelf(KHBlocks.IRRIGATION_CHANNEL.get());
+            dropSelf(KHBlocks.WATER_INTAKE.get());
 
             // Подсолнечник: дроп только с нижней зрелой половины —
             // верхняя половина не дропает ничего (защита от двойного лута).

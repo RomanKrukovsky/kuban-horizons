@@ -1,0 +1,6 @@
+{
+  "parent": "kubanhorizons:block/water_intake",
+  "textures": {
+    "top": "kubanhorizons:block/water_intake_top_active"
+  }
+}
