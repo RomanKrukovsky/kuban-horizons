@@ -1,5 +1,11 @@
 {
   "values": {
+    "kubanhorizons:corn_cob": {
+      "chance": 0.5
+    },
+    "kubanhorizons:corn_kernels": {
+      "chance": 0.3
+    },
     "kubanhorizons:oil_cake": {
       "chance": 0.5
     },
@@ -7,6 +13,12 @@
       "chance": 0.65
     },
     "kubanhorizons:sunflower_seeds": {
+      "chance": 0.3
+    },
+    "kubanhorizons:tea_leaves": {
+      "chance": 0.3
+    },
+    "kubanhorizons:tea_sapling": {
       "chance": 0.3
     }
   }

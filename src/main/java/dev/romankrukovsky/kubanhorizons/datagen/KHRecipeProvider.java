@@ -81,10 +81,22 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_copper", this.has(Items.COPPER_INGOT))
                 .save(this.output);
 
+        // Початок → зёрна (2 шт.).
+        this.shapeless(RecipeCategory.MISC, KHItems.CORN_KERNELS.get(), 2)
+                .requires(KHItems.CORN_COB.get())
+                .group("kubanhorizons:corn_kernels")
+                .unlockedBy("has_corn_cob", this.has(KHItems.CORN_COB.get()))
+                .save(this.output);
+
         // Жареные семечки — жарка в печи/коптильне/на костре.
         cooking(SmeltingRecipe::new, 200, "smelting");
         cooking(SmokingRecipe::new, 100, "smoking");
         cooking(CampfireCookingRecipe::new, 600, "campfire_cooking");
+
+        // Печёная кукуруза.
+        cookedCorn(SmeltingRecipe::new, 200, "smelting");
+        cookedCorn(SmokingRecipe::new, 100, "smoking");
+        cookedCorn(CampfireCookingRecipe::new, 600, "campfire_cooking");
 
         // Рецепт маслопресса: 8 семян + бутылка → масло + жмых.
         this.output.accept(
@@ -111,6 +123,19 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_sunflower_seeds", this.has(KHItems.SUNFLOWER_SEEDS.get()))
                 .save(this.output, ResourceKey.create(Registries.RECIPE,
                         KHIds.of("roasted_sunflower_seeds_from_" + suffix)));
+    }
+
+    /** Печёная кукуруза одним из трёх способов приготовления. */
+    private <T extends AbstractCookingRecipe> void cookedCorn(
+            AbstractCookingRecipe.Factory<T> factory, int cookingTime, String suffix) {
+        SimpleCookingRecipeBuilder.generic(
+                        Ingredient.of(KHItems.CORN_COB.get()),
+                        RecipeCategory.FOOD, CookingBookCategory.FOOD,
+                        KHItems.GRILLED_CORN.get(),
+                        0.2F, cookingTime, factory)
+                .unlockedBy("has_corn_cob", this.has(KHItems.CORN_COB.get()))
+                .save(this.output, ResourceKey.create(Registries.RECIPE,
+                        KHIds.of("grilled_corn_from_" + suffix)));
     }
 
     public static final class Runner extends RecipeProvider.Runner {

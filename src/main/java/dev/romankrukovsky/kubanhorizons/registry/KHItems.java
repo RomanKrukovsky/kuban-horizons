@@ -44,6 +44,36 @@ public final class KHItems {
             ITEMS.registerSimpleItem("roasted_sunflower_seeds",
                     p -> p.food(KHFoods.ROASTED_SUNFLOWER_SEEDS));
 
+    // --- Цепочка кукурузы ---
+
+    /** Зёрна кукурузы: посадка + сырьё мельницы. */
+    public static final DeferredItem<Item> CORN_KERNELS =
+            ITEMS.registerItem("corn_kernels",
+                    p -> new BlockItem(KHBlocks.CORN_CROP.get(), p),
+                    p -> p.useItemDescriptionPrefix());
+
+    /** Початок кукурузы — урожай; еда и источник зёрен. */
+    public static final DeferredItem<Item> CORN_COB =
+            ITEMS.registerSimpleItem("corn_cob",
+                    p -> p.food(KHFoods.CORN_COB));
+
+    /** Печёная кукуруза. */
+    public static final DeferredItem<Item> GRILLED_CORN =
+            ITEMS.registerSimpleItem("grilled_corn",
+                    p -> p.food(KHFoods.GRILLED_CORN));
+
+    // --- Цепочка чая ---
+
+    /** Саженец чайного куста. */
+    public static final DeferredItem<Item> TEA_SAPLING =
+            ITEMS.registerItem("tea_sapling",
+                    p -> new BlockItem(KHBlocks.TEA_BUSH.get(), p),
+                    p -> p.useItemDescriptionPrefix());
+
+    /** Свежий чайный лист. */
+    public static final DeferredItem<Item> TEA_LEAVES =
+            ITEMS.registerSimpleItem("tea_leaves");
+
     // --- Инструменты ---
 
     /** Почвенный щуп — анализатор плодородия грядок. */

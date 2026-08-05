@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "kubanhorizons:block/tea_bush_stage0"
+  }
+}

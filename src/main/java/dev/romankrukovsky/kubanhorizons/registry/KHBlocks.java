@@ -31,6 +31,26 @@ public final class KHBlocks {
                             .sound(SoundType.CROP)
                             .pushReaction(PushReaction.DESTROY));
 
+    /** Кукуруза (двухблочная культура, сажается зёрнами). */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.CornCropBlock> CORN_CROP =
+            BLOCKS.registerBlock("corn_crop", dev.romankrukovsky.kubanhorizons.crop.CornCropBlock::new,
+                    p -> p.mapColor(MapColor.PLANT)
+                            .noCollision()
+                            .randomTicks()
+                            .instabreak()
+                            .sound(SoundType.CROP)
+                            .pushReaction(PushReaction.DESTROY));
+
+    /** Чайный куст (многолетний, многосборный). */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock> TEA_BUSH =
+            BLOCKS.registerBlock("tea_bush", dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock::new,
+                    p -> p.mapColor(MapColor.PLANT)
+                            .noCollision()
+                            .randomTicks()
+                            .strength(0.2F)
+                            .sound(SoundType.SWEET_BERRY_BUSH)
+                            .pushReaction(PushReaction.DESTROY));
+
     /** Деревянный оросительный желоб. */
     public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.irrigation.IrrigationChannelBlock> IRRIGATION_CHANNEL =
             BLOCKS.registerBlock("irrigation_channel",

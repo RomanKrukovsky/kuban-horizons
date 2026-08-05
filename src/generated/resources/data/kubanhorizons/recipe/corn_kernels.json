@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "kubanhorizons:corn_kernels",
+  "ingredients": [
+    "kubanhorizons:corn_cob"
+  ],
+  "result": {
+    "count": 2,
+    "id": "kubanhorizons:corn_kernels"
+  }
+}

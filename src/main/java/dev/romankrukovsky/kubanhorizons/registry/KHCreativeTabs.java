@@ -27,6 +27,11 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.SUNFLOWER_OIL.get());
                         output.accept(KHItems.OIL_CAKE.get());
                         output.accept(KHItems.ROASTED_SUNFLOWER_SEEDS.get());
+                        output.accept(KHItems.CORN_KERNELS.get());
+                        output.accept(KHItems.CORN_COB.get());
+                        output.accept(KHItems.GRILLED_CORN.get());
+                        output.accept(KHItems.TEA_SAPLING.get());
+                        output.accept(KHItems.TEA_LEAVES.get());
                         output.accept(KHItems.SOIL_PROBE.get());
                         output.accept(KHItems.OIL_PRESS.get());
                         output.accept(KHItems.IRRIGATION_CHANNEL.get());

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smoking",
+  "category": "food",
+  "experience": 0.2,
+  "ingredient": "kubanhorizons:corn_cob",
+  "result": {
+    "id": "kubanhorizons:grilled_corn"
+  }
+}

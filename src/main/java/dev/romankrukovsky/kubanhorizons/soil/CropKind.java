@@ -18,6 +18,8 @@ public enum CropKind {
     POTATOES((byte) 3),
     BEETROOTS((byte) 4),
     SUNFLOWER((byte) 5),
+    CORN((byte) 6),
+    TEA((byte) 7),
     OTHER((byte) 127);
 
     private final byte code;
@@ -46,6 +48,12 @@ public enum CropKind {
         }
         if (block == KHBlocks.SUNFLOWER_CROP.get()) {
             return SUNFLOWER;
+        }
+        if (block == KHBlocks.CORN_CROP.get()) {
+            return CORN;
+        }
+        if (block == KHBlocks.TEA_BUSH.get()) {
+            return TEA;
         }
         if (block instanceof CropBlock) {
             return OTHER;

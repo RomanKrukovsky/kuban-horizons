@@ -66,6 +66,8 @@ public final class KHGameTests {
         register("irrigation_channel_fills", KHGameTests::testIrrigationFills, 400);
         register("irrigation_channel_dries", KHGameTests::testIrrigationDries, 400);
         register("irrigation_hydrates_farmland", KHGameTests::testIrrigationHydratesFarmland, 400);
+        register("corn_full_growth", KHGameTests::testCornFullGrowth, 600);
+        register("tea_bush_pick_regrows", KHGameTests::testTeaBushPick, 300);
     }
 
     private KHGameTests() {
@@ -295,6 +297,52 @@ public final class KHGameTests {
                             "Слот сырья потерял содержимое при сериализации");
                     helper.assertTrue(restoredPress.getItem(OilPressBlockEntity.SLOT_BOTTLE).getCount() == 2,
                             "Слот бутылок потерял содержимое при сериализации");
+                })
+                .thenSucceed();
+    }
+
+    // --- Тесты кукурузы и чая ---
+
+    /** Кукуруза достигает зрелости с верхней половиной. */
+    private static void testCornFullGrowth(GameTestHelper helper) {
+        BlockPos cropPos = preparedFarmland(helper, new BlockPos(1, 1, 1));
+        helper.setBlock(cropPos, KHBlocks.CORN_CROP.get().defaultBlockState());
+
+        helper.onEachTick(() -> {
+            ServerLevel level = helper.getLevel();
+            BlockPos abs = helper.absolutePos(cropPos);
+            BlockState state = level.getBlockState(abs);
+            if (state.is(KHBlocks.CORN_CROP.get())
+                    && state.getValue(dev.romankrukovsky.kubanhorizons.crop.DoubleCropBlock.HALF) == DoubleBlockHalf.LOWER) {
+                state.randomTick(level, abs, level.getRandom());
+            }
+        });
+
+        helper.succeedWhen(() -> {
+            helper.assertBlockProperty(cropPos, dev.romankrukovsky.kubanhorizons.crop.DoubleCropBlock.AGE,
+                    dev.romankrukovsky.kubanhorizons.crop.CornCropBlock.MAX_AGE);
+            helper.assertBlockPresent(KHBlocks.CORN_CROP.get(), cropPos.above());
+        });
+    }
+
+    /** Сбор чайного листа ПКМ: даёт лист, куст не уничтожается (стадия 1). */
+    private static void testTeaBushPick(GameTestHelper helper) {
+        BlockPos bushPos = new BlockPos(1, 2, 1);
+        helper.setBlock(bushPos.below(), Blocks.GRASS_BLOCK);
+        helper.setBlock(bushPos, KHBlocks.TEA_BUSH.get().defaultBlockState()
+                .setValue(dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock.AGE,
+                        dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock.MAX_AGE));
+
+        helper.startSequence()
+                .thenExecute(() -> {
+                    Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+                    helper.useBlock(bushPos, player);
+                })
+                .thenExecuteAfter(5, () -> {
+                    helper.assertBlockPresent(KHBlocks.TEA_BUSH.get(), bushPos);
+                    helper.assertBlockProperty(bushPos,
+                            dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock.AGE, 1);
+                    helper.assertItemEntityPresent(KHItems.TEA_LEAVES.get(), bushPos, 2.0);
                 })
                 .thenSucceed();
     }

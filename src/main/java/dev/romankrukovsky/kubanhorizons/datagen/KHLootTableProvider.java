@@ -44,19 +44,29 @@ public final class KHLootTableProvider extends LootTableProvider {
             dropSelf(KHBlocks.IRRIGATION_CHANNEL.get());
             dropSelf(KHBlocks.WATER_INTAKE.get());
 
-            // Подсолнечник: дроп только с нижней зрелой половины —
-            // верхняя половина не дропает ничего (защита от двойного лута).
+            // Двухблочные культуры: дроп только с нижней зрелой половины —
+            // верхняя не дропает ничего (защита от двойного лута).
+            addDoubleCropDrops(KHBlocks.SUNFLOWER_CROP.get(),
+                    KHItems.SUNFLOWER_HEAD.get(), KHItems.SUNFLOWER_SEEDS.get(),
+                    SunflowerCropBlock.MAX_AGE);
+            addDoubleCropDrops(KHBlocks.CORN_CROP.get(),
+                    KHItems.CORN_COB.get(), KHItems.CORN_KERNELS.get(),
+                    dev.romankrukovsky.kubanhorizons.crop.CornCropBlock.MAX_AGE);
+
+            // Чайный куст: при разрушении — саженец (лист собирается ПКМ).
+            add(KHBlocks.TEA_BUSH.get(),
+                    createSingleItemTable(KHItems.TEA_SAPLING.get()));
+        }
+
+        private void addDoubleCropDrops(Block crop, net.minecraft.world.item.Item product,
+                net.minecraft.world.item.Item seeds, int maxAge) {
             LootItemCondition.Builder ripeLower = LootItemBlockStatePropertyCondition
-                    .hasBlockStateProperties(KHBlocks.SUNFLOWER_CROP.get())
+                    .hasBlockStateProperties(crop)
                     .setProperties(StatePropertiesPredicate.Builder.properties()
-                            .hasProperty(SunflowerCropBlock.AGE, SunflowerCropBlock.MAX_AGE)
-                            .hasProperty(SunflowerCropBlock.HALF, DoubleBlockHalf.LOWER));
-            LootTable.Builder builder = this.createCropDrops(
-                    KHBlocks.SUNFLOWER_CROP.get(),
-                    KHItems.SUNFLOWER_HEAD.get(),
-                    KHItems.SUNFLOWER_SEEDS.get(),
-                    ripeLower);
-            add(KHBlocks.SUNFLOWER_CROP.get(), builder);
+                            .hasProperty(dev.romankrukovsky.kubanhorizons.crop.DoubleCropBlock.AGE, maxAge)
+                            .hasProperty(dev.romankrukovsky.kubanhorizons.crop.DoubleCropBlock.HALF,
+                                    DoubleBlockHalf.LOWER));
+            add(crop, this.createCropDrops(crop, product, seeds, ripeLower));
         }
 
         @Override

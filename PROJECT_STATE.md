@@ -16,7 +16,7 @@
 `main` → https://github.com/RomanKrukovsky/kuban-horizons
 
 ## Последний успешный commit
-- `9a9cdef` feat: add sunflower crop lifecycle and oil press vertical slice
+- `0f5000d` feat: implement irrigation network
 
 ## Завершено
 - [x] Разведка версий: MDK-26.2-ModDevGradle, NeoForge 26.2.0.48-beta.
@@ -35,8 +35,20 @@
 - [x] GameTest: 9 тестов (registry-based по схеме 26.2) — **все проходят**.
 - [x] Звуки маслопресса: собственный синтез (tools/soundgen), 3 OGG.
 
+- [x] **Плодородие**: ChunkFertilityData (chunk attachment,
+      ValueIOSerializable, SchemaVersion), SoilFertility API (истощение/
+      севооборот/компост/ленивое восстановление), интеграция с
+      подсолнечником, почвенный щуп с сообщениями ru/en.
+- [x] **Орошение**: IrrigationChannelBlock (DISTANCE 0..12, событийная
+      волна scheduled ticks, FluidState-гидратация ванильных грядок),
+      WaterIntakeBlock (ACTIVE), ручные модели, рецепты, лут, теги.
+
 ## Выполненные тесты
-- `./gradlew build`, `runData`, `runGameTestServer` (10/10) — успех.
+- `./gradlew build`, `runData` — успех.
+- `runGameTestServer`: **16/16** (культура 5, пресс 3, плодородие 3,
+  орошение 3, реестры 1, растения/сериализация — в составе).
+- Dedicated server: чистый старт, мир создан, Done (1.2s), ошибок мода
+  нет. Клиент: старт до окна, инициализация мода видна, 0 ERROR.
 
 ## Известные ошибки
 - GitHub Actions не запускается: «account is locked due to a billing

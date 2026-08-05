@@ -24,7 +24,11 @@ public final class KHBlockTagsProvider extends BlockTagsProvider {
         tag(BlockTags.MINEABLE_WITH_AXE).add(KHBlocks.IRRIGATION_CHANNEL.getKey());
         // Водозабор добывается киркой.
         tag(BlockTags.MINEABLE_WITH_PICKAXE).add(KHBlocks.WATER_INTAKE.getKey());
-        // Подсолнечник — культура (для механик, ломающих/обходящих культуры).
-        tag(BlockTags.CROPS).add(KHBlocks.SUNFLOWER_CROP.getKey());
+        // Культуры (для механик, ломающих/обходящих культуры).
+        tag(BlockTags.CROPS)
+                .add(KHBlocks.SUNFLOWER_CROP.getKey())
+                .add(KHBlocks.CORN_CROP.getKey());
+        // Чайный куст растёт на земле, как ягодный куст.
+        tag(BlockTags.SWORD_EFFICIENT).add(KHBlocks.TEA_BUSH.getKey());
     }
 }

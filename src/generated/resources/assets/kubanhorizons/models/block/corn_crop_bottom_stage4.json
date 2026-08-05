@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "kubanhorizons:block/corn_crop_bottom_stage4"
+  }
+}

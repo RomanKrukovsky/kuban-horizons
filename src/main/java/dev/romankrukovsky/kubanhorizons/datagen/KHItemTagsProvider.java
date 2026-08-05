@@ -22,11 +22,19 @@ public final class KHItemTagsProvider extends BlockTagCopyingItemTagProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(ItemTags.VILLAGER_PLANTABLE_SEEDS).add(KHItems.SUNFLOWER_SEEDS.getKey());
-        // Куры и попугаи едят семечки как ванильные семена.
-        tag(ItemTags.CHICKEN_FOOD).add(KHItems.SUNFLOWER_SEEDS.getKey());
-        tag(ItemTags.PARROT_FOOD).add(KHItems.SUNFLOWER_SEEDS.getKey());
-        // Жмых — корм для свиней.
-        tag(ItemTags.PIG_FOOD).add(KHItems.OIL_CAKE.getKey());
+        tag(ItemTags.VILLAGER_PLANTABLE_SEEDS)
+                .add(KHItems.SUNFLOWER_SEEDS.getKey())
+                .add(KHItems.CORN_KERNELS.getKey());
+        // Куры и попугаи едят семечки и зёрна как ванильные семена.
+        tag(ItemTags.CHICKEN_FOOD)
+                .add(KHItems.SUNFLOWER_SEEDS.getKey())
+                .add(KHItems.CORN_KERNELS.getKey());
+        tag(ItemTags.PARROT_FOOD)
+                .add(KHItems.SUNFLOWER_SEEDS.getKey())
+                .add(KHItems.CORN_KERNELS.getKey());
+        // Жмых и початки — корм для свиней.
+        tag(ItemTags.PIG_FOOD)
+                .add(KHItems.OIL_CAKE.getKey())
+                .add(KHItems.CORN_COB.getKey());
     }
 }

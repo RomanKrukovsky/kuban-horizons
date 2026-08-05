@@ -1,0 +1,69 @@
+{
+  "type": "minecraft:block",
+  "functions": [
+    {
+      "function": "minecraft:explosion_decay"
+    }
+  ],
+  "pools": [
+    {
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "block": "kubanhorizons:corn_crop",
+                  "condition": "minecraft:block_state_property",
+                  "properties": {
+                    "age": "4",
+                    "half": "lower"
+                  }
+                }
+              ],
+              "name": "kubanhorizons:corn_cob"
+            },
+            {
+              "type": "minecraft:item",
+              "name": "kubanhorizons:corn_kernels"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "conditions": [
+        {
+          "block": "kubanhorizons:corn_crop",
+          "condition": "minecraft:block_state_property",
+          "properties": {
+            "age": "4",
+            "half": "lower"
+          }
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "enchantment": "minecraft:fortune",
+              "formula": "minecraft:binomial_with_bonus_count",
+              "function": "minecraft:apply_bonus",
+              "parameters": {
+                "extra": 3,
+                "probability": 0.5714286
+              }
+            }
+          ],
+          "name": "kubanhorizons:corn_kernels"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "kubanhorizons:blocks/corn_crop"
+}
