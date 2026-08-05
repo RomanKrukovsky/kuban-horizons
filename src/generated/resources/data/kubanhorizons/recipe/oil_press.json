@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "minecraft:piston",
+    "I": "minecraft:iron_ingot",
+    "L": "#minecraft:logs",
+    "P": "#minecraft:planks"
+  },
+  "pattern": [
+    "LIL",
+    "P#P",
+    "PPP"
+  ],
+  "result": {
+    "id": "kubanhorizons:oil_press"
+  }
+}

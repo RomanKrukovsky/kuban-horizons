@@ -1,0 +1,11 @@
+{
+  "type": "kubanhorizons:oil_pressing",
+  "byproduct": {
+    "id": "kubanhorizons:oil_cake"
+  },
+  "ingredient": "kubanhorizons:sunflower_seeds",
+  "ingredient_count": 8,
+  "result": {
+    "id": "kubanhorizons:sunflower_oil"
+  }
+}

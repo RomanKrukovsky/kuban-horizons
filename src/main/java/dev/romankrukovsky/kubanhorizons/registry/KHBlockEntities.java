@@ -1,0 +1,28 @@
+package dev.romankrukovsky.kubanhorizons.registry;
+
+import dev.romankrukovsky.kubanhorizons.KubanHorizons;
+import dev.romankrukovsky.kubanhorizons.blockentity.OilPressBlockEntity;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+/**
+ * Регистрация block entities мода.
+ */
+public final class KHBlockEntities {
+    private static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
+            DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, KubanHorizons.MOD_ID);
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<OilPressBlockEntity>> OIL_PRESS =
+            BLOCK_ENTITIES.register("oil_press",
+                    () -> new BlockEntityType<>(OilPressBlockEntity::new, KHBlocks.OIL_PRESS.get()));
+
+    private KHBlockEntities() {
+    }
+
+    public static void register(IEventBus modEventBus) {
+        BLOCK_ENTITIES.register(modEventBus);
+    }
+}

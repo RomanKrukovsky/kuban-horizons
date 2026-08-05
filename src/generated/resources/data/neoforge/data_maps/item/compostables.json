@@ -1,0 +1,13 @@
+{
+  "values": {
+    "kubanhorizons:oil_cake": {
+      "chance": 0.5
+    },
+    "kubanhorizons:sunflower_head": {
+      "chance": 0.65
+    },
+    "kubanhorizons:sunflower_seeds": {
+      "chance": 0.3
+    }
+  }
+}

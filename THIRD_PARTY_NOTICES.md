@@ -18,8 +18,18 @@ Minecraft принадлежит Mojang AB / Microsoft. Проект не рас
 
 ## Звуки
 
-Пока не добавлено. Каждый звук будет записан здесь с указанием: файл,
-источник, автор, лицензия, изменения.
+Каждый звук записывается здесь с указанием: файл, источник, автор,
+лицензия, изменения.
+
+| Файл | Источник | Лицензия |
+|------|----------|----------|
+| `assets/kubanhorizons/sounds/block/oil_press/creak.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/block/oil_press/work.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/block/oil_press/finish.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+
+Звуки маслопресса сгенерированы детерминированным скриптом
+`tools/soundgen/generate_press_sounds.py` (Python 3 + numpy, без сторонних
+сэмплов); кодирование в OGG Vorbis — python-модуль `soundfile` (libsndfile).
 
 ## Текстуры и модели
 

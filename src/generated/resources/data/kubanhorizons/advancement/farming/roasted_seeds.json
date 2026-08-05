@@ -1,0 +1,32 @@
+{
+  "parent": "kubanhorizons:farming/sunflower_seeds",
+  "criteria": {
+    "has_roasted": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:roasted_sunflower_seeds"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.roasted_seeds.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:roasted_sunflower_seeds"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.roasted_seeds.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_roasted"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

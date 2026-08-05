@@ -1,0 +1,20 @@
+{
+  "block_oil_press_creak": {
+    "sounds": [
+      "kubanhorizons:block/oil_press/creak"
+    ],
+    "subtitle": "subtitles.kubanhorizons.oil_press.creak"
+  },
+  "block_oil_press_finish": {
+    "sounds": [
+      "kubanhorizons:block/oil_press/finish"
+    ],
+    "subtitle": "subtitles.kubanhorizons.oil_press.finish"
+  },
+  "block_oil_press_work": {
+    "sounds": [
+      "kubanhorizons:block/oil_press/work"
+    ],
+    "subtitle": "subtitles.kubanhorizons.oil_press.work"
+  }
+}

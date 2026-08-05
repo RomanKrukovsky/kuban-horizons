@@ -1,0 +1,33 @@
+{
+  "parent": "kubanhorizons:farming/sunflower_head",
+  "criteria": {
+    "has_oil": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:sunflower_oil"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.sunflower_oil.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "kubanhorizons:sunflower_oil"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.sunflower_oil.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_oil"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

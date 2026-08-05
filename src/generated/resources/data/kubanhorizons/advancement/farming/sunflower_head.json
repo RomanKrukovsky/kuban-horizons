@@ -1,0 +1,32 @@
+{
+  "parent": "kubanhorizons:farming/sunflower_seeds",
+  "criteria": {
+    "has_head": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:sunflower_head"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.sunflower_head.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:sunflower_head"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.sunflower_head.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_head"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

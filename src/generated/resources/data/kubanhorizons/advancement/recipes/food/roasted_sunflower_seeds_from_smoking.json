@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_sunflower_seeds": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:sunflower_seeds"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "kubanhorizons:roasted_sunflower_seeds_from_smoking"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_sunflower_seeds"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "kubanhorizons:roasted_sunflower_seeds_from_smoking"
+    ]
+  }
+}

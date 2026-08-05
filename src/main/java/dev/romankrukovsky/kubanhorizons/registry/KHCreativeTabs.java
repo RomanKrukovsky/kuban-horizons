@@ -1,0 +1,40 @@
+package dev.romankrukovsky.kubanhorizons.registry;
+
+import dev.romankrukovsky.kubanhorizons.KubanHorizons;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+/**
+ * Вкладка творческого режима «Кубанские горизонты».
+ */
+public final class KHCreativeTabs {
+    private static final DeferredRegister<CreativeModeTab> TABS =
+            DeferredRegister.create(Registries.CREATIVE_MODE_TAB, KubanHorizons.MOD_ID);
+
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN =
+            TABS.register("main", () -> CreativeModeTab.builder()
+                    .title(Component.translatable("itemGroup.kubanhorizons"))
+                    .withTabsBefore(CreativeModeTabs.SPAWN_EGGS.identifier())
+                    .icon(() -> KHItems.SUNFLOWER_SEEDS.get().getDefaultInstance())
+                    .displayItems((parameters, output) -> {
+                        output.accept(KHItems.SUNFLOWER_SEEDS.get());
+                        output.accept(KHItems.SUNFLOWER_HEAD.get());
+                        output.accept(KHItems.SUNFLOWER_OIL.get());
+                        output.accept(KHItems.OIL_CAKE.get());
+                        output.accept(KHItems.ROASTED_SUNFLOWER_SEEDS.get());
+                        output.accept(KHItems.OIL_PRESS.get());
+                    })
+                    .build());
+
+    private KHCreativeTabs() {
+    }
+
+    public static void register(IEventBus modEventBus) {
+        TABS.register(modEventBus);
+    }
+}

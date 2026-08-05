@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "kubanhorizons:block/sunflower_crop_stage1"
+  }
+}

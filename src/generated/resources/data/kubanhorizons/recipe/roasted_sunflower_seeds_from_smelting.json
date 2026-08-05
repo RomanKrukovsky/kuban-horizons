@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "experience": 0.15,
+  "ingredient": "kubanhorizons:sunflower_seeds",
+  "result": {
+    "id": "kubanhorizons:roasted_sunflower_seeds"
+  }
+}

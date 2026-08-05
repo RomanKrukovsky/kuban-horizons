@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "bottom": "kubanhorizons:block/oil_press_bottom",
+    "front": "kubanhorizons:block/oil_press_front",
+    "side": "kubanhorizons:block/oil_press_side",
+    "top": "kubanhorizons:block/oil_press_top"
+  }
+}

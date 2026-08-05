@@ -1,9 +1,18 @@
 package dev.romankrukovsky.kubanhorizons;
 
 import com.mojang.logging.LogUtils;
+import dev.romankrukovsky.kubanhorizons.config.KHServerConfig;
+import dev.romankrukovsky.kubanhorizons.registry.KHBlockEntities;
+import dev.romankrukovsky.kubanhorizons.registry.KHBlocks;
+import dev.romankrukovsky.kubanhorizons.registry.KHCreativeTabs;
+import dev.romankrukovsky.kubanhorizons.registry.KHItems;
+import dev.romankrukovsky.kubanhorizons.registry.KHMenus;
+import dev.romankrukovsky.kubanhorizons.registry.KHRecipes;
+import dev.romankrukovsky.kubanhorizons.registry.KHSounds;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
 
 /**
@@ -19,5 +28,16 @@ public final class KubanHorizons {
 
     public KubanHorizons(IEventBus modEventBus, ModContainer modContainer) {
         LOGGER.info("Кубанские горизонты: инициализация ({}).", MOD_ID);
+
+        KHBlocks.register(modEventBus);
+        KHItems.register(modEventBus);
+        KHBlockEntities.register(modEventBus);
+        KHMenus.register(modEventBus);
+        KHRecipes.register(modEventBus);
+        KHSounds.register(modEventBus);
+        KHCreativeTabs.register(modEventBus);
+        dev.romankrukovsky.kubanhorizons.gametest.KHGameTests.register(modEventBus);
+
+        modContainer.registerConfig(ModConfig.Type.SERVER, KHServerConfig.SPEC);
     }
 }

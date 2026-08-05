@@ -1,0 +1,32 @@
+{
+  "parent": "kubanhorizons:root",
+  "criteria": {
+    "has_seeds": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:sunflower_seeds"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.sunflower_seeds.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:sunflower_seeds"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.sunflower_seeds.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_seeds"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
