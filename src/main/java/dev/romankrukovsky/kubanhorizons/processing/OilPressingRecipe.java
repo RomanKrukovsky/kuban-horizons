@@ -96,8 +96,9 @@ public record OilPressingRecipe(
 
     @Override
     public PlacementInfo placementInfo() {
-        // Раскладка через recipe book не поддерживается: нестандартный станок.
-        return PlacementInfo.NOT_PLACEABLE;
+        // Полноценный PlacementInfo нужен, чтобы RecipeManager не считал
+        // рецепт «пустым» (ванильное предупреждение при загрузке).
+        return PlacementInfo.create(this.input);
     }
 
     @Override

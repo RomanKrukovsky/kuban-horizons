@@ -13,34 +13,47 @@
   (`JAVA_HOME=... ./gradlew ...`); toolchain 25 качается foojay-resolver.
 
 ## Активная ветка
-`main` (репозиторий локальный; GitHub — в плане этапа 1)
+`main` → https://github.com/RomanKrukovsky/kuban-horizons
 
 ## Последний успешный commit
-- (заполняется при коммите)
+- `9a9cdef` feat: add sunflower crop lifecycle and oil press vertical slice
 
 ## Завершено
 - [x] Разведка версий: MDK-26.2-ModDevGradle, NeoForge 26.2.0.48-beta.
-- [x] Каркас проекта: build.gradle, settings, gradle.properties, wrapper.
-- [x] `./gradlew build` — **BUILD SUCCESSFUL** (первая сборка ~5 мин).
-- [x] Главный класс `KubanHorizons`, mods.toml, lang-каркас ru/en.
-- [x] Документация: README, ARCHITECTURE, AGENTS, GAME_DESIGN,
-      CONTENT_BIBLE, ART_BIBLE, TECH_SPEC, TEST_PLAN, ROADMAP, CHANGELOG,
-      CONTRIBUTING, LICENSE, LICENSE-ASSETS, THIRD_PARTY_NOTICES.
+- [x] Каркас проекта; `./gradlew build` — успех; GitHub-репозиторий + CI.
+- [x] Документация (полный набор) + шпаргалки API 26.2 в docs/dev/api-notes.
+- [x] Модульные регистрации: KHBlocks/KHItems/KHBlockEntities/KHMenus/
+      KHRecipes/KHSounds/KHCreativeTabs/KHFoods.
+- [x] Конфиг: KHServerConfig (SERVER), KHClientConfig (CLIENT), валидация.
+- [x] **Вертикальный контур (код)**: SunflowerCropBlock (двухблочная
+      культура AGE 0–4), OilPressBlockEntity (4 слота, ручной+пассивный
+      режим, анти-дюп, SchemaVersion), OilPressingRecipe (свой тип),
+      OilPressMenu + OilPressScreen (26.2 GuiGraphicsExtractor).
+- [x] Datagen: модели/blockstates, рецепты (вкл. кастомный тип), loot,
+      теги, ru+en из единого KHTranslations, достижения (ветка
+      подсолнечника), sounds.json, компост data maps. 49 файлов.
+- [x] GameTest: 9 тестов (registry-based по схеме 26.2) — **все проходят**.
+- [x] Звуки маслопресса: собственный синтез (tools/soundgen), 3 OGG.
 
 ## Выполненные тесты
-- `./gradlew build` — успех (без исходников тестов пока).
+- `./gradlew build`, `runData`, `runGameTestServer` (10/10) — успех.
 
 ## Известные ошибки
-- Нет.
+- Нет известных.
 
-## Незавершённые изменения
-- Первый коммит ещё не создан (следующее действие).
+## Незавершённые изменения / в работе
+- Текстуры цепочки подсолнечника: фоновый агент генерирует
+  (tools/texgen + assets/…/textures). До их появления модели ссылаются
+  на отсутствующие текстуры — клиент покажет missing texture.
+- GUI-текстура oil_press.png — тем же агентом.
+- Проверка запуска dedicated server и клиента — в процессе.
 
 ## Следующий конкретный шаг
-1. `git add -A && git commit` — первый чистый коммит каркаса.
-2. Инфраструктура: registry-классы, конфиг, datagen, GameTest, CI
-   (задача #4 в списке задач сессии).
-3. Вертикальный контур подсолнечника (задача #5).
+1. Дождаться текстур, проверить их качество, закоммитить.
+2. `runServer` (eula=true уже в run/) — проверить чистый старт без
+   client-классов; затем `runClient` — smoke.
+3. Обновить CHANGELOG; пометить этап 2 в ROADMAP как завершённый.
+4. Этап 3: плодородие (ChunkFertilityData attachment) и орошение.
 
 ## Команды для продолжения
 ```bash
