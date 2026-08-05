@@ -16,9 +16,9 @@ sourceSets.main.resources {
     // Ресурсы, созданные datagen
     srcDir('src/generated/resources')
 
-    // Исходники Blockbench не попадают в JAR
+    // Исходники Blockbench и кэш datagen не попадают в JAR
     exclude("**/*.bbmodel")
-    exclude("src/generated/**/.cache")
+    exclude(".cache/**")
 }
 
 repositories {

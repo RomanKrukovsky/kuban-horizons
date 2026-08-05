@@ -16,7 +16,7 @@
 `main` → https://github.com/RomanKrukovsky/kuban-horizons
 
 ## Последний успешный commit
-- `0f44401` feat: add fruit trees and oil presser villager profession
+- `8accaae` feat: add complete deterministic pixel-art texture set
 
 ## Завершено
 - [x] Разведка версий: MDK-26.2-ModDevGradle, NeoForge 26.2.0.48-beta.
@@ -62,8 +62,11 @@
       modifiers (чай в джунглях, томат на равнинах, виноград в саваннах).
 - [x] **Профессия «маслодел»**: POI = маслопресс, data-driven сделки
       2 уровней (datapack-реестры villager_trade/trade_set).
-- [🔨] **Текстуры** цепочки подсолнечника — фоновый агент (затянулось;
-      при возобновлении сессии проверить tools/texgen и textures/).
+- [x] **Текстуры**: полный набор 84 PNG (tools/texgen, детерминированная
+      генерация по палитре ART_BIBLE): все стадии культур, маслопресс,
+      орошение, листва деревьев, предметы, GUI пресса. Клиентский атлас
+      собирается без missing textures.
+- [x] Чистый JAR: kubanhorizons-0.1.0.jar (без .cache и bbmodel).
 
 ## Выполненные тесты
 - `./gradlew build`, `runData` — успех.
@@ -87,11 +90,12 @@
 - Проверка запуска dedicated server и клиента — в процессе.
 
 ## Следующий конкретный шаг
-1. Дождаться текстур, проверить их качество, закоммитить.
-2. `runServer` (eula=true уже в run/) — проверить чистый старт без
-   client-классов; затем `runClient` — smoke.
-3. Обновить CHANGELOG; пометить этап 2 в ROADMAP как завершённый.
-4. Этап 3: плодородие (ChunkFertilityData attachment) и орошение.
+1. Этап 4: мельница (ручная/механическая) + сушилка — цепочки муки,
+   сушёного чая и сушёных фруктов (образец: OilPressBlockEntity).
+2. Достижения: расширить ветки (рис, виноград, чай, сад).
+3. Этап 5: биом «кубанская степь» (первый собственный биом).
+4. Путеводитель по Кубани (книга-руководство).
+5. Полный smoke на dedicated server + 2 клиента.
 
 ## Команды для продолжения
 ```bash
