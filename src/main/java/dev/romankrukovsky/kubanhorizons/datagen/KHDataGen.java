@@ -13,8 +13,19 @@ public final class KHDataGen {
     private KHDataGen() {
     }
 
+    /** Datapack-реестры worldgen (регистрируются первыми — см. api-notes). */
+    private static final net.minecraft.core.RegistrySetBuilder WORLDGEN_BUILDER =
+            new net.minecraft.core.RegistrySetBuilder()
+                    .add(net.minecraft.core.registries.Registries.CONFIGURED_FEATURE,
+                            dev.romankrukovsky.kubanhorizons.worldgen.KHConfiguredFeatures::bootstrap)
+                    .add(net.minecraft.core.registries.Registries.PLACED_FEATURE,
+                            dev.romankrukovsky.kubanhorizons.worldgen.KHPlacedFeatures::bootstrap)
+                    .add(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS,
+                            dev.romankrukovsky.kubanhorizons.worldgen.KHBiomeModifiers::bootstrap);
+
     @SubscribeEvent
     static void onGatherData(GatherDataEvent.Client event) {
+        event.createDatapackRegistryObjects(WORLDGEN_BUILDER);
         event.createBlockAndItemTags(KHBlockTagsProvider::new, KHItemTagsProvider::new);
         event.createProvider(KHModelProvider::new);
         event.createProvider(KHRecipeProvider.Runner::new);

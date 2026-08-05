@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": [
+    "minecraft:plains",
+    "minecraft:sunflower_plains",
+    "minecraft:savanna"
+  ],
+  "features": "kubanhorizons:wild_tomato",
+  "step": "vegetal_decoration"
+}
