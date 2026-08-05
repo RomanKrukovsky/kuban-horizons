@@ -1,0 +1,12 @@
+{
+  "type": "kubanhorizons:add_item_chance",
+  "chance": 0.25,
+  "conditions": [
+    {
+      "condition": "neoforge:loot_table_id",
+      "loot_table_id": "minecraft:blocks/azalea"
+    }
+  ],
+  "item": "kubanhorizons:tea_sapling",
+  "priority": 0
+}

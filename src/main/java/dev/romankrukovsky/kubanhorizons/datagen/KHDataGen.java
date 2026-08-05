@@ -24,5 +24,6 @@ public final class KHDataGen {
         event.createProvider(KHAdvancementProvider::new);
         event.createProvider(KHSoundDefinitionsProvider::new);
         event.createProvider(KHDataMapProvider::new);
+        event.createProvider(KHLootModifierProvider::new);
     }
 }

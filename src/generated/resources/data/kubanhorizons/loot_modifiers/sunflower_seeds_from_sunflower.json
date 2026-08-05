@@ -1,0 +1,13 @@
+{
+  "type": "kubanhorizons:add_item_chance",
+  "chance": 1.0,
+  "conditions": [
+    {
+      "condition": "neoforge:loot_table_id",
+      "loot_table_id": "minecraft:blocks/sunflower"
+    }
+  ],
+  "count": 2,
+  "item": "kubanhorizons:sunflower_seeds",
+  "priority": 0
+}
