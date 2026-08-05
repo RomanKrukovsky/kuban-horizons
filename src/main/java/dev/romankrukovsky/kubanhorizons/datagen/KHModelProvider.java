@@ -51,6 +51,20 @@ public final class KHModelProvider extends ModelProvider {
                 dev.romankrukovsky.kubanhorizons.crop.TomatoBushBlock.MAX_AGE,
                 dev.romankrukovsky.kubanhorizons.crop.TomatoBushBlock.AGE);
 
+        // Плодовые деревья: листва по стадиям + саженцы.
+        registerFruitLeaves(blockModels, KHBlocks.PEACH_LEAVES.get());
+        registerFruitLeaves(blockModels, KHBlocks.APRICOT_LEAVES.get());
+        registerFruitLeaves(blockModels, KHBlocks.PLUM_LEAVES.get());
+        registerFruitLeaves(blockModels, KHBlocks.WALNUT_LEAVES.get());
+        blockModels.createCrossBlockWithDefaultItem(KHBlocks.PEACH_SAPLING.get(),
+                BlockModelGenerators.PlantType.NOT_TINTED);
+        blockModels.createCrossBlockWithDefaultItem(KHBlocks.APRICOT_SAPLING.get(),
+                BlockModelGenerators.PlantType.NOT_TINTED);
+        blockModels.createCrossBlockWithDefaultItem(KHBlocks.PLUM_SAPLING.get(),
+                BlockModelGenerators.PlantType.NOT_TINTED);
+        blockModels.createCrossBlockWithDefaultItem(KHBlocks.WALNUT_SAPLING.get(),
+                BlockModelGenerators.PlantType.NOT_TINTED);
+
         // Маслопресс: ориентируемый куб с уникальными текстурами.
         blockModels.createHorizontallyRotatedBlock(KHBlocks.OIL_PRESS.get(), TexturedModel.ORIENTABLE);
 
@@ -76,6 +90,26 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.GRAPES.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.TOMATO_SEEDS.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.TOMATO.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.PEACH.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.APRICOT.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.PLUM.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.WALNUT.get(), ModelTemplates.FLAT_ITEM);
+    }
+
+    /**
+     * Плодовая листва: кубическая leaves-модель на каждую стадию
+     * {@code AGE} (_stage0 — листва, _stage1 — цветение, _stage2 — плоды).
+     */
+    private void registerFruitLeaves(BlockModelGenerators blockModels, Block leaves) {
+        Identifier[] models = new Identifier[dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock.MAX_AGE + 1];
+        for (int age = 0; age <= dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock.MAX_AGE; age++) {
+            models[age] = ModelTemplates.LEAVES.createWithSuffix(leaves, "_stage" + age,
+                    TextureMapping.cube(TextureMapping.getBlockTexture(leaves, "_stage" + age)),
+                    blockModels.modelOutput);
+        }
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(leaves)
+                .with(PropertyDispatch.initial(dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock.AGE)
+                        .generate(age -> plainVariant(models[age]))));
     }
 
     /**

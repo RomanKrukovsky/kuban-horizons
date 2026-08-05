@@ -1,0 +1,7 @@
+{
+  "amount": 2.0,
+  "trades": [
+    "kubanhorizons:oil_presser/emerald_to_oil",
+    "kubanhorizons:oil_presser/oil_cake_to_emerald"
+  ]
+}

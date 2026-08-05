@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "kubanhorizons:block/peach_leaves_stage1"
+  }
+}

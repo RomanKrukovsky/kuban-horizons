@@ -36,6 +36,14 @@ final class KHTranslations {
         add("block.kubanhorizons.rice_crop", "Rice", "Рис");
         add("block.kubanhorizons.grape_trellis", "Grape Trellis", "Виноградная шпалера");
         add("block.kubanhorizons.tomato_bush", "Tomato Bush", "Томатный куст");
+        add("block.kubanhorizons.peach_leaves", "Peach Leaves", "Персиковая листва");
+        add("block.kubanhorizons.apricot_leaves", "Apricot Leaves", "Абрикосовая листва");
+        add("block.kubanhorizons.plum_leaves", "Plum Leaves", "Сливовая листва");
+        add("block.kubanhorizons.walnut_leaves", "Walnut Leaves", "Листва грецкого ореха");
+        add("block.kubanhorizons.peach_sapling", "Peach Sapling", "Саженец персика");
+        add("block.kubanhorizons.apricot_sapling", "Apricot Sapling", "Саженец абрикоса");
+        add("block.kubanhorizons.plum_sapling", "Plum Sapling", "Саженец сливы");
+        add("block.kubanhorizons.walnut_sapling", "Walnut Sapling", "Саженец грецкого ореха");
 
         // --- Предметы ---
         add("item.kubanhorizons.sunflower_seeds", "Sunflower Seeds", "Семечки подсолнечника");
@@ -57,6 +65,14 @@ final class KHTranslations {
         add("item.kubanhorizons.grapes", "Grapes", "Виноград");
         add("item.kubanhorizons.tomato_seeds", "Tomato Seeds", "Семена томата");
         add("item.kubanhorizons.tomato", "Tomato", "Томат");
+        add("item.kubanhorizons.peach_sapling", "Peach Sapling", "Саженец персика");
+        add("item.kubanhorizons.apricot_sapling", "Apricot Sapling", "Саженец абрикоса");
+        add("item.kubanhorizons.plum_sapling", "Plum Sapling", "Саженец сливы");
+        add("item.kubanhorizons.walnut_sapling", "Walnut Sapling", "Саженец грецкого ореха");
+        add("item.kubanhorizons.peach", "Peach", "Персик");
+        add("item.kubanhorizons.apricot", "Apricot", "Абрикос");
+        add("item.kubanhorizons.plum", "Plum", "Слива");
+        add("item.kubanhorizons.walnut", "Walnut", "Грецкий орех");
 
         // --- Сообщения ---
         add("message.kubanhorizons.soil_probe.result",
@@ -71,6 +87,9 @@ final class KHTranslations {
         add("message.kubanhorizons.soil_probe.advice",
                 "Tip: compost the soil or rotate crops to restore fertility",
                 "Совет: внесите компост или смените культуру, чтобы восстановить плодородие");
+
+        // --- Профессии ---
+        add("entity.minecraft.villager.kubanhorizons.oil_presser", "Oil Presser", "Маслодел");
 
         // --- Контейнеры ---
         add("container.kubanhorizons.oil_press", "Oil Press", "Маслопресс");

@@ -107,6 +107,88 @@ public final class KHBlocks {
                             .sound(SoundType.WOOD)
                             .noOcclusion());
 
+    // --- Плодовые деревья ---
+
+    /** Персиковая листва (цветёт и плодоносит). */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock> PEACH_LEAVES =
+            BLOCKS.registerBlock("peach_leaves",
+                    p -> new dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock(
+                            () -> KHItems.PEACH.get(), p),
+                    fruitLeavesProperties());
+
+    /** Абрикосовая листва. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock> APRICOT_LEAVES =
+            BLOCKS.registerBlock("apricot_leaves",
+                    p -> new dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock(
+                            () -> KHItems.APRICOT.get(), p),
+                    fruitLeavesProperties());
+
+    /** Сливовая листва. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock> PLUM_LEAVES =
+            BLOCKS.registerBlock("plum_leaves",
+                    p -> new dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock(
+                            () -> KHItems.PLUM.get(), p),
+                    fruitLeavesProperties());
+
+    /** Листва грецкого ореха. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock> WALNUT_LEAVES =
+            BLOCKS.registerBlock("walnut_leaves",
+                    p -> new dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock(
+                            () -> KHItems.WALNUT.get(), p),
+                    fruitLeavesProperties());
+
+    /** Саженец персика. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.FruitSaplingBlock> PEACH_SAPLING =
+            BLOCKS.registerBlock("peach_sapling",
+                    p -> new dev.romankrukovsky.kubanhorizons.crop.FruitSaplingBlock(
+                            () -> PEACH_LEAVES.get(), p),
+                    fruitSaplingProperties());
+
+    /** Саженец абрикоса. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.FruitSaplingBlock> APRICOT_SAPLING =
+            BLOCKS.registerBlock("apricot_sapling",
+                    p -> new dev.romankrukovsky.kubanhorizons.crop.FruitSaplingBlock(
+                            () -> APRICOT_LEAVES.get(), p),
+                    fruitSaplingProperties());
+
+    /** Саженец сливы. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.FruitSaplingBlock> PLUM_SAPLING =
+            BLOCKS.registerBlock("plum_sapling",
+                    p -> new dev.romankrukovsky.kubanhorizons.crop.FruitSaplingBlock(
+                            () -> PLUM_LEAVES.get(), p),
+                    fruitSaplingProperties());
+
+    /** Саженец грецкого ореха. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.FruitSaplingBlock> WALNUT_SAPLING =
+            BLOCKS.registerBlock("walnut_sapling",
+                    p -> new dev.romankrukovsky.kubanhorizons.crop.FruitSaplingBlock(
+                            () -> WALNUT_LEAVES.get(), p),
+                    fruitSaplingProperties());
+
+    /** Свойства плодовой листвы — по образцу ванильной вишни. */
+    private static java.util.function.UnaryOperator<BlockBehaviour.Properties> fruitLeavesProperties() {
+        return p -> p.mapColor(MapColor.PLANT)
+                .strength(0.2F)
+                .randomTicks()
+                .sound(SoundType.GRASS)
+                .noOcclusion()
+                .isSuffocating((state, level, pos) -> false)
+                .isViewBlocking((state, level, pos) -> false)
+                .ignitedByLava()
+                .pushReaction(PushReaction.DESTROY)
+                .isRedstoneConductor((state, level, pos) -> false);
+    }
+
+    /** Свойства саженца — по образцу ванильных саженцев. */
+    private static java.util.function.UnaryOperator<BlockBehaviour.Properties> fruitSaplingProperties() {
+        return p -> p.mapColor(MapColor.PLANT)
+                .noCollision()
+                .randomTicks()
+                .instabreak()
+                .sound(SoundType.GRASS)
+                .pushReaction(PushReaction.DESTROY);
+    }
+
     private KHBlocks() {
     }
 

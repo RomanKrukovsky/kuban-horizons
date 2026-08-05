@@ -1,5 +1,11 @@
 {
   "values": {
+    "kubanhorizons:apricot": {
+      "chance": 0.65
+    },
+    "kubanhorizons:apricot_sapling": {
+      "chance": 0.3
+    },
     "kubanhorizons:corn_cob": {
       "chance": 0.5
     },
@@ -14,6 +20,18 @@
     },
     "kubanhorizons:oil_cake": {
       "chance": 0.5
+    },
+    "kubanhorizons:peach": {
+      "chance": 0.65
+    },
+    "kubanhorizons:peach_sapling": {
+      "chance": 0.3
+    },
+    "kubanhorizons:plum": {
+      "chance": 0.65
+    },
+    "kubanhorizons:plum_sapling": {
+      "chance": 0.3
     },
     "kubanhorizons:rice": {
       "chance": 0.3
@@ -40,6 +58,12 @@
       "chance": 0.5
     },
     "kubanhorizons:tomato_seeds": {
+      "chance": 0.3
+    },
+    "kubanhorizons:walnut": {
+      "chance": 0.65
+    },
+    "kubanhorizons:walnut_sapling": {
       "chance": 0.3
     }
   }

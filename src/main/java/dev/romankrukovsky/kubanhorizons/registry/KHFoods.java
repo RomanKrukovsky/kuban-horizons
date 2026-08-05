@@ -54,6 +54,30 @@ public final class KHFoods {
             .saturationModifier(0.55F)
             .build();
 
+    /** Персик: сочный фрукт. */
+    public static final FoodProperties PEACH = new FoodProperties.Builder()
+            .nutrition(4)
+            .saturationModifier(0.4F)
+            .build();
+
+    /** Абрикос. */
+    public static final FoodProperties APRICOT = new FoodProperties.Builder()
+            .nutrition(4)
+            .saturationModifier(0.4F)
+            .build();
+
+    /** Слива. */
+    public static final FoodProperties PLUM = new FoodProperties.Builder()
+            .nutrition(4)
+            .saturationModifier(0.4F)
+            .build();
+
+    /** Грецкий орех: калорийный перекус. */
+    public static final FoodProperties WALNUT = new FoodProperties.Builder()
+            .nutrition(2)
+            .saturationModifier(0.3F)
+            .build();
+
     private KHFoods() {
     }
 }

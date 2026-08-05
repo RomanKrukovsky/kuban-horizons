@@ -39,6 +39,7 @@ public final class KubanHorizons {
         KHCreativeTabs.register(modEventBus);
         KHAttachments.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.registry.KHLootModifiers.register(modEventBus);
+        dev.romankrukovsky.kubanhorizons.trade.KHProfessions.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.gametest.KHGameTests.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.SERVER, KHServerConfig.SPEC);

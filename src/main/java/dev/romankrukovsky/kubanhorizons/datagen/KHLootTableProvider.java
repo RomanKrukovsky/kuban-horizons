@@ -77,6 +77,13 @@ public final class KHLootTableProvider extends LootTableProvider {
                                     .add(net.minecraft.world.level.storage.loot.entries.LootItem
                                             .lootTableItem(KHItems.GRAPE_CUTTING.get())))));
 
+            // Плодовые деревья: листва — как ванильная (шанс саженца),
+            // саженцы — сами себя.
+            addFruitTree(KHBlocks.PEACH_LEAVES.get(), KHBlocks.PEACH_SAPLING.get());
+            addFruitTree(KHBlocks.APRICOT_LEAVES.get(), KHBlocks.APRICOT_SAPLING.get());
+            addFruitTree(KHBlocks.PLUM_LEAVES.get(), KHBlocks.PLUM_SAPLING.get());
+            addFruitTree(KHBlocks.WALNUT_LEAVES.get(), KHBlocks.WALNUT_SAPLING.get());
+
             // Рис: зрелый — метёлки + рассада; незрелый — рассада.
             LootItemCondition.Builder ripeRice = LootItemBlockStatePropertyCondition
                     .hasBlockStateProperties(KHBlocks.RICE_CROP.get())
@@ -88,6 +95,38 @@ public final class KHLootTableProvider extends LootTableProvider {
                     KHItems.RICE_PANICLE.get(),
                     KHItems.RICE_SEEDLINGS.get(),
                     ripeRice));
+        }
+
+        /**
+         * Листва без блок-предмета: {@code createLeavesDrops} не подходит
+         * (он дропает саму листву при shears/silk touch, а её предмет — air).
+         * Дроп: шанс саженца + палки, как у ванильной листвы без инструмента.
+         */
+        private void addFruitTree(Block leaves, Block sapling) {
+            var enchantments = this.registries.lookupOrThrow(
+                    net.minecraft.core.registries.Registries.ENCHANTMENT);
+            var fortune = enchantments.getOrThrow(
+                    net.minecraft.world.item.enchantment.Enchantments.FORTUNE);
+
+            var saplingEntry = ((net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer.Builder<?>)
+                    this.applyExplosionCondition(leaves,
+                            net.minecraft.world.level.storage.loot.entries.LootItem.lootTableItem(sapling)))
+                    .when(net.minecraft.world.level.storage.loot.predicates.BonusLevelTableCondition
+                            .bonusLevelFlatChance(fortune, NORMAL_LEAVES_SAPLING_CHANCES));
+            var stickEntry = ((net.minecraft.world.level.storage.loot.entries.LootPoolSingletonContainer.Builder<?>)
+                    this.applyExplosionDecay(leaves,
+                            net.minecraft.world.level.storage.loot.entries.LootItem
+                                    .lootTableItem(net.minecraft.world.item.Items.STICK)
+                                    .apply(net.minecraft.world.level.storage.loot.functions.SetItemCountFunction
+                                            .setCount(net.minecraft.world.level.storage.loot.providers.number.UniformGenerator
+                                                    .between(1.0F, 2.0F)))))
+                    .when(net.minecraft.world.level.storage.loot.predicates.BonusLevelTableCondition
+                            .bonusLevelFlatChance(fortune, 0.02F, 0.022222223F, 0.025F, 0.033333335F, 0.1F));
+
+            add(leaves, LootTable.lootTable()
+                    .withPool(net.minecraft.world.level.storage.loot.LootPool.lootPool().add(saplingEntry))
+                    .withPool(net.minecraft.world.level.storage.loot.LootPool.lootPool().add(stickEntry)));
+            dropSelf(sapling);
         }
 
         private void addDoubleCropDrops(Block crop, net.minecraft.world.item.Item product,

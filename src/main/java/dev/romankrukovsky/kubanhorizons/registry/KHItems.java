@@ -126,6 +126,52 @@ public final class KHItems {
     public static final DeferredItem<Item> TEA_LEAVES =
             ITEMS.registerSimpleItem("tea_leaves");
 
+    // --- Плодовые деревья ---
+
+    /** Саженец персика. */
+    public static final DeferredItem<Item> PEACH_SAPLING =
+            ITEMS.registerItem("peach_sapling",
+                    p -> new BlockItem(KHBlocks.PEACH_SAPLING.get(), p),
+                    p -> p.useItemDescriptionPrefix());
+
+    /** Саженец абрикоса. */
+    public static final DeferredItem<Item> APRICOT_SAPLING =
+            ITEMS.registerItem("apricot_sapling",
+                    p -> new BlockItem(KHBlocks.APRICOT_SAPLING.get(), p),
+                    p -> p.useItemDescriptionPrefix());
+
+    /** Саженец сливы. */
+    public static final DeferredItem<Item> PLUM_SAPLING =
+            ITEMS.registerItem("plum_sapling",
+                    p -> new BlockItem(KHBlocks.PLUM_SAPLING.get(), p),
+                    p -> p.useItemDescriptionPrefix());
+
+    /** Саженец грецкого ореха. */
+    public static final DeferredItem<Item> WALNUT_SAPLING =
+            ITEMS.registerItem("walnut_sapling",
+                    p -> new BlockItem(KHBlocks.WALNUT_SAPLING.get(), p),
+                    p -> p.useItemDescriptionPrefix());
+
+    /** Персик. */
+    public static final DeferredItem<Item> PEACH =
+            ITEMS.registerSimpleItem("peach",
+                    p -> p.food(KHFoods.PEACH));
+
+    /** Абрикос. */
+    public static final DeferredItem<Item> APRICOT =
+            ITEMS.registerSimpleItem("apricot",
+                    p -> p.food(KHFoods.APRICOT));
+
+    /** Слива. */
+    public static final DeferredItem<Item> PLUM =
+            ITEMS.registerSimpleItem("plum",
+                    p -> p.food(KHFoods.PLUM));
+
+    /** Грецкий орех. */
+    public static final DeferredItem<Item> WALNUT =
+            ITEMS.registerSimpleItem("walnut",
+                    p -> p.food(KHFoods.WALNUT));
+
     // --- Инструменты ---
 
     /** Почвенный щуп — анализатор плодородия грядок. */

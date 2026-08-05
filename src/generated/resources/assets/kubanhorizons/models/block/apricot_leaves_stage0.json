@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "kubanhorizons:block/apricot_leaves_stage0"
+  }
+}

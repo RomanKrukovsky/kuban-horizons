@@ -31,5 +31,22 @@ public final class KHBlockTagsProvider extends BlockTagsProvider {
                 .add(KHBlocks.CORN_CROP.getKey());
         // Чайный куст растёт на земле, как ягодный куст.
         tag(BlockTags.SWORD_EFFICIENT).add(KHBlocks.TEA_BUSH.getKey());
+        // Плодовая листва: рубится мотыгой и ведёт себя как листва
+        // (decay контролируется PERSISTENT — саженец ставит true).
+        tag(BlockTags.MINEABLE_WITH_HOE)
+                .add(KHBlocks.PEACH_LEAVES.getKey())
+                .add(KHBlocks.APRICOT_LEAVES.getKey())
+                .add(KHBlocks.PLUM_LEAVES.getKey())
+                .add(KHBlocks.WALNUT_LEAVES.getKey());
+        tag(BlockTags.LEAVES)
+                .add(KHBlocks.PEACH_LEAVES.getKey())
+                .add(KHBlocks.APRICOT_LEAVES.getKey())
+                .add(KHBlocks.PLUM_LEAVES.getKey())
+                .add(KHBlocks.WALNUT_LEAVES.getKey());
+        tag(net.minecraft.tags.BlockItemTags.SAPLINGS.block())
+                .add(KHBlocks.PEACH_SAPLING.getKey())
+                .add(KHBlocks.APRICOT_SAPLING.getKey())
+                .add(KHBlocks.PLUM_SAPLING.getKey())
+                .add(KHBlocks.WALNUT_SAPLING.getKey());
     }
 }

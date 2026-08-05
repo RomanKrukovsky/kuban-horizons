@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "kubanhorizons:block/plum_leaves_stage0"
+  }
+}

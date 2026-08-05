@@ -41,6 +41,14 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.RICE_PANICLE.get());
                         output.accept(KHItems.RICE.get());
                         output.accept(KHItems.COOKED_RICE.get());
+                        output.accept(KHItems.PEACH_SAPLING.get());
+                        output.accept(KHItems.PEACH.get());
+                        output.accept(KHItems.APRICOT_SAPLING.get());
+                        output.accept(KHItems.APRICOT.get());
+                        output.accept(KHItems.PLUM_SAPLING.get());
+                        output.accept(KHItems.PLUM.get());
+                        output.accept(KHItems.WALNUT_SAPLING.get());
+                        output.accept(KHItems.WALNUT.get());
                         output.accept(KHItems.SOIL_PROBE.get());
                         output.accept(KHItems.OIL_PRESS.get());
                         output.accept(KHItems.IRRIGATION_CHANNEL.get());

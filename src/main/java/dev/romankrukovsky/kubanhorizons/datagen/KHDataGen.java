@@ -21,7 +21,11 @@ public final class KHDataGen {
                     .add(net.minecraft.core.registries.Registries.PLACED_FEATURE,
                             dev.romankrukovsky.kubanhorizons.worldgen.KHPlacedFeatures::bootstrap)
                     .add(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.BIOME_MODIFIERS,
-                            dev.romankrukovsky.kubanhorizons.worldgen.KHBiomeModifiers::bootstrap);
+                            dev.romankrukovsky.kubanhorizons.worldgen.KHBiomeModifiers::bootstrap)
+                    .add(net.minecraft.core.registries.Registries.VILLAGER_TRADE,
+                            dev.romankrukovsky.kubanhorizons.trade.KHTrades::bootstrapTrades)
+                    .add(net.minecraft.core.registries.Registries.TRADE_SET,
+                            dev.romankrukovsky.kubanhorizons.trade.KHTrades::bootstrapTradeSets);
 
     @SubscribeEvent
     static void onGatherData(GatherDataEvent.Client event) {

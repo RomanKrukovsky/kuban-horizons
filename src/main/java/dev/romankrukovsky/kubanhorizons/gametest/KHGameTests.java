@@ -73,6 +73,9 @@ public final class KHGameTests {
         register("grape_graft_cutting", KHGameTests::testGrapeGraft, 200);
         register("grape_harvest_regrows", KHGameTests::testGrapeHarvest, 200);
         register("tomato_pick_regrows", KHGameTests::testTomatoPick, 200);
+        register("fruit_leaves_ripen", KHGameTests::testFruitLeavesRipen, 400);
+        register("fruit_pick_resets", KHGameTests::testFruitPickResets, 200);
+        register("sapling_grows_tree", KHGameTests::testSaplingGrowsTree, 400);
     }
 
     private KHGameTests() {
@@ -371,6 +374,78 @@ public final class KHGameTests {
                     helper.assertItemEntityPresent(KHItems.TOMATO.get(), bushPos, 2.0);
                 })
                 .thenSucceed();
+    }
+
+    // --- Тесты плодовых деревьев ---
+
+    /** Плодовая листва дозревает: AGE 0 → 2 при форсированных randomTick. */
+    private static void testFruitLeavesRipen(GameTestHelper helper) {
+        BlockPos leavesPos = new BlockPos(1, 2, 1);
+        helper.setBlock(leavesPos, KHBlocks.PEACH_LEAVES.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true)
+                .setValue(dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock.AGE, 0));
+
+        helper.onEachTick(() -> {
+            ServerLevel level = helper.getLevel();
+            BlockPos abs = helper.absolutePos(leavesPos);
+            BlockState state = level.getBlockState(abs);
+            if (state.is(KHBlocks.PEACH_LEAVES.get())) {
+                state.randomTick(level, abs, level.getRandom());
+            }
+        });
+
+        helper.succeedWhen(() -> helper.assertBlockProperty(leavesPos,
+                dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock.AGE,
+                dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock.MAX_AGE));
+    }
+
+    /** Сбор плодов ПКМ: даёт плод и откатывает листву к стадии 0. */
+    private static void testFruitPickResets(GameTestHelper helper) {
+        BlockPos leavesPos = new BlockPos(1, 2, 1);
+        helper.setBlock(leavesPos, KHBlocks.PLUM_LEAVES.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true)
+                .setValue(dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock.AGE,
+                        dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock.MAX_AGE));
+
+        helper.startSequence()
+                .thenExecute(() -> {
+                    Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+                    helper.useBlock(leavesPos, player);
+                })
+                .thenExecuteAfter(5, () -> {
+                    helper.assertBlockPresent(KHBlocks.PLUM_LEAVES.get(), leavesPos);
+                    helper.assertBlockProperty(leavesPos,
+                            dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock.AGE, 0);
+                    helper.assertItemEntityPresent(KHItems.PLUM.get(), leavesPos, 2.0);
+                })
+                .thenSucceed();
+    }
+
+    /** Саженец с форс-тиками строит дерево: лог над саженцем + листва. */
+    private static void testSaplingGrowsTree(GameTestHelper helper) {
+        BlockPos saplingPos = new BlockPos(2, 2, 2);
+        helper.setBlock(saplingPos.below(), Blocks.GRASS_BLOCK);
+        helper.setBlock(saplingPos, KHBlocks.APRICOT_SAPLING.get().defaultBlockState());
+
+        helper.onEachTick(() -> {
+            ServerLevel level = helper.getLevel();
+            BlockPos abs = helper.absolutePos(saplingPos);
+            BlockState state = level.getBlockState(abs);
+            if (state.is(KHBlocks.APRICOT_SAPLING.get())) {
+                state.randomTick(level, abs, level.getRandom());
+            }
+        });
+
+        helper.succeedWhen(() -> {
+            // Ствол занял место саженца и растёт вверх.
+            helper.assertBlockPresent(Blocks.OAK_LOG, saplingPos);
+            helper.assertBlockPresent(Blocks.OAK_LOG, saplingPos.above());
+            // Верхушка кроны — плодовая листва с PERSISTENT=true.
+            BlockPos top = saplingPos.above(4);
+            helper.assertBlockPresent(KHBlocks.APRICOT_LEAVES.get(), top);
+            helper.assertBlockProperty(top,
+                    net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true);
+        });
     }
 
     // --- Тесты винограда ---

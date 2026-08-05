@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "kubanhorizons:block/walnut_leaves_stage2"
+  }
+}
