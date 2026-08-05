@@ -47,6 +47,9 @@ public final class KHModelProvider extends ModelProvider {
         registerTeaBush(blockModels);
         registerRice(blockModels);
         registerGrapeTrellis(blockModels);
+        registerStagedCross(blockModels, KHBlocks.TOMATO_BUSH.get(),
+                dev.romankrukovsky.kubanhorizons.crop.TomatoBushBlock.MAX_AGE,
+                dev.romankrukovsky.kubanhorizons.crop.TomatoBushBlock.AGE);
 
         // Маслопресс: ориентируемый куб с уникальными текстурами.
         blockModels.createHorizontallyRotatedBlock(KHBlocks.OIL_PRESS.get(), TexturedModel.ORIENTABLE);
@@ -71,6 +74,8 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.COOKED_RICE.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.GRAPE_CUTTING.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.GRAPES.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.TOMATO_SEEDS.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.TOMATO.get(), ModelTemplates.FLAT_ITEM);
     }
 
     /**
@@ -144,29 +149,25 @@ public final class KHModelProvider extends ModelProvider {
 
     /** Рис: cross-модели стадий; WATERLOGGED не влияет на модель. */
     private void registerRice(BlockModelGenerators blockModels) {
-        Block rice = KHBlocks.RICE_CROP.get();
-        Identifier[] models = new Identifier[RiceCropBlock.MAX_AGE + 1];
-        for (int age = 0; age <= RiceCropBlock.MAX_AGE; age++) {
-            models[age] = ModelTemplates.CROSS.createWithSuffix(rice, "_stage" + age,
-                    TextureMapping.cross(TextureMapping.getBlockTexture(rice, "_stage" + age)),
-                    blockModels.modelOutput);
-        }
-        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(rice)
-                .with(PropertyDispatch.initial(RiceCropBlock.AGE)
-                        .generate(age -> plainVariant(models[age]))));
+        registerStagedCross(blockModels, KHBlocks.RICE_CROP.get(), RiceCropBlock.MAX_AGE, RiceCropBlock.AGE);
     }
 
     /** Чайный куст: cross-модели четырёх стадий. */
     private void registerTeaBush(BlockModelGenerators blockModels) {
-        Block bush = KHBlocks.TEA_BUSH.get();
-        Identifier[] models = new Identifier[TeaBushBlock.MAX_AGE + 1];
-        for (int age = 0; age <= TeaBushBlock.MAX_AGE; age++) {
-            models[age] = ModelTemplates.CROSS.createWithSuffix(bush, "_stage" + age,
-                    TextureMapping.cross(TextureMapping.getBlockTexture(bush, "_stage" + age)),
+        registerStagedCross(blockModels, KHBlocks.TEA_BUSH.get(), TeaBushBlock.MAX_AGE, TeaBushBlock.AGE);
+    }
+
+    /** Одноблочная многостадийная культура: cross-модель на каждую стадию. */
+    private void registerStagedCross(BlockModelGenerators blockModels, Block block, int maxAge,
+            net.minecraft.world.level.block.state.properties.IntegerProperty ageProperty) {
+        Identifier[] models = new Identifier[maxAge + 1];
+        for (int age = 0; age <= maxAge; age++) {
+            models[age] = ModelTemplates.CROSS.createWithSuffix(block, "_stage" + age,
+                    TextureMapping.cross(TextureMapping.getBlockTexture(block, "_stage" + age)),
                     blockModels.modelOutput);
         }
-        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(bush)
-                .with(PropertyDispatch.initial(TeaBushBlock.AGE)
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block)
+                .with(PropertyDispatch.initial(ageProperty)
                         .generate(age -> plainVariant(models[age]))));
     }
 }

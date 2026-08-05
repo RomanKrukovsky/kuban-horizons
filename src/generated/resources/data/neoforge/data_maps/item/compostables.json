@@ -35,6 +35,12 @@
     },
     "kubanhorizons:tea_sapling": {
       "chance": 0.3
+    },
+    "kubanhorizons:tomato": {
+      "chance": 0.5
+    },
+    "kubanhorizons:tomato_seeds": {
+      "chance": 0.3
     }
   }
 }

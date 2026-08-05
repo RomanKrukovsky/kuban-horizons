@@ -32,6 +32,8 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.GRILLED_CORN.get());
                         output.accept(KHItems.TEA_SAPLING.get());
                         output.accept(KHItems.TEA_LEAVES.get());
+                        output.accept(KHItems.TOMATO_SEEDS.get());
+                        output.accept(KHItems.TOMATO.get());
                         output.accept(KHItems.GRAPE_TRELLIS.get());
                         output.accept(KHItems.GRAPE_CUTTING.get());
                         output.accept(KHItems.GRAPES.get());

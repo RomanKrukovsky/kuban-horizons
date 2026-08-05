@@ -30,6 +30,12 @@ public final class KHFoods {
             .saturationModifier(0.6F)
             .build();
 
+    /** Томат: свежий овощ. */
+    public static final FoodProperties TOMATO = new FoodProperties.Builder()
+            .nutrition(2)
+            .saturationModifier(0.3F)
+            .build();
+
     /** Гроздь винограда: лёгкая сладкая еда. */
     public static final FoodProperties GRAPES = new FoodProperties.Builder()
             .nutrition(3)

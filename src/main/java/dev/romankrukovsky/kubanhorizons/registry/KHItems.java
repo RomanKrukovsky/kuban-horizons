@@ -62,6 +62,19 @@ public final class KHItems {
             ITEMS.registerSimpleItem("grilled_corn",
                     p -> p.food(KHFoods.GRILLED_CORN));
 
+    // --- Цепочка томата ---
+
+    /** Семена томата. */
+    public static final DeferredItem<Item> TOMATO_SEEDS =
+            ITEMS.registerItem("tomato_seeds",
+                    p -> new BlockItem(KHBlocks.TOMATO_BUSH.get(), p),
+                    p -> p.useItemDescriptionPrefix());
+
+    /** Томат — овощ. */
+    public static final DeferredItem<Item> TOMATO =
+            ITEMS.registerSimpleItem("tomato",
+                    p -> p.food(KHFoods.TOMATO));
+
     // --- Цепочка винограда ---
 
     /** Черенок винограда — прививается на шпалеру. */

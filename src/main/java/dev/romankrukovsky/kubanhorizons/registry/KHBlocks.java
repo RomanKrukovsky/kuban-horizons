@@ -41,6 +41,16 @@ public final class KHBlocks {
                             .sound(SoundType.CROP)
                             .pushReaction(PushReaction.DESTROY));
 
+    /** Томатный куст (многосборный). */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.TomatoBushBlock> TOMATO_BUSH =
+            BLOCKS.registerBlock("tomato_bush", dev.romankrukovsky.kubanhorizons.crop.TomatoBushBlock::new,
+                    p -> p.mapColor(MapColor.PLANT)
+                            .noCollision()
+                            .randomTicks()
+                            .instabreak()
+                            .sound(SoundType.CROP)
+                            .pushReaction(PushReaction.DESTROY));
+
     /** Виноградная шпалера (пустая или с лозой). */
     public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.GrapeTrellisBlock> GRAPE_TRELLIS =
             BLOCKS.registerBlock("grape_trellis", dev.romankrukovsky.kubanhorizons.crop.GrapeTrellisBlock::new,

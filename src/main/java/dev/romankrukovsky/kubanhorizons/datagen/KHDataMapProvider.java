@@ -32,5 +32,7 @@ public final class KHDataMapProvider extends DataMapProvider {
         compostables.add(KHItems.RICE.get().builtInRegistryHolder(), new Compostable(0.3F), false);
         compostables.add(KHItems.GRAPE_CUTTING.get().builtInRegistryHolder(), new Compostable(0.3F), false);
         compostables.add(KHItems.GRAPES.get().builtInRegistryHolder(), new Compostable(0.5F), false);
+        compostables.add(KHItems.TOMATO_SEEDS.get().builtInRegistryHolder(), new Compostable(0.3F), false);
+        compostables.add(KHItems.TOMATO.get().builtInRegistryHolder(), new Compostable(0.5F), false);
     }
 }

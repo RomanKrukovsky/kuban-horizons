@@ -88,6 +88,12 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_corn_cob", this.has(KHItems.CORN_COB.get()))
                 .save(this.output);
 
+        // Томат → семена.
+        this.shapeless(RecipeCategory.MISC, KHItems.TOMATO_SEEDS.get(), 1)
+                .requires(KHItems.TOMATO.get())
+                .unlockedBy("has_tomato", this.has(KHItems.TOMATO.get()))
+                .save(this.output);
+
         // Шпалера: палки + верёвка-стиль (2 шт.).
         this.shaped(RecipeCategory.DECORATIONS, KHItems.GRAPE_TRELLIS.get(), 2)
                 .pattern("S S")

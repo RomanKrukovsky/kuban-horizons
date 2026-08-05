@@ -72,6 +72,7 @@ public final class KHGameTests {
         register("rice_requires_water", KHGameTests::testRiceRequiresWater, 200);
         register("grape_graft_cutting", KHGameTests::testGrapeGraft, 200);
         register("grape_harvest_regrows", KHGameTests::testGrapeHarvest, 200);
+        register("tomato_pick_regrows", KHGameTests::testTomatoPick, 200);
     }
 
     private KHGameTests() {
@@ -347,6 +348,27 @@ public final class KHGameTests {
                     helper.assertBlockProperty(bushPos,
                             dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock.AGE, 1);
                     helper.assertItemEntityPresent(KHItems.TEA_LEAVES.get(), bushPos, 2.0);
+                })
+                .thenSucceed();
+    }
+
+    /** Сбор томатов ПКМ: даёт томаты, куст откатывается к стадии 2. */
+    private static void testTomatoPick(GameTestHelper helper) {
+        BlockPos bushPos = preparedFarmland(helper, new BlockPos(1, 1, 1));
+        helper.setBlock(bushPos, KHBlocks.TOMATO_BUSH.get().defaultBlockState()
+                .setValue(dev.romankrukovsky.kubanhorizons.crop.TomatoBushBlock.AGE,
+                        dev.romankrukovsky.kubanhorizons.crop.TomatoBushBlock.MAX_AGE));
+
+        helper.startSequence()
+                .thenExecute(() -> {
+                    Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+                    helper.useBlock(bushPos, player);
+                })
+                .thenExecuteAfter(5, () -> {
+                    helper.assertBlockPresent(KHBlocks.TOMATO_BUSH.get(), bushPos);
+                    helper.assertBlockProperty(bushPos,
+                            dev.romankrukovsky.kubanhorizons.crop.TomatoBushBlock.AGE, 2);
+                    helper.assertItemEntityPresent(KHItems.TOMATO.get(), bushPos, 2.0);
                 })
                 .thenSucceed();
     }

@@ -57,6 +57,10 @@ public final class KHLootTableProvider extends LootTableProvider {
             add(KHBlocks.TEA_BUSH.get(),
                     createSingleItemTable(KHItems.TEA_SAPLING.get()));
 
+            // Томатный куст: при разрушении — семена (томаты собираются ПКМ).
+            add(KHBlocks.TOMATO_BUSH.get(),
+                    createSingleItemTable(KHItems.TOMATO_SEEDS.get()));
+
             // Шпалера: всегда сама шпалера; с лозой (AGE != 0) — черенок.
             add(KHBlocks.GRAPE_TRELLIS.get(), LootTable.lootTable()
                     .withPool(this.applyExplosionCondition(KHBlocks.GRAPE_TRELLIS.get(),

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "kubanhorizons:tomato"
+  ],
+  "result": {
+    "id": "kubanhorizons:tomato_seeds"
+  }
+}
