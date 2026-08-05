@@ -30,6 +30,12 @@ public final class KHFoods {
             .saturationModifier(0.6F)
             .build();
 
+    /** Гроздь винограда: лёгкая сладкая еда. */
+    public static final FoodProperties GRAPES = new FoodProperties.Builder()
+            .nutrition(3)
+            .saturationModifier(0.3F)
+            .build();
+
     /** Сырая рисовая крупа: съедобна, но почти бесполезна. */
     public static final FoodProperties RICE = new FoodProperties.Builder()
             .nutrition(1)

@@ -22,6 +22,7 @@ public final class KHBlockTagsProvider extends BlockTagsProvider {
         // Маслопресс и желоб рубятся топором.
         tag(BlockTags.MINEABLE_WITH_AXE).add(KHBlocks.OIL_PRESS.getKey());
         tag(BlockTags.MINEABLE_WITH_AXE).add(KHBlocks.IRRIGATION_CHANNEL.getKey());
+        tag(BlockTags.MINEABLE_WITH_AXE).add(KHBlocks.GRAPE_TRELLIS.getKey());
         // Водозабор добывается киркой.
         tag(BlockTags.MINEABLE_WITH_PICKAXE).add(KHBlocks.WATER_INTAKE.getKey());
         // Культуры (для механик, ломающих/обходящих культуры).

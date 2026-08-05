@@ -1,0 +1,72 @@
+{
+  "parent": "kubanhorizons:block/grape_trellis_frame",
+  "textures": {
+    "vine": "#vine_texture"
+  },
+  "elements": [
+    {
+      "from": [7, 0, 1],
+      "to": [9, 16, 3],
+      "faces": {
+        "down": {"texture": "#trellis"},
+        "up": {"texture": "#trellis"},
+        "north": {"texture": "#trellis"},
+        "south": {"texture": "#trellis"},
+        "west": {"texture": "#trellis"},
+        "east": {"texture": "#trellis"}
+      }
+    },
+    {
+      "from": [7, 0, 13],
+      "to": [9, 16, 15],
+      "faces": {
+        "down": {"texture": "#trellis"},
+        "up": {"texture": "#trellis"},
+        "north": {"texture": "#trellis"},
+        "south": {"texture": "#trellis"},
+        "west": {"texture": "#trellis"},
+        "east": {"texture": "#trellis"}
+      }
+    },
+    {
+      "from": [7, 4, 0],
+      "to": [9, 6, 16],
+      "faces": {
+        "down": {"texture": "#trellis"},
+        "up": {"texture": "#trellis"},
+        "north": {"texture": "#trellis"},
+        "south": {"texture": "#trellis"},
+        "west": {"texture": "#trellis"},
+        "east": {"texture": "#trellis"}
+      }
+    },
+    {
+      "from": [7, 10, 0],
+      "to": [9, 12, 16],
+      "faces": {
+        "down": {"texture": "#trellis"},
+        "up": {"texture": "#trellis"},
+        "north": {"texture": "#trellis"},
+        "south": {"texture": "#trellis"},
+        "west": {"texture": "#trellis"},
+        "east": {"texture": "#trellis"}
+      }
+    },
+    {
+      "from": [6.5, 0, 8],
+      "to": [9.5, 16, 8],
+      "faces": {
+        "north": {"texture": "#vine"},
+        "south": {"texture": "#vine"}
+      }
+    },
+    {
+      "from": [8, 0, 6.5],
+      "to": [8, 16, 9.5],
+      "faces": {
+        "west": {"texture": "#vine"},
+        "east": {"texture": "#vine"}
+      }
+    }
+  ]
+}

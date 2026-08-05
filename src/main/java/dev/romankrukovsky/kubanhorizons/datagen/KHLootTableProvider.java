@@ -57,6 +57,22 @@ public final class KHLootTableProvider extends LootTableProvider {
             add(KHBlocks.TEA_BUSH.get(),
                     createSingleItemTable(KHItems.TEA_SAPLING.get()));
 
+            // Шпалера: всегда сама шпалера; с лозой (AGE != 0) — черенок.
+            add(KHBlocks.GRAPE_TRELLIS.get(), LootTable.lootTable()
+                    .withPool(this.applyExplosionCondition(KHBlocks.GRAPE_TRELLIS.get(),
+                            net.minecraft.world.level.storage.loot.LootPool.lootPool()
+                                    .add(net.minecraft.world.level.storage.loot.entries.LootItem
+                                            .lootTableItem(KHItems.GRAPE_TRELLIS.get()))))
+                    .withPool(this.applyExplosionCondition(KHBlocks.GRAPE_TRELLIS.get(),
+                            net.minecraft.world.level.storage.loot.LootPool.lootPool()
+                                    .when(net.minecraft.world.level.storage.loot.predicates.InvertedLootItemCondition.invert(
+                                            LootItemBlockStatePropertyCondition
+                                                    .hasBlockStateProperties(KHBlocks.GRAPE_TRELLIS.get())
+                                                    .setProperties(StatePropertiesPredicate.Builder.properties()
+                                                            .hasProperty(dev.romankrukovsky.kubanhorizons.crop.GrapeTrellisBlock.AGE, 0))))
+                                    .add(net.minecraft.world.level.storage.loot.entries.LootItem
+                                            .lootTableItem(KHItems.GRAPE_CUTTING.get())))));
+
             // Рис: зрелый — метёлки + рассада; незрелый — рассада.
             LootItemCondition.Builder ripeRice = LootItemBlockStatePropertyCondition
                     .hasBlockStateProperties(KHBlocks.RICE_CROP.get())

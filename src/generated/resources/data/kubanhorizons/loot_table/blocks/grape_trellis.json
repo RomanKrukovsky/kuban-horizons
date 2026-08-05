@@ -1,0 +1,44 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "kubanhorizons:grape_trellis"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "conditions": [
+        {
+          "condition": "minecraft:inverted",
+          "term": {
+            "block": "kubanhorizons:grape_trellis",
+            "condition": "minecraft:block_state_property",
+            "properties": {
+              "age": "0"
+            }
+          }
+        },
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "kubanhorizons:grape_cutting"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "kubanhorizons:blocks/grape_trellis"
+}

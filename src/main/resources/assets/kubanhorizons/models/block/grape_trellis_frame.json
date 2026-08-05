@@ -1,0 +1,57 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "kubanhorizons:block/grape_trellis",
+    "trellis": "kubanhorizons:block/grape_trellis"
+  },
+  "elements": [
+    {
+      "from": [7, 0, 1],
+      "to": [9, 16, 3],
+      "faces": {
+        "down": {"texture": "#trellis"},
+        "up": {"texture": "#trellis"},
+        "north": {"texture": "#trellis"},
+        "south": {"texture": "#trellis"},
+        "west": {"texture": "#trellis"},
+        "east": {"texture": "#trellis"}
+      }
+    },
+    {
+      "from": [7, 0, 13],
+      "to": [9, 16, 15],
+      "faces": {
+        "down": {"texture": "#trellis"},
+        "up": {"texture": "#trellis"},
+        "north": {"texture": "#trellis"},
+        "south": {"texture": "#trellis"},
+        "west": {"texture": "#trellis"},
+        "east": {"texture": "#trellis"}
+      }
+    },
+    {
+      "from": [7, 4, 0],
+      "to": [9, 6, 16],
+      "faces": {
+        "down": {"texture": "#trellis"},
+        "up": {"texture": "#trellis"},
+        "north": {"texture": "#trellis"},
+        "south": {"texture": "#trellis"},
+        "west": {"texture": "#trellis"},
+        "east": {"texture": "#trellis"}
+      }
+    },
+    {
+      "from": [7, 10, 0],
+      "to": [9, 12, 16],
+      "faces": {
+        "down": {"texture": "#trellis"},
+        "up": {"texture": "#trellis"},
+        "north": {"texture": "#trellis"},
+        "south": {"texture": "#trellis"},
+        "west": {"texture": "#trellis"},
+        "east": {"texture": "#trellis"}
+      }
+    }
+  ]
+}

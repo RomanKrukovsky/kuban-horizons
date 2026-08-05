@@ -1,0 +1,6 @@
+{
+  "parent": "kubanhorizons:block/grape_trellis_vine",
+  "textures": {
+    "vine_texture": "kubanhorizons:block/grape_vine_stage2"
+  }
+}

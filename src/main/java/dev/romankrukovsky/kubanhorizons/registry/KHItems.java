@@ -62,6 +62,21 @@ public final class KHItems {
             ITEMS.registerSimpleItem("grilled_corn",
                     p -> p.food(KHFoods.GRILLED_CORN));
 
+    // --- Цепочка винограда ---
+
+    /** Черенок винограда — прививается на шпалеру. */
+    public static final DeferredItem<Item> GRAPE_CUTTING =
+            ITEMS.registerSimpleItem("grape_cutting");
+
+    /** Гроздь винограда — еда и сырьё для сока. */
+    public static final DeferredItem<Item> GRAPES =
+            ITEMS.registerSimpleItem("grapes",
+                    p -> p.food(KHFoods.GRAPES));
+
+    /** Виноградная шпалера (предмет). */
+    public static final DeferredItem<BlockItem> GRAPE_TRELLIS =
+            ITEMS.registerSimpleBlockItem("grape_trellis", KHBlocks.GRAPE_TRELLIS);
+
     // --- Цепочка риса ---
 
     /** Рассада риса: посадка в затопленный чек. */

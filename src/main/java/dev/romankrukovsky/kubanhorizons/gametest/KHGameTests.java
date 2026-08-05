@@ -70,6 +70,8 @@ public final class KHGameTests {
         register("tea_bush_pick_regrows", KHGameTests::testTeaBushPick, 300);
         register("rice_grows_in_water", KHGameTests::testRiceGrowsInWater, 600);
         register("rice_requires_water", KHGameTests::testRiceRequiresWater, 200);
+        register("grape_graft_cutting", KHGameTests::testGrapeGraft, 200);
+        register("grape_harvest_regrows", KHGameTests::testGrapeHarvest, 200);
     }
 
     private KHGameTests() {
@@ -345,6 +347,49 @@ public final class KHGameTests {
                     helper.assertBlockProperty(bushPos,
                             dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock.AGE, 1);
                     helper.assertItemEntityPresent(KHItems.TEA_LEAVES.get(), bushPos, 2.0);
+                })
+                .thenSucceed();
+    }
+
+    // --- Тесты винограда ---
+
+    /** Черенок прививается на пустую шпалеру (AGE 0 → 1) и расходуется. */
+    private static void testGrapeGraft(GameTestHelper helper) {
+        BlockPos trellisPos = new BlockPos(1, 2, 1);
+        helper.setBlock(trellisPos.below(), Blocks.GRASS_BLOCK);
+        helper.setBlock(trellisPos, KHBlocks.GRAPE_TRELLIS.get());
+
+        helper.startSequence()
+                .thenExecute(() -> {
+                    Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+                    player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
+                            new ItemStack(KHItems.GRAPE_CUTTING.get(), 1));
+                    helper.useBlock(trellisPos, player);
+                    helper.assertTrue(player.getMainHandItem().isEmpty(),
+                            "Черенок должен расходоваться при прививке");
+                })
+                .thenExecuteAfter(2, () -> helper.assertBlockProperty(trellisPos,
+                        dev.romankrukovsky.kubanhorizons.crop.GrapeTrellisBlock.AGE, 1))
+                .thenSucceed();
+    }
+
+    /** Сбор гроздьев: даёт виноград, лоза откатывается к стадии 2. */
+    private static void testGrapeHarvest(GameTestHelper helper) {
+        BlockPos trellisPos = new BlockPos(1, 2, 1);
+        helper.setBlock(trellisPos.below(), Blocks.GRASS_BLOCK);
+        helper.setBlock(trellisPos, KHBlocks.GRAPE_TRELLIS.get().defaultBlockState()
+                .setValue(dev.romankrukovsky.kubanhorizons.crop.GrapeTrellisBlock.AGE,
+                        dev.romankrukovsky.kubanhorizons.crop.GrapeTrellisBlock.MAX_AGE));
+
+        helper.startSequence()
+                .thenExecute(() -> {
+                    Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+                    helper.useBlock(trellisPos, player);
+                })
+                .thenExecuteAfter(5, () -> {
+                    helper.assertBlockProperty(trellisPos,
+                            dev.romankrukovsky.kubanhorizons.crop.GrapeTrellisBlock.AGE, 2);
+                    helper.assertItemEntityPresent(KHItems.GRAPES.get(), trellisPos, 2.0);
                 })
                 .thenSucceed();
     }

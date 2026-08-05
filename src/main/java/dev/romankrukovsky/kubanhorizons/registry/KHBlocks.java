@@ -41,6 +41,16 @@ public final class KHBlocks {
                             .sound(SoundType.CROP)
                             .pushReaction(PushReaction.DESTROY));
 
+    /** Виноградная шпалера (пустая или с лозой). */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.GrapeTrellisBlock> GRAPE_TRELLIS =
+            BLOCKS.registerBlock("grape_trellis", dev.romankrukovsky.kubanhorizons.crop.GrapeTrellisBlock::new,
+                    p -> p.mapColor(MapColor.WOOD)
+                            .strength(0.8F)
+                            .randomTicks()
+                            .sound(SoundType.WOOD)
+                            .noOcclusion()
+                            .pushReaction(PushReaction.DESTROY));
+
     /** Рис (затопленная культура). */
     public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock> RICE_CROP =
             BLOCKS.registerBlock("rice_crop", dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock::new,

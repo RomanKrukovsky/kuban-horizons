@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "kubanhorizons:block/grape_trellis_frame"
+    },
+    "age=1": {
+      "model": "kubanhorizons:block/grape_trellis_stage1"
+    },
+    "age=2": {
+      "model": "kubanhorizons:block/grape_trellis_stage2"
+    },
+    "age=3": {
+      "model": "kubanhorizons:block/grape_trellis_stage3"
+    },
+    "age=4": {
+      "model": "kubanhorizons:block/grape_trellis_stage4"
+    }
+  }
+}

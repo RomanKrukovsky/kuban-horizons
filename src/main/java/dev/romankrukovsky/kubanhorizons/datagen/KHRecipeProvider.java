@@ -88,6 +88,22 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_corn_cob", this.has(KHItems.CORN_COB.get()))
                 .save(this.output);
 
+        // Шпалера: палки + верёвка-стиль (2 шт.).
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.GRAPE_TRELLIS.get(), 2)
+                .pattern("S S")
+                .pattern("SSS")
+                .pattern("S S")
+                .define('S', Items.STICK)
+                .unlockedBy("has_sticks", this.has(Items.STICK))
+                .save(this.output);
+
+        // Черенок из винограда (размножение лозы).
+        this.shapeless(RecipeCategory.MISC, KHItems.GRAPE_CUTTING.get(), 1)
+                .requires(KHItems.GRAPES.get())
+                .requires(Items.STICK)
+                .unlockedBy("has_grapes", this.has(KHItems.GRAPES.get()))
+                .save(this.output);
+
         // Метёлка → рис (крупа).
         this.shapeless(RecipeCategory.MISC, KHItems.RICE.get(), 1)
                 .requires(KHItems.RICE_PANICLE.get())

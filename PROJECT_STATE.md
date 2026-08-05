@@ -16,7 +16,7 @@
 `main` → https://github.com/RomanKrukovsky/kuban-horizons
 
 ## Последний успешный commit
-- `0f5000d` feat: implement irrigation network
+- `24d8f6a` feat: add rice as flooded-paddy crop
 
 ## Завершено
 - [x] Разведка версий: MDK-26.2-ModDevGradle, NeoForge 26.2.0.48-beta.
@@ -42,11 +42,17 @@
 - [x] **Орошение**: IrrigationChannelBlock (DISTANCE 0..12, событийная
       волна scheduled ticks, FluidState-гидратация ванильных грядок),
       WaterIntakeBlock (ACTIVE), ручные модели, рецепты, лут, теги.
+- [x] **Кукуруза**: DoubleCropBlock (общий базовый класс) + CornCropBlock,
+      зёрна/початок/печёная кукуруза, жарка 3 способами.
+- [x] **Чайный куст**: TeaBushBlock — многолетний, сбор ПКМ (1–2 листа,
+      откат к стадии 1), саженец при разрушении.
+- [x] **Рис**: RiceCropBlock — waterlogged-культура затопленного чека,
+      рассада/метёлка/крупа/отварной рис.
 
 ## Выполненные тесты
 - `./gradlew build`, `runData` — успех.
-- `runGameTestServer`: **16/16** (культура 5, пресс 3, плодородие 3,
-  орошение 3, реестры 1, растения/сериализация — в составе).
+- `runGameTestServer`: **20/20** (подсолнечник 5, пресс 3, плодородие 3,
+  орошение 3, кукуруза 1, чай 1, рис 2, реестры 1, сериализация 1).
 - Dedicated server: чистый старт, мир создан, Done (1.2s), ошибок мода
   нет. Клиент: старт до окна, инициализация мода видна, 0 ERROR.
 

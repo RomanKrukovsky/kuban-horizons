@@ -3,6 +3,7 @@ package dev.romankrukovsky.kubanhorizons.datagen;
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
 import dev.romankrukovsky.kubanhorizons.crop.CornCropBlock;
 import dev.romankrukovsky.kubanhorizons.crop.DoubleCropBlock;
+import dev.romankrukovsky.kubanhorizons.crop.GrapeTrellisBlock;
 import dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock;
 import dev.romankrukovsky.kubanhorizons.crop.SunflowerCropBlock;
 import dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock;
@@ -45,6 +46,7 @@ public final class KHModelProvider extends ModelProvider {
         registerDoubleCrop(blockModels, KHBlocks.CORN_CROP.get(), CornCropBlock.MAX_AGE, 2);
         registerTeaBush(blockModels);
         registerRice(blockModels);
+        registerGrapeTrellis(blockModels);
 
         // Маслопресс: ориентируемый куб с уникальными текстурами.
         blockModels.createHorizontallyRotatedBlock(KHBlocks.OIL_PRESS.get(), TexturedModel.ORIENTABLE);
@@ -67,6 +69,8 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.RICE_PANICLE.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.RICE.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.COOKED_RICE.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.GRAPE_CUTTING.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.GRAPES.get(), ModelTemplates.FLAT_ITEM);
     }
 
     /**
@@ -124,6 +128,18 @@ public final class KHModelProvider extends ModelProvider {
 
     private void registerSunflowerCrop(BlockModelGenerators blockModels) {
         registerDoubleCrop(blockModels, KHBlocks.SUNFLOWER_CROP.get(), SunflowerCropBlock.MAX_AGE, 3);
+    }
+
+    /** Шпалера: рама (стадия 0) и рама с лозой (стадии 1–4), модели ручные. */
+    private void registerGrapeTrellis(BlockModelGenerators blockModels) {
+        Block trellis = KHBlocks.GRAPE_TRELLIS.get();
+        Identifier frame = KHIds.of("block/grape_trellis_frame");
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(trellis)
+                .with(PropertyDispatch.initial(GrapeTrellisBlock.AGE)
+                        .generate(age -> plainVariant(age == 0
+                                ? frame
+                                : KHIds.of("block/grape_trellis_stage" + age)))));
+        blockModels.registerSimpleItemModel(trellis.asItem(), frame);
     }
 
     /** Рис: cross-модели стадий; WATERLOGGED не влияет на модель. */

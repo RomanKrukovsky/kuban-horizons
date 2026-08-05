@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "kubanhorizons:grapes",
+    "minecraft:stick"
+  ],
+  "result": {
+    "id": "kubanhorizons:grape_cutting"
+  }
+}
