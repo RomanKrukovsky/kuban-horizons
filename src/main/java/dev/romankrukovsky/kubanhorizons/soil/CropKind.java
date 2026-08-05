@@ -23,6 +23,8 @@ public enum CropKind {
     RICE((byte) 8),
     GRAPE((byte) 9),
     TOMATO((byte) 10),
+    MELON((byte) 11),
+    PUMPKIN((byte) 12),
     OTHER((byte) 127);
 
     private final byte code;
@@ -66,6 +68,12 @@ public enum CropKind {
         }
         if (block == KHBlocks.TOMATO_BUSH.get()) {
             return TOMATO;
+        }
+        if (block == Blocks.MELON) {
+            return MELON;
+        }
+        if (block == Blocks.PUMPKIN) {
+            return PUMPKIN;
         }
         if (block instanceof CropBlock) {
             return OTHER;
