@@ -1,0 +1,39 @@
+# Gradle
+.gradle/
+build/
+repo/
+
+# Запуск игры и datagen-кэш
+run/
+run-data/
+runs/
+src/generated/resources/.cache/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+bin/
+out/
+
+# ОС
+.DS_Store
+Thumbs.db
+
+# Локальные секреты и конфигурации
+*.env
+local.properties
+.secrets/
+
+# Логи и крашрепорты вне run/
+*.log
+hs_err_pid*
+crash-reports/
+
+# Референсные материалы с неподтверждённой лицензией — не коммитятся
+reference/concept-art/
