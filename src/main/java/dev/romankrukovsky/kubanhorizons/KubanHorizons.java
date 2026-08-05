@@ -2,6 +2,7 @@ package dev.romankrukovsky.kubanhorizons;
 
 import com.mojang.logging.LogUtils;
 import dev.romankrukovsky.kubanhorizons.config.KHServerConfig;
+import dev.romankrukovsky.kubanhorizons.registry.KHAttachments;
 import dev.romankrukovsky.kubanhorizons.registry.KHBlockEntities;
 import dev.romankrukovsky.kubanhorizons.registry.KHBlocks;
 import dev.romankrukovsky.kubanhorizons.registry.KHCreativeTabs;
@@ -36,6 +37,7 @@ public final class KubanHorizons {
         KHRecipes.register(modEventBus);
         KHSounds.register(modEventBus);
         KHCreativeTabs.register(modEventBus);
+        KHAttachments.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.gametest.KHGameTests.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.SERVER, KHServerConfig.SPEC);

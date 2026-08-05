@@ -60,6 +60,9 @@ public final class KHGameTests {
         register("oil_press_requires_bottle", KHGameTests::testOilPressRequiresBottle, 200);
         register("oil_press_persistence", KHGameTests::testOilPressSaveLoad, 200);
         register("registry_content", KHGameTests::testRegistryContent, 100);
+        register("fertility_depletes_on_harvest", KHGameTests::testFertilityDepletion, 200);
+        register("fertility_compost_restores", KHGameTests::testFertilityCompost, 200);
+        register("fertility_rotation_gentler", KHGameTests::testFertilityRotation, 200);
     }
 
     private KHGameTests() {
@@ -291,6 +294,65 @@ public final class KHGameTests {
                             "Слот бутылок потерял содержимое при сериализации");
                 })
                 .thenSucceed();
+    }
+
+    // --- Тесты плодородия ---
+
+    /** Сбор урожая истощает грядку. */
+    private static void testFertilityDepletion(GameTestHelper helper) {
+        BlockPos cropPos = preparedFarmland(helper, new BlockPos(1, 1, 1));
+        BlockPos farmlandAbs = helper.absolutePos(cropPos.below());
+        ServerLevel level = helper.getLevel();
+
+        int before = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, farmlandAbs);
+        dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onHarvest(level, farmlandAbs,
+                KHBlocks.SUNFLOWER_CROP.get());
+        dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onHarvest(level, farmlandAbs,
+                KHBlocks.SUNFLOWER_CROP.get());
+        int after = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, farmlandAbs);
+
+        helper.assertTrue(after < before,
+                "Плодородие должно снижаться при повторных сборах: " + before + " -> " + after);
+        helper.succeed();
+    }
+
+    /** Компост восстанавливает плодородие. */
+    private static void testFertilityCompost(GameTestHelper helper) {
+        BlockPos cropPos = preparedFarmland(helper, new BlockPos(1, 1, 1));
+        BlockPos farmlandAbs = helper.absolutePos(cropPos.below());
+        ServerLevel level = helper.getLevel();
+
+        dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onHarvest(level, farmlandAbs,
+                KHBlocks.SUNFLOWER_CROP.get());
+        dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onHarvest(level, farmlandAbs,
+                KHBlocks.SUNFLOWER_CROP.get());
+        int depleted = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, farmlandAbs);
+        dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onCompost(level, farmlandAbs);
+        int restored = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, farmlandAbs);
+
+        helper.assertTrue(restored > depleted,
+                "Компост должен восстанавливать плодородие: " + depleted + " -> " + restored);
+        helper.succeed();
+    }
+
+    /** Севооборот истощает почву меньше, чем монокультура. */
+    private static void testFertilityRotation(GameTestHelper helper) {
+        BlockPos monoAbs = helper.absolutePos(preparedFarmland(helper, new BlockPos(1, 1, 1)).below());
+        BlockPos rotAbs = helper.absolutePos(preparedFarmland(helper, new BlockPos(3, 1, 1)).below());
+        ServerLevel level = helper.getLevel();
+
+        // Монокультура: подсолнечник дважды.
+        dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onHarvest(level, monoAbs, KHBlocks.SUNFLOWER_CROP.get());
+        dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onHarvest(level, monoAbs, KHBlocks.SUNFLOWER_CROP.get());
+        // Ротация: подсолнечник → пшеница.
+        dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onHarvest(level, rotAbs, KHBlocks.SUNFLOWER_CROP.get());
+        dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onHarvest(level, rotAbs, Blocks.WHEAT);
+
+        int mono = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, monoAbs);
+        int rotated = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, rotAbs);
+        helper.assertTrue(rotated > mono,
+                "Севооборот должен беречь почву: моно=" + mono + ", ротация=" + rotated);
+        helper.succeed();
     }
 
     // --- Реестры ---

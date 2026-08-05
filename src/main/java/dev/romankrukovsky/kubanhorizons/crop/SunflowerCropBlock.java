@@ -3,6 +3,7 @@ package dev.romankrukovsky.kubanhorizons.crop;
 import com.mojang.serialization.MapCodec;
 import dev.romankrukovsky.kubanhorizons.config.KHServerConfig;
 import dev.romankrukovsky.kubanhorizons.registry.KHItems;
+import dev.romankrukovsky.kubanhorizons.soil.SoilFertility;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -147,13 +148,26 @@ public class SunflowerCropBlock extends DoublePlantBlock implements Bonemealable
 
     @Override
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        // Стандартная ванильная формула скорости роста (влажность грядки,
-        // соседние культуры) с конфигурируемым множителем мода.
+        // Ванильная формула скорости роста (влажность, соседние культуры)
+        // × плодородие почвы × конфигурируемый множитель мода.
         float growthSpeed = CropGrowth.growthSpeed(state, level, pos)
+                * SoilFertility.growthMultiplier(level, pos.below())
                 * (float) KHServerConfig.cropGrowthSpeed();
         if (growthSpeed > 0 && random.nextInt((int) (25.0F / growthSpeed) + 1) == 0) {
             this.grow(level, state, pos, 1);
         }
+    }
+
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.player.Player player) {
+        // Сбор зрелого растения истощает грядку (система плодородия).
+        if (level instanceof ServerLevel serverLevel && isMaxAge(state)) {
+            BlockPos farmland = state.getValue(HALF) == DoubleBlockHalf.LOWER
+                    ? pos.below()
+                    : pos.below(2);
+            SoilFertility.onHarvest(serverLevel, farmland, this);
+        }
+        return super.playerWillDestroy(level, pos, state, player);
     }
 
     private void grow(ServerLevel level, BlockState lowerState, BlockPos lowerPos, int increase) {

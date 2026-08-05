@@ -36,6 +36,21 @@ final class KHTranslations {
         add("item.kubanhorizons.sunflower_oil", "Bottle of Sunflower Oil", "Бутылка подсолнечного масла");
         add("item.kubanhorizons.oil_cake", "Oil Cake", "Жмых");
         add("item.kubanhorizons.roasted_sunflower_seeds", "Roasted Sunflower Seeds", "Жареные семечки");
+        add("item.kubanhorizons.soil_probe", "Soil Probe", "Почвенный щуп");
+
+        // --- Сообщения ---
+        add("message.kubanhorizons.soil_probe.result",
+                "Fertility: %s (%s), moisture: %s/7",
+                "Плодородие: %s (%s), влажность: %s/7");
+        add("message.kubanhorizons.soil_probe.rich", "rich", "богатая");
+        add("message.kubanhorizons.soil_probe.normal", "normal", "обычная");
+        add("message.kubanhorizons.soil_probe.poor", "poor", "истощённая");
+        add("message.kubanhorizons.soil_probe.not_farmland",
+                "Till the soil first to probe it",
+                "Сначала вспашите землю, чтобы взять пробу");
+        add("message.kubanhorizons.soil_probe.advice",
+                "Tip: compost the soil or rotate crops to restore fertility",
+                "Совет: внесите компост или смените культуру, чтобы восстановить плодородие");
 
         // --- Контейнеры ---
         add("container.kubanhorizons.oil_press", "Oil Press", "Маслопресс");

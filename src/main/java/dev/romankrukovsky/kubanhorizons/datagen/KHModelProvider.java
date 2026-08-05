@@ -45,6 +45,7 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.SUNFLOWER_OIL.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.OIL_CAKE.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.ROASTED_SUNFLOWER_SEEDS.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.SOIL_PROBE.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
     }
 
     private void registerSunflowerCrop(BlockModelGenerators blockModels) {

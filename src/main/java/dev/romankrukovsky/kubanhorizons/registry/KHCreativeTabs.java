@@ -27,6 +27,7 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.SUNFLOWER_OIL.get());
                         output.accept(KHItems.OIL_CAKE.get());
                         output.accept(KHItems.ROASTED_SUNFLOWER_SEEDS.get());
+                        output.accept(KHItems.SOIL_PROBE.get());
                         output.accept(KHItems.OIL_PRESS.get());
                     })
                     .build());

@@ -44,6 +44,14 @@ public final class KHItems {
             ITEMS.registerSimpleItem("roasted_sunflower_seeds",
                     p -> p.food(KHFoods.ROASTED_SUNFLOWER_SEEDS));
 
+    // --- Инструменты ---
+
+    /** Почвенный щуп — анализатор плодородия грядок. */
+    public static final DeferredItem<dev.romankrukovsky.kubanhorizons.item.SoilProbeItem> SOIL_PROBE =
+            ITEMS.registerItem("soil_probe",
+                    dev.romankrukovsky.kubanhorizons.item.SoilProbeItem::new,
+                    p -> p.stacksTo(1));
+
     // --- Блок-предметы ---
 
     /** Маслопресс (предмет). */

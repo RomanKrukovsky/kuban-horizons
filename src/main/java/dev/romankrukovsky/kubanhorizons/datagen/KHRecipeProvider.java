@@ -52,6 +52,16 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_sunflower_seeds", this.has(KHItems.SUNFLOWER_SEEDS.get()))
                 .save(this.output);
 
+        // Почвенный щуп: медный стержень.
+        this.shaped(RecipeCategory.TOOLS, KHItems.SOIL_PROBE.get())
+                .pattern("C")
+                .pattern("R")
+                .pattern("R")
+                .define('C', Items.COPPER_INGOT)
+                .define('R', Items.STICK)
+                .unlockedBy("has_copper", this.has(Items.COPPER_INGOT))
+                .save(this.output);
+
         // Жареные семечки — жарка в печи/коптильне/на костре.
         cooking(SmeltingRecipe::new, 200, "smelting");
         cooking(SmokingRecipe::new, 100, "smoking");
