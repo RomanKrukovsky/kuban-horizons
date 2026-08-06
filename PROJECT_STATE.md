@@ -16,7 +16,7 @@
 `main` → https://github.com/RomanKrukovsky/kuban-horizons
 
 ## Последний успешный commit
-- `79506b6` feat: integrate vanilla melon with soil fertility
+- `c4c4991` fix(worldgen): repair landmark structure palettes
 
 ## Завершено
 - [x] Разведка версий: MDK-26.2-ModDevGradle, NeoForge 26.2.0.48-beta.
@@ -82,15 +82,17 @@
       attachment с SchemaVersion предотвращает повторную выдачу и
       переносится после смерти.
 - [x] **Биом «кубанская степь»**: datapack-биом с равнинной экосистемой,
-      полями подсолнухов и структурами равнин; компактный custom BiomeSource
-      и opt-in world preset сохраняют ванильные multi-noise/Nether/End и не
-      изменяют существующие миры.
-- [x] **Плавни и лиман**: влажные datapack-биомы заменяют ванильные swamp
+      полями подсолнухов и структурами равнин; compact custom BiomeSource
+      сохраняет ванильную multi-noise географию и рельеф, но opt-in Overworld
+      публикует и генерирует только четыре биома мода. Обычный preset,
+      существующие чанки, Nether и End не меняются.
+- [x] **Плавни и лиман**: влажные datapack-биомы проецируют ванильные swamp
       и mangrove_swamp только в opt-in preset; плавни получают мелкие водные
       окна, лиман — грязевые берега через собственные noise settings поверх
       ванильных surface rules.
-- [x] **Пойма реки**: заливной луг заменяет ванильную `river` в opt-in
-      preset (замёрзшие реки остаются ванильными). Растительность следует
+- [x] **Пойма реки**: заливной луг проецирует ванильную `river` в opt-in
+      preset; остальные результаты, включая замёрзшие реки, становятся
+      кубанской степью. Растительность следует
       cycle-safe порядку ванильной незамёрзшей реки: прибрежные деревья и
       кусты, цветы, трава, грибы и речная растительность; речная фауна плюс
       скот заливных пастбищ; речной ил (грязь/глина под водой, супесь на
@@ -115,14 +117,16 @@
 
 ## Выполненные тесты
 - `./gradlew build`, `runData` — успех.
-- `runGameTestServer`: **38/38** мода (39/39 с ванильным batch)
+- `runGameTestServer`: **41/41** мода (42/42 с ванильным batch)
   (подсолнечник 5, пресс 3, плодородие 3, арбуз 1, орошение 3, кукуруза 1,
   чай 1, рис 2, виноград 2, томат 1, плодовые деревья 3, сушилка 1,
-  мельница 1, путеводитель 1, реестры 1, world preset 1, глобальный порядок
-  worldgen features 1, пойма реки 1, структуры поймы/плавней 1, дерево
-  достижений 1, строительные материалы 4). Новый тест вызывает
-  `ChunkGenerator.validate()` для полного opt-in biome source; цикл feature
-  order не обнаружен. `runData` повторно не записывает файлы; `build` успешен.
+  мельница 1, путеводитель 1, реестры 1, world preset 1, stronghold eligibility 1,
+  wild crop features 1, глобальный порядок worldgen features 1, пойма реки 1,
+  структуры поймы/плавней 2, дерево достижений 1, строительные материалы 4).
+  World preset test проверяет точное множество четырёх custom biome keys и
+  ванильные source-типы Nether/End; `ChunkGenerator.validate()` подтверждает
+  отсутствие feature-order cycle. `runData` повторно записал 0 файлов;
+  `build` успешен.
 - Dedicated server: свежий opt-in мир `kubanhorizons:kuban_horizons` создан
   с seed `17420351`, достиг `Done (1.241s)` без FeatureSorter/worldgen-ошибок
   и чисто сохранился/остановился. Интерактивная команда `/locate biome`

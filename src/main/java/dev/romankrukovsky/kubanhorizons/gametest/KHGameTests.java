@@ -15,6 +15,7 @@ import dev.romankrukovsky.kubanhorizons.worldgen.KHPlacedFeatures;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHStructures;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHStructureSets;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHWorldPresets;
+import dev.romankrukovsky.kubanhorizons.worldgen.KubanBiomeSource;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.advancements.AdvancementTree;
@@ -60,6 +61,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -109,6 +111,8 @@ public final class KHGameTests {
         register("hand_mill_grinds_wheat", KHGameTests::testHandMill, 300);
         register("kuban_guide_content", KHGameTests::testKubanGuideContent, 100);
         register("kuban_steppe_world_preset", KHGameTests::testKubanSteppeWorldPreset, 100);
+        register("kuban_stronghold_biomes", KHGameTests::testKubanStrongholdBiomes, 100);
+        register("kuban_wild_crop_features", KHGameTests::testKubanWildCropFeatures, 100);
         register("worldgen_feature_order", KHGameTests::testWorldgenFeatureOrder, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
         register("structure_registry_integrity", KHGameTests::testStructureRegistryIntegrity, 100);
@@ -281,33 +285,81 @@ public final class KHGameTests {
         helper.succeed();
     }
 
-    /** Пресет содержит три ванильных измерения и реально использует биомы мода. */
+    /** Пресет содержит три измерения, а Overworld публикует только четыре кубанских биома. */
     private static void testKubanSteppeWorldPreset(GameTestHelper helper) {
         var registries = helper.getLevel().registryAccess();
         var preset = registries.lookupOrThrow(Registries.WORLD_PRESET)
                 .getOrThrow(KHWorldPresets.KUBAN_HORIZONS)
                 .value();
+        var dimensions = preset.createWorldDimensions().dimensions();
         var overworld = preset.overworld().orElseThrow();
+        var biomeSource = overworld.generator().getBiomeSource();
 
-        helper.assertTrue(preset.createWorldDimensions().dimensions().size() == 3,
-                "Пресет должен сохранять Overworld, Nether и End");
-        helper.assertTrue(overworld.generator().getBiomeSource().possibleBiomes().stream()
-                        .anyMatch(biome -> biome.is(KHBiomes.KUBAN_STEPPE)),
-                "Кубанская степь отсутствует в biome source пресета");
-        helper.assertTrue(overworld.generator().getBiomeSource().possibleBiomes().stream()
-                        .anyMatch(biome -> biome.is(KHBiomes.PLAVNI)),
-                "Плавни отсутствуют в biome source пресета");
-        helper.assertTrue(overworld.generator().getBiomeSource().possibleBiomes().stream()
-                        .anyMatch(biome -> biome.is(KHBiomes.LIMAN)),
-                "Лиман отсутствует в biome source пресета");
-        helper.assertTrue(overworld.generator().getBiomeSource().possibleBiomes().stream()
-                        .anyMatch(biome -> biome.is(KHBiomes.RIVER_FLOODPLAIN)),
-                "Пойма реки отсутствует в biome source пресета");
+        helper.assertTrue(dimensions.keySet().equals(Set.of(
+                        net.minecraft.world.level.dimension.LevelStem.OVERWORLD,
+                        net.minecraft.world.level.dimension.LevelStem.NETHER,
+                        net.minecraft.world.level.dimension.LevelStem.END)),
+                "Пресет должен содержать ровно Overworld, Nether и End: " + dimensions.keySet());
+        helper.assertTrue(biomeSource instanceof KubanBiomeSource,
+                "Overworld пресета должен использовать KubanBiomeSource: " + biomeSource.getClass().getName());
+
+        Set<ResourceKey<net.minecraft.world.level.biome.Biome>> actualBiomes = biomeSource.possibleBiomes().stream()
+                .map(Holder::unwrapKey)
+                .map(key -> key.orElseThrow(() -> new AssertionError("Незарегистрированный биом в KubanBiomeSource")))
+                .collect(java.util.stream.Collectors.toSet());
+        Set<ResourceKey<net.minecraft.world.level.biome.Biome>> expectedBiomes = Set.of(
+                KHBiomes.KUBAN_STEPPE, KHBiomes.PLAVNI, KHBiomes.LIMAN, KHBiomes.RIVER_FLOODPLAIN);
+        helper.assertTrue(actualBiomes.equals(expectedBiomes),
+                "KubanBiomeSource должен публиковать только четыре кубанских биома: " + actualBiomes);
+
+        helper.assertTrue(dimensions.get(net.minecraft.world.level.dimension.LevelStem.NETHER).generator().getBiomeSource()
+                        instanceof net.minecraft.world.level.biome.MultiNoiseBiomeSource,
+                "Nether должен сохранять ванильный MultiNoiseBiomeSource");
+        helper.assertTrue(dimensions.get(net.minecraft.world.level.dimension.LevelStem.END).generator().getBiomeSource()
+                        instanceof net.minecraft.world.level.biome.TheEndBiomeSource,
+                "End должен сохранять ванильный TheEndBiomeSource");
         helper.assertTrue(overworld.generator() instanceof net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator
                         && ((net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator) overworld.generator())
                                 .stable(KHNoiseSettings.OVERWORLD),
                 "Пресет не использует surface rules плавней, лимана и поймы");
         helper.succeed();
+    }
+
+    /** Все достижимые биомы KubanBiomeSource допускают ванильные stronghold'ы. */
+    private static void testKubanStrongholdBiomes(GameTestHelper helper) {
+        var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
+        var strongholdBiomes = biomes.getOrThrow(net.minecraft.tags.BiomeTags.HAS_STRONGHOLD);
+        for (ResourceKey<net.minecraft.world.level.biome.Biome> key : List.of(
+                KHBiomes.KUBAN_STEPPE, KHBiomes.PLAVNI, KHBiomes.LIMAN, KHBiomes.RIVER_FLOODPLAIN)) {
+            helper.assertTrue(strongholdBiomes.contains(biomes.getOrThrow(key)),
+                    "Достижимый кубанский биом отсутствует в #has_structure/stronghold: " + key.identifier());
+        }
+        helper.succeed();
+    }
+
+    /** Дикие культуры присутствуют в растительности предназначенных кубанских биомов. */
+    private static void testKubanWildCropFeatures(GameTestHelper helper) {
+        var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
+        assertVegetationFeature(helper, biomes.getOrThrow(KHBiomes.KUBAN_STEPPE),
+                KHPlacedFeatures.WILD_TOMATO_PLACED);
+        assertVegetationFeature(helper, biomes.getOrThrow(KHBiomes.KUBAN_STEPPE),
+                KHPlacedFeatures.WILD_GRAPE_PLACED);
+        assertVegetationFeature(helper, biomes.getOrThrow(KHBiomes.PLAVNI),
+                KHPlacedFeatures.WILD_TEA_PLACED);
+        assertVegetationFeature(helper, biomes.getOrThrow(KHBiomes.LIMAN),
+                KHPlacedFeatures.WILD_TEA_PLACED);
+        assertVegetationFeature(helper, biomes.getOrThrow(KHBiomes.RIVER_FLOODPLAIN),
+                KHPlacedFeatures.WILD_RICE_PLACED);
+        helper.succeed();
+    }
+
+    private static void assertVegetationFeature(GameTestHelper helper,
+            Holder<net.minecraft.world.level.biome.Biome> biome, ResourceKey<PlacedFeature> feature) {
+        boolean present = biome.value().getGenerationSettings().features()
+                .get(GenerationStep.Decoration.VEGETAL_DECORATION.ordinal())
+                .stream().anyMatch(holder -> holder.is(feature));
+        helper.assertTrue(present, "В биоме " + biome.unwrapKey().orElseThrow().identifier()
+                + " отсутствует дикая культура " + feature.identifier());
     }
 
     /**

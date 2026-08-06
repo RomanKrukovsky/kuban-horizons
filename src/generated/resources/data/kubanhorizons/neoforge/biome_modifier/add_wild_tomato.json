@@ -3,7 +3,8 @@
   "biomes": [
     "minecraft:plains",
     "minecraft:sunflower_plains",
-    "minecraft:savanna"
+    "minecraft:savanna",
+    "kubanhorizons:kuban_steppe"
   ],
   "features": "kubanhorizons:wild_tomato",
   "step": "vegetal_decoration"

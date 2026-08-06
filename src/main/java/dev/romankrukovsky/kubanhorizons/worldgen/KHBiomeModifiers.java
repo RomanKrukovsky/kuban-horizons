@@ -6,7 +6,6 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -44,7 +43,12 @@ public final class KHBiomeModifiers {
         HolderGetter<PlacedFeature> features = context.lookup(Registries.PLACED_FEATURE);
 
         context.register(ADD_WILD_TEA, new BiomeModifiers.AddFeaturesBiomeModifier(
-                biomes.getOrThrow(BiomeTags.IS_JUNGLE),
+                HolderSet.direct(
+                        biomes.getOrThrow(Biomes.JUNGLE),
+                        biomes.getOrThrow(Biomes.SPARSE_JUNGLE),
+                        biomes.getOrThrow(Biomes.BAMBOO_JUNGLE),
+                        biomes.getOrThrow(KHBiomes.PLAVNI),
+                        biomes.getOrThrow(KHBiomes.LIMAN)),
                 HolderSet.direct(features.getOrThrow(KHPlacedFeatures.WILD_TEA_PLACED)),
                 GenerationStep.Decoration.VEGETAL_DECORATION));
 
@@ -52,7 +56,8 @@ public final class KHBiomeModifiers {
                 HolderSet.direct(
                         biomes.getOrThrow(Biomes.PLAINS),
                         biomes.getOrThrow(Biomes.SUNFLOWER_PLAINS),
-                        biomes.getOrThrow(Biomes.SAVANNA)),
+                        biomes.getOrThrow(Biomes.SAVANNA),
+                        biomes.getOrThrow(KHBiomes.KUBAN_STEPPE)),
                 HolderSet.direct(features.getOrThrow(KHPlacedFeatures.WILD_TOMATO_PLACED)),
                 GenerationStep.Decoration.VEGETAL_DECORATION));
 
@@ -60,7 +65,8 @@ public final class KHBiomeModifiers {
                 HolderSet.direct(
                         biomes.getOrThrow(Biomes.SAVANNA),
                         biomes.getOrThrow(Biomes.SAVANNA_PLATEAU),
-                        biomes.getOrThrow(Biomes.WOODED_BADLANDS)),
+                        biomes.getOrThrow(Biomes.WOODED_BADLANDS),
+                        biomes.getOrThrow(KHBiomes.KUBAN_STEPPE)),
                 HolderSet.direct(features.getOrThrow(KHPlacedFeatures.WILD_GRAPE_PLACED)),
                 GenerationStep.Decoration.VEGETAL_DECORATION));
 

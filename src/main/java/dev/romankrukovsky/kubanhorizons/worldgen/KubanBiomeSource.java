@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.biome.Climate;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSource;
 import net.minecraft.world.level.biome.MultiNoiseBiomeSourceParameterList;
@@ -12,8 +13,8 @@ import net.minecraft.world.level.biome.MultiNoiseBiomeSourceParameterList;
 import java.util.stream.Stream;
 
 /**
- * Компактная обёртка над ванильным multi-noise preset.
- * Подменяет выбранные ванильные аналоги на региональные биомы.
+ * Проецирует ванильную multi-noise географию в четыре региональных биома.
+ * Ванильный источник остаётся климатическим классификатором, но его biome ID наружу не выходят.
  */
 public final class KubanBiomeSource extends BiomeSource {
     public static final MapCodec<KubanBiomeSource> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -48,8 +49,7 @@ public final class KubanBiomeSource extends BiomeSource {
 
     @Override
     protected Stream<Holder<Biome>> collectPossibleBiomes() {
-        return Stream.concat(delegate.possibleBiomes().stream(),
-                Stream.of(steppe, plavni, liman, floodplain)).distinct();
+        return Stream.of(steppe, plavni, liman, floodplain);
     }
 
     @Override
@@ -60,19 +60,15 @@ public final class KubanBiomeSource extends BiomeSource {
     @Override
     public Holder<Biome> getNoiseBiome(int x, int y, int z, Climate.Sampler sampler) {
         Holder<Biome> selected = delegate.getNoiseBiome(x, y, z, sampler);
-        if (selected.is(net.minecraft.world.level.biome.Biomes.SUNFLOWER_PLAINS)) {
-            return steppe;
-        }
-        if (selected.is(net.minecraft.world.level.biome.Biomes.SWAMP)) {
+        if (selected.is(Biomes.SWAMP)) {
             return plavni;
         }
-        if (selected.is(net.minecraft.world.level.biome.Biomes.MANGROVE_SWAMP)) {
+        if (selected.is(Biomes.MANGROVE_SWAMP)) {
             return liman;
         }
-        // Незамёрзшие реки становятся кубанской поймой; замёрзшие остаются ванильными.
-        if (selected.is(net.minecraft.world.level.biome.Biomes.RIVER)) {
+        if (selected.is(Biomes.RIVER)) {
             return floodplain;
         }
-        return selected;
+        return steppe;
     }
 }

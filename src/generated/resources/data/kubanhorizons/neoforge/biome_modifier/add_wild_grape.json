@@ -3,7 +3,8 @@
   "biomes": [
     "minecraft:savanna",
     "minecraft:savanna_plateau",
-    "minecraft:wooded_badlands"
+    "minecraft:wooded_badlands",
+    "kubanhorizons:kuban_steppe"
   ],
   "features": "kubanhorizons:wild_grape",
   "step": "vegetal_decoration"
