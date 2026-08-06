@@ -86,6 +86,33 @@ final class KHTranslations {
         add("item.kubanhorizons.plum", "Plum", "Слива");
         add("item.kubanhorizons.walnut", "Walnut", "Грецкий орех");
 
+        // --- Путеводитель ---
+        add("guide.kubanhorizons.title", "Guide to Kuban", "Путеводитель по Кубани");
+        add("guide.kubanhorizons.page1",
+                "KUBAN HORIZONS\n\nWelcome to the fertile lands between the black-earth steppe and the warm sea. This guide will help you begin.",
+                "КУБАНСКИЕ ГОРИЗОНТЫ\n\nДобро пожаловать на плодородные земли между чернозёмной степью и тёплым морем. Этот путеводитель поможет начать.");
+        add("guide.kubanhorizons.page2",
+                "FERTILE SOIL\n\nCrops exhaust farmland. Use the soil probe to inspect fertility. Compost exhausted soil and rotate crops between harvests.",
+                "ПЛОДОРОДНАЯ ПОЧВА\n\nКультуры истощают грядки. Проверяйте плодородие почвенным щупом. Удобряйте истощённую почву и чередуйте культуры.");
+        add("guide.kubanhorizons.page3",
+                "FIELD CROPS\n\nGrow sunflower and corn on farmland. Rice needs a flooded field. Tomatoes can be harvested repeatedly after ripening.",
+                "ПОЛЕВЫЕ КУЛЬТУРЫ\n\nВыращивайте подсолнечник и кукурузу на грядках. Рису нужен затопленный чек. Созревшие томаты можно собирать многократно.");
+        add("guide.kubanhorizons.page4",
+                "TEA AND GRAPES\n\nTea grows on soil and gives new leaves after each harvest. Build a trellis, then graft a grape cutting onto it.",
+                "ЧАЙ И ВИНОГРАД\n\nЧай растёт на земле и вновь даёт листья после сбора. Постройте шпалеру и привейте к ней черенок винограда.");
+        add("guide.kubanhorizons.page5",
+                "IRRIGATION\n\nPlace a water intake beside water, then lead irrigation channels to your fields. Wet channels hydrate nearby farmland.",
+                "ОРОШЕНИЕ\n\nПоставьте водозабор у воды и проведите от него оросительные желоба к полям. Заполненные желоба увлажняют грядки рядом.");
+        add("guide.kubanhorizons.page6",
+                "THE ORCHARD\n\nPlant peach, apricot, plum, and walnut saplings. Ripe fruit appears in the crown and can be picked without cutting the tree.",
+                "КУБАНСКИЙ САД\n\nСажайте персики, абрикосы, сливы и грецкие орехи. Спелые плоды появляются в кроне и собираются без рубки дерева.");
+        add("guide.kubanhorizons.page7",
+                "CRAFT AND PROCESS\n\nThe oil press turns sunflower seeds into oil. Dry tea and fruit under open skies. Turn the hand mill to grind grain.",
+                "РЕМЕСЛО\n\nМаслопресс выжимает масло из семечек. Сушите чай и фрукты под открытым небом. Мелите зерно ручной мельницей.");
+        add("guide.kubanhorizons.page8",
+                "KUBAN KITCHEN\n\nBake bread, brew tea, and cook local dishes from your harvest. Follow advancements to discover every branch of the homestead.",
+                "КУБАНСКАЯ КУХНЯ\n\nПеките хлеб, заваривайте чай и готовьте местные блюда из своего урожая. Достижения подскажут все пути развития хозяйства.");
+
         // --- Сообщения ---
         add("message.kubanhorizons.soil_probe.result",
                 "Fertility: %s (%s), moisture: %s/7",

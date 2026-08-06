@@ -3,10 +3,12 @@ package dev.romankrukovsky.kubanhorizons.gametest;
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
 import dev.romankrukovsky.kubanhorizons.blockentity.OilPressBlockEntity;
 import dev.romankrukovsky.kubanhorizons.crop.SunflowerCropBlock;
+import dev.romankrukovsky.kubanhorizons.item.KubanGuide;
 import dev.romankrukovsky.kubanhorizons.registry.KHBlocks;
 import dev.romankrukovsky.kubanhorizons.registry.KHItems;
 import dev.romankrukovsky.kubanhorizons.util.KHIds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -21,6 +23,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.WrittenBookContent;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -78,6 +81,7 @@ public final class KHGameTests {
         register("sapling_grows_tree", KHGameTests::testSaplingGrowsTree, 400);
         register("drying_rack_dries_tea", KHGameTests::testDryingRack, 400);
         register("hand_mill_grinds_wheat", KHGameTests::testHandMill, 300);
+        register("kuban_guide_content", KHGameTests::testKubanGuideContent, 100);
     }
 
     private KHGameTests() {
@@ -224,6 +228,21 @@ public final class KHGameTests {
                 .setValue(SunflowerCropBlock.HALF, DoubleBlockHalf.LOWER);
         helper.setBlock(cropPos, lower);
         helper.setBlock(cropPos.above(), lower.setValue(SunflowerCropBlock.HALF, DoubleBlockHalf.UPPER));
+    }
+
+    /** Путеводитель создаётся как подписанная книга с полным набором страниц. */
+    private static void testKubanGuideContent(GameTestHelper helper) {
+        ItemStack guide = KubanGuide.create();
+        WrittenBookContent content = guide.get(DataComponents.WRITTEN_BOOK_CONTENT);
+
+        helper.assertTrue(guide.is(Items.WRITTEN_BOOK),
+                "Путеводитель должен использовать ванильную письменную книгу");
+        helper.assertTrue(content != null, "У путеводителя отсутствует содержимое книги");
+        helper.assertTrue(content.pages().size() == KubanGuide.PAGES,
+                "Ожидалось страниц: " + KubanGuide.PAGES + ", получено: " + content.pages().size());
+        helper.assertTrue(guide.has(DataComponents.CUSTOM_NAME),
+                "У путеводителя отсутствует локализуемое название");
+        helper.succeed();
     }
 
     // --- Тесты маслопресса ---
