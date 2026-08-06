@@ -35,6 +35,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.player.Player;
@@ -111,6 +112,7 @@ public final class KHGameTests {
         register("worldgen_feature_order", KHGameTests::testWorldgenFeatureOrder, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
         register("structure_registry_integrity", KHGameTests::testStructureRegistryIntegrity, 100);
+        register("structure_templates_load", KHGameTests::testStructureTemplatesLoad, 100);
         register("advancement_tree_complete", KHGameTests::testAdvancementTree, 100);
         register("building_slab_drops_two", KHGameTests::testBuildingSlabDropsTwo, 100);
         register("building_requires_pickaxe", KHGameTests::testBuildingRequiresPickaxe, 100);
@@ -407,6 +409,21 @@ public final class KHGameTests {
         helper.assertTrue(reedShelter.value().biomes().size() == 1
                         && reedShelter.value().biomes().contains(plavni),
                 "Камышовый навес должен генерироваться только в плавнях");
+        helper.succeed();
+    }
+
+    /** Обе NBT-заготовки структур разбираются менеджером шаблонов MC 26.2. */
+    private static void testStructureTemplatesLoad(GameTestHelper helper) {
+        for (String path : List.of("floodplain_fishing_camp", "plavni_reed_shelter")) {
+            Identifier id = KHIds.of(path);
+            StructureTemplate template = helper.getLevel().getStructureManager()
+                    .get(id)
+                    .orElseThrow(() -> new AssertionError("Шаблон структуры не загрузился: " + id));
+            helper.assertTrue(template.getSize().getX() > 0
+                            && template.getSize().getY() > 0
+                            && template.getSize().getZ() > 0,
+                    "Шаблон структуры должен иметь ненулевой размер: " + id);
+        }
         helper.succeed();
     }
 
