@@ -16,7 +16,7 @@
 `main` → https://github.com/RomanKrukovsky/kuban-horizons
 
 ## Последний успешный commit
-- `c4c4991` fix(worldgen): repair landmark structure palettes
+- `b701a7d` feat(worldgen): restrict Kuban preset to regional biomes
 
 ## Завершено
 - [x] Разведка версий: MDK-26.2-ModDevGradle, NeoForge 26.2.0.48-beta.
@@ -127,13 +127,17 @@
   ванильные source-типы Nether/End; `ChunkGenerator.validate()` подтверждает
   отсутствие feature-order cycle. `runData` повторно записал 0 файлов;
   `build` успешен.
-- Dedicated server: свежий opt-in мир `kubanhorizons:kuban_horizons` создан
-  с seed `17420351`, достиг `Done (1.241s)` без FeatureSorter/worldgen-ошибок
-  и чисто сохранился/остановился. Интерактивная команда `/locate biome`
-  записана в неполный transcript без ответа, поэтому достижимость биомов и
-  структур, surface rules и растительность этим smoke не доказаны; ручная
-  визуальная проверка не выполнялась. Клиент: старт до окна, инициализация
-  мода видна, 0 ERROR.
+- Dedicated server: свежий изолированный opt-in мир с seed `17420351`
+  достиг `Done (1.374s)` без FeatureSorter/worldgen-ошибок. Runtime-команды
+  нашли все четыре биома мода, stronghold, `floodplain_fishing_camp` и
+  `plavni_reed_shelter`; Nether вернул `nether_wastes`/`crimson_forest`, End —
+  `the_end`/`end_highlands`. Отдельный свежий `minecraft:normal` мир достиг
+  `Done (1.279s)`, нашёл vanilla plains/swamp/river и stronghold, но не нашёл
+  четыре custom биома и обе custom структуры в пределах поиска. Оба мира
+  чисто сохранены и остановлены. Эти проверки доказывают runtime-достижимость
+  и практическую изоляцию preset, но не заменяют широкую координатную выборку
+  или визуальную проверку surface rules, растительности и посадки структур.
+  Клиент: старт до окна, инициализация мода видна, 0 ERROR.
 
 ## Известные ошибки
 - GitHub Actions не запускается: «account is locked due to a billing
@@ -143,14 +147,14 @@
 
 ## Незавершённые изменения / в работе
 - Stage 5: cycle-safe порядок растительности поймы, автоматическая проверка
-  полного графа features и свежий opt-in startup готовы; datagen идемпотентен,
-  все GameTest'ы зелёные. Ещё нужна достоверная runtime-проверка достижимости
-  четырёх биомов и обеих структур, surface rules/растительности и отсутствия
-  влияния на обычный world preset.
+  полного графа features, runtime-достижимость четырёх биомов и двух структур,
+  а также изоляция обычного preset подтверждены. Ещё нужна ручная визуальная
+  проверка surface rules, растительности и посадки структур; широкая runtime-
+  выборка координат остаётся дополнительным усилением exact-set GameTest.
 
 ## Следующий конкретный шаг
-1. Завершить достоверную runtime-диагностику генерации структур и биомов Stage 5.
-2. Этап 7: белёная штукатурка и наличники; затем черепица, керамика и звуки.
+1. Этап 7: белёная штукатурка и наличники; затем черепица, керамика и звуки.
+2. Выполнить ручную визуальную проверку Stage 5 при следующем клиентском smoke.
 3. Перед релизом — полный smoke на dedicated server + 2 клиента.
 
 ## Команды для продолжения

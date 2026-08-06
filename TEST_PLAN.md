@@ -35,6 +35,8 @@
 | Worldgen | полный граф features не содержит циклов | ✅ |
 | Worldgen | дикие культуры доступны в достижимых custom биомах | ✅ |
 | Progression | все четыре custom биома допускают stronghold | ✅ |
+| Runtime preset | fresh custom мир находит 4 биома, stronghold и 2 структуры | ✅ |
+| Runtime isolation | fresh normal мир находит vanilla, но не custom цели в пределах поиска | ✅ |
 | Структуры | шаблон размещается без парения в воздухе | 📋 |
 | Сущности | спавн по правилам биомов | 📋 |
 | Сеть | ContainerData доносит прогресс до клиента | 📋 |
