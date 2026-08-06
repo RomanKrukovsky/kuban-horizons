@@ -273,6 +273,27 @@ public final class KHBlocks {
                     net.minecraft.world.level.block.SlabBlock::new,
                     plasterProperties());
 
+    /** Черепица — обожжённая глиняная кровля кубанского дома. */
+    public static final DeferredBlock<net.minecraft.world.level.block.Block> ROOF_TILES =
+            BLOCKS.registerSimpleBlock("roof_tiles", ceramicProperties());
+
+    /** Ступеньки из черепицы для скатной кровли. */
+    public static final DeferredBlock<net.minecraft.world.level.block.StairBlock> ROOF_TILE_STAIRS =
+            BLOCKS.registerBlock("roof_tile_stairs",
+                    p -> new net.minecraft.world.level.block.StairBlock(
+                            ROOF_TILES.get().defaultBlockState(), p),
+                    ceramicProperties());
+
+    /** Плита из черепицы для пологой кровли. */
+    public static final DeferredBlock<net.minecraft.world.level.block.SlabBlock> ROOF_TILE_SLAB =
+            BLOCKS.registerBlock("roof_tile_slab",
+                    net.minecraft.world.level.block.SlabBlock::new,
+                    ceramicProperties());
+
+    /** Декоративная расписная керамика. */
+    public static final DeferredBlock<net.minecraft.world.level.block.Block> DECORATIVE_CERAMIC =
+            BLOCKS.registerSimpleBlock("decorative_ceramic", ceramicProperties());
+
     /** Резной оконный наличник. */
     public static final DeferredBlock<CarvedWindowCasingBlock> CARVED_WINDOW_CASING =
             BLOCKS.registerBlock("carved_window_casing", CarvedWindowCasingBlock::new,
@@ -317,6 +338,15 @@ public final class KHBlocks {
                 .requiresCorrectToolForDrops()
                 .strength(0.8F, 2.0F)
                 .sound(SoundType.CALCITE);
+    }
+
+    /** Свойства обожжённой черепицы и керамики. */
+    private static java.util.function.UnaryOperator<BlockBehaviour.Properties> ceramicProperties() {
+        return p -> p.mapColor(MapColor.TERRACOTTA_RED)
+                .instrument(net.minecraft.world.level.block.state.properties.NoteBlockInstrument.BASEDRUM)
+                .requiresCorrectToolForDrops()
+                .strength(1.25F, 4.2F)
+                .sound(SoundType.DECORATED_POT);
     }
 
     /** Свойства плетня — лоза: как дерево, но легче и горит. */

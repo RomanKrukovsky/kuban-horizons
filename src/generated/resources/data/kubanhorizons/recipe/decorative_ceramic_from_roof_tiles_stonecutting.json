@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "kubanhorizons:roof_tiles",
+  "result": {
+    "id": "kubanhorizons:decorative_ceramic"
+  }
+}

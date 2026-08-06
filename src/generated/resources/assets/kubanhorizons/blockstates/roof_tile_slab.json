@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "kubanhorizons:block/roof_tile_slab"
+    },
+    "type=double": {
+      "model": "kubanhorizons:block/roof_tiles"
+    },
+    "type=top": {
+      "model": "kubanhorizons:block/roof_tile_slab_top"
+    }
+  }
+}

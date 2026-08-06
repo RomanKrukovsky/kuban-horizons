@@ -20,6 +20,12 @@ PLASTER_DARK = (201, 193, 174, 255)
 PLASTER_CRACK = (174, 164, 146, 255)
 CASING_ACCENT = (106, 153, 178, 255)
 CASING_ACCENT_DARK = (70, 112, 138, 255)
+ROOF_HI = (190, 104, 67, 255)
+ROOF_MID = (165, 80, 46, 255)
+ROOF_DARK = (118, 53, 34, 255)
+CERAMIC_WHITE = (232, 224, 208, 255)
+CERAMIC_BLUE = (66, 111, 151, 255)
+CERAMIC_BLUE_DARK = (44, 76, 112, 255)
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "..",
                    "src/main/resources/assets/kubanhorizons/textures/block")
@@ -334,6 +340,35 @@ def whitewashed_plaster():
     return im
 
 
+def roof_tiles():
+    """Черепица: повторяющиеся выпуклые ряды обожжённой глины."""
+    im = img()
+    rect(im, 0, 0, 15, 15, ROOF_MID)
+    for y in (0, 4, 8, 12):
+        hline(im, y, 0, 15, ROOF_HI)
+        hline(im, min(15, y + 3), 0, 15, ROOF_DARK)
+        offset = 0 if (y // 4) % 2 == 0 else 4
+        for x in range(offset, 16, 8):
+            vline(im, x, y, min(15, y + 3), ROOF_DARK)
+            if x + 1 < 16:
+                vline(im, x + 1, y, min(15, y + 2), ROOF_HI)
+    return im
+
+
+def decorative_ceramic():
+    """Расписная керамика: белая глазурь с синим ромбическим орнаментом."""
+    im = img()
+    rect(im, 0, 0, 15, 15, CERAMIC_WHITE)
+    hline(im, 0, 0, 15, (245, 238, 222, 255))
+    hline(im, 15, 0, 15, (194, 181, 160, 255))
+    for cx, cy in ((3, 3), (11, 3), (7, 7), (3, 11), (11, 11)):
+        for dx, dy in ((0, -2), (-1, -1), (1, -1), (-2, 0), (0, 0), (2, 0),
+                       (-1, 1), (1, 1), (0, 2)):
+            px(im, cx + dx, cy + dy, CERAMIC_BLUE)
+        px(im, cx, cy, CERAMIC_BLUE_DARK)
+    return im
+
+
 def carved_window_casing():
     """Резной наличник: белая основа с кубанским сине-голубым орнаментом."""
     im = whitewashed_plaster()
@@ -424,6 +459,8 @@ def main():
     save(adobe_bricks(), "adobe_bricks")
     save(shell_rock(), "shell_rock")
     save(whitewashed_plaster(), "whitewashed_plaster")
+    save(roof_tiles(), "roof_tiles")
+    save(decorative_ceramic(), "decorative_ceramic")
     save(carved_window_casing(), "carved_window_casing")
     save(wattle(), "wattle")
     save(wattle_particle(), "wattle_particle")

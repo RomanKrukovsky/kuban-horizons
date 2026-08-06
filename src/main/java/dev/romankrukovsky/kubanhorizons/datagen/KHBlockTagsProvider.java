@@ -66,17 +66,23 @@ public final class KHBlockTagsProvider extends BlockTagsProvider {
                 .add(KHBlocks.WHITEWASHED_PLASTER.getKey())
                 .add(KHBlocks.WHITEWASHED_PLASTER_STAIRS.getKey())
                 .add(KHBlocks.WHITEWASHED_PLASTER_SLAB.getKey())
-                .add(KHBlocks.CARVED_WINDOW_CASING.getKey());
+                .add(KHBlocks.CARVED_WINDOW_CASING.getKey())
+                .add(KHBlocks.ROOF_TILES.getKey())
+                .add(KHBlocks.ROOF_TILE_STAIRS.getKey())
+                .add(KHBlocks.ROOF_TILE_SLAB.getKey())
+                .add(KHBlocks.DECORATIVE_CERAMIC.getKey());
         // Формы вариантов: без этих тегов стенки не стыкуются с ванильными,
         // а плиты и ступеньки не видны механикам, работающим по форме.
         tag(BlockTags.STAIRS)
                 .add(KHBlocks.ADOBE_BRICK_STAIRS.getKey())
                 .add(KHBlocks.SHELL_ROCK_STAIRS.getKey())
-                .add(KHBlocks.WHITEWASHED_PLASTER_STAIRS.getKey());
+                .add(KHBlocks.WHITEWASHED_PLASTER_STAIRS.getKey())
+                .add(KHBlocks.ROOF_TILE_STAIRS.getKey());
         tag(BlockTags.SLABS)
                 .add(KHBlocks.ADOBE_BRICK_SLAB.getKey())
                 .add(KHBlocks.SHELL_ROCK_SLAB.getKey())
-                .add(KHBlocks.WHITEWASHED_PLASTER_SLAB.getKey());
+                .add(KHBlocks.WHITEWASHED_PLASTER_SLAB.getKey())
+                .add(KHBlocks.ROOF_TILE_SLAB.getKey());
         tag(BlockTags.WALLS)
                 .add(KHBlocks.ADOBE_BRICK_WALL.getKey())
                 .add(KHBlocks.SHELL_ROCK_WALL.getKey());

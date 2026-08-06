@@ -249,6 +249,25 @@ public final class KHRecipeProvider extends RecipeProvider {
         this.generateRecipes(KHBlockFamilies.SHELL_ROCK, FeatureFlags.REGISTRY.allFlags());
         this.generateRecipes(KHBlockFamilies.WHITEWASHED_PLASTER, FeatureFlags.REGISTRY.allFlags());
 
+        // Черепица обжигается из кирпичей; расписная керамика сочетает её
+        // с белой глазурью из кварца и кубанским синим пигментом.
+        this.shaped(RecipeCategory.BUILDING_BLOCKS, KHItems.ROOF_TILES.get(), 4)
+                .pattern("BB")
+                .pattern("BB")
+                .define('B', Items.BRICK)
+                .unlockedBy("has_brick", this.has(Items.BRICK))
+                .save(this.output);
+        this.generateRecipes(KHBlockFamilies.ROOF_TILES, FeatureFlags.REGISTRY.allFlags());
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.DECORATIVE_CERAMIC.get(), 4)
+                .pattern("LQL")
+                .pattern("QRQ")
+                .pattern("LQL")
+                .define('L', Items.LAPIS_LAZULI)
+                .define('Q', Items.QUARTZ)
+                .define('R', KHItems.ROOF_TILES.get())
+                .unlockedBy("has_roof_tiles", this.has(KHItems.ROOF_TILES.get()))
+                .save(this.output);
+
         // Камнерез. Семейство эти рецепты не генерирует: ванильный
         // stonecutterResultFromBase сохраняет их по имени без пространства
         // имён, и они уехали бы в minecraft:.
@@ -268,6 +287,12 @@ public final class KHRecipeProvider extends RecipeProvider {
                 RecipeCategory.BUILDING_BLOCKS, 1);
         stonecutting(KHItems.WHITEWASHED_PLASTER.get(), KHItems.WHITEWASHED_PLASTER_SLAB.get(),
                 RecipeCategory.BUILDING_BLOCKS, 2);
+        stonecutting(KHItems.ROOF_TILES.get(), KHItems.ROOF_TILE_STAIRS.get(),
+                RecipeCategory.BUILDING_BLOCKS, 1);
+        stonecutting(KHItems.ROOF_TILES.get(), KHItems.ROOF_TILE_SLAB.get(),
+                RecipeCategory.BUILDING_BLOCKS, 2);
+        stonecutting(KHItems.ROOF_TILES.get(), KHItems.DECORATIVE_CERAMIC.get(),
+                RecipeCategory.DECORATIONS, 1);
 
         // Наличник вырезается из белёной штукатурки и даёт одну готовую раму.
         this.shaped(RecipeCategory.DECORATIONS, KHItems.CARVED_WINDOW_CASING.get())

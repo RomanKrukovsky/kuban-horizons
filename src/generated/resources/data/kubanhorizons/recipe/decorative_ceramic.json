@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "L": "minecraft:lapis_lazuli",
+    "Q": "minecraft:quartz",
+    "R": "kubanhorizons:roof_tiles"
+  },
+  "pattern": [
+    "LQL",
+    "QRQ",
+    "LQL"
+  ],
+  "result": {
+    "count": 4,
+    "id": "kubanhorizons:decorative_ceramic"
+  }
+}

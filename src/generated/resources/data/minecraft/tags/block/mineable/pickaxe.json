@@ -13,6 +13,10 @@
     "kubanhorizons:whitewashed_plaster",
     "kubanhorizons:whitewashed_plaster_stairs",
     "kubanhorizons:whitewashed_plaster_slab",
-    "kubanhorizons:carved_window_casing"
+    "kubanhorizons:carved_window_casing",
+    "kubanhorizons:roof_tiles",
+    "kubanhorizons:roof_tile_stairs",
+    "kubanhorizons:roof_tile_slab",
+    "kubanhorizons:decorative_ceramic"
   ]
 }

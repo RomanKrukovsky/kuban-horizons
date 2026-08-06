@@ -2,6 +2,7 @@
   "values": [
     "kubanhorizons:adobe_brick_slab",
     "kubanhorizons:shell_rock_slab",
-    "kubanhorizons:whitewashed_plaster_slab"
+    "kubanhorizons:whitewashed_plaster_slab",
+    "kubanhorizons:roof_tile_slab"
   ]
 }

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "kubanhorizons:block/roof_tiles",
+    "side": "kubanhorizons:block/roof_tiles",
+    "top": "kubanhorizons:block/roof_tiles"
+  }
+}

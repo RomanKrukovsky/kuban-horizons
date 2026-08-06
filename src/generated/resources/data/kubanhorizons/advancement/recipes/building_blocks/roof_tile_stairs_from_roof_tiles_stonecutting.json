@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_roof_tiles": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:roof_tiles"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "kubanhorizons:roof_tile_stairs_from_roof_tiles_stonecutting"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_roof_tiles"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "kubanhorizons:roof_tile_stairs_from_roof_tiles_stonecutting"
+    ]
+  }
+}

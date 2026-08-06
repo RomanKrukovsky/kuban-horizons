@@ -127,6 +127,8 @@ public final class KHGameTests {
         register("plaster_slab_drops_two", KHGameTests::testPlasterSlabDropsTwo, 100);
         register("plaster_tools_drops_and_tags", KHGameTests::testPlasterToolsDropsAndTags, 100);
         register("carved_casing_facing_and_shape", KHGameTests::testCarvedCasingFacingAndShape, 100);
+        register("roof_tile_slab_drops_two", KHGameTests::testRoofTileSlabDropsTwo, 100);
+        register("ceramics_tools_drops_and_tags", KHGameTests::testCeramicsToolsDropsAndTags, 100);
     }
 
     private KHGameTests() {
@@ -1218,6 +1220,9 @@ public final class KHGameTests {
                 "whitewashed_plaster_stairs_from_whitewashed_plaster_stonecutting",
                 "whitewashed_plaster_slab_from_whitewashed_plaster_stonecutting",
                 "carved_window_casing_from_whitewashed_plaster_stonecutting",
+                "roof_tile_stairs_from_roof_tiles_stonecutting",
+                "roof_tile_slab_from_roof_tiles_stonecutting",
+                "decorative_ceramic_from_roof_tiles_stonecutting",
         };
         var recipes = helper.getLevel().recipeAccess();
         for (String name : names) {
@@ -1310,6 +1315,55 @@ public final class KHGameTests {
         helper.succeed();
     }
 
+    /** Двойная плита черепицы сохраняет обе половины материала. */
+    private static void testRoofTileSlabDropsTwo(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, KHBlocks.ROOF_TILE_SLAB.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.SlabBlock.TYPE,
+                        net.minecraft.world.level.block.state.properties.SlabType.DOUBLE));
+        BlockPos abs = helper.absolutePos(pos);
+        List<ItemStack> drops = net.minecraft.world.level.block.Block.getDrops(
+                level.getBlockState(abs), level, abs, null, null,
+                new ItemStack(Items.IRON_PICKAXE));
+        int total = drops.stream()
+                .filter(stack -> stack.is(KHItems.ROOF_TILE_SLAB.get()))
+                .mapToInt(ItemStack::getCount)
+                .sum();
+        helper.assertValueEqual(total, 2, "Двойная плита черепицы должна дать 2 плиты");
+
+        helper.setBlock(pos, KHBlocks.ROOF_TILE_SLAB.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.SlabBlock.TYPE,
+                        net.minecraft.world.level.block.state.properties.SlabType.BOTTOM));
+        List<ItemStack> singleDrops = net.minecraft.world.level.block.Block.getDrops(
+                level.getBlockState(abs), level, abs, null, null,
+                new ItemStack(Items.IRON_PICKAXE));
+        int singleTotal = singleDrops.stream()
+                .filter(stack -> stack.is(KHItems.ROOF_TILE_SLAB.get()))
+                .mapToInt(ItemStack::getCount)
+                .sum();
+        helper.assertValueEqual(singleTotal, 1, "Одинарная плита черепицы должна дать 1 плиту");
+        helper.succeed();
+    }
+
+    /** Черепица и керамика требуют кирку, дропают себя и входят в shape tags. */
+    private static void testCeramicsToolsDropsAndTags(GameTestHelper helper) {
+        assertNeedsPickaxe(helper, new BlockPos(1, 1, 1),
+                KHBlocks.ROOF_TILES.get(), KHItems.ROOF_TILES.get());
+        assertNeedsPickaxe(helper, new BlockPos(2, 1, 1),
+                KHBlocks.DECORATIVE_CERAMIC.get(), KHItems.DECORATIVE_CERAMIC.get());
+
+        helper.assertTrue(KHBlocks.ROOF_TILE_STAIRS.get().defaultBlockState().is(BlockTags.STAIRS),
+                "Ступеньки черепицы должны входить в block tag stairs");
+        helper.assertTrue(KHBlocks.ROOF_TILE_SLAB.get().defaultBlockState().is(BlockTags.SLABS),
+                "Плита черепицы должна входить в block tag slabs");
+        helper.assertTrue(new ItemStack(KHItems.ROOF_TILE_STAIRS.get()).is(BlockItemTags.STAIRS.item()),
+                "Ступеньки черепицы должны входить в item tag stairs");
+        helper.assertTrue(new ItemStack(KHItems.ROOF_TILE_SLAB.get()).is(BlockItemTags.SLABS.item()),
+                "Плита черепицы должна входить в item tag slabs");
+        helper.succeed();
+    }
+
     // --- Реестры ---
 
     /** Все заявленные ID контента присутствуют в реестрах. */
@@ -1318,12 +1372,14 @@ public final class KHGameTests {
                 "adobe_bricks", "adobe_brick_stairs", "adobe_brick_slab", "adobe_brick_wall",
                 "shell_rock", "shell_rock_stairs", "shell_rock_slab", "shell_rock_wall",
                 "whitewashed_plaster", "whitewashed_plaster_stairs", "whitewashed_plaster_slab",
+                "roof_tiles", "roof_tile_stairs", "roof_tile_slab", "decorative_ceramic",
                 "carved_window_casing", "wattle", "wattle_gate"};
         String[] items = {"sunflower_seeds", "sunflower_head", "sunflower_oil",
                 "oil_cake", "roasted_sunflower_seeds", "oil_press",
                 "adobe_bricks", "adobe_brick_stairs", "adobe_brick_slab", "adobe_brick_wall",
                 "shell_rock", "shell_rock_stairs", "shell_rock_slab", "shell_rock_wall",
                 "whitewashed_plaster", "whitewashed_plaster_stairs", "whitewashed_plaster_slab",
+                "roof_tiles", "roof_tile_stairs", "roof_tile_slab", "decorative_ceramic",
                 "carved_window_casing", "wattle", "wattle_gate"};
         for (String id : blocks) {
             helper.assertTrue(BuiltInRegistries.BLOCK.containsKey(KHIds.of(id)),

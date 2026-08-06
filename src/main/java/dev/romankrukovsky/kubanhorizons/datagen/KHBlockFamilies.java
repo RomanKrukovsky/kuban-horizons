@@ -40,6 +40,13 @@ final class KHBlockFamilies {
                     .wall(KHBlocks.SHELL_ROCK_WALL.get())
                     .getFamily();
 
+    /** Черепица: полный блок, ступеньки и плита для кровельных профилей. */
+    static final BlockFamily ROOF_TILES =
+            new BlockFamily.Builder(KHBlocks.ROOF_TILES.get())
+                    .stairs(KHBlocks.ROOF_TILE_STAIRS.get())
+                    .slab(KHBlocks.ROOF_TILE_SLAB.get())
+                    .getFamily();
+
     /** Белёная штукатурка: полный блок, ступеньки и плита. */
     static final BlockFamily WHITEWASHED_PLASTER =
             new BlockFamily.Builder(KHBlocks.WHITEWASHED_PLASTER.get())
