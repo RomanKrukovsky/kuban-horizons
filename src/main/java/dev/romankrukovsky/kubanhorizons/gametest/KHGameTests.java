@@ -46,6 +46,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
@@ -107,6 +108,7 @@ public final class KHGameTests {
         register("hand_mill_grinds_wheat", KHGameTests::testHandMill, 300);
         register("kuban_guide_content", KHGameTests::testKubanGuideContent, 100);
         register("kuban_steppe_world_preset", KHGameTests::testKubanSteppeWorldPreset, 100);
+        register("worldgen_feature_order", KHGameTests::testWorldgenFeatureOrder, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
         register("structure_registry_integrity", KHGameTests::testStructureRegistryIntegrity, 100);
         register("advancement_tree_complete", KHGameTests::testAdvancementTree, 100);
@@ -306,7 +308,30 @@ public final class KHGameTests {
         helper.succeed();
     }
 
-    /** Пойма реки: речная фауна, влажный климат и дикий рис среди растительности. */
+    /**
+     * Инициализирует реальный граф декорации opt-in генератора.
+     *
+     * <p>{@link net.minecraft.world.level.chunk.ChunkGenerator#validate()} вызывает
+     * тот же {@code FeatureSorter.buildFeaturesPerStep}, который лениво запускается
+     * при декорации чанка. Поэтому тест падает на несовместимом порядке features
+     * даже когда spawn GameTest-сервера не пересекает пользовательский биом.</p>
+     */
+    private static void testWorldgenFeatureOrder(GameTestHelper helper) {
+        var preset = helper.getLevel().registryAccess()
+                .lookupOrThrow(Registries.WORLD_PRESET)
+                .getOrThrow(KHWorldPresets.KUBAN_HORIZONS)
+                .value();
+        var generator = preset.overworld().orElseThrow().generator();
+
+        try {
+            generator.validate();
+        } catch (IllegalStateException exception) {
+            throw new AssertionError("Несовместимый порядок worldgen features opt-in preset", exception);
+        }
+        helper.succeed();
+    }
+
+    /** Пойма реки: речная фауна, влажный климат и точный порядок растительности. */
     private static void testRiverFloodplainBiome(GameTestHelper helper) {
         var biome = helper.getLevel().registryAccess()
                 .lookupOrThrow(Registries.BIOME)
@@ -320,12 +345,36 @@ public final class KHGameTests {
                         .anyMatch(entry -> entry.value().type() == EntityTypes.COW),
                 "Заливные луга поймы должны быть пастбищами");
 
-        boolean hasWildRice = biome.getGenerationSettings()
+        List<Holder<PlacedFeature>> vegetation = biome.getGenerationSettings()
                 .features()
                 .get(GenerationStep.Decoration.VEGETAL_DECORATION.ordinal())
                 .stream()
-                .anyMatch(feature -> feature.is(KHPlacedFeatures.WILD_RICE_PLACED));
-        helper.assertTrue(hasWildRice, "Дикий рис не добавлен в растительность поймы");
+                .toList();
+        List<String> actualOrder = vegetation.stream()
+                .map(feature -> feature.unwrapKey()
+                        .map(key -> key.identifier().toString())
+                        .orElse("<unregistered>"))
+                .toList();
+        List<String> expectedOrder = List.of(
+                "minecraft:glow_lichen",
+                "minecraft:trees_water",
+                "minecraft:patch_bush",
+                "minecraft:flower_default",
+                "minecraft:patch_grass_badlands",
+                "minecraft:brown_mushroom_normal",
+                "minecraft:red_mushroom_normal",
+                "minecraft:patch_pumpkin",
+                "minecraft:patch_sugar_cane",
+                "minecraft:patch_firefly_bush_near_water",
+                "minecraft:seagrass_river",
+                KHPlacedFeatures.WILD_RICE_PLACED.identifier().toString());
+        helper.assertTrue(actualOrder.equals(expectedOrder),
+                "Порядок растительности поймы отличается от vanilla river baseline: " + actualOrder);
+        helper.assertTrue(vegetation.getLast().is(KHPlacedFeatures.WILD_RICE_PLACED),
+                "Дикий рис должен добавляться последним biome modifier'ом");
+        helper.assertTrue(actualOrder.stream().noneMatch(id -> id.equals("minecraft:patch_berry_common")
+                        || id.equals("minecraft:patch_tall_grass_2")),
+                "В пойму вернулся shared feature с несовместимым порядком: " + actualOrder);
         helper.succeed();
     }
 

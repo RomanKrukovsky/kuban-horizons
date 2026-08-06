@@ -7,7 +7,6 @@ import net.minecraft.data.worldgen.BiomeDefaultFeatures;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.data.worldgen.biome.OverworldBiomes;
 import net.minecraft.data.worldgen.placement.AquaticPlacements;
-import net.minecraft.data.worldgen.placement.VegetationPlacements;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.Musics;
 import net.minecraft.world.attribute.BackgroundMusic;
@@ -54,10 +53,10 @@ public final class KHBiomes {
     /**
      * Пойма реки — заливной луг кубанских рек.
      *
-     * <p>Строится по образцу ванильной {@code OverworldBiomes.river}, но
-     * богаче растительностью: прибрежные деревья и кусты, кувшинки, ежевика
-     * (ягодные кусты), высокая трава заливного луга. Речная фауна ванильная
-     * (кальмар, лосось, утопленники), плюс домашний скот заливных пастбищ.
+     * <p>Строится по образцу ванильной {@code OverworldBiomes.river}:
+     * прибрежные деревья и кусты, цветы, трава, грибы и речная растительность.
+     * Речная фауна ванильная (кальмар, лосось, утопленники), плюс домашний
+     * скот заливных пастбищ.
      * Приватные хелперы {@code baseBiome}/{@code globalOverworldGeneration}
      * ванильного класса недоступны извне, поэтому их состав воспроизведён
      * здесь публичными вызовами {@link BiomeDefaultFeatures}.</p>
@@ -87,15 +86,15 @@ public final class KHBiomes {
 
         BiomeDefaultFeatures.addDefaultOres(generation);
         BiomeDefaultFeatures.addDefaultSoftDisks(generation);
+        // Порядок намеренно совпадает с ванильной незамёрзшей рекой. FeatureSorter
+        // объединяет все возможные биомы opt-in preset, поэтому общие placed
+        // features обязаны сохранять глобально совместимый относительный порядок.
         BiomeDefaultFeatures.addWaterTrees(generation);
         BiomeDefaultFeatures.addBushes(generation);
-        BiomeDefaultFeatures.addCommonBerryBushes(generation);
         BiomeDefaultFeatures.addDefaultFlowers(generation);
-        BiomeDefaultFeatures.addPlainGrass(generation);
+        BiomeDefaultFeatures.addDefaultGrass(generation);
         BiomeDefaultFeatures.addDefaultMushrooms(generation);
         BiomeDefaultFeatures.addDefaultExtraVegetation(generation, true);
-        generation.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
-                VegetationPlacements.PATCH_WATERLILY);
         generation.addFeature(GenerationStep.Decoration.VEGETAL_DECORATION,
                 AquaticPlacements.SEAGRASS_RIVER);
 
