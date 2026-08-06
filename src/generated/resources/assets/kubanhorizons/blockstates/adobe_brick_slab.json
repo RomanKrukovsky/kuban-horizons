@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "kubanhorizons:block/adobe_brick_slab"
+    },
+    "type=double": {
+      "model": "kubanhorizons:block/adobe_bricks"
+    },
+    "type=top": {
+      "model": "kubanhorizons:block/adobe_brick_slab_top"
+    }
+  }
+}

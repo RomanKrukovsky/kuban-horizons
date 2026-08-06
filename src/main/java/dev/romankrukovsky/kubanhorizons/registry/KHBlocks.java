@@ -207,6 +207,103 @@ public final class KHBlocks {
                 .pushReaction(PushReaction.DESTROY);
     }
 
+    // --- Строительные материалы (этап 7) ---
+
+    /** Саманный кирпич — глиняно-соломенная кладка кубанской хаты. */
+    public static final DeferredBlock<net.minecraft.world.level.block.Block> ADOBE_BRICKS =
+            BLOCKS.registerSimpleBlock("adobe_bricks", adobeProperties());
+
+    /** Саманная ступенька. */
+    public static final DeferredBlock<net.minecraft.world.level.block.StairBlock> ADOBE_BRICK_STAIRS =
+            BLOCKS.registerBlock("adobe_brick_stairs",
+                    p -> new net.minecraft.world.level.block.StairBlock(
+                            ADOBE_BRICKS.get().defaultBlockState(), p),
+                    adobeProperties());
+
+    /** Саманная плита. */
+    public static final DeferredBlock<net.minecraft.world.level.block.SlabBlock> ADOBE_BRICK_SLAB =
+            BLOCKS.registerBlock("adobe_brick_slab",
+                    net.minecraft.world.level.block.SlabBlock::new,
+                    adobeProperties());
+
+    /** Саманная стенка. */
+    public static final DeferredBlock<net.minecraft.world.level.block.WallBlock> ADOBE_BRICK_WALL =
+            BLOCKS.registerBlock("adobe_brick_wall",
+                    net.minecraft.world.level.block.WallBlock::new,
+                    solidOn(adobeProperties()));
+
+    /** Ракушечник — пористый известняк азовского побережья. */
+    public static final DeferredBlock<net.minecraft.world.level.block.Block> SHELL_ROCK =
+            BLOCKS.registerSimpleBlock("shell_rock", shellRockProperties());
+
+    /** Ступенька из ракушечника. */
+    public static final DeferredBlock<net.minecraft.world.level.block.StairBlock> SHELL_ROCK_STAIRS =
+            BLOCKS.registerBlock("shell_rock_stairs",
+                    p -> new net.minecraft.world.level.block.StairBlock(
+                            SHELL_ROCK.get().defaultBlockState(), p),
+                    shellRockProperties());
+
+    /** Плита из ракушечника. */
+    public static final DeferredBlock<net.minecraft.world.level.block.SlabBlock> SHELL_ROCK_SLAB =
+            BLOCKS.registerBlock("shell_rock_slab",
+                    net.minecraft.world.level.block.SlabBlock::new,
+                    shellRockProperties());
+
+    /** Стенка из ракушечника. */
+    public static final DeferredBlock<net.minecraft.world.level.block.WallBlock> SHELL_ROCK_WALL =
+            BLOCKS.registerBlock("shell_rock_wall",
+                    net.minecraft.world.level.block.WallBlock::new,
+                    solidOn(shellRockProperties()));
+
+    /** Плетень — лозовая ограда двора. */
+    public static final DeferredBlock<net.minecraft.world.level.block.FenceBlock> WATTLE =
+            BLOCKS.registerBlock("wattle",
+                    net.minecraft.world.level.block.FenceBlock::new,
+                    wattleProperties());
+
+    /** Калитка плетня. */
+    public static final DeferredBlock<net.minecraft.world.level.block.FenceGateBlock> WATTLE_GATE =
+            BLOCKS.registerBlock("wattle_gate",
+                    p -> new net.minecraft.world.level.block.FenceGateBlock(p,
+                            net.minecraft.sounds.SoundEvents.FENCE_GATE_OPEN,
+                            net.minecraft.sounds.SoundEvents.FENCE_GATE_CLOSE),
+                    solidOn(wattleProperties()));
+
+    /** Свойства самана — по образцу ванильного грязевого кирпича. */
+    private static java.util.function.UnaryOperator<BlockBehaviour.Properties> adobeProperties() {
+        return p -> p.mapColor(MapColor.TERRACOTTA_YELLOW)
+                .instrument(net.minecraft.world.level.block.state.properties.NoteBlockInstrument.BASEDRUM)
+                .requiresCorrectToolForDrops()
+                .strength(1.5F, 3.0F)
+                .sound(SoundType.MUD_BRICKS);
+    }
+
+    /** Свойства ракушечника — мягкий пористый камень (по образцу кальцита). */
+    private static java.util.function.UnaryOperator<BlockBehaviour.Properties> shellRockProperties() {
+        return p -> p.mapColor(MapColor.SAND)
+                .instrument(net.minecraft.world.level.block.state.properties.NoteBlockInstrument.BASEDRUM)
+                .requiresCorrectToolForDrops()
+                .strength(0.9F, 2.5F)
+                .sound(SoundType.CALCITE);
+    }
+
+    /** Свойства плетня — лоза: как дерево, но легче и горит. */
+    private static java.util.function.UnaryOperator<BlockBehaviour.Properties> wattleProperties() {
+        return p -> p.mapColor(MapColor.WOOD)
+                .strength(1.5F, 2.0F)
+                .sound(SoundType.SCAFFOLDING)
+                .ignitedByLava();
+    }
+
+    /**
+     * Стенки и калитки должны считаться сплошными снизу (ванильное
+     * {@code forceSolidOn}), иначе на них нельзя ставить блоки-опоры.
+     */
+    private static java.util.function.UnaryOperator<BlockBehaviour.Properties> solidOn(
+            java.util.function.UnaryOperator<BlockBehaviour.Properties> base) {
+        return p -> base.apply(p).forceSolidOn();
+    }
+
     private KHBlocks() {
     }
 

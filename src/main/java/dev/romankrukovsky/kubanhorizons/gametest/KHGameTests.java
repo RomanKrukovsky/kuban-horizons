@@ -18,6 +18,7 @@ import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.advancements.AdvancementTree;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -105,6 +106,10 @@ public final class KHGameTests {
         register("kuban_steppe_world_preset", KHGameTests::testKubanSteppeWorldPreset, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
         register("advancement_tree_complete", KHGameTests::testAdvancementTree, 100);
+        register("building_slab_drops_two", KHGameTests::testBuildingSlabDropsTwo, 100);
+        register("building_requires_pickaxe", KHGameTests::testBuildingRequiresPickaxe, 100);
+        register("wattle_connects", KHGameTests::testWattleConnects, 100);
+        register("building_stonecutting_namespace", KHGameTests::testBuildingStonecuttingNamespace, 100);
     }
 
     private KHGameTests() {
@@ -886,13 +891,160 @@ public final class KHGameTests {
                 .thenSucceed();
     }
 
+    // --- Строительные материалы ---
+
+    /**
+     * Двойная плита отдаёт два предмета.
+     *
+     * <p>Дроп проверяется через {@code Block.getDrops} с явным инструментом:
+     * {@code destroyBlock} у мира ломает блок ПУСТЫМ инструментом, а плита
+     * требует кирку, и лут был бы пустым независимо от таблицы.</p>
+     */
+    private static void testBuildingSlabDropsTwo(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, KHBlocks.ADOBE_BRICK_SLAB.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.SlabBlock.TYPE,
+                        net.minecraft.world.level.block.state.properties.SlabType.DOUBLE));
+
+        BlockPos abs = helper.absolutePos(pos);
+        List<ItemStack> drops = net.minecraft.world.level.block.Block.getDrops(
+                level.getBlockState(abs), level, abs, null, null,
+                new ItemStack(Items.IRON_PICKAXE));
+        int total = drops.stream()
+                .filter(stack -> stack.is(KHItems.ADOBE_BRICK_SLAB.get()))
+                .mapToInt(ItemStack::getCount)
+                .sum();
+        helper.assertValueEqual(total, 2, "Двойная плита самана должна дать 2 плиты");
+
+        // Одинарная плита — ровно одна.
+        helper.setBlock(pos, KHBlocks.ADOBE_BRICK_SLAB.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.SlabBlock.TYPE,
+                        net.minecraft.world.level.block.state.properties.SlabType.BOTTOM));
+        List<ItemStack> single = net.minecraft.world.level.block.Block.getDrops(
+                level.getBlockState(abs), level, abs, null, null,
+                new ItemStack(Items.IRON_PICKAXE));
+        int singleTotal = single.stream()
+                .filter(stack -> stack.is(KHItems.ADOBE_BRICK_SLAB.get()))
+                .mapToInt(ItemStack::getCount)
+                .sum();
+        helper.assertValueEqual(singleTotal, 1, "Одинарная плита самана должна дать 1 плиту");
+        helper.succeed();
+    }
+
+    /**
+     * Саман и ракушечник добываются только киркой.
+     *
+     * <p>Проверяется механизм, которым ванилла реально гейтит дроп:
+     * {@code requiresCorrectToolForDrops} + {@code isCorrectToolForDrops}
+     * инструмента (в loot table условия на инструмент нет — его подставляет
+     * {@code ServerPlayerGameMode} при разрушении).</p>
+     */
+    private static void testBuildingRequiresPickaxe(GameTestHelper helper) {
+        assertNeedsPickaxe(helper, new BlockPos(1, 1, 1),
+                KHBlocks.ADOBE_BRICKS.get(), KHItems.ADOBE_BRICKS.get());
+        assertNeedsPickaxe(helper, new BlockPos(2, 1, 1),
+                KHBlocks.SHELL_ROCK.get(), KHItems.SHELL_ROCK.get());
+        helper.succeed();
+    }
+
+    private static void assertNeedsPickaxe(GameTestHelper helper, BlockPos pos,
+            net.minecraft.world.level.block.Block block, net.minecraft.world.item.Item drop) {
+        ServerLevel level = helper.getLevel();
+        helper.setBlock(pos, block);
+        BlockPos abs = helper.absolutePos(pos);
+        BlockState state = level.getBlockState(abs);
+
+        helper.assertTrue(state.requiresCorrectToolForDrops(),
+                "Блок должен требовать инструмент: " + drop);
+        helper.assertTrue(!new ItemStack(Items.IRON_AXE).isCorrectToolForDrops(state),
+                "Топор не должен считаться подходящим инструментом: " + drop);
+        // Ярус не нужен — как ванильный грязевой кирпич, хватает деревянной.
+        helper.assertTrue(new ItemStack(Items.WOODEN_PICKAXE).isCorrectToolForDrops(state),
+                "Деревянная кирка должна подходить: " + drop);
+
+        List<ItemStack> drops = net.minecraft.world.level.block.Block.getDrops(
+                state, level, abs, null, null, new ItemStack(Items.IRON_PICKAXE));
+        helper.assertValueEqual(drops.size(), 1, "Кирка должна дать один предмет: " + drop);
+        helper.assertTrue(drops.getFirst().is(drop),
+                "Дроп не совпадает с блоком: " + drop);
+    }
+
+    /**
+     * Плетень стыкуется с ванильной оградой и со своей калиткой.
+     *
+     * <p>Соседи ставятся ПОСЛЕ плетня: {@code setBlock} обновляет формы
+     * соседей, но не свою собственную, — поэтому плетень должен быть на месте
+     * первым, чтобы его обновили оба соседа.</p>
+     *
+     * <p>Калитка повёрнута по оси Z (FACING=NORTH): именно при такой оси
+     * {@code FenceGateBlock.connectsToDirection} разрешает стык с запада и
+     * востока.</p>
+     */
+    private static void testWattleConnects(GameTestHelper helper) {
+        BlockPos wattle = new BlockPos(2, 1, 1);
+        helper.setBlock(wattle.below(), Blocks.DIRT);
+        helper.setBlock(wattle, KHBlocks.WATTLE.get());
+        helper.setBlock(wattle.west(), Blocks.OAK_FENCE);
+        helper.setBlock(wattle.east(), KHBlocks.WATTLE_GATE.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.FenceGateBlock.FACING, Direction.NORTH));
+
+        helper.startSequence()
+                .thenExecuteAfter(2, () -> {
+                    helper.assertBlockProperty(wattle,
+                            net.minecraft.world.level.block.FenceBlock.WEST, true);
+                    helper.assertBlockProperty(wattle,
+                            net.minecraft.world.level.block.FenceBlock.EAST, true);
+                    // По оси Z соседей нет — стыков быть не должно.
+                    helper.assertBlockProperty(wattle,
+                            net.minecraft.world.level.block.FenceBlock.NORTH, false);
+                    helper.assertBlockProperty(wattle,
+                            net.minecraft.world.level.block.FenceBlock.SOUTH, false);
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * Рецепты камнереза лежат в {@code kubanhorizons:}, а не в {@code minecraft:}.
+     *
+     * <p>Регрессия: ванильный {@code stonecutterResultFromBase} сохраняет
+     * рецепт по имени без пространства имён, и {@code Identifier.parse}
+     * относил его к {@code minecraft}.</p>
+     */
+    private static void testBuildingStonecuttingNamespace(GameTestHelper helper) {
+        String[] names = {
+                "adobe_brick_stairs_from_adobe_bricks_stonecutting",
+                "adobe_brick_slab_from_adobe_bricks_stonecutting",
+                "adobe_brick_wall_from_adobe_bricks_stonecutting",
+                "shell_rock_stairs_from_shell_rock_stonecutting",
+                "shell_rock_slab_from_shell_rock_stonecutting",
+                "shell_rock_wall_from_shell_rock_stonecutting",
+        };
+        var recipes = helper.getLevel().recipeAccess();
+        for (String name : names) {
+            helper.assertTrue(recipes.byKey(ResourceKey.create(Registries.RECIPE,
+                            KHIds.of(name))).isPresent(),
+                    "Нет рецепта камнереза: kubanhorizons:" + name);
+            helper.assertTrue(recipes.byKey(ResourceKey.create(Registries.RECIPE,
+                            Identifier.withDefaultNamespace(name))).isEmpty(),
+                    "Рецепт камнереза утёк в minecraft: " + name);
+        }
+        helper.succeed();
+    }
+
     // --- Реестры ---
 
     /** Все заявленные ID контента присутствуют в реестрах. */
     private static void testRegistryContent(GameTestHelper helper) {
-        String[] blocks = {"sunflower_crop", "oil_press"};
+        String[] blocks = {"sunflower_crop", "oil_press",
+                "adobe_bricks", "adobe_brick_stairs", "adobe_brick_slab", "adobe_brick_wall",
+                "shell_rock", "shell_rock_stairs", "shell_rock_slab", "shell_rock_wall",
+                "wattle", "wattle_gate"};
         String[] items = {"sunflower_seeds", "sunflower_head", "sunflower_oil",
-                "oil_cake", "roasted_sunflower_seeds", "oil_press"};
+                "oil_cake", "roasted_sunflower_seeds", "oil_press",
+                "adobe_bricks", "adobe_brick_stairs", "adobe_brick_slab", "adobe_brick_wall",
+                "shell_rock", "shell_rock_stairs", "shell_rock_slab", "shell_rock_wall",
+                "wattle", "wattle_gate"};
         for (String id : blocks) {
             helper.assertTrue(BuiltInRegistries.BLOCK.containsKey(KHIds.of(id)),
                     "Блок отсутствует в реестре: " + id);

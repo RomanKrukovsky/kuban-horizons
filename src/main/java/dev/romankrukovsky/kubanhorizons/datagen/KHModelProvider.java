@@ -84,6 +84,8 @@ public final class KHModelProvider extends ModelProvider {
                 plainVariant(KHIds.of("block/hand_mill"))));
         blockModels.registerSimpleItemModel(handMill.asItem(), KHIds.of("block/hand_mill"));
 
+        registerBuildingFamilies(blockModels);
+
         // Плоские предметы.
         itemModels.generateFlatItem(KHItems.SUNFLOWER_SEEDS.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.SUNFLOWER_HEAD.get(), ModelTemplates.FLAT_ITEM);
@@ -118,6 +120,24 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.APRICOT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.PLUM.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.WALNUT.get(), ModelTemplates.FLAT_ITEM);
+    }
+
+    /**
+     * Строительные семейства: ступеньки, плиты, стенки и плетень.
+     *
+     * <p>Саман и ракушечник — обычные каменные семейства: полный куб плюс
+     * три варианта. Плетень базового куба не имеет, поэтому используется
+     * NeoForge-метод {@code familyWithExistingFullBlock}: он подставляет
+     * несуществующую модель куба как «уже готовую» и тем самым не пишет для
+     * неё ни blockstate, ни модель — а {@code customFence}/
+     * {@code customFenceGate} свою карту текстур строят сами
+     * ({@code TextureMapping.customParticle}) и к ней не обращаются.</p>
+     */
+    private void registerBuildingFamilies(BlockModelGenerators blockModels) {
+        blockModels.family(KHBlocks.ADOBE_BRICKS.get()).generateFor(KHBlockFamilies.ADOBE_BRICKS);
+        blockModels.family(KHBlocks.SHELL_ROCK.get()).generateFor(KHBlockFamilies.SHELL_ROCK);
+        blockModels.familyWithExistingFullBlock(KHBlocks.WATTLE.get())
+                .generateFor(KHBlockFamilies.WATTLE);
     }
 
     /**

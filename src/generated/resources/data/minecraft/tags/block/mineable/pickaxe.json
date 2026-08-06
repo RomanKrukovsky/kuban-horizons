@@ -1,6 +1,14 @@
 {
   "values": [
     "kubanhorizons:water_intake",
-    "kubanhorizons:hand_mill"
+    "kubanhorizons:hand_mill",
+    "kubanhorizons:adobe_bricks",
+    "kubanhorizons:adobe_brick_stairs",
+    "kubanhorizons:adobe_brick_slab",
+    "kubanhorizons:adobe_brick_wall",
+    "kubanhorizons:shell_rock",
+    "kubanhorizons:shell_rock_stairs",
+    "kubanhorizons:shell_rock_slab",
+    "kubanhorizons:shell_rock_wall"
   ]
 }

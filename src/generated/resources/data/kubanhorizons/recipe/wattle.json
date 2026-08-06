@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "S": "minecraft:stick",
+    "V": "#minecraft:leaves"
+  },
+  "pattern": [
+    "SVS",
+    "SVS"
+  ],
+  "result": {
+    "count": 3,
+    "id": "kubanhorizons:wattle"
+  }
+}

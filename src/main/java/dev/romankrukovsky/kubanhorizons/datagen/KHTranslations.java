@@ -52,6 +52,18 @@ final class KHTranslations {
         add("block.kubanhorizons.plum_sapling", "Plum Sapling", "Саженец сливы");
         add("block.kubanhorizons.walnut_sapling", "Walnut Sapling", "Саженец грецкого ореха");
 
+        // --- Строительные материалы ---
+        add("block.kubanhorizons.adobe_bricks", "Adobe Bricks", "Саманный кирпич");
+        add("block.kubanhorizons.adobe_brick_stairs", "Adobe Brick Stairs", "Саманная ступенька");
+        add("block.kubanhorizons.adobe_brick_slab", "Adobe Brick Slab", "Саманная плита");
+        add("block.kubanhorizons.adobe_brick_wall", "Adobe Brick Wall", "Саманная стенка");
+        add("block.kubanhorizons.shell_rock", "Shell Rock", "Ракушечник");
+        add("block.kubanhorizons.shell_rock_stairs", "Shell Rock Stairs", "Ступенька из ракушечника");
+        add("block.kubanhorizons.shell_rock_slab", "Shell Rock Slab", "Плита из ракушечника");
+        add("block.kubanhorizons.shell_rock_wall", "Shell Rock Wall", "Стенка из ракушечника");
+        add("block.kubanhorizons.wattle", "Wattle Fence", "Плетень");
+        add("block.kubanhorizons.wattle_gate", "Wattle Gate", "Калитка плетня");
+
         // --- Предметы ---
         add("item.kubanhorizons.sunflower_seeds", "Sunflower Seeds", "Семечки подсолнечника");
         add("item.kubanhorizons.sunflower_head", "Sunflower Head", "Шляпка подсолнечника");

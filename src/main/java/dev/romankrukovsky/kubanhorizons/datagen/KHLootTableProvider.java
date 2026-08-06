@@ -46,6 +46,21 @@ public final class KHLootTableProvider extends LootTableProvider {
             dropSelf(KHBlocks.DRYING_RACK.get());
             dropSelf(KHBlocks.HAND_MILL.get());
 
+            // Строительные блоки (этап 7). Плиты дают два предмета — иначе
+            // разбор двойной плиты терял бы половину материала.
+            dropSelf(KHBlocks.ADOBE_BRICKS.get());
+            dropSelf(KHBlocks.ADOBE_BRICK_STAIRS.get());
+            add(KHBlocks.ADOBE_BRICK_SLAB.get(),
+                    createSlabItemTable(KHBlocks.ADOBE_BRICK_SLAB.get()));
+            dropSelf(KHBlocks.ADOBE_BRICK_WALL.get());
+            dropSelf(KHBlocks.SHELL_ROCK.get());
+            dropSelf(KHBlocks.SHELL_ROCK_STAIRS.get());
+            add(KHBlocks.SHELL_ROCK_SLAB.get(),
+                    createSlabItemTable(KHBlocks.SHELL_ROCK_SLAB.get()));
+            dropSelf(KHBlocks.SHELL_ROCK_WALL.get());
+            dropSelf(KHBlocks.WATTLE.get());
+            dropSelf(KHBlocks.WATTLE_GATE.get());
+
             // Двухблочные культуры: дроп только с нижней зрелой половины —
             // верхняя не дропает ничего (защита от двойного лута).
             addDoubleCropDrops(KHBlocks.SUNFLOWER_CROP.get(),

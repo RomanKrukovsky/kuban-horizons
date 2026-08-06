@@ -3,6 +3,8 @@
     "kubanhorizons:oil_press",
     "kubanhorizons:irrigation_channel",
     "kubanhorizons:grape_trellis",
-    "kubanhorizons:drying_rack"
+    "kubanhorizons:drying_rack",
+    "kubanhorizons:wattle",
+    "kubanhorizons:wattle_gate"
   ]
 }

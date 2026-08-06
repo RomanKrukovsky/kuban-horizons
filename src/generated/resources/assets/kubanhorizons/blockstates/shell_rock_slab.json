@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "kubanhorizons:block/shell_rock_slab"
+    },
+    "type=double": {
+      "model": "kubanhorizons:block/shell_rock"
+    },
+    "type=top": {
+      "model": "kubanhorizons:block/shell_rock_slab_top"
+    }
+  }
+}

@@ -202,6 +202,48 @@ public final class KHItems {
     public static final DeferredItem<BlockItem> HAND_MILL =
             ITEMS.registerSimpleBlockItem("hand_mill", KHBlocks.HAND_MILL);
 
+    // --- Строительные материалы (предметы) ---
+
+    /** Саманный кирпич (предмет). */
+    public static final DeferredItem<BlockItem> ADOBE_BRICKS =
+            ITEMS.registerSimpleBlockItem("adobe_bricks", KHBlocks.ADOBE_BRICKS);
+
+    /** Саманная ступенька (предмет). */
+    public static final DeferredItem<BlockItem> ADOBE_BRICK_STAIRS =
+            ITEMS.registerSimpleBlockItem("adobe_brick_stairs", KHBlocks.ADOBE_BRICK_STAIRS);
+
+    /** Саманная плита (предмет). */
+    public static final DeferredItem<BlockItem> ADOBE_BRICK_SLAB =
+            ITEMS.registerSimpleBlockItem("adobe_brick_slab", KHBlocks.ADOBE_BRICK_SLAB);
+
+    /** Саманная стенка (предмет). */
+    public static final DeferredItem<BlockItem> ADOBE_BRICK_WALL =
+            ITEMS.registerSimpleBlockItem("adobe_brick_wall", KHBlocks.ADOBE_BRICK_WALL);
+
+    /** Ракушечник (предмет). */
+    public static final DeferredItem<BlockItem> SHELL_ROCK =
+            ITEMS.registerSimpleBlockItem("shell_rock", KHBlocks.SHELL_ROCK);
+
+    /** Ступенька из ракушечника (предмет). */
+    public static final DeferredItem<BlockItem> SHELL_ROCK_STAIRS =
+            ITEMS.registerSimpleBlockItem("shell_rock_stairs", KHBlocks.SHELL_ROCK_STAIRS);
+
+    /** Плита из ракушечника (предмет). */
+    public static final DeferredItem<BlockItem> SHELL_ROCK_SLAB =
+            ITEMS.registerSimpleBlockItem("shell_rock_slab", KHBlocks.SHELL_ROCK_SLAB);
+
+    /** Стенка из ракушечника (предмет). */
+    public static final DeferredItem<BlockItem> SHELL_ROCK_WALL =
+            ITEMS.registerSimpleBlockItem("shell_rock_wall", KHBlocks.SHELL_ROCK_WALL);
+
+    /** Плетень (предмет). */
+    public static final DeferredItem<BlockItem> WATTLE =
+            ITEMS.registerSimpleBlockItem("wattle", KHBlocks.WATTLE);
+
+    /** Калитка плетня (предмет). */
+    public static final DeferredItem<BlockItem> WATTLE_GATE =
+            ITEMS.registerSimpleBlockItem("wattle_gate", KHBlocks.WATTLE_GATE);
+
     // --- Мучные продукты ---
 
     /** Мука — основа выпечки. */

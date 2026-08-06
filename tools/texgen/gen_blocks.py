@@ -1,7 +1,18 @@
-"""Текстуры блоков-устройств: маслопресс, желоб, водозабор, листва, саженцы."""
+"""Текстуры блоков: маслопресс, желоб, водозабор, листва, саженцы,
+строительные материалы (саман, ракушечник, плетень)."""
 import os
 from texlib import (PAL, img, px, rect, vline, hline, blob, leaf, stem,
                     checker_noise, plank_texture)
+
+# Производные оттенки строительных материалов (ART_BIBLE §2: не более
+# 8–10 тонов на текстуру, обводка тёмным тоном собственного цвета).
+ADOBE_HI = (196, 170, 126, 255)
+ADOBE_DARK = (148, 122, 82, 255)
+ADOBE_MORTAR = (124, 100, 68, 255)
+
+SHELL_HI = (232, 221, 192, 255)
+SHELL_DARK = (188, 174, 140, 255)
+SHELL_PORE = (160, 146, 116, 255)
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "..",
                    "src/main/resources/assets/kubanhorizons/textures/block")
@@ -258,6 +269,94 @@ def hand_mill_top():
     return im
 
 
+# ---------- Строительные материалы ----------
+
+def adobe_bricks():
+    """Саманный кирпич: глиняно-соломенные блоки с широкими швами."""
+    im = img()
+    rect(im, 0, 0, 15, 15, PAL["adobe"])
+    # Горизонтальные швы (четыре ряда по 4 пикселя)
+    for y in (0, 4, 8, 12):
+        hline(im, y, 0, 15, ADOBE_MORTAR)
+        hline(im, y + 1, 0, 15, ADOBE_HI)
+        hline(im, y + 3, 0, 15, ADOBE_DARK)
+    # Вертикальные швы со сдвигом через ряд
+    for row, off in ((0, 7), (1, 3), (2, 11), (3, 3)):
+        y0 = row * 4 + 1
+        vline(im, off, y0, y0 + 2, ADOBE_MORTAR)
+    # Соломенные вкрапления самана: короткие светлые штрихи
+    for x, y in ((2, 2), (10, 2), (5, 6), (13, 6), (3, 10), (9, 10), (6, 14),
+                 (12, 14)):
+        px(im, x, y, PAL["dry_grass"])
+    return im
+
+
+def shell_rock():
+    """Ракушечник: пористый светлый известняк с раковинными вкраплениями."""
+    im = img()
+    rect(im, 0, 0, 15, 15, PAL["shell_rock"])
+    # Поры — осмысленное «зерно» камня, а не случайный шум
+    checker_noise(im, 0, 0, 15, 15, PAL["shell_rock"], SHELL_DARK, 3)
+    # Свет сверху-слева, тень снизу-справа
+    hline(im, 0, 0, 15, SHELL_HI)
+    vline(im, 0, 0, 15, SHELL_HI)
+    hline(im, 15, 0, 15, SHELL_DARK)
+    vline(im, 15, 0, 15, SHELL_DARK)
+    # Крупные раковинные каверны
+    for x, y in ((4, 3), (11, 5), (6, 10), (13, 12), (2, 13)):
+        px(im, x, y, SHELL_PORE)
+        px(im, x + 1, y, SHELL_PORE)
+        px(im, x, y + 1, SHELL_PORE)
+        px(im, x + 1, y - 1, SHELL_HI)
+    return im
+
+
+def wattle():
+    """Плетень: вертикальные колья и горизонтальная лозовая оплётка."""
+    im = img()
+    # Колья
+    for x in (1, 6, 11):
+        vline(im, x, 0, 15, PAL["wood_dark"])
+        vline(im, x + 1, 0, 15, PAL["wood_darker"])
+    # Лоза: ряды прутьев, огибающие колья через один
+    for row in range(8):
+        y = row * 2
+        hline(im, y, 0, 15, PAL["wood"])
+        hline(im, y + 1, 0, 15, PAL["wood_darker"])
+        # Прут уходит за кол — восстанавливаем кол там, где он спереди
+        for x in (1, 6, 11):
+            if (row + x) % 2 == 0:
+                px(im, x, y, PAL["wood_dark"])
+                px(im, x + 1, y, PAL["wood_darker"])
+                px(im, x, y + 1, PAL["wood_darker"])
+                px(im, x + 1, y + 1, PAL["wood_darker"])
+            else:
+                px(im, x, y, PAL["wood_hi"])
+    # Верхняя кромка светлее (свет сверху)
+    hline(im, 0, 0, 15, PAL["wood_hi"])
+    return im
+
+
+def wattle_particle():
+    """Частицы плетня: усреднённая лозовая фактура без просветов."""
+    im = img()
+    rect(im, 0, 0, 15, 15, PAL["wood"])
+    for y in range(1, 16, 2):
+        hline(im, y, 0, 15, PAL["wood_dark"])
+    hline(im, 0, 0, 15, PAL["wood_hi"])
+    return im
+
+
+def wattle_gate():
+    """Калитка плетня: та же оплётка, но с усиленной рамой."""
+    im = wattle()
+    hline(im, 0, 0, 15, PAL["wood_hi"])
+    hline(im, 1, 0, 15, PAL["wood"])
+    hline(im, 14, 0, 15, PAL["wood_dark"])
+    hline(im, 15, 0, 15, PAL["wood_darker"])
+    return im
+
+
 def main():
     save(hand_mill_side(), "hand_mill_side")
     save(hand_mill_top(), "hand_mill_top")
@@ -279,6 +378,13 @@ def main():
     save(water_intake_side_base(), "water_intake")
 
     save(grape_trellis(), "grape_trellis")
+
+    save(adobe_bricks(), "adobe_bricks")
+    save(shell_rock(), "shell_rock")
+    save(wattle(), "wattle")
+    save(wattle_particle(), "wattle_particle")
+    save(wattle_gate(), "wattle_gate")
+    save(wattle_particle(), "wattle_gate_particle")
 
     for kind in LEAF_SETS:
         for stage in range(3):

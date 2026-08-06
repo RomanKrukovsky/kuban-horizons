@@ -11,6 +11,7 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
@@ -216,6 +217,66 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_oil", this.has(KHItems.SUNFLOWER_OIL.get()))
                 .save(this.output);
 
+        // --- Строительные материалы ---
+
+        // Саман: глина + песок + солома (сухая трава как связующее).
+        this.shaped(RecipeCategory.BUILDING_BLOCKS, KHItems.ADOBE_BRICKS.get())
+                .pattern("CS")
+                .pattern("SC")
+                .define('C', Items.CLAY_BALL)
+                .define('S', Items.WHEAT)
+                .unlockedBy("has_clay_ball", this.has(Items.CLAY_BALL))
+                .save(this.output);
+
+        // Ракушечник: пористый известняк — прессуется из песка и ракушек.
+        this.shaped(RecipeCategory.BUILDING_BLOCKS, KHItems.SHELL_ROCK.get())
+                .pattern("NS")
+                .pattern("SN")
+                .define('N', Items.NAUTILUS_SHELL)
+                .define('S', Items.SAND)
+                .unlockedBy("has_nautilus_shell", this.has(Items.NAUTILUS_SHELL))
+                .save(this.output);
+
+        // Ступеньки, плиты, стенки и рецепты камнереза — из семейств.
+        this.generateRecipes(KHBlockFamilies.ADOBE_BRICKS, FeatureFlags.REGISTRY.allFlags());
+        this.generateRecipes(KHBlockFamilies.SHELL_ROCK, FeatureFlags.REGISTRY.allFlags());
+
+        // Камнерез. Семейство эти рецепты не генерирует: ванильный
+        // stonecutterResultFromBase сохраняет их по имени без пространства
+        // имён, и они уехали бы в minecraft:.
+        stonecutting(KHItems.ADOBE_BRICKS.get(), KHItems.ADOBE_BRICK_STAIRS.get(),
+                RecipeCategory.BUILDING_BLOCKS, 1);
+        stonecutting(KHItems.ADOBE_BRICKS.get(), KHItems.ADOBE_BRICK_SLAB.get(),
+                RecipeCategory.BUILDING_BLOCKS, 2);
+        stonecutting(KHItems.ADOBE_BRICKS.get(), KHItems.ADOBE_BRICK_WALL.get(),
+                RecipeCategory.DECORATIONS, 1);
+        stonecutting(KHItems.SHELL_ROCK.get(), KHItems.SHELL_ROCK_STAIRS.get(),
+                RecipeCategory.BUILDING_BLOCKS, 1);
+        stonecutting(KHItems.SHELL_ROCK.get(), KHItems.SHELL_ROCK_SLAB.get(),
+                RecipeCategory.BUILDING_BLOCKS, 2);
+        stonecutting(KHItems.SHELL_ROCK.get(), KHItems.SHELL_ROCK_WALL.get(),
+                RecipeCategory.DECORATIONS, 1);
+
+        // Плетень: лоза на кольях. Семейство плетня рецепты не генерирует —
+        // базовый блок совпадает с самой оградой, и ванильный
+        // getBaseBlockForCrafting предложил бы плести плетень из плетня.
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.WATTLE.get(), 3)
+                .pattern("SVS")
+                .pattern("SVS")
+                .define('S', Items.STICK)
+                .define('V', net.minecraft.tags.ItemTags.LEAVES)
+                .unlockedBy("has_sticks", this.has(Items.STICK))
+                .save(this.output);
+
+        // Калитка плетня: тот же материал, но рама вертикальная.
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.WATTLE_GATE.get())
+                .pattern("SVS")
+                .pattern("SVS")
+                .define('S', Items.STICK)
+                .define('V', net.minecraft.tags.ItemTags.LEAVES)
+                .unlockedBy("has_wattle", this.has(KHItems.WATTLE.get()))
+                .save(this.output);
+
         // Рецепт маслопресса: 8 семян + бутылка → масло + жмых.
         this.output.accept(
                 ResourceKey.create(Registries.RECIPE, KHIds.of("oil_pressing/sunflower_oil")),
@@ -228,6 +289,22 @@ public final class KHRecipeProvider extends RecipeProvider {
                         new ItemStackTemplate(KHItems.OIL_CAKE.get()),
                         300),
                 null);
+    }
+
+    /**
+     * Рецепт камнереза в пространстве имён мода.
+     *
+     * <p>Ключ строится через {@link KHIds}, а не строкой без префикса, —
+     * иначе рецепт попал бы в {@code minecraft:}.</p>
+     */
+    private void stonecutting(net.minecraft.world.level.ItemLike base,
+            net.minecraft.world.level.ItemLike result, RecipeCategory category, int count) {
+        net.minecraft.data.recipes.SingleItemRecipeBuilder
+                .stonecutting(Ingredient.of(base), category, result, count)
+                .unlockedBy(getHasName(base), this.has(base))
+                .save(this.output, ResourceKey.create(Registries.RECIPE,
+                        KHIds.of(getItemName(result) + "_from_" + getItemName(base)
+                                + "_stonecutting")));
     }
 
     /** Выпечка еды в печи. */

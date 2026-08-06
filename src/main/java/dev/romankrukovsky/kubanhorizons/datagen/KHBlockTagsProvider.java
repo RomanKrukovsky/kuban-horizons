@@ -50,5 +50,37 @@ public final class KHBlockTagsProvider extends BlockTagsProvider {
                 .add(KHBlocks.APRICOT_SAPLING.getKey())
                 .add(KHBlocks.PLUM_SAPLING.getKey())
                 .add(KHBlocks.WALNUT_SAPLING.getKey());
+
+        // --- Строительные материалы (этап 7) ---
+        // Саман и ракушечник — каменная кладка: кирка, ярус не нужен
+        // (как ванильный грязевой кирпич — хватает деревянной).
+        tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                .add(KHBlocks.ADOBE_BRICKS.getKey())
+                .add(KHBlocks.ADOBE_BRICK_STAIRS.getKey())
+                .add(KHBlocks.ADOBE_BRICK_SLAB.getKey())
+                .add(KHBlocks.ADOBE_BRICK_WALL.getKey())
+                .add(KHBlocks.SHELL_ROCK.getKey())
+                .add(KHBlocks.SHELL_ROCK_STAIRS.getKey())
+                .add(KHBlocks.SHELL_ROCK_SLAB.getKey())
+                .add(KHBlocks.SHELL_ROCK_WALL.getKey());
+        // Формы вариантов: без этих тегов стенки не стыкуются с ванильными,
+        // а плиты и ступеньки не видны механикам, работающим по форме.
+        tag(BlockTags.STAIRS)
+                .add(KHBlocks.ADOBE_BRICK_STAIRS.getKey())
+                .add(KHBlocks.SHELL_ROCK_STAIRS.getKey());
+        tag(BlockTags.SLABS)
+                .add(KHBlocks.ADOBE_BRICK_SLAB.getKey())
+                .add(KHBlocks.SHELL_ROCK_SLAB.getKey());
+        tag(BlockTags.WALLS)
+                .add(KHBlocks.ADOBE_BRICK_WALL.getKey())
+                .add(KHBlocks.SHELL_ROCK_WALL.getKey());
+        // Плетень — деревянная ограда: топор, стыковка с ванильными оградами
+        // и калитками (WOODEN_FENCES нужен, чтобы калитка вставала в линию).
+        tag(BlockTags.MINEABLE_WITH_AXE)
+                .add(KHBlocks.WATTLE.getKey())
+                .add(KHBlocks.WATTLE_GATE.getKey());
+        tag(BlockTags.FENCES).add(KHBlocks.WATTLE.getKey());
+        tag(BlockTags.WOODEN_FENCES).add(KHBlocks.WATTLE.getKey());
+        tag(BlockTags.FENCE_GATES).add(KHBlocks.WATTLE_GATE.getKey());
     }
 }

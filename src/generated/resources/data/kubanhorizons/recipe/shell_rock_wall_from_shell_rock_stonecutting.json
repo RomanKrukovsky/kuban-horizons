@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "kubanhorizons:shell_rock",
+  "result": {
+    "id": "kubanhorizons:shell_rock_wall"
+  }
+}

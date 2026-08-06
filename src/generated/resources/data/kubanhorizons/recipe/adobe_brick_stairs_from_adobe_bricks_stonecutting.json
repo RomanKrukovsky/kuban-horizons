@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "kubanhorizons:adobe_bricks",
+  "result": {
+    "id": "kubanhorizons:adobe_brick_stairs"
+  }
+}

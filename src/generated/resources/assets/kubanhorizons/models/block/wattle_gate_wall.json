@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_custom_fence_gate_wall",
+  "textures": {
+    "particle": "kubanhorizons:block/wattle_gate_particle",
+    "texture": "kubanhorizons:block/wattle_gate"
+  }
+}

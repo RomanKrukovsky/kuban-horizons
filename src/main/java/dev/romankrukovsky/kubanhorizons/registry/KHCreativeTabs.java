@@ -65,6 +65,16 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.TEA_CUP.get());
                         output.accept(KHItems.HONEY_WALNUTS.get());
                         output.accept(KHItems.VEGETABLE_SPREAD.get());
+                        output.accept(KHItems.ADOBE_BRICKS.get());
+                        output.accept(KHItems.ADOBE_BRICK_STAIRS.get());
+                        output.accept(KHItems.ADOBE_BRICK_SLAB.get());
+                        output.accept(KHItems.ADOBE_BRICK_WALL.get());
+                        output.accept(KHItems.SHELL_ROCK.get());
+                        output.accept(KHItems.SHELL_ROCK_STAIRS.get());
+                        output.accept(KHItems.SHELL_ROCK_SLAB.get());
+                        output.accept(KHItems.SHELL_ROCK_WALL.get());
+                        output.accept(KHItems.WATTLE.get());
+                        output.accept(KHItems.WATTLE_GATE.get());
                     })
                     .build());
 

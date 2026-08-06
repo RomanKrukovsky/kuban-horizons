@@ -1,0 +1,41 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "kubanhorizons:block/wattle_post"
+      }
+    },
+    {
+      "apply": {
+        "model": "kubanhorizons:block/wattle_side_north"
+      },
+      "when": {
+        "north": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "kubanhorizons:block/wattle_side_east"
+      },
+      "when": {
+        "east": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "kubanhorizons:block/wattle_side_south"
+      },
+      "when": {
+        "south": "true"
+      }
+    },
+    {
+      "apply": {
+        "model": "kubanhorizons:block/wattle_side_west"
+      },
+      "when": {
+        "west": "true"
+      }
+    }
+  ]
+}

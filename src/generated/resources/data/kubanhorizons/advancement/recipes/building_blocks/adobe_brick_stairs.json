@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_adobe_bricks": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:adobe_bricks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "kubanhorizons:adobe_brick_stairs"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_adobe_bricks"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "kubanhorizons:adobe_brick_stairs"
+    ]
+  }
+}
