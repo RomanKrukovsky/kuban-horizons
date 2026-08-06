@@ -135,6 +135,22 @@ public final class KHRecipeProvider extends RecipeProvider {
         cookedCorn(SmokingRecipe::new, 100, "smoking");
         cookedCorn(CampfireCookingRecipe::new, 600, "campfire_cooking");
 
+        // Сушильная рама: палки + верёвка.
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.DRYING_RACK.get())
+                .pattern("SSS")
+                .pattern("T T")
+                .define('S', Items.STICK)
+                .define('T', Items.STRING)
+                .unlockedBy("has_string", this.has(Items.STRING))
+                .save(this.output);
+
+        // Рецепты сушки.
+        drying("dried_tea", KHItems.TEA_LEAVES.get(), KHItems.DRIED_TEA.get(), 1200);
+        drying("dried_fruit_from_peach", KHItems.PEACH.get(), KHItems.DRIED_FRUIT.get(), 2400);
+        drying("dried_fruit_from_apricot", KHItems.APRICOT.get(), KHItems.DRIED_FRUIT.get(), 2400);
+        drying("dried_fruit_from_plum", KHItems.PLUM.get(), KHItems.DRIED_FRUIT.get(), 2400);
+        drying("dried_fruit_from_grapes", KHItems.GRAPES.get(), KHItems.DRIED_FRUIT.get(), 2400);
+
         // Рецепт маслопресса: 8 семян + бутылка → масло + жмых.
         this.output.accept(
                 ResourceKey.create(Registries.RECIPE, KHIds.of("oil_pressing/sunflower_oil")),
@@ -146,6 +162,19 @@ public final class KHRecipeProvider extends RecipeProvider {
                         new ItemStackTemplate(KHItems.SUNFLOWER_OIL.get()),
                         new ItemStackTemplate(KHItems.OIL_CAKE.get()),
                         300),
+                null);
+    }
+
+    /** Рецепт сушки на раме. */
+    private void drying(String name, net.minecraft.world.level.ItemLike input,
+            net.minecraft.world.level.ItemLike result, int ticks) {
+        this.output.accept(
+                ResourceKey.create(Registries.RECIPE, KHIds.of("drying/" + name)),
+                new dev.romankrukovsky.kubanhorizons.processing.DryingRecipe(
+                        new Recipe.CommonInfo(true), "",
+                        Ingredient.of(input),
+                        new ItemStackTemplate(result.asItem()),
+                        ticks),
                 null);
     }
 

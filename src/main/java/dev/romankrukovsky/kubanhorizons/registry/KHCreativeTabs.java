@@ -53,6 +53,9 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.OIL_PRESS.get());
                         output.accept(KHItems.IRRIGATION_CHANNEL.get());
                         output.accept(KHItems.WATER_INTAKE.get());
+                        output.accept(KHItems.DRYING_RACK.get());
+                        output.accept(KHItems.DRIED_TEA.get());
+                        output.accept(KHItems.DRIED_FRUIT.get());
                     })
                     .build());
 

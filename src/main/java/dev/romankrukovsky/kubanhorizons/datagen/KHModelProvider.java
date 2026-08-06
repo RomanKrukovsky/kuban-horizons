@@ -70,6 +70,14 @@ public final class KHModelProvider extends ModelProvider {
 
         registerIrrigation(blockModels);
 
+        // Сушильная рама: ручная модель + горизонтальные повороты.
+        Block dryingRack = KHBlocks.DRYING_RACK.get();
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(dryingRack,
+                                plainVariant(KHIds.of("block/drying_rack")))
+                        .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        blockModels.registerSimpleItemModel(dryingRack.asItem(), KHIds.of("block/drying_rack"));
+
         // Плоские предметы.
         itemModels.generateFlatItem(KHItems.SUNFLOWER_SEEDS.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.SUNFLOWER_HEAD.get(), ModelTemplates.FLAT_ITEM);
@@ -90,6 +98,8 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.GRAPES.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.TOMATO_SEEDS.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.TOMATO.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.DRIED_TEA.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.DRIED_FRUIT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.PEACH.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.APRICOT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.PLUM.get(), ModelTemplates.FLAT_ITEM);

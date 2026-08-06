@@ -30,6 +30,12 @@ public final class KHFoods {
             .saturationModifier(0.6F)
             .build();
 
+    /** Сушёные фрукты: концентрированная походная еда. */
+    public static final FoodProperties DRIED_FRUIT = new FoodProperties.Builder()
+            .nutrition(5)
+            .saturationModifier(0.6F)
+            .build();
+
     /** Томат: свежий овощ. */
     public static final FoodProperties TOMATO = new FoodProperties.Builder()
             .nutrition(2)

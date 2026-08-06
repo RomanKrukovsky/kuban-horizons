@@ -35,6 +35,21 @@ public final class KHRecipes {
     public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> OIL_PRESSING_CATEGORY =
             BOOK_CATEGORIES.register("oil_pressing", RecipeBookCategory::new);
 
+    /** Тип рецепта «сушка». */
+    public static final DeferredHolder<RecipeType<?>, RecipeType<dev.romankrukovsky.kubanhorizons.processing.DryingRecipe>> DRYING_TYPE =
+            TYPES.register("drying", () -> RecipeType.simple(KHIds.of("drying")));
+
+    /** Сериализатор рецепта «сушка». */
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<dev.romankrukovsky.kubanhorizons.processing.DryingRecipe>> DRYING_SERIALIZER =
+            SERIALIZERS.register("drying",
+                    () -> new RecipeSerializer<>(
+                            dev.romankrukovsky.kubanhorizons.processing.DryingRecipe.MAP_CODEC,
+                            dev.romankrukovsky.kubanhorizons.processing.DryingRecipe.STREAM_CODEC));
+
+    /** Категория книги рецептов «сушка». */
+    public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> DRYING_CATEGORY =
+            BOOK_CATEGORIES.register("drying", RecipeBookCategory::new);
+
     private KHRecipes() {
     }
 

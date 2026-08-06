@@ -1,0 +1,8 @@
+{
+  "type": "kubanhorizons:drying",
+  "dry_ticks": 2400,
+  "ingredient": "kubanhorizons:apricot",
+  "result": {
+    "id": "kubanhorizons:dried_fruit"
+  }
+}

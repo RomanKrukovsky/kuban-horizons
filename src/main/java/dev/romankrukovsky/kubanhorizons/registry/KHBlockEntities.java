@@ -19,6 +19,11 @@ public final class KHBlockEntities {
             BLOCK_ENTITIES.register("oil_press",
                     () -> new BlockEntityType<>(OilPressBlockEntity::new, KHBlocks.OIL_PRESS.get()));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<dev.romankrukovsky.kubanhorizons.blockentity.DryingRackBlockEntity>> DRYING_RACK =
+            BLOCK_ENTITIES.register("drying_rack",
+                    () -> new BlockEntityType<>(dev.romankrukovsky.kubanhorizons.blockentity.DryingRackBlockEntity::new,
+                            KHBlocks.DRYING_RACK.get()));
+
     private KHBlockEntities() {
     }
 

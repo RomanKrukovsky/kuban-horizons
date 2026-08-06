@@ -214,7 +214,26 @@ def fruit_sapling(kind):
     return im
 
 
+def drying_rack_side():
+    im = plank_texture(PAL["wood"], PAL["wood_hi"], PAL["wood_dark"], PAL["wood_darker"])
+    return im
+
+
+def drying_rack_top():
+    im = img()
+    # Решётка из прутьев с просветами
+    for x in range(16):
+        for y in range(16):
+            if y % 3 != 2:
+                c = PAL["wood"] if y % 3 == 0 else PAL["wood_dark"]
+                px(im, x, y, c)
+    hline(im, 0, 0, 15, PAL["wood_hi"])
+    return im
+
+
 def main():
+    save(drying_rack_side(), "drying_rack_side")
+    save(drying_rack_top(), "drying_rack_top")
     save(oil_press_side(), "oil_press_side")
     save(oil_press_front(), "oil_press_front")
     save(oil_press_top(), "oil_press_top")

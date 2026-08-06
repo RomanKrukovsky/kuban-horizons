@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "S": "minecraft:stick",
+    "T": "minecraft:string"
+  },
+  "pattern": [
+    "SSS",
+    "T T"
+  ],
+  "result": {
+    "id": "kubanhorizons:drying_rack"
+  }
+}

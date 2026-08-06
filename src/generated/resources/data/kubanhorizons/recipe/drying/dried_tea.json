@@ -1,0 +1,7 @@
+{
+  "type": "kubanhorizons:drying",
+  "ingredient": "kubanhorizons:tea_leaves",
+  "result": {
+    "id": "kubanhorizons:dried_tea"
+  }
+}

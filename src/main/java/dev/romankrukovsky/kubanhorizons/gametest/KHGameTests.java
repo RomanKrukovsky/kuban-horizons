@@ -76,6 +76,7 @@ public final class KHGameTests {
         register("fruit_leaves_ripen", KHGameTests::testFruitLeavesRipen, 400);
         register("fruit_pick_resets", KHGameTests::testFruitPickResets, 200);
         register("sapling_grows_tree", KHGameTests::testSaplingGrowsTree, 400);
+        register("drying_rack_dries_tea", KHGameTests::testDryingRack, 400);
     }
 
     private KHGameTests() {
@@ -446,6 +447,32 @@ public final class KHGameTests {
             helper.assertBlockProperty(top,
                     net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true);
         });
+    }
+
+    /** Сушилка принимает чайный лист и высушивает его в сушёный чай. */
+    private static void testDryingRack(GameTestHelper helper) {
+        BlockPos rackPos = new BlockPos(1, 1, 1);
+        helper.setBlock(rackPos, KHBlocks.DRYING_RACK.get());
+
+        helper.startSequence()
+                .thenExecute(() -> {
+                    var rack = helper.getBlockEntity(rackPos,
+                            dev.romankrukovsky.kubanhorizons.blockentity.DryingRackBlockEntity.class);
+                    ItemStack leaves = new ItemStack(KHItems.TEA_LEAVES.get(), 1);
+                    helper.assertTrue(rack.insert(helper.getLevel(), leaves),
+                            "Рама должна принять чайный лист");
+                    helper.assertTrue(leaves.isEmpty(), "Лист должен быть изъят из стека");
+                    // 1200 тиков сушки чая — форсируем напрямую.
+                    rack.advanceDrying(helper.getLevel(), 1300);
+                })
+                .thenExecuteAfter(2, () -> {
+                    var rack = helper.getBlockEntity(rackPos,
+                            dev.romankrukovsky.kubanhorizons.blockentity.DryingRackBlockEntity.class);
+                    ItemStack out = rack.removeLast(helper.getLevel());
+                    helper.assertTrue(out.is(KHItems.DRIED_TEA.get()),
+                            "Ожидался сушёный чай, получено: " + out);
+                })
+                .thenSucceed();
     }
 
     // --- Тесты винограда ---

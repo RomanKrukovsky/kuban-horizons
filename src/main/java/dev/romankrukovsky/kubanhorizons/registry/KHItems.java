@@ -194,6 +194,21 @@ public final class KHItems {
     public static final DeferredItem<BlockItem> WATER_INTAKE =
             ITEMS.registerSimpleBlockItem("water_intake", KHBlocks.WATER_INTAKE);
 
+    /** Сушильная рама (предмет). */
+    public static final DeferredItem<BlockItem> DRYING_RACK =
+            ITEMS.registerSimpleBlockItem("drying_rack", KHBlocks.DRYING_RACK);
+
+    // --- Сушёные продукты ---
+
+    /** Сушёный чай — заварка. */
+    public static final DeferredItem<Item> DRIED_TEA =
+            ITEMS.registerSimpleItem("dried_tea");
+
+    /** Сушёные фрукты — походная еда. */
+    public static final DeferredItem<Item> DRIED_FRUIT =
+            ITEMS.registerSimpleItem("dried_fruit",
+                    p -> p.food(KHFoods.DRIED_FRUIT));
+
     private KHItems() {
     }
 

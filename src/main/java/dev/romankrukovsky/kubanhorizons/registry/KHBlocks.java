@@ -99,6 +99,15 @@ public final class KHBlocks {
                             .sound(SoundType.STONE)
                             .noOcclusion());
 
+    /** Сушильная рама (чай, фрукты, рыба). */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.processing.DryingRackBlock> DRYING_RACK =
+            BLOCKS.registerBlock("drying_rack",
+                    dev.romankrukovsky.kubanhorizons.processing.DryingRackBlock::new,
+                    p -> p.mapColor(MapColor.WOOD)
+                            .strength(1.5F)
+                            .sound(SoundType.WOOD)
+                            .noOcclusion());
+
     /** Маслопресс — первое перерабатывающее устройство мода. */
     public static final DeferredBlock<OilPressBlock> OIL_PRESS =
             BLOCKS.registerBlock("oil_press", OilPressBlock::new,

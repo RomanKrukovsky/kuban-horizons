@@ -43,6 +43,7 @@ public final class KHLootTableProvider extends LootTableProvider {
             dropSelf(KHBlocks.OIL_PRESS.get());
             dropSelf(KHBlocks.IRRIGATION_CHANNEL.get());
             dropSelf(KHBlocks.WATER_INTAKE.get());
+            dropSelf(KHBlocks.DRYING_RACK.get());
 
             // Двухблочные культуры: дроп только с нижней зрелой половины —
             // верхняя не дропает ничего (защита от двойного лута).

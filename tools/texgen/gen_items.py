@@ -296,7 +296,33 @@ def walnut_item():
     return im
 
 
+def dried_tea_item():
+    im = img()
+    # Кучка скрученного сухого листа
+    for x, y in ((5, 8), (7, 7), (9, 8), (6, 10), (8, 10), (10, 10), (7, 12), (9, 12), (5, 11)):
+        px(im, x, y, (74, 88, 46, 255))
+        px(im, x + 1, y, (56, 68, 36, 255))
+    px(im, 7, 7, (96, 112, 60, 255))
+    px(im, 5, 8, (96, 112, 60, 255))
+    return im
+
+
+def dried_fruit_item():
+    im = img()
+    # Сморщенные дольки трёх оттенков
+    for cx, cy, c, hi in ((5, 6, PAL["apricot"], PAL["apricot_hi"]),
+                          (10, 7, PAL["plum"], PAL["plum_hi"]),
+                          (7, 11, (176, 108, 60, 255), (204, 140, 88, 255))):
+        rect(im, cx - 1, cy, cx + 1, cy + 1, c)
+        px(im, cx - 1, cy, hi)
+        px(im, cx + 1, cy + 1, PAL["chernozem_dark"])
+        px(im, cx, cy - 1, c)
+    return im
+
+
 def main():
+    save(dried_tea_item(), "dried_tea")
+    save(dried_fruit_item(), "dried_fruit")
     save(sunflower_seeds(), "sunflower_seeds")
     save(sunflower_head(), "sunflower_head")
     save(bottle(PAL["oil"], PAL["oil_hi"]), "sunflower_oil")
