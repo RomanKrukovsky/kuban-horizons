@@ -1,0 +1,72 @@
+{
+  "parent": "kubanhorizons:orchard/first_fruit",
+  "criteria": {
+    "has_apricot": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:apricot"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_peach": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:peach"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_plum": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:plum"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_walnut": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:walnut"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.kuban_orchard.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "id": "kubanhorizons:walnut"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.kuban_orchard.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_peach"
+    ],
+    [
+      "has_apricot"
+    ],
+    [
+      "has_plum"
+    ],
+    [
+      "has_walnut"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

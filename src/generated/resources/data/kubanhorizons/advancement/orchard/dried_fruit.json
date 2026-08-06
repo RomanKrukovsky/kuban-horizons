@@ -1,0 +1,32 @@
+{
+  "parent": "kubanhorizons:orchard/first_fruit",
+  "criteria": {
+    "has_dried_fruit": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:dried_fruit"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.dried_fruit.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:dried_fruit"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.dried_fruit.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_dried_fruit"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

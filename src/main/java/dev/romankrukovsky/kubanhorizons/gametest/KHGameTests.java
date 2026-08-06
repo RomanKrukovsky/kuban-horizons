@@ -1,5 +1,7 @@
 package dev.romankrukovsky.kubanhorizons.gametest;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
 import dev.romankrukovsky.kubanhorizons.blockentity.OilPressBlockEntity;
 import dev.romankrukovsky.kubanhorizons.crop.SunflowerCropBlock;
@@ -11,6 +13,10 @@ import dev.romankrukovsky.kubanhorizons.worldgen.KHBiomes;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHNoiseSettings;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHPlacedFeatures;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHWorldPresets;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementNode;
+import net.minecraft.advancements.AdvancementTree;
+import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Holder;
@@ -21,6 +27,8 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestInstance;
 import net.minecraft.gametest.framework.TestData;
 import net.minecraft.gametest.framework.TestEnvironmentDefinition;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -40,7 +48,12 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
@@ -91,6 +104,7 @@ public final class KHGameTests {
         register("kuban_guide_content", KHGameTests::testKubanGuideContent, 100);
         register("kuban_steppe_world_preset", KHGameTests::testKubanSteppeWorldPreset, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
+        register("advancement_tree_complete", KHGameTests::testAdvancementTree, 100);
     }
 
     private KHGameTests() {
@@ -304,6 +318,74 @@ public final class KHGameTests {
                 .anyMatch(feature -> feature.is(KHPlacedFeatures.WILD_RICE_PLACED));
         helper.assertTrue(hasWildRice, "Дикий рис не добавлен в растительность поймы");
         helper.succeed();
+    }
+
+    // --- Достижения ---
+
+    /**
+     * Дерево достижений: каждая ветка загружена, все узлы восходят к корню мода
+     * и каждый заголовок/описание имеет перевод в обоих языках.
+     *
+     * <p>Опечатка в пути родителя приводит к тому, что ванильный
+     * {@code AdvancementTree.addAll} молча выбрасывает узел, а забытый перевод
+     * даёт пустую строку в интерфейсе — этот тест ловит и то, и другое.</p>
+     */
+    private static void testAdvancementTree(GameTestHelper helper) {
+        String[] expected = {
+                "root",
+                "farming/sunflower_seeds", "farming/sunflower_head", "farming/sunflower_oil",
+                "farming/roasted_seeds",
+                "kitchen/homemade_bread", "kitchen/borscht", "kitchen/tea_cup", "kitchen/taster",
+                "rice/rice_seedlings", "rice/rice_panicle", "rice/cooked_rice",
+                "vineyard/grape_cutting", "vineyard/grape_trellis", "vineyard/grapes",
+                "tea/tea_sapling", "tea/tea_leaves", "tea/dried_tea",
+                "orchard/sapling", "orchard/first_fruit", "orchard/dried_fruit",
+                "orchard/kuban_orchard",
+        };
+
+        AdvancementTree tree = helper.getLevel().getServer().getAdvancements().tree();
+        Identifier rootId = KHIds.of("root");
+        JsonObject english = readLang("en_us");
+        JsonObject russian = readLang("ru_ru");
+
+        for (String path : expected) {
+            Identifier id = KHIds.of(path);
+            AdvancementNode node = tree.get(id);
+            helper.assertTrue(node != null, "Достижение не загружено (проверьте родителя): " + path);
+
+            AdvancementNode root = node.root();
+            helper.assertTrue(root.holder().id().equals(rootId),
+                    "Достижение " + path + " не входит в дерево мода, корень: " + root.holder().id());
+
+            DisplayInfo display = node.advancement().display().orElse(null);
+            helper.assertTrue(display != null, "У достижения нет display: " + path);
+            for (Component component : List.of(display.getTitle(), display.getDescription())) {
+                String key = ((TranslatableContents) component.getContents()).getKey();
+                helper.assertTrue(english.has(key), "Нет английского перевода: " + key);
+                helper.assertTrue(russian.has(key), "Нет русского перевода: " + key);
+            }
+        }
+
+        // Челленджи требуют выполнить все условия, а не любое из них.
+        Advancement orchardChallenge = tree.get(KHIds.of("orchard/kuban_orchard")).advancement();
+        helper.assertTrue(orchardChallenge.requirements().size() == 4,
+                "«Кубанский сад» должен требовать все четыре плода, групп условий: "
+                        + orchardChallenge.requirements().size());
+        helper.succeed();
+    }
+
+    /** Читает сгенерированный файл локализации с пути ресурсов мода. */
+    private static JsonObject readLang(String locale) {
+        String path = "/assets/kubanhorizons/lang/" + locale + ".json";
+        try (InputStream stream = KHGameTests.class.getResourceAsStream(path)) {
+            if (stream == null) {
+                throw new IllegalStateException("Файл локализации не найден: " + path);
+            }
+            return JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
+                    .getAsJsonObject();
+        } catch (IOException exception) {
+            throw new IllegalStateException("Не удалось прочитать " + path, exception);
+        }
     }
 
     // --- Тесты маслопресса ---

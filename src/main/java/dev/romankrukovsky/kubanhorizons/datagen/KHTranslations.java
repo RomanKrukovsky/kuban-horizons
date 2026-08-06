@@ -172,6 +172,48 @@ final class KHTranslations {
         add("advancement.kubanhorizons.taster.title", "Taster", "Дегустатор");
         add("advancement.kubanhorizons.taster.description",
                 "Collect every Kuban dish", "Соберите все кубанские блюда");
+        add("advancement.kubanhorizons.rice_seedlings.title", "Flooded Paddy", "Затопленный чек");
+        add("advancement.kubanhorizons.rice_seedlings.description",
+                "Obtain rice seedlings", "Раздобудьте рисовую рассаду");
+        add("advancement.kubanhorizons.rice_panicle.title", "Kuban Rice", "Кубанский рис");
+        add("advancement.kubanhorizons.rice_panicle.description",
+                "Harvest a ripe rice panicle", "Соберите созревшую метёлку риса");
+        add("advancement.kubanhorizons.cooked_rice.title", "Steaming Bowl", "Пар над казаном");
+        add("advancement.kubanhorizons.cooked_rice.description",
+                "Cook a portion of rice", "Отварите порцию риса");
+        add("advancement.kubanhorizons.grape_cutting.title", "A Cutting for Grafting",
+                "Черенок на прививку");
+        add("advancement.kubanhorizons.grape_cutting.description",
+                "Obtain a grape cutting", "Раздобудьте виноградный черенок");
+        add("advancement.kubanhorizons.grape_trellis.title", "Trellis Row", "Шпалерный ряд");
+        add("advancement.kubanhorizons.grape_trellis.description",
+                "Build a grape trellis", "Соберите виноградную шпалеру");
+        add("advancement.kubanhorizons.grapes.title", "Cluster by Cluster", "Гроздь за гроздью");
+        add("advancement.kubanhorizons.grapes.description",
+                "Harvest a cluster of grapes", "Соберите гроздь винограда");
+        add("advancement.kubanhorizons.tea_sapling.title", "Tea Slopes", "Чайные склоны");
+        add("advancement.kubanhorizons.tea_sapling.description",
+                "Obtain a tea sapling", "Раздобудьте чайный саженец");
+        add("advancement.kubanhorizons.tea_leaves.title", "Top Two Leaves and a Bud",
+                "Два листа и почка");
+        add("advancement.kubanhorizons.tea_leaves.description",
+                "Pick tea leaves from a bush", "Соберите листья с чайного куста");
+        add("advancement.kubanhorizons.dried_tea.title", "Krasnodar Blend", "Краснодарский купаж");
+        add("advancement.kubanhorizons.dried_tea.description",
+                "Dry tea leaves on a drying rack", "Высушите чайный лист на сушилке");
+        add("advancement.kubanhorizons.orchard.title", "Orchard Begins", "Сад начинается");
+        add("advancement.kubanhorizons.orchard.description",
+                "Obtain a fruit tree sapling", "Раздобудьте саженец плодового дерева");
+        add("advancement.kubanhorizons.first_fruit.title", "First Fruit", "Первый плод");
+        add("advancement.kubanhorizons.first_fruit.description",
+                "Pick fruit from your own tree", "Сорвите плод с собственного дерева");
+        add("advancement.kubanhorizons.dried_fruit.title", "Winter Stores", "Запасы на зиму");
+        add("advancement.kubanhorizons.dried_fruit.description",
+                "Dry fruit on a drying rack", "Высушите фрукты на сушилке");
+        add("advancement.kubanhorizons.kuban_orchard.title", "Kuban Orchard", "Кубанский сад");
+        add("advancement.kubanhorizons.kuban_orchard.description",
+                "Gather peach, apricot, plum and walnut",
+                "Соберите персик, абрикос, сливу и грецкий орех");
 
         // --- Конфигурация (переводы ключей) ---
         add("config.kubanhorizons.crops.growthSpeed", "Crop growth speed", "Скорость роста культур");

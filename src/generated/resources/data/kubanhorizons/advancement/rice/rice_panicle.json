@@ -1,11 +1,11 @@
 {
-  "parent": "kubanhorizons:tea/dried_tea",
+  "parent": "kubanhorizons:rice/rice_seedlings",
   "criteria": {
-    "has_tea": {
+    "has_panicle": {
       "conditions": {
         "items": [
           {
-            "items": "kubanhorizons:tea_cup"
+            "items": "kubanhorizons:rice_panicle"
           }
         ]
       },
@@ -14,19 +14,18 @@
   },
   "display": {
     "description": {
-      "translate": "advancement.kubanhorizons.tea_cup.description"
+      "translate": "advancement.kubanhorizons.rice_panicle.description"
     },
-    "frame": "goal",
     "icon": {
-      "id": "kubanhorizons:tea_cup"
+      "id": "kubanhorizons:rice_panicle"
     },
     "title": {
-      "translate": "advancement.kubanhorizons.tea_cup.title"
+      "translate": "advancement.kubanhorizons.rice_panicle.title"
     }
   },
   "requirements": [
     [
-      "has_tea"
+      "has_panicle"
     ]
   ],
   "sends_telemetry_event": true

@@ -1,0 +1,32 @@
+{
+  "parent": "kubanhorizons:vineyard/grape_cutting",
+  "criteria": {
+    "has_trellis": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:grape_trellis"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.grape_trellis.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:grape_trellis"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.grape_trellis.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_trellis"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,65 @@
+{
+  "parent": "kubanhorizons:root",
+  "criteria": {
+    "has_apricot_sapling": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:apricot_sapling"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_peach_sapling": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:peach_sapling"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_plum_sapling": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:plum_sapling"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_walnut_sapling": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:walnut_sapling"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.orchard.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:peach_sapling"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.orchard.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_peach_sapling",
+      "has_apricot_sapling",
+      "has_plum_sapling",
+      "has_walnut_sapling"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
