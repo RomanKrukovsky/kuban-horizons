@@ -16,7 +16,7 @@
 `main` → https://github.com/RomanKrukovsky/kuban-horizons
 
 ## Последний успешный commit
-- `14a9c54` docs: record custom preset runtime validation
+- `6e093bd` feat(building): add roof tiles and ceramics
 
 ## Завершено
 - [x] Разведка версий: MDK-26.2-ModDevGradle, NeoForge 26.2.0.48-beta.
