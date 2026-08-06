@@ -89,6 +89,7 @@ public final class KHGameTests {
         register("fertility_depletes_on_harvest", KHGameTests::testFertilityDepletion, 200);
         register("fertility_compost_restores", KHGameTests::testFertilityCompost, 200);
         register("fertility_rotation_gentler", KHGameTests::testFertilityRotation, 200);
+        register("melon_harvest_depletes_stem_farmland", KHGameTests::testMelonHarvestFertility, 200);
         register("irrigation_channel_fills", KHGameTests::testIrrigationFills, 400);
         register("irrigation_channel_dries", KHGameTests::testIrrigationDries, 400);
         register("irrigation_hydrates_farmland", KHGameTests::testIrrigationHydratesFarmland, 400);
@@ -852,6 +853,43 @@ public final class KHGameTests {
         helper.assertTrue(rotated > mono,
                 "Севооборот должен беречь почву: моно=" + mono + ", ротация=" + rotated);
         helper.succeed();
+    }
+
+    /** Сбор ванильного арбуза истощает грядку его привязанного стебля. */
+    private static void testMelonHarvestFertility(GameTestHelper helper) {
+        BlockPos stemPos = preparedFarmland(helper, new BlockPos(1, 1, 1));
+        BlockPos fruitPos = stemPos.east();
+        helper.setBlock(fruitPos.below(), Blocks.DIRT);
+        helper.setBlock(stemPos, Blocks.ATTACHED_MELON_STEM.defaultBlockState()
+                .setValue(net.minecraft.world.level.block.AttachedStemBlock.FACING, Direction.EAST));
+        helper.setBlock(fruitPos, Blocks.MELON);
+
+        ServerLevel level = helper.getLevel();
+        BlockPos stemFarmland = helper.absolutePos(stemPos.below());
+        BlockPos fruitGround = helper.absolutePos(fruitPos.below());
+        int stemBefore = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, stemFarmland);
+        int fruitBefore = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, fruitGround);
+
+        helper.startSequence()
+                .thenExecute(() -> {
+                    Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+                    BlockPos fruitAbs = helper.absolutePos(fruitPos);
+                    net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(
+                            new net.neoforged.neoforge.event.level.block.BreakBlockEvent(
+                                    level, fruitAbs, level.getBlockState(fruitAbs), player));
+                    level.destroyBlock(fruitAbs, true, player);
+                })
+                .thenExecuteAfter(2, () -> {
+                    int stemAfter = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, stemFarmland);
+                    int fruitAfter = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, fruitGround);
+                    helper.assertTrue(stemAfter < stemBefore,
+                            "Арбуз должен истощать грядку привязанного стебля: "
+                                    + stemBefore + " -> " + stemAfter);
+                    helper.assertTrue(fruitAfter == fruitBefore,
+                            "Почва под плодом не должна учитываться как грядка: "
+                                    + fruitBefore + " -> " + fruitAfter);
+                })
+                .thenSucceed();
     }
 
     // --- Тесты орошения ---

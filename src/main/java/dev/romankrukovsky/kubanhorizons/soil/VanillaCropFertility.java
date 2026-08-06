@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.StemBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
@@ -73,10 +74,27 @@ public final class VanillaCropFertility {
         if (state.getBlock() instanceof CropBlock crop && crop.isMaxAge(state)) {
             SoilFertility.onHarvest(level, event.getPos().below(), crop);
         }
-        // Арбуз/тыква: плод не стоит на грядке — берём привязанный стебель
-        // рядом, если он есть, иначе почву под плодом.
+        // Арбуз/тыква: плод не стоит на грядке. Учитываем только реально
+        // привязанный к нему стебель и истощаем грядку под этим стеблем.
         if (state.is(Blocks.MELON) || state.is(Blocks.PUMPKIN)) {
-            SoilFertility.onHarvest(level, event.getPos().below(), state.getBlock());
+            attachedStemFarmland(level, event.getPos(), state)
+                    .ifPresent(farmland -> SoilFertility.onHarvest(level, farmland, state.getBlock()));
         }
+    }
+
+    private static java.util.Optional<BlockPos> attachedStemFarmland(
+            ServerLevel level, BlockPos fruitPos, BlockState fruitState) {
+        for (net.minecraft.core.Direction direction : net.minecraft.core.Direction.Plane.HORIZONTAL) {
+            BlockPos stemPos = fruitPos.relative(direction);
+            BlockState stemState = level.getBlockState(stemPos);
+            boolean matchingStem = fruitState.is(Blocks.MELON)
+                    ? stemState.is(Blocks.ATTACHED_MELON_STEM)
+                    : stemState.is(Blocks.ATTACHED_PUMPKIN_STEM);
+            if (matchingStem
+                    && stemState.getValue(BlockStateProperties.HORIZONTAL_FACING) == direction.getOpposite()) {
+                return java.util.Optional.of(stemPos.below());
+            }
+        }
+        return java.util.Optional.empty();
     }
 }
