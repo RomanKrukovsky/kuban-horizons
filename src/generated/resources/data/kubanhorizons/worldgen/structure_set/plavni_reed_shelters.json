@@ -1,0 +1,15 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 17420352,
+    "separation": 14,
+    "spacing": 44,
+    "spread_type": "triangular"
+  },
+  "structures": [
+    {
+      "structure": "kubanhorizons:plavni_reed_shelter",
+      "weight": 1
+    }
+  ]
+}

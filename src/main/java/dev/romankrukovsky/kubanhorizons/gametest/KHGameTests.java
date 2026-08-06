@@ -12,6 +12,8 @@ import dev.romankrukovsky.kubanhorizons.util.KHIds;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHBiomes;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHNoiseSettings;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHPlacedFeatures;
+import dev.romankrukovsky.kubanhorizons.worldgen.KHStructures;
+import dev.romankrukovsky.kubanhorizons.worldgen.KHStructureSets;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHWorldPresets;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementNode;
@@ -105,6 +107,7 @@ public final class KHGameTests {
         register("kuban_guide_content", KHGameTests::testKubanGuideContent, 100);
         register("kuban_steppe_world_preset", KHGameTests::testKubanSteppeWorldPreset, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
+        register("structure_registry_integrity", KHGameTests::testStructureRegistryIntegrity, 100);
         register("advancement_tree_complete", KHGameTests::testAdvancementTree, 100);
         register("building_slab_drops_two", KHGameTests::testBuildingSlabDropsTwo, 100);
         register("building_requires_pickaxe", KHGameTests::testBuildingRequiresPickaxe, 100);
@@ -322,6 +325,38 @@ public final class KHGameTests {
                 .stream()
                 .anyMatch(feature -> feature.is(KHPlacedFeatures.WILD_RICE_PLACED));
         helper.assertTrue(hasWildRice, "Дикий рис не добавлен в растительность поймы");
+        helper.succeed();
+    }
+
+    /** Структуры и их наборы загружены и не могут выйти за границы родного биома. */
+    private static void testStructureRegistryIntegrity(GameTestHelper helper) {
+        var registries = helper.getLevel().registryAccess();
+        var biomeRegistry = registries.lookupOrThrow(Registries.BIOME);
+        var structureRegistry = registries.lookupOrThrow(Registries.STRUCTURE);
+        var structureSetRegistry = registries.lookupOrThrow(Registries.STRUCTURE_SET);
+
+        var fishingCamp = structureRegistry.getOrThrow(KHStructures.FLOODPLAIN_FISHING_CAMP);
+        var reedShelter = structureRegistry.getOrThrow(KHStructures.PLAVNI_REED_SHELTER);
+        var fishingCamps = structureSetRegistry.getOrThrow(KHStructureSets.FLOODPLAIN_FISHING_CAMPS);
+        var reedShelters = structureSetRegistry.getOrThrow(KHStructureSets.PLAVNI_REED_SHELTERS);
+
+        helper.assertTrue(fishingCamps.value().structures().size() == 1
+                        && fishingCamps.value().structures().getFirst().structure().is(
+                                KHStructures.FLOODPLAIN_FISHING_CAMP),
+                "Набор рыбацких станов должен ссылаться только на свой стан");
+        helper.assertTrue(reedShelters.value().structures().size() == 1
+                        && reedShelters.value().structures().getFirst().structure().is(
+                                KHStructures.PLAVNI_REED_SHELTER),
+                "Набор камышовых навесов должен ссылаться только на свой навес");
+
+        var floodplain = biomeRegistry.getOrThrow(KHBiomes.RIVER_FLOODPLAIN);
+        var plavni = biomeRegistry.getOrThrow(KHBiomes.PLAVNI);
+        helper.assertTrue(fishingCamp.value().biomes().size() == 1
+                        && fishingCamp.value().biomes().contains(floodplain),
+                "Рыбацкий стан должен генерироваться только в пойме реки");
+        helper.assertTrue(reedShelter.value().biomes().size() == 1
+                        && reedShelter.value().biomes().contains(plavni),
+                "Камышовый навес должен генерироваться только в плавнях");
         helper.succeed();
     }
 

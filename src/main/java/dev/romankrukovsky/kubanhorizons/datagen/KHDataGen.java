@@ -18,6 +18,12 @@ public final class KHDataGen {
             new net.minecraft.core.RegistrySetBuilder()
                     .add(net.minecraft.core.registries.Registries.BIOME,
                             dev.romankrukovsky.kubanhorizons.worldgen.KHBiomes::bootstrap)
+                    .add(net.minecraft.core.registries.Registries.TEMPLATE_POOL,
+                            dev.romankrukovsky.kubanhorizons.worldgen.KHStructures::bootstrapTemplatePools)
+                    .add(net.minecraft.core.registries.Registries.STRUCTURE,
+                            dev.romankrukovsky.kubanhorizons.worldgen.KHStructures::bootstrap)
+                    .add(net.minecraft.core.registries.Registries.STRUCTURE_SET,
+                            dev.romankrukovsky.kubanhorizons.worldgen.KHStructureSets::bootstrap)
                     .add(net.minecraft.core.registries.Registries.NOISE_SETTINGS,
                             dev.romankrukovsky.kubanhorizons.worldgen.KHNoiseSettings::bootstrap)
                     .add(net.minecraft.core.registries.Registries.CONFIGURED_FEATURE,

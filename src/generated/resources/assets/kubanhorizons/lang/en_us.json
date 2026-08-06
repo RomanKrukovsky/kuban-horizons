@@ -135,6 +135,8 @@
   "message.kubanhorizons.soil_probe.poor": "poor",
   "message.kubanhorizons.soil_probe.result": "Fertility: %s (%s), moisture: %s/7",
   "message.kubanhorizons.soil_probe.rich": "rich",
+  "structure.kubanhorizons.floodplain_fishing_camp": "Floodplain Fishing Camp",
+  "structure.kubanhorizons.plavni_reed_shelter": "Plavni Reed Shelter",
   "subtitles.kubanhorizons.oil_press.creak": "Oil press creaks",
   "subtitles.kubanhorizons.oil_press.finish": "Oil drips",
   "subtitles.kubanhorizons.oil_press.work": "Oil press works"

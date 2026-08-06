@@ -2,6 +2,7 @@ package dev.romankrukovsky.kubanhorizons.datagen;
 
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHBiomes;
+import dev.romankrukovsky.kubanhorizons.worldgen.KHBiomeTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.BiomeTagsProvider;
@@ -22,6 +23,10 @@ final class KHBiomeTagsProvider extends BiomeTagsProvider {
                 .add(KHBiomes.PLAVNI)
                 .add(KHBiomes.LIMAN)
                 .add(KHBiomes.RIVER_FLOODPLAIN);
+        // Теги публикуют смысловые категории для datapack-интеграций. Сами
+        // структуры намеренно используют прямые holder'ы и не расширяются тегами.
+        tag(KHBiomeTags.HAS_FLOODPLAIN_FISHING_CAMP).add(KHBiomes.RIVER_FLOODPLAIN);
+        tag(KHBiomeTags.HAS_PLAVNI_REED_SHELTER).add(KHBiomes.PLAVNI);
         tag(net.neoforged.neoforge.common.Tags.Biomes.IS_PLAINS).add(KHBiomes.KUBAN_STEPPE);
         tag(net.neoforged.neoforge.common.Tags.Biomes.IS_TEMPERATE)
                 .add(KHBiomes.KUBAN_STEPPE)

@@ -1,0 +1,15 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 17420351,
+    "separation": 16,
+    "spacing": 48,
+    "spread_type": "triangular"
+  },
+  "structures": [
+    {
+      "structure": "kubanhorizons:floodplain_fishing_camp",
+      "weight": 1
+    }
+  ]
+}

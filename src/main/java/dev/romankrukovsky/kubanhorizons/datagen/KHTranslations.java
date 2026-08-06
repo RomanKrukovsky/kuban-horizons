@@ -30,6 +30,10 @@ final class KHTranslations {
         add("biome.kubanhorizons.liman", "Liman", "Лиман");
         add("biome.kubanhorizons.river_floodplain", "River Floodplain", "Пойма реки");
         add("generator.kubanhorizons.kuban_horizons", "Kuban Horizons", "Кубанские горизонты");
+        add("structure.kubanhorizons.floodplain_fishing_camp",
+                "Floodplain Fishing Camp", "Рыбацкий стан в пойме");
+        add("structure.kubanhorizons.plavni_reed_shelter",
+                "Plavni Reed Shelter", "Камышовый навес в плавнях");
 
         // --- Блоки ---
         add("block.kubanhorizons.sunflower_crop", "Sunflower Crop", "Подсолнечник");

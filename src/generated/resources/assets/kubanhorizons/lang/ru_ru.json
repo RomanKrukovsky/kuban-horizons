@@ -135,6 +135,8 @@
   "message.kubanhorizons.soil_probe.poor": "истощённая",
   "message.kubanhorizons.soil_probe.result": "Плодородие: %s (%s), влажность: %s/7",
   "message.kubanhorizons.soil_probe.rich": "богатая",
+  "structure.kubanhorizons.floodplain_fishing_camp": "Рыбацкий стан в пойме",
+  "structure.kubanhorizons.plavni_reed_shelter": "Камышовый навес в плавнях",
   "subtitles.kubanhorizons.oil_press.creak": "Маслопресс скрипит",
   "subtitles.kubanhorizons.oil_press.finish": "Капает масло",
   "subtitles.kubanhorizons.oil_press.work": "Маслопресс работает"
