@@ -16,7 +16,7 @@
 `main` → https://github.com/RomanKrukovsky/kuban-horizons
 
 ## Последний успешный commit
-- `c11142e` feat: add river floodplain biome with wild rice
+- `6ac623b` feat: add rice, grape, tea and orchard advancement branches
 
 ## Завершено
 - [x] Разведка версий: MDK-26.2-ModDevGradle, NeoForge 26.2.0.48-beta.
