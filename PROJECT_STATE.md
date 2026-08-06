@@ -16,7 +16,7 @@
 `main` → https://github.com/RomanKrukovsky/kuban-horizons
 
 ## Последний успешный commit
-- `fc2d3b0` feat: add floodplain and plavni landmarks
+- `79506b6` feat: integrate vanilla melon with soil fertility
 
 ## Завершено
 - [x] Разведка версий: MDK-26.2-ModDevGradle, NeoForge 26.2.0.48-beta.
