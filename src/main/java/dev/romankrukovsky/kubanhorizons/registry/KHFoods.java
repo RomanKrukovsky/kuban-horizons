@@ -1,6 +1,14 @@
 package dev.romankrukovsky.kubanhorizons.registry;
 
+import net.minecraft.core.Holder;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.component.Consumables;
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 
 /**
  * Свойства еды мода. Баланс — см. GAME_DESIGN.md §11.
@@ -82,6 +90,66 @@ public final class KHFoods {
     public static final FoodProperties WALNUT = new FoodProperties.Builder()
             .nutrition(2)
             .saturationModifier(0.3F)
+            .build();
+
+    // --- Кухня ---
+
+    /** Домашний хлеб: сытнее ванильного. */
+    public static final FoodProperties HOMEMADE_BREAD = new FoodProperties.Builder()
+            .nutrition(6)
+            .saturationModifier(0.75F)
+            .build();
+
+    /** Кубанский борщ: главное блюдо — сильное насыщение и регенерация. */
+    public static final FoodProperties BORSCHT = new FoodProperties.Builder()
+            .nutrition(10)
+            .saturationModifier(0.85F)
+            .build();
+
+    /** Борщ подаётся горячим: короткая регенерация. */
+    public static final Consumable BORSCHT_CONSUMABLE = Consumables.defaultFood()
+            .consumeSeconds(2.4F)
+            .onConsume(new ApplyStatusEffectsConsumeEffect(
+                    new MobEffectInstance(MobEffects.REGENERATION, 100, 0)))
+            .build();
+
+    /** Мамалыга: простая сытная каша. */
+    public static final FoodProperties MAMALYGA = new FoodProperties.Builder()
+            .nutrition(8)
+            .saturationModifier(0.6F)
+            .build();
+
+    /** Чайный напиток: бодрость (скорость). */
+    public static final FoodProperties TEA_DRINK = new FoodProperties.Builder()
+            .nutrition(2)
+            .saturationModifier(0.2F)
+            .alwaysEdible()
+            .build();
+
+    public static final Consumable TEA_DRINK_CONSUMABLE = Consumable.builder()
+            .consumeSeconds(1.6F)
+            .animation(ItemUseAnimation.DRINK)
+            .sound(SoundEvents.GENERIC_DRINK)
+            .hasConsumeParticles(false)
+            .onConsume(new ApplyStatusEffectsConsumeEffect(
+                    new MobEffectInstance(MobEffects.SPEED, 1200, 0)))
+            .build();
+
+    /** Мёд с орехами: десерт с поглощением. */
+    public static final FoodProperties HONEY_WALNUTS = new FoodProperties.Builder()
+            .nutrition(6)
+            .saturationModifier(0.7F)
+            .build();
+
+    public static final Consumable HONEY_WALNUTS_CONSUMABLE = Consumables.defaultFood()
+            .onConsume(new ApplyStatusEffectsConsumeEffect(
+                    new MobEffectInstance(MobEffects.ABSORPTION, 600, 0)))
+            .build();
+
+    /** Овощная закуска: лёгкое питание + насыщение. */
+    public static final FoodProperties VEGETABLE_SPREAD = new FoodProperties.Builder()
+            .nutrition(7)
+            .saturationModifier(0.65F)
             .build();
 
     private KHFoods() {

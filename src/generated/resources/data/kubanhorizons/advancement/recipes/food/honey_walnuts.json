@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "kubanhorizons:honey_walnuts"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_walnut": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:walnut"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_walnut"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "kubanhorizons:honey_walnuts"
+    ]
+  }
+}

@@ -59,6 +59,12 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.HAND_MILL.get());
                         output.accept(KHItems.FLOUR.get());
                         output.accept(KHItems.CORNMEAL.get());
+                        output.accept(KHItems.HOMEMADE_BREAD.get());
+                        output.accept(KHItems.BORSCHT.get());
+                        output.accept(KHItems.MAMALYGA.get());
+                        output.accept(KHItems.TEA_CUP.get());
+                        output.accept(KHItems.HONEY_WALNUTS.get());
+                        output.accept(KHItems.VEGETABLE_SPREAD.get());
                     })
                     .build());
 

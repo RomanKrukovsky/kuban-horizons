@@ -71,6 +71,12 @@ final class KHTranslations {
         add("item.kubanhorizons.dried_fruit", "Dried Fruit", "Сушёные фрукты");
         add("item.kubanhorizons.flour", "Flour", "Мука");
         add("item.kubanhorizons.cornmeal", "Cornmeal", "Кукурузная крупа");
+        add("item.kubanhorizons.homemade_bread", "Homemade Bread", "Домашний хлеб");
+        add("item.kubanhorizons.borscht", "Kuban Borscht", "Кубанский борщ");
+        add("item.kubanhorizons.mamalyga", "Mamalyga", "Мамалыга");
+        add("item.kubanhorizons.tea_cup", "Cup of Tea", "Чашка чая");
+        add("item.kubanhorizons.honey_walnuts", "Honey with Walnuts", "Мёд с орехами");
+        add("item.kubanhorizons.vegetable_spread", "Vegetable Spread", "Овощная закуска");
         add("item.kubanhorizons.peach_sapling", "Peach Sapling", "Саженец персика");
         add("item.kubanhorizons.apricot_sapling", "Apricot Sapling", "Саженец абрикоса");
         add("item.kubanhorizons.plum_sapling", "Plum Sapling", "Саженец сливы");
@@ -122,6 +128,18 @@ final class KHTranslations {
         add("advancement.kubanhorizons.roasted_seeds.title", "Crack, Crack", "Щёлк-щёлк");
         add("advancement.kubanhorizons.roasted_seeds.description",
                 "Roast sunflower seeds", "Пожарьте семечки");
+        add("advancement.kubanhorizons.kitchen.title", "Kuban Kitchen", "Кубанская кухня");
+        add("advancement.kubanhorizons.kitchen.description",
+                "Bake homemade bread from flour", "Испеките домашний хлеб из муки");
+        add("advancement.kubanhorizons.borscht.title", "The Real Borscht", "Тот самый борщ");
+        add("advancement.kubanhorizons.borscht.description",
+                "Cook Kuban borscht", "Сварите кубанский борщ");
+        add("advancement.kubanhorizons.tea_cup.title", "Tea Time", "Чаепитие");
+        add("advancement.kubanhorizons.tea_cup.description",
+                "Brew a cup of Krasnodar tea", "Заварите чашку краснодарского чая");
+        add("advancement.kubanhorizons.taster.title", "Taster", "Дегустатор");
+        add("advancement.kubanhorizons.taster.description",
+                "Collect every Kuban dish", "Соберите все кубанские блюда");
 
         // --- Конфигурация (переводы ключей) ---
         add("config.kubanhorizons.crops.growthSpeed", "Crop growth speed", "Скорость роста культур");

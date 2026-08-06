@@ -1,0 +1,72 @@
+{
+  "parent": "kubanhorizons:kitchen/homemade_bread",
+  "criteria": {
+    "has_borscht": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:borscht"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_honey_walnuts": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:honey_walnuts"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_mamalyga": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:mamalyga"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_spread": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:vegetable_spread"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.taster.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "id": "kubanhorizons:honey_walnuts"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.taster.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_borscht"
+    ],
+    [
+      "has_mamalyga"
+    ],
+    [
+      "has_honey_walnuts"
+    ],
+    [
+      "has_spread"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "kubanhorizons:cornmeal",
+    "kubanhorizons:cornmeal",
+    "minecraft:bowl"
+  ],
+  "result": {
+    "id": "kubanhorizons:mamalyga"
+  }
+}

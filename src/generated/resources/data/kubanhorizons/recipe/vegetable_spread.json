@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "kubanhorizons:tomato",
+    "kubanhorizons:tomato",
+    "minecraft:carrot",
+    "kubanhorizons:sunflower_oil",
+    "minecraft:bowl"
+  ],
+  "result": {
+    "id": "kubanhorizons:vegetable_spread"
+  }
+}

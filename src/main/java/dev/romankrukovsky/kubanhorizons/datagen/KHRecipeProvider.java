@@ -166,6 +166,56 @@ public final class KHRecipeProvider extends RecipeProvider {
         drying("dried_fruit_from_plum", KHItems.PLUM.get(), KHItems.DRIED_FRUIT.get(), 2400);
         drying("dried_fruit_from_grapes", KHItems.GRAPES.get(), KHItems.DRIED_FRUIT.get(), 2400);
 
+        // --- Кухня ---
+
+        // Домашний хлеб: 3 муки (в печи).
+        cookFood(KHItems.FLOUR.get(), KHItems.HOMEMADE_BREAD.get(), "homemade_bread", 200);
+
+        // Кубанский борщ: свёкла + капуста(морковь) + томат + мясо + миска.
+        this.shapeless(RecipeCategory.FOOD, KHItems.BORSCHT.get())
+                .requires(Items.BEETROOT)
+                .requires(Items.CARROT)
+                .requires(KHItems.TOMATO.get())
+                .requires(Items.COOKED_BEEF)
+                .requires(KHItems.SUNFLOWER_OIL.get())
+                .requires(Items.BOWL)
+                .unlockedBy("has_tomato", this.has(KHItems.TOMATO.get()))
+                .save(this.output);
+
+        // Мамалыга: 2 крупы + миска.
+        this.shapeless(RecipeCategory.FOOD, KHItems.MAMALYGA.get())
+                .requires(KHItems.CORNMEAL.get())
+                .requires(KHItems.CORNMEAL.get())
+                .requires(Items.BOWL)
+                .unlockedBy("has_cornmeal", this.has(KHItems.CORNMEAL.get()))
+                .save(this.output);
+
+        // Чашка чая: сушёный чай + бутылка воды.
+        this.shapeless(RecipeCategory.FOOD, KHItems.TEA_CUP.get())
+                .requires(KHItems.DRIED_TEA.get())
+                .requires(Items.POTION) // бутылка воды — предмет POTION по умолчанию
+                .unlockedBy("has_dried_tea", this.has(KHItems.DRIED_TEA.get()))
+                .save(this.output);
+
+        // Мёд с орехами: мёд + 2 ореха + миска.
+        this.shapeless(RecipeCategory.FOOD, KHItems.HONEY_WALNUTS.get())
+                .requires(Items.HONEY_BOTTLE)
+                .requires(KHItems.WALNUT.get())
+                .requires(KHItems.WALNUT.get())
+                .requires(Items.BOWL)
+                .unlockedBy("has_walnut", this.has(KHItems.WALNUT.get()))
+                .save(this.output);
+
+        // Овощная закуска: томат + арбуз? нет — томат + морковь + масло + миска.
+        this.shapeless(RecipeCategory.FOOD, KHItems.VEGETABLE_SPREAD.get())
+                .requires(KHItems.TOMATO.get())
+                .requires(KHItems.TOMATO.get())
+                .requires(Items.CARROT)
+                .requires(KHItems.SUNFLOWER_OIL.get())
+                .requires(Items.BOWL)
+                .unlockedBy("has_oil", this.has(KHItems.SUNFLOWER_OIL.get()))
+                .save(this.output);
+
         // Рецепт маслопресса: 8 семян + бутылка → масло + жмых.
         this.output.accept(
                 ResourceKey.create(Registries.RECIPE, KHIds.of("oil_pressing/sunflower_oil")),
@@ -178,6 +228,17 @@ public final class KHRecipeProvider extends RecipeProvider {
                         new ItemStackTemplate(KHItems.OIL_CAKE.get()),
                         300),
                 null);
+    }
+
+    /** Выпечка еды в печи. */
+    private void cookFood(net.minecraft.world.level.ItemLike input,
+            net.minecraft.world.level.ItemLike result, String name, int time) {
+        SimpleCookingRecipeBuilder.generic(
+                        Ingredient.of(input),
+                        RecipeCategory.FOOD, CookingBookCategory.FOOD,
+                        result.asItem(), 0.3F, time, SmeltingRecipe::new)
+                .unlockedBy("has_input", this.has(input))
+                .save(this.output, ResourceKey.create(Registries.RECIPE, KHIds.of(name)));
     }
 
     /** Рецепт помола на мельнице. */

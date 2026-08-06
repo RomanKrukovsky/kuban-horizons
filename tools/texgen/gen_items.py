@@ -333,7 +333,68 @@ def powder_pile(c_main, c_hi, c_dark):
     return im
 
 
+def bowl_dish(content, content_hi, garnish=None):
+    """Миска с содержимым."""
+    im = img()
+    # Миска
+    for y in range(9, 14):
+        w = 6 - (y - 9)
+        rect(im, 8 - w, y, 7 + w, y, PAL["wood"])
+    hline(im, 13, 6, 9, PAL["wood_darker"])
+    px(im, 2, 9, PAL["wood_hi"])
+    px(im, 2, 10, PAL["wood_hi"])
+    # Содержимое
+    rect(im, 3, 7, 12, 8, content)
+    hline(im, 7, 3, 12, content_hi)
+    if garnish:
+        for x, y, c in garnish:
+            px(im, x, y, c)
+    return im
+
+
+def homemade_bread_item():
+    im = img()
+    # Каравай: округлый, с надрезами
+    for y, x0, x1 in ((5, 5, 10), (6, 4, 11), (7, 3, 12), (8, 3, 12),
+                      (9, 3, 12), (10, 4, 11)):
+        rect(im, x0, y, x1, y, (196, 148, 78, 255))
+    hline(im, 5, 5, 10, (222, 178, 106, 255))
+    hline(im, 6, 4, 11, (212, 166, 94, 255))
+    hline(im, 10, 4, 11, (156, 112, 56, 255))
+    # Надрезы
+    px(im, 6, 6, (156, 112, 56, 255))
+    px(im, 9, 6, (156, 112, 56, 255))
+    outline_soft(im, (128, 92, 46, 255))
+    return im
+
+
+def tea_cup_item():
+    im = img()
+    # Стакан янтарного чая
+    rect(im, 5, 5, 10, 12, (178, 108, 38, 255))
+    rect(im, 5, 5, 10, 6, (212, 142, 58, 255))
+    vline(im, 5, 5, 12, (212, 142, 58, 255))
+    # Стеклянные стенки
+    vline(im, 4, 4, 13, PAL["glass"])
+    vline(im, 11, 4, 13, PAL["glass"])
+    hline(im, 13, 4, 11, PAL["glass_hi"])
+    # Пар
+    px(im, 7, 2, (232, 232, 232, 140))
+    px(im, 8, 1, (232, 232, 232, 100))
+    outline_soft(im, (90, 100, 108, 255))
+    return im
+
+
 def main():
+    save(homemade_bread_item(), "homemade_bread")
+    save(bowl_dish((176, 44, 52, 255), (204, 74, 70, 255),
+                   [(5, 7, (238, 238, 238, 255)), (9, 7, PAL["leaf_hi"])]), "borscht")
+    save(bowl_dish(PAL["corn_yellow"], PAL["corn_hi"]), "mamalyga")
+    save(tea_cup_item(), "tea_cup")
+    save(bowl_dish(PAL["oil"], PAL["oil_hi"],
+                   [(5, 7, PAL["walnut"]), (8, 7, PAL["walnut"]), (10, 7, PAL["walnut_hi"])]), "honey_walnuts")
+    save(bowl_dish((188, 96, 40, 255), (212, 124, 58, 255),
+                   [(6, 7, PAL["tomato_red"]), (9, 7, PAL["leaf"])]), "vegetable_spread")
     save(powder_pile((238, 232, 216, 255), (250, 246, 236, 255), (206, 196, 172, 255)), "flour")
     save(powder_pile(PAL["corn_yellow"], PAL["corn_hi"], (188, 148, 48, 255)), "cornmeal")
     save(dried_tea_item(), "dried_tea")

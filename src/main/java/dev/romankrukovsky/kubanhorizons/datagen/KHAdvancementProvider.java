@@ -73,6 +73,50 @@ public final class KHAdvancementProvider extends AdvancementProvider {
                     .addCriterion("has_roasted",
                             InventoryChangeTrigger.TriggerInstance.hasItems(KHItems.ROASTED_SUNFLOWER_SEEDS.get()))
                     .save(output, KHIds.of("farming/roasted_seeds").toString());
+
+            // --- Ветка кухни ---
+            AdvancementHolder kitchen = Advancement.Builder.advancement()
+                    .parent(oil)
+                    .display(KHItems.HOMEMADE_BREAD.get(),
+                            title("kitchen"), description("kitchen"),
+                            null, AdvancementType.TASK, true, true, false)
+                    .addCriterion("has_bread",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(KHItems.HOMEMADE_BREAD.get()))
+                    .save(output, KHIds.of("kitchen/homemade_bread").toString());
+
+            Advancement.Builder.advancement()
+                    .parent(kitchen)
+                    .display(KHItems.BORSCHT.get(),
+                            title("borscht"), description("borscht"),
+                            null, AdvancementType.GOAL, true, true, false)
+                    .addCriterion("has_borscht",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(KHItems.BORSCHT.get()))
+                    .save(output, KHIds.of("kitchen/borscht").toString());
+
+            Advancement.Builder.advancement()
+                    .parent(kitchen)
+                    .display(KHItems.TEA_CUP.get(),
+                            title("tea_cup"), description("tea_cup"),
+                            null, AdvancementType.TASK, true, true, false)
+                    .addCriterion("has_tea",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(KHItems.TEA_CUP.get()))
+                    .save(output, KHIds.of("kitchen/tea_cup").toString());
+
+            // Дегустатор: попробовать все блюда кухни.
+            Advancement.Builder.advancement()
+                    .parent(kitchen)
+                    .display(KHItems.HONEY_WALNUTS.get(),
+                            title("taster"), description("taster"),
+                            null, AdvancementType.CHALLENGE, true, true, false)
+                    .addCriterion("has_borscht",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(KHItems.BORSCHT.get()))
+                    .addCriterion("has_mamalyga",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(KHItems.MAMALYGA.get()))
+                    .addCriterion("has_honey_walnuts",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(KHItems.HONEY_WALNUTS.get()))
+                    .addCriterion("has_spread",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(KHItems.VEGETABLE_SPREAD.get()))
+                    .save(output, KHIds.of("kitchen/taster").toString());
         }
 
         private static Component title(String key) {

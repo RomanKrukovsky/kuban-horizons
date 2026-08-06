@@ -108,6 +108,12 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.DRIED_FRUIT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.FLOUR.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.CORNMEAL.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.HOMEMADE_BREAD.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.BORSCHT.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.MAMALYGA.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.TEA_CUP.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.HONEY_WALNUTS.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.VEGETABLE_SPREAD.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.PEACH.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.APRICOT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.PLUM.get(), ModelTemplates.FLAT_ITEM);

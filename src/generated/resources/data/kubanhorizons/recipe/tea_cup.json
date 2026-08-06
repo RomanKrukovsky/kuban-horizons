@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "kubanhorizons:dried_tea",
+    "minecraft:potion"
+  ],
+  "result": {
+    "id": "kubanhorizons:tea_cup"
+  }
+}

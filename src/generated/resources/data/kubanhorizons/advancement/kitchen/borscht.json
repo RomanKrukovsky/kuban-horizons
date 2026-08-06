@@ -1,0 +1,33 @@
+{
+  "parent": "kubanhorizons:kitchen/homemade_bread",
+  "criteria": {
+    "has_borscht": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:borscht"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.borscht.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "kubanhorizons:borscht"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.borscht.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_borscht"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "kubanhorizons:kitchen/homemade_bread",
+  "criteria": {
+    "has_tea": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:tea_cup"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.tea_cup.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:tea_cup"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.tea_cup.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_tea"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

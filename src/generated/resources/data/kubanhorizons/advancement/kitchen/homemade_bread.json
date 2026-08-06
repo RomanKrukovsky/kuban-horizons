@@ -1,0 +1,32 @@
+{
+  "parent": "kubanhorizons:farming/sunflower_oil",
+  "criteria": {
+    "has_bread": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:homemade_bread"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.kitchen.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:homemade_bread"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.kitchen.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_bread"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

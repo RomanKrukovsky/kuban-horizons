@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smelting",
+  "category": "food",
+  "experience": 0.3,
+  "ingredient": "kubanhorizons:flour",
+  "result": {
+    "id": "kubanhorizons:homemade_bread"
+  }
+}

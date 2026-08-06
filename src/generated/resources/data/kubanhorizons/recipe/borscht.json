@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:beetroot",
+    "minecraft:carrot",
+    "kubanhorizons:tomato",
+    "minecraft:cooked_beef",
+    "kubanhorizons:sunflower_oil",
+    "minecraft:bowl"
+  ],
+  "result": {
+    "id": "kubanhorizons:borscht"
+  }
+}

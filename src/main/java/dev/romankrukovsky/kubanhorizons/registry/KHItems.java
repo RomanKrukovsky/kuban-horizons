@@ -212,6 +212,48 @@ public final class KHItems {
     public static final DeferredItem<Item> CORNMEAL =
             ITEMS.registerSimpleItem("cornmeal");
 
+    // --- Кухня ---
+
+    /** Домашний хлеб. */
+    public static final DeferredItem<Item> HOMEMADE_BREAD =
+            ITEMS.registerSimpleItem("homemade_bread",
+                    p -> p.food(KHFoods.HOMEMADE_BREAD));
+
+    /** Кубанский борщ (миска). */
+    public static final DeferredItem<Item> BORSCHT =
+            ITEMS.registerSimpleItem("borscht",
+                    p -> p.stacksTo(1)
+                            .food(KHFoods.BORSCHT, KHFoods.BORSCHT_CONSUMABLE)
+                            .usingConvertsTo(Items.BOWL));
+
+    /** Мамалыга (миска). */
+    public static final DeferredItem<Item> MAMALYGA =
+            ITEMS.registerSimpleItem("mamalyga",
+                    p -> p.stacksTo(16)
+                            .food(KHFoods.MAMALYGA)
+                            .usingConvertsTo(Items.BOWL));
+
+    /** Чашка чая. */
+    public static final DeferredItem<Item> TEA_CUP =
+            ITEMS.registerSimpleItem("tea_cup",
+                    p -> p.stacksTo(16)
+                            .food(KHFoods.TEA_DRINK, KHFoods.TEA_DRINK_CONSUMABLE)
+                            .usingConvertsTo(Items.GLASS_BOTTLE));
+
+    /** Мёд с орехами. */
+    public static final DeferredItem<Item> HONEY_WALNUTS =
+            ITEMS.registerSimpleItem("honey_walnuts",
+                    p -> p.stacksTo(16)
+                            .food(KHFoods.HONEY_WALNUTS, KHFoods.HONEY_WALNUTS_CONSUMABLE)
+                            .usingConvertsTo(Items.BOWL));
+
+    /** Овощная закуска (икра). */
+    public static final DeferredItem<Item> VEGETABLE_SPREAD =
+            ITEMS.registerSimpleItem("vegetable_spread",
+                    p -> p.stacksTo(16)
+                            .food(KHFoods.VEGETABLE_SPREAD)
+                            .usingConvertsTo(Items.BOWL));
+
     // --- Сушёные продукты ---
 
     /** Сушёный чай — заварка. */

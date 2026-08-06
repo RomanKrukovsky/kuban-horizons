@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:honey_bottle",
+    "kubanhorizons:walnut",
+    "kubanhorizons:walnut",
+    "minecraft:bowl"
+  ],
+  "result": {
+    "id": "kubanhorizons:honey_walnuts"
+  }
+}
