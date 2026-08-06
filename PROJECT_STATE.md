@@ -16,7 +16,7 @@
 `main` → https://github.com/RomanKrukovsky/kuban-horizons
 
 ## Последний успешный commit
-- `14b4a24` feat: add plavni and liman biomes
+- `c11142e` feat: add river floodplain biome with wild rice
 
 ## Завершено
 - [x] Разведка версий: MDK-26.2-ModDevGradle, NeoForge 26.2.0.48-beta.
