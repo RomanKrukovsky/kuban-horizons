@@ -237,9 +237,17 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_nautilus_shell", this.has(Items.NAUTILUS_SHELL))
                 .save(this.output);
 
+        // Белёная штукатурка: известь (кальцит) наносится на основу из самана.
+        this.shapeless(RecipeCategory.BUILDING_BLOCKS, KHItems.WHITEWASHED_PLASTER.get(), 2)
+                .requires(KHItems.ADOBE_BRICKS.get(), 2)
+                .requires(Items.CALCITE)
+                .unlockedBy("has_calcite", this.has(Items.CALCITE))
+                .save(this.output);
+
         // Ступеньки, плиты, стенки и рецепты камнереза — из семейств.
         this.generateRecipes(KHBlockFamilies.ADOBE_BRICKS, FeatureFlags.REGISTRY.allFlags());
         this.generateRecipes(KHBlockFamilies.SHELL_ROCK, FeatureFlags.REGISTRY.allFlags());
+        this.generateRecipes(KHBlockFamilies.WHITEWASHED_PLASTER, FeatureFlags.REGISTRY.allFlags());
 
         // Камнерез. Семейство эти рецепты не генерирует: ванильный
         // stonecutterResultFromBase сохраняет их по имени без пространства
@@ -255,6 +263,21 @@ public final class KHRecipeProvider extends RecipeProvider {
         stonecutting(KHItems.SHELL_ROCK.get(), KHItems.SHELL_ROCK_SLAB.get(),
                 RecipeCategory.BUILDING_BLOCKS, 2);
         stonecutting(KHItems.SHELL_ROCK.get(), KHItems.SHELL_ROCK_WALL.get(),
+                RecipeCategory.DECORATIONS, 1);
+        stonecutting(KHItems.WHITEWASHED_PLASTER.get(), KHItems.WHITEWASHED_PLASTER_STAIRS.get(),
+                RecipeCategory.BUILDING_BLOCKS, 1);
+        stonecutting(KHItems.WHITEWASHED_PLASTER.get(), KHItems.WHITEWASHED_PLASTER_SLAB.get(),
+                RecipeCategory.BUILDING_BLOCKS, 2);
+
+        // Наличник вырезается из белёной штукатурки и даёт одну готовую раму.
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.CARVED_WINDOW_CASING.get())
+                .pattern("PPP")
+                .pattern("P P")
+                .pattern("PPP")
+                .define('P', KHItems.WHITEWASHED_PLASTER.get())
+                .unlockedBy("has_whitewashed_plaster", this.has(KHItems.WHITEWASHED_PLASTER.get()))
+                .save(this.output);
+        stonecutting(KHItems.WHITEWASHED_PLASTER.get(), KHItems.CARVED_WINDOW_CASING.get(),
                 RecipeCategory.DECORATIONS, 1);
 
         // Плетень: лоза на кольях. Семейство плетня рецепты не генерирует —

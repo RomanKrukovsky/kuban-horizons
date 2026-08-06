@@ -14,6 +14,13 @@ SHELL_HI = (232, 221, 192, 255)
 SHELL_DARK = (188, 174, 140, 255)
 SHELL_PORE = (160, 146, 116, 255)
 
+PLASTER_HI = (245, 240, 226, 255)
+PLASTER_MID = PAL["white_wall"]
+PLASTER_DARK = (201, 193, 174, 255)
+PLASTER_CRACK = (174, 164, 146, 255)
+CASING_ACCENT = (106, 153, 178, 255)
+CASING_ACCENT_DARK = (70, 112, 138, 255)
+
 OUT = os.path.join(os.path.dirname(__file__), "..", "..",
                    "src/main/resources/assets/kubanhorizons/textures/block")
 
@@ -311,6 +318,41 @@ def shell_rock():
     return im
 
 
+def whitewashed_plaster():
+    """Белёная штукатурка: спокойная известковая поверхность с мазками."""
+    im = img()
+    rect(im, 0, 0, 15, 15, PLASTER_MID)
+    # Нерегулярность создаётся фиксированными мазками, без случайного шума.
+    for x, y, length in ((1, 2, 5), (9, 1, 4), (4, 6, 7), (0, 10, 4),
+                         (8, 12, 6), (3, 15, 5)):
+        hline(im, y, x, min(15, x + length), PLASTER_HI)
+    for x, y, length in ((6, 3, 3), (1, 8, 5), (11, 7, 3), (5, 13, 4)):
+        hline(im, y, x, min(15, x + length), PLASTER_DARK)
+    # Две тонкие усадочные трещины, читаемые, но не превращающие стену в руину.
+    for x, y in ((13, 2), (13, 3), (12, 4), (12, 5), (3, 11), (4, 12), (4, 13)):
+        px(im, x, y, PLASTER_CRACK)
+    return im
+
+
+def carved_window_casing():
+    """Резной наличник: белая основа с кубанским сине-голубым орнаментом."""
+    im = whitewashed_plaster()
+    # Тёмная внутренняя кромка усиливает рельеф модели.
+    for p in range(3, 13):
+        px(im, p, 3, PLASTER_DARK)
+        px(im, p, 12, PLASTER_DARK)
+        px(im, 3, p, PLASTER_DARK)
+        px(im, 12, p, PLASTER_DARK)
+    # Симметричный геометрический резной мотив по углам и верхней планке.
+    for x, y in ((1, 1), (14, 1), (1, 14), (14, 14),
+                 (5, 1), (8, 1), (3, 2), (12, 2)):
+        px(im, x, y, CASING_ACCENT_DARK)
+    for x, y in ((2, 1), (13, 1), (1, 2), (14, 2),
+                 (2, 14), (13, 14), (6, 1), (9, 1)):
+        px(im, x, y, CASING_ACCENT)
+    return im
+
+
 def wattle():
     """Плетень: вертикальные колья и горизонтальная лозовая оплётка."""
     im = img()
@@ -381,6 +423,8 @@ def main():
 
     save(adobe_bricks(), "adobe_bricks")
     save(shell_rock(), "shell_rock")
+    save(whitewashed_plaster(), "whitewashed_plaster")
+    save(carved_window_casing(), "carved_window_casing")
     save(wattle(), "wattle")
     save(wattle_particle(), "wattle_particle")
     save(wattle_gate(), "wattle_gate")

@@ -73,6 +73,10 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.SHELL_ROCK_STAIRS.get());
                         output.accept(KHItems.SHELL_ROCK_SLAB.get());
                         output.accept(KHItems.SHELL_ROCK_WALL.get());
+                        output.accept(KHItems.WHITEWASHED_PLASTER.get());
+                        output.accept(KHItems.WHITEWASHED_PLASTER_STAIRS.get());
+                        output.accept(KHItems.WHITEWASHED_PLASTER_SLAB.get());
+                        output.accept(KHItems.CARVED_WINDOW_CASING.get());
                         output.accept(KHItems.WATTLE.get());
                         output.accept(KHItems.WATTLE_GATE.get());
                     })

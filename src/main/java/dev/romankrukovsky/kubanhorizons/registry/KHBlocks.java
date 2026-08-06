@@ -1,6 +1,7 @@
 package dev.romankrukovsky.kubanhorizons.registry;
 
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
+import dev.romankrukovsky.kubanhorizons.block.CarvedWindowCasingBlock;
 import dev.romankrukovsky.kubanhorizons.crop.SunflowerCropBlock;
 import dev.romankrukovsky.kubanhorizons.processing.OilPressBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -255,6 +256,28 @@ public final class KHBlocks {
                     net.minecraft.world.level.block.WallBlock::new,
                     solidOn(shellRockProperties()));
 
+    /** Белёная штукатурка кубанской хаты. */
+    public static final DeferredBlock<net.minecraft.world.level.block.Block> WHITEWASHED_PLASTER =
+            BLOCKS.registerSimpleBlock("whitewashed_plaster", plasterProperties());
+
+    /** Ступенька из белёной штукатурки. */
+    public static final DeferredBlock<net.minecraft.world.level.block.StairBlock> WHITEWASHED_PLASTER_STAIRS =
+            BLOCKS.registerBlock("whitewashed_plaster_stairs",
+                    p -> new net.minecraft.world.level.block.StairBlock(
+                            WHITEWASHED_PLASTER.get().defaultBlockState(), p),
+                    plasterProperties());
+
+    /** Плита из белёной штукатурки. */
+    public static final DeferredBlock<net.minecraft.world.level.block.SlabBlock> WHITEWASHED_PLASTER_SLAB =
+            BLOCKS.registerBlock("whitewashed_plaster_slab",
+                    net.minecraft.world.level.block.SlabBlock::new,
+                    plasterProperties());
+
+    /** Резной оконный наличник. */
+    public static final DeferredBlock<CarvedWindowCasingBlock> CARVED_WINDOW_CASING =
+            BLOCKS.registerBlock("carved_window_casing", CarvedWindowCasingBlock::new,
+                    p -> plasterProperties().apply(p).noOcclusion());
+
     /** Плетень — лозовая ограда двора. */
     public static final DeferredBlock<net.minecraft.world.level.block.FenceBlock> WATTLE =
             BLOCKS.registerBlock("wattle",
@@ -284,6 +307,15 @@ public final class KHBlocks {
                 .instrument(net.minecraft.world.level.block.state.properties.NoteBlockInstrument.BASEDRUM)
                 .requiresCorrectToolForDrops()
                 .strength(0.9F, 2.5F)
+                .sound(SoundType.CALCITE);
+    }
+
+    /** Свойства штукатурки — мягкая известковая отделка поверх кладки. */
+    private static java.util.function.UnaryOperator<BlockBehaviour.Properties> plasterProperties() {
+        return p -> p.mapColor(MapColor.QUARTZ)
+                .instrument(net.minecraft.world.level.block.state.properties.NoteBlockInstrument.BASEDRUM)
+                .requiresCorrectToolForDrops()
+                .strength(0.8F, 2.0F)
                 .sound(SoundType.CALCITE);
     }
 

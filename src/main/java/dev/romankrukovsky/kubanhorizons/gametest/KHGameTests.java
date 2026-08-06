@@ -46,6 +46,8 @@ import net.minecraft.world.item.component.WrittenBookContent;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -122,6 +124,9 @@ public final class KHGameTests {
         register("building_requires_pickaxe", KHGameTests::testBuildingRequiresPickaxe, 100);
         register("wattle_connects", KHGameTests::testWattleConnects, 100);
         register("building_stonecutting_namespace", KHGameTests::testBuildingStonecuttingNamespace, 100);
+        register("plaster_slab_drops_two", KHGameTests::testPlasterSlabDropsTwo, 100);
+        register("plaster_tools_drops_and_tags", KHGameTests::testPlasterToolsDropsAndTags, 100);
+        register("carved_casing_facing_and_shape", KHGameTests::testCarvedCasingFacingAndShape, 100);
     }
 
     private KHGameTests() {
@@ -1210,6 +1215,9 @@ public final class KHGameTests {
                 "shell_rock_stairs_from_shell_rock_stonecutting",
                 "shell_rock_slab_from_shell_rock_stonecutting",
                 "shell_rock_wall_from_shell_rock_stonecutting",
+                "whitewashed_plaster_stairs_from_whitewashed_plaster_stonecutting",
+                "whitewashed_plaster_slab_from_whitewashed_plaster_stonecutting",
+                "carved_window_casing_from_whitewashed_plaster_stonecutting",
         };
         var recipes = helper.getLevel().recipeAccess();
         for (String name : names) {
@@ -1223,6 +1231,85 @@ public final class KHGameTests {
         helper.succeed();
     }
 
+    /** Белёная двойная плита сохраняет обе половины материала. */
+    private static void testPlasterSlabDropsTwo(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, KHBlocks.WHITEWASHED_PLASTER_SLAB.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.SlabBlock.TYPE,
+                        net.minecraft.world.level.block.state.properties.SlabType.DOUBLE));
+        BlockPos abs = helper.absolutePos(pos);
+        List<ItemStack> drops = net.minecraft.world.level.block.Block.getDrops(
+                level.getBlockState(abs), level, abs, null, null,
+                new ItemStack(Items.IRON_PICKAXE));
+        int total = drops.stream()
+                .filter(stack -> stack.is(KHItems.WHITEWASHED_PLASTER_SLAB.get()))
+                .mapToInt(ItemStack::getCount)
+                .sum();
+        helper.assertValueEqual(total, 2, "Двойная плита штукатурки должна дать 2 плиты");
+
+        helper.setBlock(pos, KHBlocks.WHITEWASHED_PLASTER_SLAB.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.SlabBlock.TYPE,
+                        net.minecraft.world.level.block.state.properties.SlabType.BOTTOM));
+        List<ItemStack> singleDrops = net.minecraft.world.level.block.Block.getDrops(
+                level.getBlockState(abs), level, abs, null, null,
+                new ItemStack(Items.IRON_PICKAXE));
+        int singleTotal = singleDrops.stream()
+                .filter(stack -> stack.is(KHItems.WHITEWASHED_PLASTER_SLAB.get()))
+                .mapToInt(ItemStack::getCount)
+                .sum();
+        helper.assertValueEqual(singleTotal, 1, "Одинарная плита штукатурки должна дать 1 плиту");
+        helper.succeed();
+    }
+
+    /** Штукатурка и наличник требуют кирку, дропают себя и входят в структурные теги. */
+    private static void testPlasterToolsDropsAndTags(GameTestHelper helper) {
+        assertNeedsPickaxe(helper, new BlockPos(1, 1, 1),
+                KHBlocks.WHITEWASHED_PLASTER.get(), KHItems.WHITEWASHED_PLASTER.get());
+        assertNeedsPickaxe(helper, new BlockPos(2, 1, 1),
+                KHBlocks.CARVED_WINDOW_CASING.get(), KHItems.CARVED_WINDOW_CASING.get());
+
+        helper.assertTrue(KHBlocks.WHITEWASHED_PLASTER_STAIRS.get().defaultBlockState().is(BlockTags.STAIRS),
+                "Ступеньки штукатурки должны входить в block tag stairs");
+        helper.assertTrue(KHBlocks.WHITEWASHED_PLASTER_SLAB.get().defaultBlockState().is(BlockTags.SLABS),
+                "Плита штукатурки должна входить в block tag slabs");
+        helper.assertTrue(new ItemStack(KHItems.WHITEWASHED_PLASTER_STAIRS.get()).is(BlockItemTags.STAIRS.item()),
+                "Ступеньки штукатурки должны входить в item tag stairs");
+        helper.assertTrue(new ItemStack(KHItems.WHITEWASHED_PLASTER_SLAB.get()).is(BlockItemTags.SLABS.item()),
+                "Плита штукатурки должна входить в item tag slabs");
+        helper.succeed();
+    }
+
+    /** Наличник хранит горизонтальный поворот и меняет тонкую форму по оси. */
+    private static void testCarvedCasingFacingAndShape(GameTestHelper helper) {
+        BlockState north = KHBlocks.CARVED_WINDOW_CASING.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.NORTH);
+        BlockState east = north.setValue(
+                net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING, Direction.EAST);
+        helper.assertValueEqual(north.getValue(
+                        net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING),
+                Direction.NORTH, "Наличник должен сохранять северный поворот");
+        helper.assertValueEqual(east.getValue(
+                        net.minecraft.world.level.block.HorizontalDirectionalBlock.FACING),
+                Direction.EAST, "Наличник должен сохранять восточный поворот");
+        var northBounds = north.getShape(helper.getLevel(), helper.absolutePos(new BlockPos(1, 1, 1))).bounds();
+        var eastBounds = east.getShape(helper.getLevel(), helper.absolutePos(new BlockPos(2, 1, 1))).bounds();
+        helper.assertTrue(northBounds.getZsize() < northBounds.getXsize(),
+                "Северный наличник должен быть тонким по оси Z");
+        helper.assertTrue(eastBounds.getXsize() < eastBounds.getZsize(),
+                "Восточный наличник должен быть тонким по оси X");
+        helper.assertTrue(!north.getShape(helper.getLevel(), helper.absolutePos(new BlockPos(1, 1, 1)))
+                        .toAabbs().stream().anyMatch(box -> box.minX < 0.5 && box.maxX > 0.5
+                                && box.minY < 0.5 && box.maxY > 0.5),
+                "Северный наличник должен иметь открытый центр");
+        helper.assertTrue(!east.getShape(helper.getLevel(), helper.absolutePos(new BlockPos(2, 1, 1)))
+                        .toAabbs().stream().anyMatch(box -> box.minZ < 0.5 && box.maxZ > 0.5
+                                && box.minY < 0.5 && box.maxY > 0.5),
+                "Восточный наличник должен иметь открытый центр");
+        helper.assertTrue(!north.canOcclude(), "Наличник не должен перекрывать соседние грани");
+        helper.succeed();
+    }
+
     // --- Реестры ---
 
     /** Все заявленные ID контента присутствуют в реестрах. */
@@ -1230,12 +1317,14 @@ public final class KHGameTests {
         String[] blocks = {"sunflower_crop", "oil_press",
                 "adobe_bricks", "adobe_brick_stairs", "adobe_brick_slab", "adobe_brick_wall",
                 "shell_rock", "shell_rock_stairs", "shell_rock_slab", "shell_rock_wall",
-                "wattle", "wattle_gate"};
+                "whitewashed_plaster", "whitewashed_plaster_stairs", "whitewashed_plaster_slab",
+                "carved_window_casing", "wattle", "wattle_gate"};
         String[] items = {"sunflower_seeds", "sunflower_head", "sunflower_oil",
                 "oil_cake", "roasted_sunflower_seeds", "oil_press",
                 "adobe_bricks", "adobe_brick_stairs", "adobe_brick_slab", "adobe_brick_wall",
                 "shell_rock", "shell_rock_stairs", "shell_rock_slab", "shell_rock_wall",
-                "wattle", "wattle_gate"};
+                "whitewashed_plaster", "whitewashed_plaster_stairs", "whitewashed_plaster_slab",
+                "carved_window_casing", "wattle", "wattle_gate"};
         for (String id : blocks) {
             helper.assertTrue(BuiltInRegistries.BLOCK.containsKey(KHIds.of(id)),
                     "Блок отсутствует в реестре: " + id);

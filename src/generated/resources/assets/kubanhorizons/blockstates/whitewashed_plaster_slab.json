@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "kubanhorizons:block/whitewashed_plaster_slab"
+    },
+    "type=double": {
+      "model": "kubanhorizons:block/whitewashed_plaster"
+    },
+    "type=top": {
+      "model": "kubanhorizons:block/whitewashed_plaster_slab_top"
+    }
+  }
+}

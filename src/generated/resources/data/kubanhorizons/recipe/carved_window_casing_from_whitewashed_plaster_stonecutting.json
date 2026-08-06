@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "kubanhorizons:whitewashed_plaster",
+  "result": {
+    "id": "kubanhorizons:carved_window_casing"
+  }
+}

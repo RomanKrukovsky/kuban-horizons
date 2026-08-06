@@ -236,6 +236,22 @@ public final class KHItems {
     public static final DeferredItem<BlockItem> SHELL_ROCK_WALL =
             ITEMS.registerSimpleBlockItem("shell_rock_wall", KHBlocks.SHELL_ROCK_WALL);
 
+    /** Белёная штукатурка (предмет). */
+    public static final DeferredItem<BlockItem> WHITEWASHED_PLASTER =
+            ITEMS.registerSimpleBlockItem("whitewashed_plaster", KHBlocks.WHITEWASHED_PLASTER);
+
+    /** Ступенька из белёной штукатурки (предмет). */
+    public static final DeferredItem<BlockItem> WHITEWASHED_PLASTER_STAIRS =
+            ITEMS.registerSimpleBlockItem("whitewashed_plaster_stairs", KHBlocks.WHITEWASHED_PLASTER_STAIRS);
+
+    /** Плита из белёной штукатурки (предмет). */
+    public static final DeferredItem<BlockItem> WHITEWASHED_PLASTER_SLAB =
+            ITEMS.registerSimpleBlockItem("whitewashed_plaster_slab", KHBlocks.WHITEWASHED_PLASTER_SLAB);
+
+    /** Резной оконный наличник (предмет). */
+    public static final DeferredItem<BlockItem> CARVED_WINDOW_CASING =
+            ITEMS.registerSimpleBlockItem("carved_window_casing", KHBlocks.CARVED_WINDOW_CASING);
+
     /** Плетень (предмет). */
     public static final DeferredItem<BlockItem> WATTLE =
             ITEMS.registerSimpleBlockItem("wattle", KHBlocks.WATTLE);

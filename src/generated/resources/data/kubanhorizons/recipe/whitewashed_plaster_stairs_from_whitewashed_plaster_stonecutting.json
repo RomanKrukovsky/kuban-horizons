@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "kubanhorizons:whitewashed_plaster",
+  "result": {
+    "id": "kubanhorizons:whitewashed_plaster_stairs"
+  }
+}

@@ -58,6 +58,11 @@ public final class KHLootTableProvider extends LootTableProvider {
             add(KHBlocks.SHELL_ROCK_SLAB.get(),
                     createSlabItemTable(KHBlocks.SHELL_ROCK_SLAB.get()));
             dropSelf(KHBlocks.SHELL_ROCK_WALL.get());
+            dropSelf(KHBlocks.WHITEWASHED_PLASTER.get());
+            dropSelf(KHBlocks.WHITEWASHED_PLASTER_STAIRS.get());
+            add(KHBlocks.WHITEWASHED_PLASTER_SLAB.get(),
+                    createSlabItemTable(KHBlocks.WHITEWASHED_PLASTER_SLAB.get()));
+            dropSelf(KHBlocks.CARVED_WINDOW_CASING.get());
             dropSelf(KHBlocks.WATTLE.get());
             dropSelf(KHBlocks.WATTLE_GATE.get());
 

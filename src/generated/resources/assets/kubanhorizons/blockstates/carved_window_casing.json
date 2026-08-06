@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "kubanhorizons:block/carved_window_casing",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "kubanhorizons:block/carved_window_casing"
+    },
+    "facing=south": {
+      "model": "kubanhorizons:block/carved_window_casing",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "kubanhorizons:block/carved_window_casing",
+      "y": 270
+    }
+  }
+}

@@ -86,6 +86,14 @@ public final class KHModelProvider extends ModelProvider {
 
         registerBuildingFamilies(blockModels);
 
+        // Резной наличник: ручная тонкая модель + горизонтальные повороты.
+        Block casing = KHBlocks.CARVED_WINDOW_CASING.get();
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(casing,
+                                plainVariant(KHIds.of("block/carved_window_casing")))
+                        .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        blockModels.registerSimpleItemModel(casing.asItem(), KHIds.of("block/carved_window_casing"));
+
         // Плоские предметы.
         itemModels.generateFlatItem(KHItems.SUNFLOWER_SEEDS.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.SUNFLOWER_HEAD.get(), ModelTemplates.FLAT_ITEM);
@@ -136,6 +144,7 @@ public final class KHModelProvider extends ModelProvider {
     private void registerBuildingFamilies(BlockModelGenerators blockModels) {
         blockModels.family(KHBlocks.ADOBE_BRICKS.get()).generateFor(KHBlockFamilies.ADOBE_BRICKS);
         blockModels.family(KHBlocks.SHELL_ROCK.get()).generateFor(KHBlockFamilies.SHELL_ROCK);
+        blockModels.family(KHBlocks.WHITEWASHED_PLASTER.get()).generateFor(KHBlockFamilies.WHITEWASHED_PLASTER);
         blockModels.familyWithExistingFullBlock(KHBlocks.WATTLE.get())
                 .generateFor(KHBlockFamilies.WATTLE);
     }

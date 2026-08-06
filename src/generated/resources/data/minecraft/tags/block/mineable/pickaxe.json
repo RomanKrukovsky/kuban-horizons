@@ -9,6 +9,10 @@
     "kubanhorizons:shell_rock",
     "kubanhorizons:shell_rock_stairs",
     "kubanhorizons:shell_rock_slab",
-    "kubanhorizons:shell_rock_wall"
+    "kubanhorizons:shell_rock_wall",
+    "kubanhorizons:whitewashed_plaster",
+    "kubanhorizons:whitewashed_plaster_stairs",
+    "kubanhorizons:whitewashed_plaster_slab",
+    "kubanhorizons:carved_window_casing"
   ]
 }

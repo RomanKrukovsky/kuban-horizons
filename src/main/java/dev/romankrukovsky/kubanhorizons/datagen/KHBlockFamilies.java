@@ -40,6 +40,13 @@ final class KHBlockFamilies {
                     .wall(KHBlocks.SHELL_ROCK_WALL.get())
                     .getFamily();
 
+    /** Белёная штукатурка: полный блок, ступеньки и плита. */
+    static final BlockFamily WHITEWASHED_PLASTER =
+            new BlockFamily.Builder(KHBlocks.WHITEWASHED_PLASTER.get())
+                    .stairs(KHBlocks.WHITEWASHED_PLASTER_STAIRS.get())
+                    .slab(KHBlocks.WHITEWASHED_PLASTER_SLAB.get())
+                    .getFamily();
+
     /**
      * Плетень: базовый блок — сама ограда, полноценного куба нет.
      *

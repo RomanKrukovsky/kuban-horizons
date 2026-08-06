@@ -1,0 +1,57 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "kubanhorizons:block/whitewashed_plaster",
+    "casing": "kubanhorizons:block/carved_window_casing"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 6],
+      "to": [3, 16, 10],
+      "faces": {
+        "north": {"texture": "#casing", "uv": [0, 0, 3, 16]},
+        "south": {"texture": "#casing", "uv": [13, 0, 16, 16]},
+        "west": {"texture": "#casing", "uv": [6, 0, 10, 16]},
+        "east": {"texture": "#casing", "uv": [6, 0, 10, 16]},
+        "up": {"texture": "#casing", "uv": [0, 6, 3, 10]},
+        "down": {"texture": "#casing", "uv": [0, 6, 3, 10]}
+      }
+    },
+    {
+      "from": [13, 0, 6],
+      "to": [16, 16, 10],
+      "faces": {
+        "north": {"texture": "#casing", "uv": [13, 0, 16, 16]},
+        "south": {"texture": "#casing", "uv": [0, 0, 3, 16]},
+        "west": {"texture": "#casing", "uv": [6, 0, 10, 16]},
+        "east": {"texture": "#casing", "uv": [6, 0, 10, 16]},
+        "up": {"texture": "#casing", "uv": [13, 6, 16, 10]},
+        "down": {"texture": "#casing", "uv": [13, 6, 16, 10]}
+      }
+    },
+    {
+      "from": [3, 13, 6],
+      "to": [13, 16, 10],
+      "faces": {
+        "north": {"texture": "#casing", "uv": [3, 0, 13, 3]},
+        "south": {"texture": "#casing", "uv": [3, 0, 13, 3]},
+        "west": {"texture": "#casing", "uv": [6, 0, 10, 3]},
+        "east": {"texture": "#casing", "uv": [6, 0, 10, 3]},
+        "up": {"texture": "#casing", "uv": [3, 6, 13, 10]},
+        "down": {"texture": "#casing", "uv": [3, 6, 13, 10]}
+      }
+    },
+    {
+      "from": [3, 0, 6],
+      "to": [13, 3, 10],
+      "faces": {
+        "north": {"texture": "#casing", "uv": [3, 13, 13, 16]},
+        "south": {"texture": "#casing", "uv": [3, 13, 13, 16]},
+        "west": {"texture": "#casing", "uv": [6, 13, 10, 16]},
+        "east": {"texture": "#casing", "uv": [6, 13, 10, 16]},
+        "up": {"texture": "#casing", "uv": [3, 6, 13, 10]},
+        "down": {"texture": "#casing", "uv": [3, 6, 13, 10]}
+      }
+    }
+  ]
+}

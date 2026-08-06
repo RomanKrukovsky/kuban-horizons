@@ -65,6 +65,10 @@ final class KHTranslations {
         add("block.kubanhorizons.shell_rock_stairs", "Shell Rock Stairs", "Ступенька из ракушечника");
         add("block.kubanhorizons.shell_rock_slab", "Shell Rock Slab", "Плита из ракушечника");
         add("block.kubanhorizons.shell_rock_wall", "Shell Rock Wall", "Стенка из ракушечника");
+        add("block.kubanhorizons.whitewashed_plaster", "Whitewashed Plaster", "Белёная штукатурка");
+        add("block.kubanhorizons.whitewashed_plaster_stairs", "Whitewashed Plaster Stairs", "Ступеньки из белёной штукатурки");
+        add("block.kubanhorizons.whitewashed_plaster_slab", "Whitewashed Plaster Slab", "Плита из белёной штукатурки");
+        add("block.kubanhorizons.carved_window_casing", "Carved Window Casing", "Резной оконный наличник");
         add("block.kubanhorizons.wattle", "Wattle Fence", "Плетень");
         add("block.kubanhorizons.wattle_gate", "Wattle Gate", "Калитка плетня");
 
