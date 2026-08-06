@@ -14,6 +14,10 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 public final class KHBiomes {
     public static final ResourceKey<Biome> KUBAN_STEPPE =
             ResourceKey.create(Registries.BIOME, KHIds.of("kuban_steppe"));
+    public static final ResourceKey<Biome> PLAVNI =
+            ResourceKey.create(Registries.BIOME, KHIds.of("plavni"));
+    public static final ResourceKey<Biome> LIMAN =
+            ResourceKey.create(Registries.BIOME, KHIds.of("liman"));
 
     private KHBiomes() {
     }
@@ -25,5 +29,7 @@ public final class KHBiomes {
         // Солнечная степь наследует полный безопасный набор генерации равнин:
         // руды, озёра, траву, цветы, животных и редкие поля подсолнухов.
         context.register(KUBAN_STEPPE, OverworldBiomes.plains(features, carvers, true, false, false));
+        context.register(PLAVNI, OverworldBiomes.swamp(features, carvers));
+        context.register(LIMAN, OverworldBiomes.swamp(features, carvers));
     }
 }

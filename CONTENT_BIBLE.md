@@ -65,8 +65,8 @@
 | `kuban_steppe` | Кубанская степь | ✅ (opt-in world preset) |
 | `chernozem_plain` | Чернозёмная равнина | 📋 |
 | `sunflower_fields` | Поля подсолнечника | 📋 |
-| `plavni` | Плавни | 📋 |
-| `liman` | Лиман | 📋 |
+| `plavni` | Плавни | ✅ (водные окна, болотная растительность) |
+| `liman` | Лиман | ✅ (грязевые берега, влажная экосистема) |
 | `river_floodplain` | Пойма реки | 📋 |
 | `vineyard_hills` | Виноградные холмы | 📋 |
 | `foothill_forest` | Предгорный лес | 📋 |

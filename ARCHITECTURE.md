@@ -63,7 +63,8 @@ Vanilla multi-noise preset не предоставляет data-driven точк�
 добавления новых биомов, а NeoForge BiomeModifier изменяет только содержимое
 уже выбранных биомов. Поэтому Kuban Horizons регистрирует компактный
 `BiomeSource` codec и отдельный world preset. Он делегирует выбор ванильному
-`minecraft:overworld` и заменяет только `sunflower_plains` на кубанскую степь.
+`minecraft:overworld` и заменяет региональные аналоги (`sunflower_plains`,
+`swamp`, `mangrove_swamp`) на кубанскую степь, плавни и лиман.
 Обычные и существующие миры не меняются; игрок выбирает preset при создании
 нового мира. Nether и End остаются ванильными.
 

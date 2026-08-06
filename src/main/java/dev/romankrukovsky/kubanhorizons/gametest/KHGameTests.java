@@ -8,6 +8,7 @@ import dev.romankrukovsky.kubanhorizons.registry.KHBlocks;
 import dev.romankrukovsky.kubanhorizons.registry.KHItems;
 import dev.romankrukovsky.kubanhorizons.util.KHIds;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHBiomes;
+import dev.romankrukovsky.kubanhorizons.worldgen.KHNoiseSettings;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHWorldPresets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -261,6 +262,16 @@ public final class KHGameTests {
         helper.assertTrue(overworld.generator().getBiomeSource().possibleBiomes().stream()
                         .anyMatch(biome -> biome.is(KHBiomes.KUBAN_STEPPE)),
                 "Кубанская степь отсутствует в biome source пресета");
+        helper.assertTrue(overworld.generator().getBiomeSource().possibleBiomes().stream()
+                        .anyMatch(biome -> biome.is(KHBiomes.PLAVNI)),
+                "Плавни отсутствуют в biome source пресета");
+        helper.assertTrue(overworld.generator().getBiomeSource().possibleBiomes().stream()
+                        .anyMatch(biome -> biome.is(KHBiomes.LIMAN)),
+                "Лиман отсутствует в biome source пресета");
+        helper.assertTrue(overworld.generator() instanceof net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator
+                        && ((net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator) overworld.generator())
+                                .stable(KHNoiseSettings.OVERWORLD),
+                "Пресет не использует surface rules плавней и лимана");
         helper.succeed();
     }
 

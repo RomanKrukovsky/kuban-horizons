@@ -26,6 +26,8 @@ final class KHTranslations {
         // --- Общее ---
         add("itemGroup.kubanhorizons", "Kuban Horizons", "Кубанские горизонты");
         add("biome.kubanhorizons.kuban_steppe", "Kuban Steppe", "Кубанская степь");
+        add("biome.kubanhorizons.plavni", "Kuban Wetlands", "Плавни");
+        add("biome.kubanhorizons.liman", "Liman", "Лиман");
         add("generator.kubanhorizons.kuban_horizons", "Kuban Horizons", "Кубанские горизонты");
 
         // --- Блоки ---

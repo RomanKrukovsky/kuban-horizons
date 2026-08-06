@@ -6,10 +6,12 @@
         "type": "minecraft:noise",
         "biome_source": {
           "type": "kubanhorizons:kuban",
+          "liman": "kubanhorizons:liman",
+          "plavni": "kubanhorizons:plavni",
           "preset": "minecraft:overworld",
           "steppe": "kubanhorizons:kuban_steppe"
         },
-        "settings": "minecraft:overworld"
+        "settings": "kubanhorizons:overworld"
       }
     },
     "minecraft:the_end": {
