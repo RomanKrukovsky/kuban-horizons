@@ -20,7 +20,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
  *
  * <p>Дикий чай — влажные тёплые леса (джунгли, тёмный лес); дикие
  * томаты — равнины и саванны; одичавший виноград — саванны и лесистые
- * холмы (сухие «южные» склоны).</p>
+ * холмы (сухие «южные» склоны); дикий рис — мелководье поймы реки.</p>
  */
 public final class KHBiomeModifiers {
     public static final ResourceKey<BiomeModifier> ADD_WILD_TEA =
@@ -29,6 +29,8 @@ public final class KHBiomeModifiers {
             createKey("add_wild_tomato");
     public static final ResourceKey<BiomeModifier> ADD_WILD_GRAPE =
             createKey("add_wild_grape");
+    public static final ResourceKey<BiomeModifier> ADD_WILD_RICE =
+            createKey("add_wild_rice");
 
     private KHBiomeModifiers() {
     }
@@ -60,6 +62,12 @@ public final class KHBiomeModifiers {
                         biomes.getOrThrow(Biomes.SAVANNA_PLATEAU),
                         biomes.getOrThrow(Biomes.WOODED_BADLANDS)),
                 HolderSet.direct(features.getOrThrow(KHPlacedFeatures.WILD_GRAPE_PLACED)),
+                GenerationStep.Decoration.VEGETAL_DECORATION));
+
+        // Дикий рис — только пойма реки: мелководье с илистым дном.
+        context.register(ADD_WILD_RICE, new BiomeModifiers.AddFeaturesBiomeModifier(
+                HolderSet.direct(biomes.getOrThrow(KHBiomes.RIVER_FLOODPLAIN)),
+                HolderSet.direct(features.getOrThrow(KHPlacedFeatures.WILD_RICE_PLACED)),
                 GenerationStep.Decoration.VEGETAL_DECORATION));
     }
 }

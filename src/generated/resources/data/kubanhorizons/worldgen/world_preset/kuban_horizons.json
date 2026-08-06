@@ -6,6 +6,7 @@
         "type": "minecraft:noise",
         "biome_source": {
           "type": "kubanhorizons:kuban",
+          "floodplain": "kubanhorizons:river_floodplain",
           "liman": "kubanhorizons:liman",
           "plavni": "kubanhorizons:plavni",
           "preset": "minecraft:overworld",

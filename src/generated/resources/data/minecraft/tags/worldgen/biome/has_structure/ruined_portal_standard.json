@@ -1,6 +1,7 @@
 {
   "values": [
     "kubanhorizons:kuban_steppe",
-    "kubanhorizons:liman"
+    "kubanhorizons:liman",
+    "kubanhorizons:river_floodplain"
   ]
 }

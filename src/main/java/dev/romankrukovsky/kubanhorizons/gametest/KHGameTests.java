@@ -9,6 +9,7 @@ import dev.romankrukovsky.kubanhorizons.registry.KHItems;
 import dev.romankrukovsky.kubanhorizons.util.KHIds;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHBiomes;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHNoiseSettings;
+import dev.romankrukovsky.kubanhorizons.worldgen.KHPlacedFeatures;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHWorldPresets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -23,6 +24,8 @@ import net.minecraft.gametest.framework.TestEnvironmentDefinition;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -31,6 +34,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
@@ -86,6 +90,7 @@ public final class KHGameTests {
         register("hand_mill_grinds_wheat", KHGameTests::testHandMill, 300);
         register("kuban_guide_content", KHGameTests::testKubanGuideContent, 100);
         register("kuban_steppe_world_preset", KHGameTests::testKubanSteppeWorldPreset, 100);
+        register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
     }
 
     private KHGameTests() {
@@ -249,7 +254,7 @@ public final class KHGameTests {
         helper.succeed();
     }
 
-    /** Пресет содержит три ванильных измерения и реально использует кубанскую степь. */
+    /** Пресет содержит три ванильных измерения и реально использует биомы мода. */
     private static void testKubanSteppeWorldPreset(GameTestHelper helper) {
         var registries = helper.getLevel().registryAccess();
         var preset = registries.lookupOrThrow(Registries.WORLD_PRESET)
@@ -268,10 +273,36 @@ public final class KHGameTests {
         helper.assertTrue(overworld.generator().getBiomeSource().possibleBiomes().stream()
                         .anyMatch(biome -> biome.is(KHBiomes.LIMAN)),
                 "Лиман отсутствует в biome source пресета");
+        helper.assertTrue(overworld.generator().getBiomeSource().possibleBiomes().stream()
+                        .anyMatch(biome -> biome.is(KHBiomes.RIVER_FLOODPLAIN)),
+                "Пойма реки отсутствует в biome source пресета");
         helper.assertTrue(overworld.generator() instanceof net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator
                         && ((net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator) overworld.generator())
                                 .stable(KHNoiseSettings.OVERWORLD),
-                "Пресет не использует surface rules плавней и лимана");
+                "Пресет не использует surface rules плавней, лимана и поймы");
+        helper.succeed();
+    }
+
+    /** Пойма реки: речная фауна, влажный климат и дикий рис среди растительности. */
+    private static void testRiverFloodplainBiome(GameTestHelper helper) {
+        var biome = helper.getLevel().registryAccess()
+                .lookupOrThrow(Registries.BIOME)
+                .getOrThrow(KHBiomes.RIVER_FLOODPLAIN)
+                .value();
+
+        helper.assertTrue(biome.hasPrecipitation(), "Пойма должна быть влажным биомом");
+        helper.assertTrue(!biome.getMobSettings().getMobs(MobCategory.WATER_AMBIENT).isEmpty(),
+                "В пойме отсутствует речная рыба");
+        helper.assertTrue(biome.getMobSettings().getMobs(MobCategory.CREATURE).unwrap().stream()
+                        .anyMatch(entry -> entry.value().type() == EntityTypes.COW),
+                "Заливные луга поймы должны быть пастбищами");
+
+        boolean hasWildRice = biome.getGenerationSettings()
+                .features()
+                .get(GenerationStep.Decoration.VEGETAL_DECORATION.ordinal())
+                .stream()
+                .anyMatch(feature -> feature.is(KHPlacedFeatures.WILD_RICE_PLACED));
+        helper.assertTrue(hasWildRice, "Дикий рис не добавлен в растительность поймы");
         helper.succeed();
     }
 

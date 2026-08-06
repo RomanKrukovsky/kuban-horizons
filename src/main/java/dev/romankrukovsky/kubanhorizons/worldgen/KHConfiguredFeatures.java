@@ -1,6 +1,7 @@
 package dev.romankrukovsky.kubanhorizons.worldgen;
 
 import dev.romankrukovsky.kubanhorizons.crop.GrapeTrellisBlock;
+import dev.romankrukovsky.kubanhorizons.crop.RiceCropBlock;
 import dev.romankrukovsky.kubanhorizons.crop.TeaBushBlock;
 import dev.romankrukovsky.kubanhorizons.crop.TomatoBushBlock;
 import dev.romankrukovsky.kubanhorizons.registry.KHBlocks;
@@ -25,6 +26,7 @@ public final class KHConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> WILD_TEA = createKey("wild_tea");
     public static final ResourceKey<ConfiguredFeature<?, ?>> WILD_TOMATO = createKey("wild_tomato");
     public static final ResourceKey<ConfiguredFeature<?, ?>> WILD_GRAPE = createKey("wild_grape");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> WILD_RICE = createKey("wild_rice");
 
     private KHConfiguredFeatures() {
     }
@@ -51,5 +53,13 @@ public final class KHConfiguredFeatures {
                 new SimpleBlockConfiguration(BlockStateProvider.simple(
                         KHBlocks.GRAPE_TRELLIS.get().defaultBlockState()
                                 .setValue(GrapeTrellisBlock.AGE, 3)))));
+
+        // Дикий рис поймы: зрелая метёлка в затопленном мелководье.
+        // Состояние waterlogged обязательно — блок сохраняет воду вокруг себя.
+        context.register(WILD_RICE, new ConfiguredFeature<>(Feature.SIMPLE_BLOCK,
+                new SimpleBlockConfiguration(BlockStateProvider.simple(
+                        KHBlocks.RICE_CROP.get().defaultBlockState()
+                                .setValue(RiceCropBlock.AGE, RiceCropBlock.MAX_AGE)
+                                .setValue(RiceCropBlock.WATERLOGGED, true)))));
     }
 }

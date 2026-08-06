@@ -38,13 +38,14 @@ public final class KHWorldPresets {
         Holder<Biome> steppe = biomes.getOrThrow(KHBiomes.KUBAN_STEPPE);
         Holder<Biome> plavni = biomes.getOrThrow(KHBiomes.PLAVNI);
         Holder<Biome> liman = biomes.getOrThrow(KHBiomes.LIMAN);
+        Holder<Biome> floodplain = biomes.getOrThrow(KHBiomes.RIVER_FLOODPLAIN);
 
         LevelStem overworld = new LevelStem(
                 dimensionTypes.getOrThrow(BuiltinDimensionTypes.OVERWORLD),
                 new NoiseBasedChunkGenerator(
                         new KubanBiomeSource(
                                 parameterLists.getOrThrow(MultiNoiseBiomeSourceParameterLists.OVERWORLD),
-                                steppe, plavni, liman),
+                                steppe, plavni, liman, floodplain),
                         noiseSettings.getOrThrow(KHNoiseSettings.OVERWORLD)));
         LevelStem nether = new LevelStem(
                 dimensionTypes.getOrThrow(BuiltinDimensionTypes.NETHER),

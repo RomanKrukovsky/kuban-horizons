@@ -28,6 +28,7 @@ final class KHTranslations {
         add("biome.kubanhorizons.kuban_steppe", "Kuban Steppe", "Кубанская степь");
         add("biome.kubanhorizons.plavni", "Kuban Wetlands", "Плавни");
         add("biome.kubanhorizons.liman", "Liman", "Лиман");
+        add("biome.kubanhorizons.river_floodplain", "River Floodplain", "Пойма реки");
         add("generator.kubanhorizons.kuban_horizons", "Kuban Horizons", "Кубанские горизонты");
 
         // --- Блоки ---

@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "kubanhorizons:river_floodplain",
+  "features": "kubanhorizons:wild_rice",
+  "step": "vegetal_decoration"
+}

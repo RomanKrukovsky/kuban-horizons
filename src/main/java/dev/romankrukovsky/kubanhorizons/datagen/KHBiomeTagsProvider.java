@@ -20,38 +20,51 @@ final class KHBiomeTagsProvider extends BiomeTagsProvider {
         tag(BiomeTags.IS_OVERWORLD)
                 .add(KHBiomes.KUBAN_STEPPE)
                 .add(KHBiomes.PLAVNI)
-                .add(KHBiomes.LIMAN);
+                .add(KHBiomes.LIMAN)
+                .add(KHBiomes.RIVER_FLOODPLAIN);
         tag(net.neoforged.neoforge.common.Tags.Biomes.IS_PLAINS).add(KHBiomes.KUBAN_STEPPE);
         tag(net.neoforged.neoforge.common.Tags.Biomes.IS_TEMPERATE)
                 .add(KHBiomes.KUBAN_STEPPE)
                 .add(KHBiomes.PLAVNI)
-                .add(KHBiomes.LIMAN);
+                .add(KHBiomes.LIMAN)
+                .add(KHBiomes.RIVER_FLOODPLAIN);
         tag(net.neoforged.neoforge.common.Tags.Biomes.IS_DRY).add(KHBiomes.KUBAN_STEPPE);
         tag(net.neoforged.neoforge.common.Tags.Biomes.IS_WET)
                 .add(KHBiomes.PLAVNI)
-                .add(KHBiomes.LIMAN);
+                .add(KHBiomes.LIMAN)
+                .add(KHBiomes.RIVER_FLOODPLAIN);
         tag(net.neoforged.neoforge.common.Tags.Biomes.IS_SWAMP)
                 .add(KHBiomes.PLAVNI)
                 .add(KHBiomes.LIMAN);
         tag(net.neoforged.neoforge.common.Tags.Biomes.IS_AQUATIC).add(KHBiomes.LIMAN);
+        tag(net.neoforged.neoforge.common.Tags.Biomes.IS_LUSH).add(KHBiomes.RIVER_FLOODPLAIN);
+        // Пойма — речной биом: наследует все ванильные категории рек.
+        tag(BiomeTags.IS_RIVER).add(KHBiomes.RIVER_FLOODPLAIN);
+        tag(BiomeTags.WATER_ON_MAP_OUTLINES).add(KHBiomes.RIVER_FLOODPLAIN);
+        tag(BiomeTags.REDUCED_WATER_AMBIENT_SPAWNS).add(KHBiomes.RIVER_FLOODPLAIN);
+        tag(BiomeTags.MORE_FREQUENT_DROWNED_SPAWNS).add(KHBiomes.RIVER_FLOODPLAIN);
         tag(BiomeTags.HAS_VILLAGE_PLAINS).add(KHBiomes.KUBAN_STEPPE);
         tag(BiomeTags.HAS_MINESHAFT)
                 .add(KHBiomes.KUBAN_STEPPE)
                 .add(KHBiomes.PLAVNI)
-                .add(KHBiomes.LIMAN);
+                .add(KHBiomes.LIMAN)
+                .add(KHBiomes.RIVER_FLOODPLAIN);
         tag(BiomeTags.HAS_RUINED_PORTAL_STANDARD)
                 .add(KHBiomes.KUBAN_STEPPE)
-                .add(KHBiomes.LIMAN);
+                .add(KHBiomes.LIMAN)
+                .add(KHBiomes.RIVER_FLOODPLAIN);
         tag(BiomeTags.HAS_RUINED_PORTAL_SWAMP).add(KHBiomes.PLAVNI);
         tag(BiomeTags.HAS_SWAMP_HUT).add(KHBiomes.PLAVNI);
         tag(BiomeTags.HAS_PILLAGER_OUTPOST).add(KHBiomes.KUBAN_STEPPE);
         tag(BiomeTags.HAS_STRONGHOLD)
                 .add(KHBiomes.KUBAN_STEPPE)
                 .add(KHBiomes.PLAVNI)
-                .add(KHBiomes.LIMAN);
+                .add(KHBiomes.LIMAN)
+                .add(KHBiomes.RIVER_FLOODPLAIN);
         tag(BiomeTags.HAS_TRIAL_CHAMBERS)
                 .add(KHBiomes.KUBAN_STEPPE)
                 .add(KHBiomes.PLAVNI)
-                .add(KHBiomes.LIMAN);
+                .add(KHBiomes.LIMAN)
+                .add(KHBiomes.RIVER_FLOODPLAIN);
     }
 }

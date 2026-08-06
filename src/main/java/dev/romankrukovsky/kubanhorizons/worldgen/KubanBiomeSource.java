@@ -24,27 +24,32 @@ public final class KubanBiomeSource extends BiomeSource {
             Biome.CODEC.fieldOf("plavni")
                     .forGetter(source -> source.plavni),
             Biome.CODEC.fieldOf("liman")
-                    .forGetter(source -> source.liman)
+                    .forGetter(source -> source.liman),
+            Biome.CODEC.fieldOf("floodplain")
+                    .forGetter(source -> source.floodplain)
     ).apply(instance, KubanBiomeSource::new));
 
     private final Holder<MultiNoiseBiomeSourceParameterList> preset;
     private final Holder<Biome> steppe;
     private final Holder<Biome> plavni;
     private final Holder<Biome> liman;
+    private final Holder<Biome> floodplain;
     private final MultiNoiseBiomeSource delegate;
 
     public KubanBiomeSource(Holder<MultiNoiseBiomeSourceParameterList> preset, Holder<Biome> steppe,
-            Holder<Biome> plavni, Holder<Biome> liman) {
+            Holder<Biome> plavni, Holder<Biome> liman, Holder<Biome> floodplain) {
         this.preset = preset;
         this.steppe = steppe;
         this.plavni = plavni;
         this.liman = liman;
+        this.floodplain = floodplain;
         this.delegate = MultiNoiseBiomeSource.createFromPreset(preset);
     }
 
     @Override
     protected Stream<Holder<Biome>> collectPossibleBiomes() {
-        return Stream.concat(delegate.possibleBiomes().stream(), Stream.of(steppe, plavni, liman)).distinct();
+        return Stream.concat(delegate.possibleBiomes().stream(),
+                Stream.of(steppe, plavni, liman, floodplain)).distinct();
     }
 
     @Override
@@ -63,6 +68,10 @@ public final class KubanBiomeSource extends BiomeSource {
         }
         if (selected.is(net.minecraft.world.level.biome.Biomes.MANGROVE_SWAMP)) {
             return liman;
+        }
+        // Незамёрзшие реки становятся кубанской поймой; замёрзшие остаются ванильными.
+        if (selected.is(net.minecraft.world.level.biome.Biomes.RIVER)) {
+            return floodplain;
         }
         return selected;
     }
