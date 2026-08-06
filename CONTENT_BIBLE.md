@@ -62,7 +62,7 @@
 
 | ID | Биом | Статус |
 |----|------|--------|
-| `kuban_steppe` | Кубанская степь | 📋 |
+| `kuban_steppe` | Кубанская степь | ✅ (opt-in world preset) |
 | `chernozem_plain` | Чернозёмная равнина | 📋 |
 | `sunflower_fields` | Поля подсолнечника | 📋 |
 | `plavni` | Плавни | 📋 |

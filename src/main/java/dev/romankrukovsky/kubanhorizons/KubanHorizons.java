@@ -10,6 +10,7 @@ import dev.romankrukovsky.kubanhorizons.registry.KHItems;
 import dev.romankrukovsky.kubanhorizons.registry.KHMenus;
 import dev.romankrukovsky.kubanhorizons.registry.KHRecipes;
 import dev.romankrukovsky.kubanhorizons.registry.KHSounds;
+import dev.romankrukovsky.kubanhorizons.worldgen.KHBiomeSources;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -38,6 +39,7 @@ public final class KubanHorizons {
         KHSounds.register(modEventBus);
         KHCreativeTabs.register(modEventBus);
         KHAttachments.register(modEventBus);
+        KHBiomeSources.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.registry.KHLootModifiers.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.trade.KHProfessions.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.gametest.KHGameTests.register(modEventBus);

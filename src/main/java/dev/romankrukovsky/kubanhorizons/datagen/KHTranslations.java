@@ -25,6 +25,8 @@ final class KHTranslations {
     static {
         // --- Общее ---
         add("itemGroup.kubanhorizons", "Kuban Horizons", "Кубанские горизонты");
+        add("biome.kubanhorizons.kuban_steppe", "Kuban Steppe", "Кубанская степь");
+        add("generator.kubanhorizons.kuban_horizons", "Kuban Horizons", "Кубанские горизонты");
 
         // --- Блоки ---
         add("block.kubanhorizons.sunflower_crop", "Sunflower Crop", "Подсолнечник");

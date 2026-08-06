@@ -7,6 +7,8 @@ import dev.romankrukovsky.kubanhorizons.item.KubanGuide;
 import dev.romankrukovsky.kubanhorizons.registry.KHBlocks;
 import dev.romankrukovsky.kubanhorizons.registry.KHItems;
 import dev.romankrukovsky.kubanhorizons.util.KHIds;
+import dev.romankrukovsky.kubanhorizons.worldgen.KHBiomes;
+import dev.romankrukovsky.kubanhorizons.worldgen.KHWorldPresets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.Holder;
@@ -82,6 +84,7 @@ public final class KHGameTests {
         register("drying_rack_dries_tea", KHGameTests::testDryingRack, 400);
         register("hand_mill_grinds_wheat", KHGameTests::testHandMill, 300);
         register("kuban_guide_content", KHGameTests::testKubanGuideContent, 100);
+        register("kuban_steppe_world_preset", KHGameTests::testKubanSteppeWorldPreset, 100);
     }
 
     private KHGameTests() {
@@ -242,6 +245,22 @@ public final class KHGameTests {
                 "Ожидалось страниц: " + KubanGuide.PAGES + ", получено: " + content.pages().size());
         helper.assertTrue(guide.has(DataComponents.CUSTOM_NAME),
                 "У путеводителя отсутствует локализуемое название");
+        helper.succeed();
+    }
+
+    /** Пресет содержит три ванильных измерения и реально использует кубанскую степь. */
+    private static void testKubanSteppeWorldPreset(GameTestHelper helper) {
+        var registries = helper.getLevel().registryAccess();
+        var preset = registries.lookupOrThrow(Registries.WORLD_PRESET)
+                .getOrThrow(KHWorldPresets.KUBAN_HORIZONS)
+                .value();
+        var overworld = preset.overworld().orElseThrow();
+
+        helper.assertTrue(preset.createWorldDimensions().dimensions().size() == 3,
+                "Пресет должен сохранять Overworld, Nether и End");
+        helper.assertTrue(overworld.generator().getBiomeSource().possibleBiomes().stream()
+                        .anyMatch(biome -> biome.is(KHBiomes.KUBAN_STEPPE)),
+                "Кубанская степь отсутствует в biome source пресета");
         helper.succeed();
     }
 
