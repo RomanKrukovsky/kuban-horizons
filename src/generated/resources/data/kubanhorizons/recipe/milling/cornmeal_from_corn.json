@@ -1,0 +1,7 @@
+{
+  "type": "kubanhorizons:milling",
+  "ingredient": "kubanhorizons:corn_kernels",
+  "result": {
+    "id": "kubanhorizons:cornmeal"
+  }
+}

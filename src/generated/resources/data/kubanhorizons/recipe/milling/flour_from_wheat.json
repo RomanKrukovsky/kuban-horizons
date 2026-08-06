@@ -1,0 +1,7 @@
+{
+  "type": "kubanhorizons:milling",
+  "ingredient": "minecraft:wheat",
+  "result": {
+    "id": "kubanhorizons:flour"
+  }
+}

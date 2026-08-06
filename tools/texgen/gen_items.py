@@ -320,7 +320,22 @@ def dried_fruit_item():
     return im
 
 
+def powder_pile(c_main, c_hi, c_dark):
+    im = img()
+    # Горка порошка
+    for y, w in ((12, 6), (11, 5), (10, 4), (9, 3), (8, 2), (7, 1)):
+        rect(im, 8 - w, y, 7 + w, y, c_main)
+    px(im, 5, 9, c_hi)
+    px(im, 6, 8, c_hi)
+    px(im, 7, 7, c_hi)
+    hline(im, 12, 2, 13, c_dark)
+    px(im, 10, 10, c_dark)
+    return im
+
+
 def main():
+    save(powder_pile((238, 232, 216, 255), (250, 246, 236, 255), (206, 196, 172, 255)), "flour")
+    save(powder_pile(PAL["corn_yellow"], PAL["corn_hi"], (188, 148, 48, 255)), "cornmeal")
     save(dried_tea_item(), "dried_tea")
     save(dried_fruit_item(), "dried_fruit")
     save(sunflower_seeds(), "sunflower_seeds")

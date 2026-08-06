@@ -78,6 +78,12 @@ public final class KHModelProvider extends ModelProvider {
                         .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
         blockModels.registerSimpleItemModel(dryingRack.asItem(), KHIds.of("block/drying_rack"));
 
+        // Ручная мельница: ручная модель без поворотов.
+        Block handMill = KHBlocks.HAND_MILL.get();
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(handMill,
+                plainVariant(KHIds.of("block/hand_mill"))));
+        blockModels.registerSimpleItemModel(handMill.asItem(), KHIds.of("block/hand_mill"));
+
         // Плоские предметы.
         itemModels.generateFlatItem(KHItems.SUNFLOWER_SEEDS.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.SUNFLOWER_HEAD.get(), ModelTemplates.FLAT_ITEM);
@@ -100,6 +106,8 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.TOMATO.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.DRIED_TEA.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.DRIED_FRUIT.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.FLOUR.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.CORNMEAL.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.PEACH.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.APRICOT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.PLUM.get(), ModelTemplates.FLAT_ITEM);

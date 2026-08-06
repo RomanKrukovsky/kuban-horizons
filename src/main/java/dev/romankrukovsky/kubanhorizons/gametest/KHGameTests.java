@@ -77,6 +77,7 @@ public final class KHGameTests {
         register("fruit_pick_resets", KHGameTests::testFruitPickResets, 200);
         register("sapling_grows_tree", KHGameTests::testSaplingGrowsTree, 400);
         register("drying_rack_dries_tea", KHGameTests::testDryingRack, 400);
+        register("hand_mill_grinds_wheat", KHGameTests::testHandMill, 300);
     }
 
     private KHGameTests() {
@@ -447,6 +448,29 @@ public final class KHGameTests {
             helper.assertBlockProperty(top,
                     net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true);
         });
+    }
+
+    /** Мельница мелет пшеницу в муку за 3 оборота. */
+    private static void testHandMill(GameTestHelper helper) {
+        BlockPos millPos = new BlockPos(1, 1, 1);
+        helper.setBlock(millPos, KHBlocks.HAND_MILL.get());
+
+        helper.startSequence()
+                .thenExecute(() -> {
+                    var mill = helper.getBlockEntity(millPos,
+                            dev.romankrukovsky.kubanhorizons.blockentity.HandMillBlockEntity.class);
+                    ItemStack wheat = new ItemStack(net.minecraft.world.item.Items.WHEAT, 1);
+                    helper.assertTrue(mill.insert(helper.getLevel(), wheat),
+                            "Мельница должна принять пшеницу");
+                    for (int i = 0; i < 3; i++) {
+                        helper.assertTrue(mill.turn(helper.getLevel()),
+                                "Оборот " + i + " должен быть выполнен");
+                    }
+                    helper.assertTrue(!mill.hasInput(), "Сырьё должно быть смолото");
+                })
+                .thenExecuteAfter(5, () -> helper.assertItemEntityPresent(
+                        KHItems.FLOUR.get(), millPos.above(), 2.0))
+                .thenSucceed();
     }
 
     /** Сушилка принимает чайный лист и высушивает его в сушёный чай. */

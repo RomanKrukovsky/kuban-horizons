@@ -1,0 +1,8 @@
+{
+  "type": "kubanhorizons:milling",
+  "ingredient": "kubanhorizons:rice_panicle",
+  "result": {
+    "id": "kubanhorizons:rice"
+  },
+  "turns": 2
+}

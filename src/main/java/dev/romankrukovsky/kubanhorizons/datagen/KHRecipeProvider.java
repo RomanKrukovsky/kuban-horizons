@@ -144,6 +144,21 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_string", this.has(Items.STRING))
                 .save(this.output);
 
+        // Ручная мельница: камень + палка.
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.HAND_MILL.get())
+                .pattern(" T ")
+                .pattern("SSS")
+                .pattern("SSS")
+                .define('T', Items.STICK)
+                .define('S', Items.STONE)
+                .unlockedBy("has_stone", this.has(Items.STONE))
+                .save(this.output);
+
+        // Рецепты помола.
+        milling("flour_from_wheat", Items.WHEAT, KHItems.FLOUR.get(), 3);
+        milling("cornmeal_from_corn", KHItems.CORN_KERNELS.get(), KHItems.CORNMEAL.get(), 3);
+        milling("rice_from_panicle", KHItems.RICE_PANICLE.get(), KHItems.RICE.get(), 2);
+
         // Рецепты сушки.
         drying("dried_tea", KHItems.TEA_LEAVES.get(), KHItems.DRIED_TEA.get(), 1200);
         drying("dried_fruit_from_peach", KHItems.PEACH.get(), KHItems.DRIED_FRUIT.get(), 2400);
@@ -162,6 +177,19 @@ public final class KHRecipeProvider extends RecipeProvider {
                         new ItemStackTemplate(KHItems.SUNFLOWER_OIL.get()),
                         new ItemStackTemplate(KHItems.OIL_CAKE.get()),
                         300),
+                null);
+    }
+
+    /** Рецепт помола на мельнице. */
+    private void milling(String name, net.minecraft.world.level.ItemLike input,
+            net.minecraft.world.level.ItemLike result, int turns) {
+        this.output.accept(
+                ResourceKey.create(Registries.RECIPE, KHIds.of("milling/" + name)),
+                new dev.romankrukovsky.kubanhorizons.processing.MillingRecipe(
+                        new Recipe.CommonInfo(true), "",
+                        Ingredient.of(input),
+                        new ItemStackTemplate(result.asItem()),
+                        turns),
                 null);
     }
 

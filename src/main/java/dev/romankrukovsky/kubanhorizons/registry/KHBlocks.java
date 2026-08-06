@@ -99,6 +99,15 @@ public final class KHBlocks {
                             .sound(SoundType.STONE)
                             .noOcclusion());
 
+    /** Ручная мельница-жёрнов. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.processing.HandMillBlock> HAND_MILL =
+            BLOCKS.registerBlock("hand_mill",
+                    dev.romankrukovsky.kubanhorizons.processing.HandMillBlock::new,
+                    p -> p.mapColor(MapColor.STONE)
+                            .strength(2.5F)
+                            .sound(SoundType.STONE)
+                            .noOcclusion());
+
     /** Сушильная рама (чай, фрукты, рыба). */
     public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.processing.DryingRackBlock> DRYING_RACK =
             BLOCKS.registerBlock("drying_rack",

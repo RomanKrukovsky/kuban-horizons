@@ -37,6 +37,7 @@ final class KHTranslations {
         add("block.kubanhorizons.grape_trellis", "Grape Trellis", "Виноградная шпалера");
         add("block.kubanhorizons.tomato_bush", "Tomato Bush", "Томатный куст");
         add("block.kubanhorizons.drying_rack", "Drying Rack", "Сушильная рама");
+        add("block.kubanhorizons.hand_mill", "Hand Mill", "Ручная мельница");
         add("block.kubanhorizons.peach_leaves", "Peach Leaves", "Персиковая листва");
         add("block.kubanhorizons.apricot_leaves", "Apricot Leaves", "Абрикосовая листва");
         add("block.kubanhorizons.plum_leaves", "Plum Leaves", "Сливовая листва");
@@ -68,6 +69,8 @@ final class KHTranslations {
         add("item.kubanhorizons.tomato", "Tomato", "Томат");
         add("item.kubanhorizons.dried_tea", "Dried Tea", "Сушёный чай");
         add("item.kubanhorizons.dried_fruit", "Dried Fruit", "Сушёные фрукты");
+        add("item.kubanhorizons.flour", "Flour", "Мука");
+        add("item.kubanhorizons.cornmeal", "Cornmeal", "Кукурузная крупа");
         add("item.kubanhorizons.peach_sapling", "Peach Sapling", "Саженец персика");
         add("item.kubanhorizons.apricot_sapling", "Apricot Sapling", "Саженец абрикоса");
         add("item.kubanhorizons.plum_sapling", "Plum Sapling", "Саженец сливы");

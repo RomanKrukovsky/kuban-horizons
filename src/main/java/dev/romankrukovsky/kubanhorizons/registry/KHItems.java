@@ -198,6 +198,20 @@ public final class KHItems {
     public static final DeferredItem<BlockItem> DRYING_RACK =
             ITEMS.registerSimpleBlockItem("drying_rack", KHBlocks.DRYING_RACK);
 
+    /** Ручная мельница (предмет). */
+    public static final DeferredItem<BlockItem> HAND_MILL =
+            ITEMS.registerSimpleBlockItem("hand_mill", KHBlocks.HAND_MILL);
+
+    // --- Мучные продукты ---
+
+    /** Мука — основа выпечки. */
+    public static final DeferredItem<Item> FLOUR =
+            ITEMS.registerSimpleItem("flour");
+
+    /** Кукурузная крупа. */
+    public static final DeferredItem<Item> CORNMEAL =
+            ITEMS.registerSimpleItem("cornmeal");
+
     // --- Сушёные продукты ---
 
     /** Сушёный чай — заварка. */

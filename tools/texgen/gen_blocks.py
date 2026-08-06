@@ -231,7 +231,36 @@ def drying_rack_top():
     return im
 
 
+def hand_mill_side():
+    im = img()
+    rect(im, 0, 0, 15, 15, PAL["stone"])
+    hline(im, 0, 0, 15, PAL["stone_hi"])
+    hline(im, 15, 0, 15, PAL["stone_dark"])
+    # Каменные насечки жёрнова
+    for x in range(2, 15, 4):
+        vline(im, x, 3, 12, PAL["stone_dark"])
+    return im
+
+
+def hand_mill_top():
+    im = img()
+    rect(im, 0, 0, 15, 15, PAL["stone"])
+    # Радиальные борозды (упрощённо — крест и диагонали)
+    for i in range(16):
+        px(im, i, 7, PAL["stone_dark"])
+        px(im, 7, i, PAL["stone_dark"])
+        if 0 <= i < 16:
+            px(im, i, i, PAL["stone_dark"])
+            px(im, i, 15 - i, PAL["stone_dark"])
+    # Отверстие в центре
+    rect(im, 6, 6, 9, 9, PAL["chernozem_dark"])
+    hline(im, 0, 0, 15, PAL["stone_hi"])
+    return im
+
+
 def main():
+    save(hand_mill_side(), "hand_mill_side")
+    save(hand_mill_top(), "hand_mill_top")
     save(drying_rack_side(), "drying_rack_side")
     save(drying_rack_top(), "drying_rack_top")
     save(oil_press_side(), "oil_press_side")

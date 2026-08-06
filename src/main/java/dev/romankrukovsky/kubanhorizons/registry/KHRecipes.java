@@ -50,6 +50,21 @@ public final class KHRecipes {
     public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> DRYING_CATEGORY =
             BOOK_CATEGORIES.register("drying", RecipeBookCategory::new);
 
+    /** Тип рецепта «помол». */
+    public static final DeferredHolder<RecipeType<?>, RecipeType<dev.romankrukovsky.kubanhorizons.processing.MillingRecipe>> MILLING_TYPE =
+            TYPES.register("milling", () -> RecipeType.simple(KHIds.of("milling")));
+
+    /** Сериализатор рецепта «помол». */
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<dev.romankrukovsky.kubanhorizons.processing.MillingRecipe>> MILLING_SERIALIZER =
+            SERIALIZERS.register("milling",
+                    () -> new RecipeSerializer<>(
+                            dev.romankrukovsky.kubanhorizons.processing.MillingRecipe.MAP_CODEC,
+                            dev.romankrukovsky.kubanhorizons.processing.MillingRecipe.STREAM_CODEC));
+
+    /** Категория книги рецептов «помол». */
+    public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> MILLING_CATEGORY =
+            BOOK_CATEGORIES.register("milling", RecipeBookCategory::new);
+
     private KHRecipes() {
     }
 

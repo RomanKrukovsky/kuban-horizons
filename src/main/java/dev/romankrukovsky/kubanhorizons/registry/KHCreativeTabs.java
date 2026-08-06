@@ -56,6 +56,9 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.DRYING_RACK.get());
                         output.accept(KHItems.DRIED_TEA.get());
                         output.accept(KHItems.DRIED_FRUIT.get());
+                        output.accept(KHItems.HAND_MILL.get());
+                        output.accept(KHItems.FLOUR.get());
+                        output.accept(KHItems.CORNMEAL.get());
                     })
                     .build());
 
