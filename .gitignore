@@ -37,3 +37,7 @@ crash-reports/
 
 # Референсные материалы с неподтверждённой лицензией — не коммитятся
 reference/concept-art/
+
+# Python-кэш инструментов
+__pycache__/
+*.pyc
