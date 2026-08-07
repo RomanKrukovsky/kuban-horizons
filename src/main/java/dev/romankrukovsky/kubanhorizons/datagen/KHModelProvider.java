@@ -128,6 +128,12 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.APRICOT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.PLUM.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.WALNUT.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.PHEASANT_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.QUAIL_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.RAW_PHEASANT.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.COOKED_PHEASANT.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.RAW_QUAIL.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.COOKED_QUAIL.get(), ModelTemplates.FLAT_ITEM);
     }
 
     /**

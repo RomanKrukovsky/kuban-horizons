@@ -28,6 +28,15 @@ public final class KHSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> OIL_PRESS_FINISH =
             register("block.oil_press.finish");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> PHEASANT_AMBIENT = register("entity.pheasant.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PHEASANT_HURT = register("entity.pheasant.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PHEASANT_DEATH = register("entity.pheasant.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> PHEASANT_FLUSH = register("entity.pheasant.flush");
+    public static final DeferredHolder<SoundEvent, SoundEvent> QUAIL_AMBIENT = register("entity.quail.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> QUAIL_HURT = register("entity.quail.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> QUAIL_DEATH = register("entity.quail.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> QUAIL_FLUSH = register("entity.quail.flush");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name.replace('.', '_'),
                 () -> SoundEvent.createVariableRangeEvent(KHIds.of(name.replace('.', '_'))));

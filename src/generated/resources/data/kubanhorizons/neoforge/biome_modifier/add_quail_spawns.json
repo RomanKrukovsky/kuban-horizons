@@ -1,0 +1,10 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": "kubanhorizons:kuban_steppe",
+  "spawners": {
+    "type": "kubanhorizons:quail",
+    "maxCount": 6,
+    "minCount": 3,
+    "weight": 10
+  }
+}

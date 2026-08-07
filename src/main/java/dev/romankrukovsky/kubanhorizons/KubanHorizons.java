@@ -6,6 +6,7 @@ import dev.romankrukovsky.kubanhorizons.registry.KHAttachments;
 import dev.romankrukovsky.kubanhorizons.registry.KHBlockEntities;
 import dev.romankrukovsky.kubanhorizons.registry.KHBlocks;
 import dev.romankrukovsky.kubanhorizons.registry.KHCreativeTabs;
+import dev.romankrukovsky.kubanhorizons.registry.KHEntities;
 import dev.romankrukovsky.kubanhorizons.registry.KHItems;
 import dev.romankrukovsky.kubanhorizons.registry.KHMenus;
 import dev.romankrukovsky.kubanhorizons.registry.KHRecipes;
@@ -32,6 +33,7 @@ public final class KubanHorizons {
         LOGGER.info("Кубанские горизонты: инициализация ({}).", MOD_ID);
 
         KHBlocks.register(modEventBus);
+        KHEntities.register(modEventBus);
         KHItems.register(modEventBus);
         KHBlockEntities.register(modEventBus);
         KHMenus.register(modEventBus);

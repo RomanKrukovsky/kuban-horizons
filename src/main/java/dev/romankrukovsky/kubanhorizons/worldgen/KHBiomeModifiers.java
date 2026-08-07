@@ -1,13 +1,16 @@
 package dev.romankrukovsky.kubanhorizons.worldgen;
 
+import dev.romankrukovsky.kubanhorizons.registry.KHEntities;
 import dev.romankrukovsky.kubanhorizons.util.KHIds;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.random.Weighted;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.neoforged.neoforge.common.world.BiomeModifier;
@@ -30,6 +33,10 @@ public final class KHBiomeModifiers {
             createKey("add_wild_grape");
     public static final ResourceKey<BiomeModifier> ADD_WILD_RICE =
             createKey("add_wild_rice");
+    public static final ResourceKey<BiomeModifier> ADD_PHEASANT_SPAWNS =
+            createKey("add_pheasant_spawns");
+    public static final ResourceKey<BiomeModifier> ADD_QUAIL_SPAWNS =
+            createKey("add_quail_spawns");
 
     private KHBiomeModifiers() {
     }
@@ -75,5 +82,15 @@ public final class KHBiomeModifiers {
                 HolderSet.direct(biomes.getOrThrow(KHBiomes.RIVER_FLOODPLAIN)),
                 HolderSet.direct(features.getOrThrow(KHPlacedFeatures.WILD_RICE_PLACED)),
                 GenerationStep.Decoration.VEGETAL_DECORATION));
+
+        context.register(ADD_PHEASANT_SPAWNS, BiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(
+                HolderSet.direct(
+                        biomes.getOrThrow(KHBiomes.KUBAN_STEPPE),
+                        biomes.getOrThrow(KHBiomes.RIVER_FLOODPLAIN)),
+                new Weighted<>(new MobSpawnSettings.SpawnerData(KHEntities.PHEASANT.get(), 1, 3), 8)));
+
+        context.register(ADD_QUAIL_SPAWNS, BiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(
+                HolderSet.direct(biomes.getOrThrow(KHBiomes.KUBAN_STEPPE)),
+                new Weighted<>(new MobSpawnSettings.SpawnerData(KHEntities.QUAIL.get(), 3, 6), 10)));
     }
 }

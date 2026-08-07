@@ -1,7 +1,10 @@
 package dev.romankrukovsky.kubanhorizons.registry;
 
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.component.TypedEntityData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
@@ -338,6 +341,25 @@ public final class KHItems {
     public static final DeferredItem<Item> DRIED_FRUIT =
             ITEMS.registerSimpleItem("dried_fruit",
                     p -> p.food(KHFoods.DRIED_FRUIT));
+
+    // --- Региональная фауна ---
+
+    public static final DeferredItem<SpawnEggItem> PHEASANT_SPAWN_EGG =
+            ITEMS.registerItem("pheasant_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.PHEASANT.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> QUAIL_SPAWN_EGG =
+            ITEMS.registerItem("quail_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.QUAIL.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<Item> RAW_PHEASANT =
+            ITEMS.registerSimpleItem("raw_pheasant", p -> p.food(KHFoods.RAW_PHEASANT));
+    public static final DeferredItem<Item> COOKED_PHEASANT =
+            ITEMS.registerSimpleItem("cooked_pheasant", p -> p.food(KHFoods.COOKED_PHEASANT));
+    public static final DeferredItem<Item> RAW_QUAIL =
+            ITEMS.registerSimpleItem("raw_quail", p -> p.food(KHFoods.RAW_QUAIL));
+    public static final DeferredItem<Item> COOKED_QUAIL =
+            ITEMS.registerSimpleItem("cooked_quail", p -> p.food(KHFoods.COOKED_QUAIL));
 
     private KHItems() {
     }

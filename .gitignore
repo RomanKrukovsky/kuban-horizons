@@ -41,3 +41,5 @@ reference/concept-art/
 # Python-кэш инструментов
 __pycache__/
 *.pyc
+.gamemaker/
+.gauntlet/

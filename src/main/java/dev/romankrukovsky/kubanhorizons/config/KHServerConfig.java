@@ -61,6 +61,13 @@ public final class KHServerConfig {
                     "Число тиков пассивной работы для одной операции отжима.")
             .defineInRange("automation.oilPressWorkTicks", 300, 20, 6000);
 
+    // --- Дикая природа ---
+
+    private static final ModConfigSpec.BooleanValue GROUND_BIRD_SPAWNS = BUILDER
+            .comment("Enable natural pheasant and quail spawning. Requires a server restart.",
+                    "Включает естественный спавн фазанов и перепелов. Требует перезапуска сервера.")
+            .define("wildlife.enableGroundBirdSpawns", true);
+
     // --- Мир ---
 
     private static final ModConfigSpec.BooleanValue WORLDGEN_ENABLED = BUILDER
@@ -110,6 +117,10 @@ public final class KHServerConfig {
 
     public static int oilPressWorkTicks() {
         return OIL_PRESS_WORK_TICKS.get();
+    }
+
+    public static boolean groundBirdSpawnsEnabled() {
+        return GROUND_BIRD_SPAWNS.get();
     }
 
     public static boolean worldgenEnabled() {

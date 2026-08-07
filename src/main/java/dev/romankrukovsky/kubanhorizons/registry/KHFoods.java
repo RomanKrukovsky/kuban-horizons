@@ -92,6 +92,19 @@ public final class KHFoods {
             .saturationModifier(0.3F)
             .build();
 
+    /** Сырое мясо фазана. */
+    public static final FoodProperties RAW_PHEASANT = new FoodProperties.Builder()
+            .nutrition(3).saturationModifier(0.3F).build();
+    /** Запечённое мясо фазана. */
+    public static final FoodProperties COOKED_PHEASANT = new FoodProperties.Builder()
+            .nutrition(7).saturationModifier(0.75F).build();
+    /** Сырое мясо перепела. */
+    public static final FoodProperties RAW_QUAIL = new FoodProperties.Builder()
+            .nutrition(2).saturationModifier(0.25F).build();
+    /** Запечённое мясо перепела. */
+    public static final FoodProperties COOKED_QUAIL = new FoodProperties.Builder()
+            .nutrition(5).saturationModifier(0.65F).build();
+
     // --- Кухня ---
 
     /** Домашний хлеб: сытнее ванильного. */
