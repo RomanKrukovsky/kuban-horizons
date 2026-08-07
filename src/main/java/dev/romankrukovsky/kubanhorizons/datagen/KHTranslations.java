@@ -47,6 +47,7 @@ final class KHTranslations {
         add("block.kubanhorizons.tomato_bush", "Tomato Bush", "Томатный куст");
         add("block.kubanhorizons.drying_rack", "Drying Rack", "Сушильная рама");
         add("block.kubanhorizons.hand_mill", "Hand Mill", "Ручная мельница");
+        add("block.kubanhorizons.cutting_board", "Cutting Board", "Разделочная доска");
         add("block.kubanhorizons.peach_leaves", "Peach Leaves", "Персиковая листва");
         add("block.kubanhorizons.apricot_leaves", "Apricot Leaves", "Абрикосовая листва");
         add("block.kubanhorizons.plum_leaves", "Plum Leaves", "Сливовая листва");
@@ -126,6 +127,44 @@ final class KHTranslations {
                 "Яйцо появления фазана");
         add("item.kubanhorizons.quail_spawn_egg", "Quail Spawn Egg",
                 "Яйцо появления перепела");
+
+        // --- Фауна давления: вредители, симбионты и защита ---
+        add("entity.kubanhorizons.wild_boar", "Wild Boar", "Дикий кабан");
+        add("entity.kubanhorizons.nutria", "Nutria", "Нутрия");
+        add("entity.kubanhorizons.locust", "Locust", "Саранча");
+        add("entity.kubanhorizons.caucasian_bee", "Caucasian Bee", "Кавказская пчела");
+        add("entity.kubanhorizons.caucasian_shepherd", "Caucasian Shepherd",
+                "Кавказская овчарка");
+        add("entity.kubanhorizons.sturgeon", "Sturgeon", "Осётр");
+        add("entity.kubanhorizons.gull", "Gull", "Чайка");
+        add("entity.kubanhorizons.heron", "Heron", "Цапля");
+
+        add("item.kubanhorizons.raw_boar", "Raw Boar", "Сырая кабанина");
+        add("item.kubanhorizons.cooked_boar", "Cooked Boar", "Жареная кабанина");
+        add("item.kubanhorizons.raw_sturgeon", "Raw Sturgeon", "Сырой осётр");
+        add("item.kubanhorizons.cooked_sturgeon", "Cooked Sturgeon", "Запечённый осётр");
+        add("item.kubanhorizons.nutria_pelt", "Nutria Pelt", "Шкура нутрии");
+        add("item.kubanhorizons.sturgeon_bucket", "Bucket of Sturgeon", "Ведро с осётром");
+
+        add("item.kubanhorizons.wild_boar_spawn_egg", "Wild Boar Spawn Egg",
+                "Яйцо появления дикого кабана");
+        add("item.kubanhorizons.nutria_spawn_egg", "Nutria Spawn Egg",
+                "Яйцо появления нутрии");
+        add("item.kubanhorizons.locust_spawn_egg", "Locust Spawn Egg",
+                "Яйцо появления саранчи");
+        add("item.kubanhorizons.caucasian_bee_spawn_egg", "Caucasian Bee Spawn Egg",
+                "Яйцо появления кавказской пчелы");
+        add("item.kubanhorizons.caucasian_shepherd_spawn_egg", "Caucasian Shepherd Spawn Egg",
+                "Яйцо появления кавказской овчарки");
+        add("item.kubanhorizons.sturgeon_spawn_egg", "Sturgeon Spawn Egg",
+                "Яйцо появления осетра");
+        add("item.kubanhorizons.gull_spawn_egg", "Gull Spawn Egg",
+                "Яйцо появления чайки");
+        add("item.kubanhorizons.heron_spawn_egg", "Heron Spawn Egg",
+                "Яйцо появления цапли");
+
+        add("block.kubanhorizons.stone_irrigation_channel", "Stone Irrigation Channel",
+                "Каменный оросительный желоб");
 
         // --- Путеводитель ---
         add("guide.kubanhorizons.title", "Guide to Kuban", "Путеводитель по Кубани");

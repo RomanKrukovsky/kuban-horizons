@@ -38,6 +38,13 @@ neoForge {
         client {
             client()
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // Необязательный быстрый вход в мир: ./gradlew runClient -PkhQuickPlay="<каталог мира>"
+            // Нужен для проверки сущностей и блоков без ручной навигации по меню;
+            // без свойства поведение runClient не меняется. Значение — имя
+            // каталога в run/saves, а не отображаемое имя мира.
+            if (project.hasProperty('khQuickPlay')) {
+                programArguments.addAll '--quickPlaySingleplayer', project.khQuickPlay
+            }
         }
 
         server {

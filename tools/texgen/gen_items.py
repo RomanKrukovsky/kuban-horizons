@@ -419,6 +419,95 @@ def spawn_egg_item(base, spots):
     return im
 
 
+def slab_meat_item(c_main, c_hi, c_dark, marbled=False):
+    """Кусок мяса без косточки: кабанина рубится куском, а не тушкой.
+
+    Форма намеренно угловатее, чем у raw_bird_item: птичья тушка округлая с
+    косточкой, а кабаний окорок — плотный ломоть. Иначе две иконки мяса в
+    инвентаре не отличить.
+    """
+    im = img()
+    rect(im, 3, 5, 12, 11, c_main)
+    hline(im, 5, 4, 11, c_hi)
+    vline(im, 3, 6, 10, c_hi)
+    hline(im, 11, 4, 11, c_dark)
+    vline(im, 12, 6, 10, c_dark)
+    for x, y in ((3, 5), (12, 5), (3, 11), (12, 11)):
+        px(im, x, y, (0, 0, 0, 0))
+    if marbled:
+        # Прожилки сала: две светлые линии, признак сырого мяса.
+        for x in range(5, 11, 3):
+            px(im, x, 7, c_hi)
+            px(im, x + 1, 9, c_hi)
+    return im
+
+
+def fish_item(c_back, c_belly, c_dark, cooked=False):
+    """Рыба в профиль: вытянутое тело, рострум и раздвоенный хвост.
+
+    Осетра от ванильной рыбы отличает длинный нос — он и вынесен вперёд,
+    иначе иконка читается как лосось.
+    """
+    im = img()
+    # Тело.
+    rect(im, 5, 6, 11, 10, c_back)
+    rect(im, 5, 9, 11, 10, c_belly)
+    hline(im, 6, 6, 10, c_back)
+    # Рострум — заострённый нос слева.
+    px(im, 4, 8, c_dark)
+    px(im, 3, 8, c_dark)
+    px(im, 2, 8, c_dark)
+    # Хвост-вилка справа.
+    px(im, 12, 7, c_dark)
+    px(im, 13, 6, c_dark)
+    px(im, 12, 9, c_dark)
+    px(im, 13, 10, c_dark)
+    # Спинной гребень жучков.
+    for x in range(6, 11, 2):
+        px(im, x, 5, c_dark if not cooked else c_back)
+    px(im, 6, 8, (24, 20, 18, 255))  # глаз
+    return im
+
+
+def pelt_item(c_fur, c_fur_hi, c_dark):
+    """Растянутая шкурка: трапеция с лапами по углам.
+
+    Читается как шкура, а не как мясо, именно за счёт углов-лап и светлой
+    изнанки по нижнему краю.
+    """
+    im = img()
+    for i, y in enumerate(range(4, 12)):
+        half = 3 + i // 3
+        rect(im, 8 - half, y, 7 + half, y, c_fur)
+    hline(im, 4, 5, 10, c_fur_hi)
+    # Лапы: четыре угловых выступа.
+    for x, y in ((3, 6), (12, 6), (2, 10), (13, 10)):
+        px(im, x, y, c_fur)
+        px(im, x, y + 1, c_dark)
+    hline(im, 11, 4, 11, c_dark)
+    return im
+
+
+def bucket_with_fish_item(c_fish):
+    """Ведро с рыбой: ванильный силуэт ведра плюс хвост наружу."""
+    im = img()
+    # Ведро.
+    rect(im, 4, 7, 11, 13, PAL["iron"])
+    hline(im, 7, 4, 11, PAL["iron"])
+    vline(im, 4, 8, 12, (168, 168, 176, 255))
+    vline(im, 11, 8, 12, PAL["iron_dark"])
+    hline(im, 13, 5, 10, PAL["iron_dark"])
+    # Дужка.
+    px(im, 3, 6, PAL["iron_dark"])
+    px(im, 12, 6, PAL["iron_dark"])
+    hline(im, 5, 5, 10, PAL["iron"])
+    # Рыба торчит хвостом вверх — так ванильные вёдра и читаются.
+    rect(im, 7, 3, 8, 6, c_fish)
+    px(im, 6, 3, c_fish)
+    px(im, 9, 3, c_fish)
+    return im
+
+
 def main():
     save(homemade_bread_item(), "homemade_bread")
     save(bowl_dish((176, 44, 52, 255), (204, 74, 70, 255),
@@ -478,6 +567,39 @@ def main():
          "pheasant_spawn_egg")
     save(spawn_egg_item((176, 156, 112, 255), (92, 72, 46, 255)),
          "quail_spawn_egg")
+
+    # Кабан: мясо ломтем, а не тушкой — зверь крупный.
+    save(slab_meat_item((176, 82, 84, 255), (206, 116, 116, 255),
+                        (130, 54, 58, 255), marbled=True), "raw_boar")
+    save(slab_meat_item((138, 86, 50, 255), (172, 116, 72, 255),
+                        (98, 58, 32, 255)), "cooked_boar")
+    # Осётр: тёмная спина, светлое брюхо; готовый теплее и без гребня.
+    save(fish_item((104, 108, 96, 255), (208, 202, 180, 255),
+                   (74, 78, 70, 255)), "raw_sturgeon")
+    save(fish_item((166, 126, 78, 255), (216, 190, 146, 255),
+                   (122, 88, 50, 255), cooked=True), "cooked_sturgeon")
+    save(bucket_with_fish_item((104, 108, 96, 255)), "sturgeon_bucket")
+    # Шкурка нутрии — товарный продукт плавней.
+    save(pelt_item((118, 88, 58, 255), (146, 112, 76, 255),
+                   (86, 64, 42, 255)), "nutria_pelt")
+
+    # Яйца-спавнеры остальной фауны: базовый тон — окрас вида, пятна — акцент.
+    save(spawn_egg_item((74, 60, 48, 255), (92, 78, 62, 255)),
+         "wild_boar_spawn_egg")
+    save(spawn_egg_item((188, 170, 138, 255), (98, 86, 72, 255)),
+         "caucasian_shepherd_spawn_egg")
+    save(spawn_egg_item((118, 88, 58, 255), (226, 146, 46, 255)),
+         "nutria_spawn_egg")
+    save(spawn_egg_item((162, 148, 82, 255), (120, 108, 58, 255)),
+         "locust_spawn_egg")
+    save(spawn_egg_item((196, 158, 66, 255), (86, 72, 52, 255)),
+         "caucasian_bee_spawn_egg")
+    save(spawn_egg_item((236, 238, 240, 255), (112, 126, 138, 255)),
+         "gull_spawn_egg")
+    save(spawn_egg_item((168, 172, 176, 255), (40, 42, 46, 255)),
+         "heron_spawn_egg")
+    save(spawn_egg_item((104, 108, 96, 255), (208, 202, 180, 255)),
+         "sturgeon_spawn_egg")
 
 
 if __name__ == "__main__":
