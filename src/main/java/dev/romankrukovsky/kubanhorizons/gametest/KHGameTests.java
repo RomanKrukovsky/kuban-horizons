@@ -118,6 +118,7 @@ public final class KHGameTests {
         register("kuban_wild_crop_features", KHGameTests::testKubanWildCropFeatures, 100);
         register("fauna_natural_spawns", KHGameTests::testFaunaNaturalSpawns, 100);
         register("fauna_food_tags", KHGameTests::testFaunaFoodTags, 100);
+        register("boar_raid_tramples_crop", KHGameTests::testBoarRaidTramples, 200);
         register("worldgen_feature_order", KHGameTests::testWorldgenFeatureOrder, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
         register("structure_registry_integrity", KHGameTests::testStructureRegistryIntegrity, 100);
@@ -449,6 +450,71 @@ public final class KHGameTests {
                 .getTagOrEmpty(tag).iterator().hasNext();
         helper.assertTrue(any, "Тег корма " + name + " пуст — существо нельзя "
                 + "ни приманить, ни развести");
+    }
+
+    /**
+     * Кабан действительно уничтожает посев и вытаптывает грядку.
+     *
+     * <p>Смысл кабана — давление на незащищённую ферму. Всё остальное о нём
+     * (модель, спавн, корм) бесполезно, если налёт ничего не делает: игрок
+     * увидит зверя, который бродит по грядкам и не наносит урона. Тест
+     * прогоняет саму механику до исхода, а не проверяет наличие класса.</p>
+     *
+     * <p>Проверяются оба следствия, потому что они независимы: культура
+     * исчезает, а грядка под ней деградирует в землю с потерей плодородия.
+     * Первое без второго означало бы, что налёт не имеет долгих последствий.</p>
+     */
+    private static void testBoarRaidTramples(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        if (!dev.romankrukovsky.kubanhorizons.config.KHServerConfig.pressureEnabled()) {
+            // Давление выключено конфигом — механика намеренно неактивна.
+            helper.succeed();
+            return;
+        }
+
+        BlockPos cropPos = preparedFarmland(helper, new BlockPos(1, 1, 1));
+        BlockPos soilPos = cropPos.below();
+        placeMatureSunflower(helper, cropPos);
+
+        // Пол вокруг грядки: структура теста пустая, и без опоры кабан просто
+        // провалился бы, так и не дойдя до посева. Первый прогон теста упал
+        // именно на этом — падение выглядело как «налёт не работает».
+        for (int dx = -1; dx <= 4; dx++) {
+            for (int dz = -2; dz <= 2; dz++) {
+                BlockPos floor = soilPos.offset(dx, 0, dz);
+                if (!helper.getBlockState(floor).is(Blocks.FARMLAND)) {
+                    helper.setBlock(floor, Blocks.DIRT);
+                }
+            }
+        }
+
+        BlockPos absoluteSoil = helper.absolutePos(soilPos);
+        int before = dev.romankrukovsky.kubanhorizons.soil.SoilFertility
+                .fertility(level, absoluteSoil);
+
+        // Кабан ставится вплотную к посеву. Цель начинает копать, когда цель
+        // ближе 1.5 блока; ставить зверя дальше означало бы проверять ещё и
+        // навигацию по пустой тестовой структуре, где ей не за что зацепиться.
+        // Здесь проверяется исход налёта, а не поиск пути.
+        var boar = helper.spawn(KHEntities.WILD_BOAR.get(), cropPos.offset(1, 0, 0));
+        helper.assertTrue(boar != null, "Кабан не создался");
+
+        // Налёт идёт по таймеру цели, поэтому даём ему время отработать и
+        // проверяем исход, а не отдельные тики.
+        helper.runAfterDelay(180, () -> {
+            BlockState cropAfter = helper.getBlockState(cropPos);
+            helper.assertTrue(!cropAfter.is(BlockTags.CROPS),
+                    "Кабан не уничтожил культуру: налёт не наносит урона ферме");
+            BlockState soilAfter = helper.getBlockState(soilPos);
+            helper.assertTrue(soilAfter.is(Blocks.DIRT),
+                    "Грядка не вытоптана — у налёта нет долгих последствий");
+            int after = dev.romankrukovsky.kubanhorizons.soil.SoilFertility
+                    .fertility(level, absoluteSoil);
+            helper.assertTrue(after < before,
+                    "Плодородие не упало после вытаптывания: " + before + " -> " + after);
+            boar.discard();
+            helper.succeed();
+        });
     }
 
     /**
