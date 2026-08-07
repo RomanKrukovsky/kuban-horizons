@@ -410,6 +410,17 @@ public final class KHGameTests {
                 + " не спавнит " + net.minecraft.core.registries.BuiltInRegistries
                         .ENTITY_TYPE.getKey(type)
                 + " — существо недостижимо в мире без спавн-яйца");
+        // Спавн в биоме бесполезен, если биом не порождается генератором мода:
+        // тогда запись есть, а зверя в игре по-прежнему нет. Проверяем всю
+        // цепочку «биом published → биом спавнит зверя» целиком.
+        var preset = helper.getLevel().registryAccess()
+                .lookupOrThrow(Registries.WORLD_PRESET)
+                .getOrThrow(KHWorldPresets.KUBAN_HORIZONS).value();
+        boolean reachable = preset.overworld().orElseThrow().generator()
+                .getBiomeSource().possibleBiomes().stream()
+                .anyMatch(holder -> holder.is(biomeKey));
+        helper.assertTrue(reachable, "Биом " + biomeKey.identifier()
+                + " не порождается KubanBiomeSource — спавн в нём недостижим");
     }
 
     /**
