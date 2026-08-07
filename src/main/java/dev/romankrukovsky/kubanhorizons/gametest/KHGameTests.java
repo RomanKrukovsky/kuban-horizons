@@ -7,6 +7,7 @@ import dev.romankrukovsky.kubanhorizons.blockentity.OilPressBlockEntity;
 import dev.romankrukovsky.kubanhorizons.crop.SunflowerCropBlock;
 import dev.romankrukovsky.kubanhorizons.item.KubanGuide;
 import dev.romankrukovsky.kubanhorizons.registry.KHBlocks;
+import dev.romankrukovsky.kubanhorizons.registry.KHEntities;
 import dev.romankrukovsky.kubanhorizons.registry.KHItems;
 import dev.romankrukovsky.kubanhorizons.util.KHIds;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHBiomes;
@@ -115,6 +116,8 @@ public final class KHGameTests {
         register("kuban_steppe_world_preset", KHGameTests::testKubanSteppeWorldPreset, 100);
         register("kuban_stronghold_biomes", KHGameTests::testKubanStrongholdBiomes, 100);
         register("kuban_wild_crop_features", KHGameTests::testKubanWildCropFeatures, 100);
+        register("fauna_natural_spawns", KHGameTests::testFaunaNaturalSpawns, 100);
+        register("fauna_food_tags", KHGameTests::testFaunaFoodTags, 100);
         register("worldgen_feature_order", KHGameTests::testWorldgenFeatureOrder, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
         register("structure_registry_integrity", KHGameTests::testStructureRegistryIntegrity, 100);
@@ -367,6 +370,74 @@ public final class KHGameTests {
                 .stream().anyMatch(holder -> holder.is(feature));
         helper.assertTrue(present, "В биоме " + biome.unwrapKey().orElseThrow().identifier()
                 + " отсутствует дикая культура " + feature.identifier());
+    }
+
+    /**
+     * Каждое существо мода достижимо в мире без спавн-яйца.
+     *
+     * <p>Восемь существ были зарегистрированы, но ни один биом их не спавнил:
+     * встретить их в игре было невозможно, поэтому ни давление на ферму, ни
+     * оживление плавней не работали. Тест проверяет именно достижимость —
+     * то, что игрок увидит зверя, просто играя.</p>
+     *
+     * <p>Саранча и овчарка сюда намеренно не входят: саранча приходит налётом
+     * через PressureScheduler, а овчарка появляется у хуторов, а не в дикой
+     * природе. У них другой источник, и требовать биом-спавн было бы неверно.</p>
+     */
+    private static void testFaunaNaturalSpawns(GameTestHelper helper) {
+        assertSpawnsIn(helper, KHBiomes.KUBAN_STEPPE, KHEntities.PHEASANT.get());
+        assertSpawnsIn(helper, KHBiomes.KUBAN_STEPPE, KHEntities.QUAIL.get());
+        assertSpawnsIn(helper, KHBiomes.KUBAN_STEPPE, KHEntities.CAUCASIAN_BEE.get());
+        assertSpawnsIn(helper, KHBiomes.PLAVNI, KHEntities.NUTRIA.get());
+        assertSpawnsIn(helper, KHBiomes.PLAVNI, KHEntities.HERON.get());
+        assertSpawnsIn(helper, KHBiomes.LIMAN, KHEntities.NUTRIA.get());
+        assertSpawnsIn(helper, KHBiomes.LIMAN, KHEntities.GULL.get());
+        assertSpawnsIn(helper, KHBiomes.LIMAN, KHEntities.STURGEON.get());
+        assertSpawnsIn(helper, KHBiomes.RIVER_FLOODPLAIN, KHEntities.WILD_BOAR.get());
+        assertSpawnsIn(helper, KHBiomes.RIVER_FLOODPLAIN, KHEntities.STURGEON.get());
+        helper.succeed();
+    }
+
+    private static void assertSpawnsIn(GameTestHelper helper,
+            ResourceKey<net.minecraft.world.level.biome.Biome> biomeKey,
+            net.minecraft.world.entity.EntityType<?> type) {
+        Holder<net.minecraft.world.level.biome.Biome> biome = helper.getLevel()
+                .registryAccess().lookupOrThrow(Registries.BIOME).getOrThrow(biomeKey);
+        boolean present = biome.value().getMobSettings()
+                .getMobs(type.getCategory()).unwrap().stream()
+                .anyMatch(weighted -> weighted.value().type() == type);
+        helper.assertTrue(present, "Биом " + biomeKey.identifier()
+                + " не спавнит " + net.minecraft.core.registries.BuiltInRegistries
+                        .ENTITY_TYPE.getKey(type)
+                + " — существо недостижимо в мире без спавн-яйца");
+    }
+
+    /**
+     * Корма фауны заполнены: существо можно приманить и развести.
+     *
+     * <p>Теги объявлялись в самих сущностях, но datagen их не заполнял, из-за
+     * чего {@code isFood} всегда возвращал false — TemptGoal и BreedGoal были
+     * мертвы, а овчарку нечем было приручить.</p>
+     */
+    private static void testFaunaFoodTags(GameTestHelper helper) {
+        assertTagNotEmpty(helper, "ground_bird_foods");
+        assertTagNotEmpty(helper, "wild_boar_foods");
+        assertTagNotEmpty(helper, "nutria_foods");
+        assertTagNotEmpty(helper, "caucasian_bee_foods");
+        assertTagNotEmpty(helper, "gull_foods");
+        assertTagNotEmpty(helper, "heron_foods");
+        assertTagNotEmpty(helper, "caucasian_shepherd_foods");
+        assertTagNotEmpty(helper, "caucasian_shepherd_taming");
+        helper.succeed();
+    }
+
+    private static void assertTagNotEmpty(GameTestHelper helper, String name) {
+        net.minecraft.tags.TagKey<net.minecraft.world.item.Item> tag =
+                net.minecraft.tags.ItemTags.create(KHIds.of(name));
+        boolean any = net.minecraft.core.registries.BuiltInRegistries.ITEM
+                .getTagOrEmpty(tag).iterator().hasNext();
+        helper.assertTrue(any, "Тег корма " + name + " пуст — существо нельзя "
+                + "ни приманить, ни развести");
     }
 
     /**

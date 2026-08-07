@@ -1,0 +1,13 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "kubanhorizons:river_floodplain",
+    "kubanhorizons:liman"
+  ],
+  "spawners": {
+    "type": "kubanhorizons:sturgeon",
+    "maxCount": 4,
+    "minCount": 2,
+    "weight": 8
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "kubanhorizons:plavni",
+    "kubanhorizons:river_floodplain"
+  ],
+  "spawners": {
+    "type": "kubanhorizons:heron",
+    "maxCount": 2,
+    "minCount": 1,
+    "weight": 6
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "kubanhorizons:plavni",
+    "kubanhorizons:liman"
+  ],
+  "spawners": {
+    "type": "kubanhorizons:nutria",
+    "maxCount": 4,
+    "minCount": 2,
+    "weight": 8
+  }
+}
