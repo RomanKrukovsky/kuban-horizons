@@ -385,6 +385,40 @@ def tea_cup_item():
     return im
 
 
+def raw_bird_item(c_main, c_hi, c_dark, bone=True):
+    """Сырая тушка птицы: округлое тело, кость слева, свет сверху-слева.
+
+    Форма отличается от плода тем, что тело вытянуто по горизонтали и имеет
+    выступающую косточку — иначе иконка мяса читается как ягода.
+    """
+    im = img()
+    rect(im, 5, 7, 11, 11, c_main)
+    rect(im, 6, 6, 10, 6, c_main)
+    px(im, 6, 7, c_hi)
+    px(im, 7, 6, c_hi)
+    for x, y in ((5, 11), (11, 11), (6, 12), (10, 12)):
+        px(im, x, y, c_dark)
+    hline(im, 12, 7, 9, c_dark)
+    if bone:
+        px(im, 4, 6, PAL["paper"])
+        px(im, 4, 5, PAL["paper"])
+        px(im, 3, 5, PAL["paper_dark"])
+        px(im, 5, 6, PAL["paper_dark"])
+    return im
+
+
+def spawn_egg_item(base, spots):
+    """Яйцо-спавнер в ванильном силуэте: овал с пятнами вида."""
+    im = img()
+    for y in range(3, 13):
+        half = 2 if y in (3, 12) else (3 if y in (4, 11) else 4)
+        rect(im, 8 - half, y, 7 + half, y, base)
+    px(im, 6, 5, (255, 255, 255, 90))
+    for x, y in ((5, 7), (9, 6), (7, 9), (10, 10), (6, 11)):
+        px(im, x, y, spots)
+    return im
+
+
 def main():
     save(homemade_bread_item(), "homemade_bread")
     save(bowl_dish((176, 44, 52, 255), (204, 74, 70, 255),
@@ -428,6 +462,22 @@ def main():
     save(fruit_item(PAL["apricot"], PAL["apricot_hi"], (196, 132, 40, 255)), "apricot")
     save(fruit_item(PAL["plum"], PAL["plum_hi"], (80, 42, 96, 255)), "plum")
     save(walnut_item(), "walnut")
+
+    # Фауна: фазан и перепел. Сырое мясо холоднее и краснее, готовое — темнее
+    # и теплее; перепел мельче фазана, поэтому его тушка на пиксель компактнее.
+    save(raw_bird_item((196, 106, 104, 255), (222, 142, 138, 255),
+                       (150, 68, 70, 255)), "raw_pheasant")
+    save(raw_bird_item((186, 122, 96, 255), (214, 156, 128, 255),
+                       (142, 84, 62, 255)), "raw_quail")
+    save(raw_bird_item((150, 96, 52, 255), (182, 128, 74, 255),
+                       (104, 62, 32, 255)), "cooked_pheasant")
+    save(raw_bird_item((160, 112, 64, 255), (192, 144, 92, 255),
+                       (112, 72, 40, 255)), "cooked_quail")
+    # Яйца-спавнеры: базовый тон — оперение вида, пятна — акцент.
+    save(spawn_egg_item((122, 84, 48, 255), (196, 64, 44, 255)),
+         "pheasant_spawn_egg")
+    save(spawn_egg_item((176, 156, 112, 255), (92, 72, 46, 255)),
+         "quail_spawn_egg")
 
 
 if __name__ == "__main__":
