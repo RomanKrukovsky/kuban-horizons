@@ -29,6 +29,10 @@ public final class SoilFertility {
     private static final int DEPLETION_ROTATED = 4;
     /** Прибавка от компостирования (костной муки на почву и т.п.). */
     private static final int COMPOST_BONUS = 15;
+    /** Потеря плодородия от вытаптывания грядки животным. */
+    private static final int TRAMPLE_LOSS = 25;
+    /** Прибавка от речного ила после схода половодья. */
+    private static final int FLOOD_SILT_BONUS = 20;
     /** Восстановление: +1 плодородия за столько тиков простоя. */
     private static final long RECOVERY_TICKS_PER_POINT = 1200; // 1 минута
 
@@ -99,18 +103,56 @@ public final class SoilFertility {
         if (!KHServerConfig.fertilityEnabled()) {
             return;
         }
+        adjust(level, farmlandPos,
+                (int) Math.round(COMPOST_BONUS * KHServerConfig.fertilityRecoveryRate()));
+    }
+
+    /**
+     * Вытаптывание грядки животным: резкая потеря плодородия без смены
+     * культуры-истории. Сила масштабируется конфигом давления.
+     *
+     * @return плодородие после вытаптывания
+     */
+    public static int onTrample(ServerLevel level, BlockPos farmlandPos) {
+        if (!KHServerConfig.fertilityEnabled()) {
+            return BASE_FARMLAND;
+        }
+        int loss = (int) Math.round(TRAMPLE_LOSS * KHServerConfig.pressureSeverity());
+        return adjust(level, farmlandPos, -loss);
+    }
+
+    /**
+     * Обогащение почвы после схода половодья: заливной луг становится
+     * плодороднее, чем был. Прибавка не зависит от давности события.
+     *
+     * @return плодородие после обогащения
+     */
+    public static int onFloodDeposit(ServerLevel level, BlockPos farmlandPos) {
+        if (!KHServerConfig.fertilityEnabled()) {
+            return BASE_FARMLAND;
+        }
+        int bonus = (int) Math.round(FLOOD_SILT_BONUS * KHServerConfig.fertilityRecoveryRate());
+        return adjust(level, farmlandPos, bonus);
+    }
+
+    /**
+     * Общий путь изменения плодородия на дельту с сохранением истории культуры.
+     * Все внешние операции проходят здесь, поэтому ленивое восстановление и
+     * запись в чанк реализованы один раз.
+     */
+    private static int adjust(ServerLevel level, BlockPos farmlandPos, int delta) {
         LevelChunk chunk = level.getChunkAt(farmlandPos);
         ChunkFertilityData data = chunk.getData(KHAttachments.CHUNK_FERTILITY.get());
         long now = level.getGameTime();
 
         ChunkFertilityData.Entry old = data.get(farmlandPos);
         int current = old != null ? recoveredFertility(old, now) : BASE_FARMLAND;
-        int bonus = (int) Math.round(COMPOST_BONUS * KHServerConfig.fertilityRecoveryRate());
-        int updated = Mth.clamp(current + bonus, 0, MAX);
+        int updated = Mth.clamp(current + delta, 0, MAX);
         byte crop = old != null ? old.lastCrop() : ChunkFertilityData.NO_CROP;
 
         data.put(farmlandPos, new ChunkFertilityData.Entry(updated, crop, now));
         chunk.markUnsaved();
+        return updated;
     }
 
     /** Ленивое восстановление: +1 за каждые RECOVERY_TICKS_PER_POINT тиков. */

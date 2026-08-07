@@ -36,6 +36,27 @@ public final class KHSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> QUAIL_HURT = register("entity.quail.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> QUAIL_DEATH = register("entity.quail.death");
     public static final DeferredHolder<SoundEvent, SoundEvent> QUAIL_FLUSH = register("entity.quail.flush");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WILD_BOAR_AMBIENT = register("entity.wild_boar.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WILD_BOAR_HURT = register("entity.wild_boar.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> WILD_BOAR_DEATH = register("entity.wild_boar.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NUTRIA_AMBIENT = register("entity.nutria.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NUTRIA_HURT = register("entity.nutria.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NUTRIA_DEATH = register("entity.nutria.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOCUST_AMBIENT = register("entity.locust.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOCUST_HURT = register("entity.locust.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CAUCASIAN_BEE_AMBIENT = register("entity.caucasian_bee.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CAUCASIAN_BEE_HURT = register("entity.caucasian_bee.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CAUCASIAN_SHEPHERD_AMBIENT = register("entity.caucasian_shepherd.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CAUCASIAN_SHEPHERD_HURT = register("entity.caucasian_shepherd.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CAUCASIAN_SHEPHERD_DEATH = register("entity.caucasian_shepherd.death");
+    public static final DeferredHolder<SoundEvent, SoundEvent> STURGEON_FLOP = register("entity.sturgeon.flop");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GULL_AMBIENT = register("entity.gull.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> GULL_HURT = register("entity.gull.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HERON_AMBIENT = register("entity.heron.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> HERON_HURT = register("entity.heron.hurt");
+
+    /** Суховей: шум сухого степного ветра над полем. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> DRY_WIND = register("weather.dry_wind");
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name.replace('.', '_'),

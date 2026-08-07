@@ -205,6 +205,23 @@ public final class KHItems {
     public static final DeferredItem<BlockItem> HAND_MILL =
             ITEMS.registerSimpleBlockItem("hand_mill", KHBlocks.HAND_MILL);
 
+    public static final DeferredItem<BlockItem> CUTTING_BOARD =
+            ITEMS.registerSimpleBlockItem("cutting_board", KHBlocks.CUTTING_BOARD);
+
+    /**
+     * Ведро с осетром: ванильный способ переноса рыбы.
+     *
+     * <p>Без него осётр не ловится ведром, и игрок, привыкший к ванильной рыбе,
+     * получает пустое ведро — молчаливый сбой вместо ожидаемого действия.</p>
+     */
+    public static final DeferredItem<net.minecraft.world.item.MobBucketItem> STURGEON_BUCKET =
+            ITEMS.registerItem("sturgeon_bucket",
+                    p -> new net.minecraft.world.item.MobBucketItem(
+                            KHEntities.STURGEON.get(),
+                            net.minecraft.world.level.material.Fluids.WATER,
+                            net.minecraft.sounds.SoundEvents.BUCKET_EMPTY_FISH, p),
+                    p -> p.stacksTo(1));
+
     // --- Строительные материалы (предметы) ---
 
     /** Саманный кирпич (предмет). */
@@ -360,6 +377,53 @@ public final class KHItems {
             ITEMS.registerSimpleItem("raw_quail", p -> p.food(KHFoods.RAW_QUAIL));
     public static final DeferredItem<Item> COOKED_QUAIL =
             ITEMS.registerSimpleItem("cooked_quail", p -> p.food(KHFoods.COOKED_QUAIL));
+
+    public static final DeferredItem<SpawnEggItem> WILD_BOAR_SPAWN_EGG =
+            ITEMS.registerItem("wild_boar_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.WILD_BOAR.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> NUTRIA_SPAWN_EGG =
+            ITEMS.registerItem("nutria_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.NUTRIA.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> CAUCASIAN_BEE_SPAWN_EGG =
+            ITEMS.registerItem("caucasian_bee_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.CAUCASIAN_BEE.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> CAUCASIAN_SHEPHERD_SPAWN_EGG =
+            ITEMS.registerItem("caucasian_shepherd_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.CAUCASIAN_SHEPHERD.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> LOCUST_SPAWN_EGG =
+            ITEMS.registerItem("locust_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.LOCUST.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> STURGEON_SPAWN_EGG =
+            ITEMS.registerItem("sturgeon_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.STURGEON.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> GULL_SPAWN_EGG =
+            ITEMS.registerItem("gull_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.GULL.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> HERON_SPAWN_EGG =
+            ITEMS.registerItem("heron_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.HERON.get(), new net.minecraft.nbt.CompoundTag())));
+
+    /** Сырая кабанина — трофей защищённого поля. */
+    public static final DeferredItem<Item> RAW_BOAR =
+            ITEMS.registerSimpleItem("raw_boar", p -> p.food(KHFoods.RAW_BOAR));
+    public static final DeferredItem<Item> COOKED_BOAR =
+            ITEMS.registerSimpleItem("cooked_boar", p -> p.food(KHFoods.COOKED_BOAR));
+    public static final DeferredItem<Item> RAW_STURGEON =
+            ITEMS.registerSimpleItem("raw_sturgeon", p -> p.food(KHFoods.RAW_STURGEON));
+    public static final DeferredItem<Item> COOKED_STURGEON =
+            ITEMS.registerSimpleItem("cooked_sturgeon", p -> p.food(KHFoods.COOKED_STURGEON));
+
+    /** Шкура нутрии: ремесленное сырьё, а не еда. */
+    public static final DeferredItem<Item> NUTRIA_PELT =
+            ITEMS.registerSimpleItem("nutria_pelt");
 
     private KHItems() {
     }

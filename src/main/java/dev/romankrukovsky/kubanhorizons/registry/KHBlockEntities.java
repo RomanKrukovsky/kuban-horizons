@@ -29,6 +29,11 @@ public final class KHBlockEntities {
                     () -> new BlockEntityType<>(dev.romankrukovsky.kubanhorizons.blockentity.DryingRackBlockEntity::new,
                             KHBlocks.DRYING_RACK.get()));
 
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<dev.romankrukovsky.kubanhorizons.blockentity.CuttingBoardBlockEntity>> CUTTING_BOARD =
+            BLOCK_ENTITIES.register("cutting_board",
+                    () -> new BlockEntityType<>(dev.romankrukovsky.kubanhorizons.blockentity.CuttingBoardBlockEntity::new,
+                            KHBlocks.CUTTING_BOARD.get()));
+
     private KHBlockEntities() {
     }
 

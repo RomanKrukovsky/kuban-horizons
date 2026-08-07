@@ -57,10 +57,13 @@ public abstract class AbstractGroundBird extends Animal {
                 walkSpeed(), panicSpeed()));
         goalSelector.addGoal(3, new BreedGoal(this, walkSpeed()));
         goalSelector.addGoal(4, new TemptGoal(this, walkSpeed(), this::isFood, false));
-        goalSelector.addGoal(5, new GroundBirdFlockGoal(this));
-        goalSelector.addGoal(6, new RandomStrollGoal(this, walkSpeed()));
-        goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 6.0F));
-        goalSelector.addGoal(8, new RandomLookAroundGoal(this));
+        // Охота на саранчу выше прогулки и стайности: птица бросает стаю, чтобы
+        // схватить вредителя — именно это делает её защитой урожая.
+        goalSelector.addGoal(5, new HuntLocustGoal(this, panicSpeed(), flockRadius()));
+        goalSelector.addGoal(6, new GroundBirdFlockGoal(this));
+        goalSelector.addGoal(7, new RandomStrollGoal(this, walkSpeed()));
+        goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 6.0F));
+        goalSelector.addGoal(9, new RandomLookAroundGoal(this));
     }
 
     @Override

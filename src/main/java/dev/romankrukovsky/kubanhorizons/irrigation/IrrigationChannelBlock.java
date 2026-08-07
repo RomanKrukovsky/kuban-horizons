@@ -56,7 +56,7 @@ public class IrrigationChannelBlock extends Block {
     }
 
     @Override
-    protected MapCodec<IrrigationChannelBlock> codec() {
+    protected MapCodec<? extends IrrigationChannelBlock> codec() {
         return CODEC;
     }
 

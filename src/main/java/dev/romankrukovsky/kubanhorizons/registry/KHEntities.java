@@ -33,6 +33,103 @@ public final class KHEntities {
                     .clientTrackingRange(8)
                     .build(key("quail")));
 
+    /**
+     * Дикий кабан: давление на незащищённое хозяйство.
+     *
+     * <p>MONSTER, а не CREATURE: спавн должен подчиняться темноте и лимиту
+     * враждебных, иначе кабаны заполнят степь днём и потрава станет постоянной,
+     * а не ночным событием. Радиус трекинга больше птичьего — игрок должен
+     * увидеть кабана до того, как тот дойдёт до грядок.</p>
+     */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.WildBoar>> WILD_BOAR =
+            ENTITIES.register("wild_boar", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.WildBoar::new, MobCategory.MONSTER)
+                    .sized(1.0F, 1.05F)
+                    .eyeHeight(0.9F)
+                    .clientTrackingRange(10)
+                    .build(key("wild_boar")));
+
+    /**
+     * Нутрия: вредитель оросительной сети в плавнях и лиманах.
+     *
+     * <p>CREATURE, а не MONSTER: она не угроза игроку и должна спавниться днём
+     * у воды, как обычное животное. Урон она наносит инфраструктуре, а не
+     * здоровью.</p>
+     */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.Nutria>> NUTRIA =
+            ENTITIES.register("nutria", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.Nutria::new, MobCategory.CREATURE)
+                    .sized(0.6F, 0.6F)
+                    .eyeHeight(0.5F)
+                    .clientTrackingRange(8)
+                    .build(key("nutria")));
+
+    /**
+     * Саранча: сезонное давление на посевы с воздуха.
+     *
+     * <p>MONSTER: налёт должен быть событием, ограниченным лимитом враждебных,
+     * а не постоянным фоном. Сама особь живёт около четырёх игровых минут —
+     * популяция самоограничена по времени, а не по числу.</p>
+     */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.Locust>> LOCUST =
+            ENTITIES.register("locust", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.Locust::new, MobCategory.MONSTER)
+                    .sized(0.4F, 0.35F)
+                    .eyeHeight(0.25F)
+                    .clientTrackingRange(8)
+                    .build(key("locust")));
+
+    /** Кавказская пчела: опыление и медовая цепочка. */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.CaucasianBee>> CAUCASIAN_BEE =
+            ENTITIES.register("caucasian_bee", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.CaucasianBee::new, MobCategory.CREATURE)
+                    .sized(0.4F, 0.4F)
+                    .eyeHeight(0.3F)
+                    .clientTrackingRange(8)
+                    .build(key("caucasian_bee")));
+
+    /**
+     * Кавказская овчарка: ответ игрока на давление.
+     *
+     * <p>CREATURE и приручаемая: это не дикая фауна, а инструмент защиты.
+     * Существует ровно для того, чтобы у кабана и нутрии был контр-приём кроме
+     * ограды, иначе давление остаётся безответным налогом.</p>
+     */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.CaucasianShepherd>> CAUCASIAN_SHEPHERD =
+            ENTITIES.register("caucasian_shepherd", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.CaucasianShepherd::new, MobCategory.CREATURE)
+                    .sized(0.9F, 1.0F)
+                    .eyeHeight(0.9F)
+                    .clientTrackingRange(10)
+                    .build(key("caucasian_shepherd")));
+
+    /** Осётр: крупная речная рыба поймы и лиманов, сырьё коптильни. */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.Sturgeon>> STURGEON =
+            ENTITIES.register("sturgeon", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.Sturgeon::new, MobCategory.WATER_AMBIENT)
+                    .sized(0.9F, 0.5F)
+                    .eyeHeight(0.3F)
+                    .clientTrackingRange(4)
+                    .build(key("sturgeon")));
+
+    /** Чайка: падальщик побережий и лиманов. */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.Gull>> GULL =
+            ENTITIES.register("gull", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.Gull::new, MobCategory.CREATURE)
+                    .sized(0.6F, 0.6F)
+                    .eyeHeight(0.5F)
+                    .clientTrackingRange(8)
+                    .build(key("gull")));
+
+    /** Цапля: хищник мелкой рыбы на отмелях плавней. */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.Heron>> HERON =
+            ENTITIES.register("heron", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.Heron::new, MobCategory.CREATURE)
+                    .sized(0.6F, 1.4F)
+                    .eyeHeight(1.3F)
+                    .clientTrackingRange(10)
+                    .build(key("heron")));
+
     private KHEntities() {
     }
 

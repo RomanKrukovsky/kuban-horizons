@@ -68,6 +68,45 @@ public final class KHServerConfig {
                     "Включает естественный спавн фазанов и перепелов. Требует перезапуска сервера.")
             .define("wildlife.enableGroundBirdSpawns", true);
 
+    // --- Давление на хозяйство ---
+
+    private static final ModConfigSpec.BooleanValue PRESSURE_ENABLED = BUILDER
+            .comment("Master switch for farm pressure: pests, trampling, drought and floods.",
+                    "Главный выключатель давления на хозяйство: вредители, вытаптывание,",
+                    "суховей и половодье. Выключенный — мод остаётся мирным садоводством.")
+            .define("pressure.enabled", true);
+
+    private static final ModConfigSpec.DoubleValue PRESSURE_SEVERITY = BUILDER
+            .comment("Scales every pressure effect: trampling, gnawing, drought and locust damage.",
+                    "Масштабирует силу всех видов давления: вытаптывания, порчи желобов,",
+                    "суховея и потрав саранчи. 0.5 — мягко, 2.0 — жёстко.")
+            .defineInRange("pressure.severity", 1.0D, 0.0D, 4.0D);
+
+    private static final ModConfigSpec.BooleanValue LOCUST_SWARMS = BUILDER
+            .comment("Enable periodic locust swarms over farmland.",
+                    "Включает периодические налёты саранчи на посевы.")
+            .define("pressure.enableLocustSwarms", true);
+
+    private static final ModConfigSpec.IntValue LOCUST_SWARM_INTERVAL = BUILDER
+            .comment("Average ticks between locust swarm attempts per player.",
+                    "Средний интервал в тиках между попытками налёта саранчи на игрока.")
+            .defineInRange("pressure.locustSwarmInterval", 24000, 1200, 720000);
+
+    private static final ModConfigSpec.BooleanValue DRY_WIND_ENABLED = BUILDER
+            .comment("Enable sukhovey: a dry steppe wind that removes farmland moisture.",
+                    "Включает суховей — сухой степной ветер, сушащий грядки.")
+            .define("pressure.enableDryWind", true);
+
+    private static final ModConfigSpec.BooleanValue FLOODING_ENABLED = BUILDER
+            .comment("Enable floodplain high water: floods low farmland, enriches meadow soil.",
+                    "Включает половодье в пойме: заливает низкие грядки, обогащая луг.")
+            .define("pressure.enableFlooding", true);
+
+    private static final ModConfigSpec.BooleanValue POLLINATION_ENABLED = BUILDER
+            .comment("Enable Caucasian bee pollination yield bonus.",
+                    "Включает бонус к урожаю от опыления кавказской пчелой.")
+            .define("wildlife.enablePollination", true);
+
     // --- Мир ---
 
     private static final ModConfigSpec.BooleanValue WORLDGEN_ENABLED = BUILDER
@@ -121,6 +160,36 @@ public final class KHServerConfig {
 
     public static boolean groundBirdSpawnsEnabled() {
         return GROUND_BIRD_SPAWNS.get();
+    }
+
+    /** Главный выключатель давления на хозяйство. */
+    public static boolean pressureEnabled() {
+        return PRESSURE_ENABLED.get();
+    }
+
+    /** Множитель силы давления; 0 равносилен выключению эффектов. */
+    public static double pressureSeverity() {
+        return PRESSURE_SEVERITY.get();
+    }
+
+    public static boolean locustSwarmsEnabled() {
+        return PRESSURE_ENABLED.get() && LOCUST_SWARMS.get();
+    }
+
+    public static int locustSwarmInterval() {
+        return LOCUST_SWARM_INTERVAL.get();
+    }
+
+    public static boolean dryWindEnabled() {
+        return PRESSURE_ENABLED.get() && DRY_WIND_ENABLED.get();
+    }
+
+    public static boolean floodingEnabled() {
+        return PRESSURE_ENABLED.get() && FLOODING_ENABLED.get();
+    }
+
+    public static boolean pollinationEnabled() {
+        return POLLINATION_ENABLED.get();
     }
 
     public static boolean worldgenEnabled() {

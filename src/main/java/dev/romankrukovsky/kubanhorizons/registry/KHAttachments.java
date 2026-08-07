@@ -31,6 +31,12 @@ public final class KHAttachments {
             ATTACHMENTS.register("chunk_fertility",
                     () -> AttachmentType.serializable(ChunkFertilityData::new).build());
 
+    /** Метки опыления грядок чанка. Пустая карта не сериализуется. */
+    public static final Supplier<AttachmentType<dev.romankrukovsky.kubanhorizons.soil.ChunkPollinationData>> CHUNK_POLLINATION =
+            ATTACHMENTS.register("chunk_pollination",
+                    () -> AttachmentType.serializable(
+                            dev.romankrukovsky.kubanhorizons.soil.ChunkPollinationData::new).build());
+
     /** Флаг «путеводитель выдан» на игроке; переживает смерть. */
     public static final Supplier<AttachmentType<Boolean>> GUIDE_GIVEN =
             ATTACHMENTS.register("guide_given",

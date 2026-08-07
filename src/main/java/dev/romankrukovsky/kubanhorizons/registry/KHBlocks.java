@@ -91,6 +91,16 @@ public final class KHBlocks {
                             .sound(SoundType.WOOD)
                             .noOcclusion());
 
+    /** Каменный оросительный желоб: та же гидравлика, но нутрия его не грызёт. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.irrigation.StoneIrrigationChannelBlock> STONE_IRRIGATION_CHANNEL =
+            BLOCKS.registerBlock("stone_irrigation_channel",
+                    dev.romankrukovsky.kubanhorizons.irrigation.StoneIrrigationChannelBlock::new,
+                    p -> p.mapColor(MapColor.STONE)
+                            .strength(3.0F)
+                            .sound(SoundType.STONE)
+                            .requiresCorrectToolForDrops()
+                            .noOcclusion());
+
     /** Водозабор — источник оросительной сети. */
     public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.irrigation.WaterIntakeBlock> WATER_INTAKE =
             BLOCKS.registerBlock("water_intake",
@@ -113,6 +123,15 @@ public final class KHBlocks {
     public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.processing.DryingRackBlock> DRYING_RACK =
             BLOCKS.registerBlock("drying_rack",
                     dev.romankrukovsky.kubanhorizons.processing.DryingRackBlock::new,
+                    p -> p.mapColor(MapColor.WOOD)
+                            .strength(1.5F)
+                            .sound(SoundType.WOOD)
+                            .noOcclusion());
+
+    /** Разделочный стол — нарезка продуктов ножом, без GUI. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.processing.CuttingBoardBlock> CUTTING_BOARD =
+            BLOCKS.registerBlock("cutting_board",
+                    dev.romankrukovsky.kubanhorizons.processing.CuttingBoardBlock::new,
                     p -> p.mapColor(MapColor.WOOD)
                             .strength(1.5F)
                             .sound(SoundType.WOOD)

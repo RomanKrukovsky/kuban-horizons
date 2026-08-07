@@ -104,6 +104,18 @@ public final class KHFoods {
     /** Запечённое мясо перепела. */
     public static final FoodProperties COOKED_QUAIL = new FoodProperties.Builder()
             .nutrition(5).saturationModifier(0.65F).build();
+    /** Сырая кабанина: жёсткое дикое мясо. */
+    public static final FoodProperties RAW_BOAR = new FoodProperties.Builder()
+            .nutrition(3).saturationModifier(0.3F).build();
+    /** Жареная кабанина: сытная дичь, награда за защиту поля. */
+    public static final FoodProperties COOKED_BOAR = new FoodProperties.Builder()
+            .nutrition(8).saturationModifier(0.8F).build();
+    /** Сырой осётр: крупная рыба. */
+    public static final FoodProperties RAW_STURGEON = new FoodProperties.Builder()
+            .nutrition(3).saturationModifier(0.3F).build();
+    /** Запечённый осётр: лучшая рыба региона. */
+    public static final FoodProperties COOKED_STURGEON = new FoodProperties.Builder()
+            .nutrition(8).saturationModifier(0.85F).build();
 
     // --- Кухня ---
 

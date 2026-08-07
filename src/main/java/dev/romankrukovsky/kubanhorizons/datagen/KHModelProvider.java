@@ -84,6 +84,14 @@ public final class KHModelProvider extends ModelProvider {
                 plainVariant(KHIds.of("block/hand_mill"))));
         blockModels.registerSimpleItemModel(handMill.asItem(), KHIds.of("block/hand_mill"));
 
+        // Разделочный стол: ручная модель + горизонтальные повороты.
+        Block cuttingBoard = KHBlocks.CUTTING_BOARD.get();
+        blockModels.blockStateOutput.accept(
+                MultiVariantGenerator.dispatch(cuttingBoard,
+                                plainVariant(KHIds.of("block/cutting_board")))
+                        .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        blockModels.registerSimpleItemModel(cuttingBoard.asItem(), KHIds.of("block/cutting_board"));
+
         registerBuildingFamilies(blockModels);
 
         // Резной наличник: ручная тонкая модель + горизонтальные повороты.
@@ -194,6 +202,16 @@ public final class KHModelProvider extends ModelProvider {
                 .with(PropertyDispatch.initial(WaterIntakeBlock.ACTIVE)
                         .generate(isActive -> plainVariant(isActive ? active : idle))));
         blockModels.registerSimpleItemModel(intake.asItem(), idle);
+
+        // Каменный желоб: та же гидравлика и та же схема состояний, свои
+        // текстуры. Модель ручная, как и у деревянного.
+        Block stoneChannel = KHBlocks.STONE_IRRIGATION_CHANNEL.get();
+        Identifier stoneDry = KHIds.of("block/stone_irrigation_channel_dry");
+        Identifier stoneFilled = KHIds.of("block/stone_irrigation_channel_filled");
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(stoneChannel)
+                .with(PropertyDispatch.initial(IrrigationChannelBlock.DISTANCE)
+                        .generate(distance -> plainVariant(distance > 0 ? stoneFilled : stoneDry))));
+        blockModels.registerSimpleItemModel(stoneChannel.asItem(), stoneDry);
     }
 
     /** Двухблочная культура по схеме pitcher crop: cross-модели стадий. */
