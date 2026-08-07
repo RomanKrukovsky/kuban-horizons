@@ -27,6 +27,9 @@ public final class KHBlockTagsProvider extends BlockTagsProvider {
         // Водозабор и мельница добываются киркой.
         tag(BlockTags.MINEABLE_WITH_PICKAXE).add(KHBlocks.WATER_INTAKE.getKey());
         tag(BlockTags.MINEABLE_WITH_PICKAXE).add(KHBlocks.HAND_MILL.getKey());
+        // Каменный желоб — тоже кирка: блок требует правильного инструмента,
+        // без тега он не выпадал бы вообще.
+        tag(BlockTags.MINEABLE_WITH_PICKAXE).add(KHBlocks.STONE_IRRIGATION_CHANNEL.getKey());
         // Культуры (для механик, ломающих/обходящих культуры).
         tag(BlockTags.CROPS)
                 .add(KHBlocks.SUNFLOWER_CROP.getKey())

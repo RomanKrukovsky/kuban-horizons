@@ -61,6 +61,15 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_planks", this.has(net.minecraft.tags.ItemTags.PLANKS))
                 .save(this.output);
 
+        // Каменный желоб: тот же корытный силуэт, но из камня (4 шт.).
+        // Дороже деревянного по материалу, зато нутрия его не грызёт.
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.STONE_IRRIGATION_CHANNEL.get(), 4)
+                .pattern("S S")
+                .pattern("SSS")
+                .define('S', Items.STONE)
+                .unlockedBy("has_stone", this.has(Items.STONE))
+                .save(this.output);
+
         // Водозабор: камень + железная решётка (ведро как символ забора воды).
         this.shaped(RecipeCategory.DECORATIONS, KHItems.WATER_INTAKE.get())
                 .pattern("I I")

@@ -193,6 +193,11 @@ public final class KHItems {
     public static final DeferredItem<BlockItem> IRRIGATION_CHANNEL =
             ITEMS.registerSimpleBlockItem("irrigation_channel", KHBlocks.IRRIGATION_CHANNEL);
 
+    /** Каменный оросительный желоб (предмет). */
+    public static final DeferredItem<BlockItem> STONE_IRRIGATION_CHANNEL =
+            ITEMS.registerSimpleBlockItem("stone_irrigation_channel",
+                    KHBlocks.STONE_IRRIGATION_CHANNEL);
+
     /** Водозабор (предмет). */
     public static final DeferredItem<BlockItem> WATER_INTAKE =
             ITEMS.registerSimpleBlockItem("water_intake", KHBlocks.WATER_INTAKE);
