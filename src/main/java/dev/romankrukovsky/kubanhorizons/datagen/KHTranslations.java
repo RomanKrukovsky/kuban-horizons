@@ -115,6 +115,18 @@ final class KHTranslations {
         add("item.kubanhorizons.plum", "Plum", "Слива");
         add("item.kubanhorizons.walnut", "Walnut", "Грецкий орех");
 
+        // --- Фауна: сущности, мясо, яйца-спавнеры ---
+        add("entity.kubanhorizons.pheasant", "Pheasant", "Фазан");
+        add("entity.kubanhorizons.quail", "Quail", "Перепел");
+        add("item.kubanhorizons.raw_pheasant", "Raw Pheasant", "Сырой фазан");
+        add("item.kubanhorizons.cooked_pheasant", "Cooked Pheasant", "Жареный фазан");
+        add("item.kubanhorizons.raw_quail", "Raw Quail", "Сырой перепел");
+        add("item.kubanhorizons.cooked_quail", "Cooked Quail", "Жареный перепел");
+        add("item.kubanhorizons.pheasant_spawn_egg", "Pheasant Spawn Egg",
+                "Яйцо появления фазана");
+        add("item.kubanhorizons.quail_spawn_egg", "Quail Spawn Egg",
+                "Яйцо появления перепела");
+
         // --- Путеводитель ---
         add("guide.kubanhorizons.title", "Guide to Kuban", "Путеводитель по Кубани");
         add("guide.kubanhorizons.page1",
@@ -166,6 +178,15 @@ final class KHTranslations {
         add("subtitles.kubanhorizons.oil_press.creak", "Oil press creaks", "Маслопресс скрипит");
         add("subtitles.kubanhorizons.oil_press.work", "Oil press works", "Маслопресс работает");
         add("subtitles.kubanhorizons.oil_press.finish", "Oil drips", "Капает масло");
+        add("subtitles.kubanhorizons.pheasant.ambient", "Pheasant calls", "Фазан кричит");
+        add("subtitles.kubanhorizons.pheasant.hurt", "Pheasant hurts", "Фазану больно");
+        add("subtitles.kubanhorizons.pheasant.death", "Pheasant dies", "Фазан умирает");
+        add("subtitles.kubanhorizons.pheasant.flush", "Pheasant flushes",
+                "Фазан взлетает");
+        add("subtitles.kubanhorizons.quail.ambient", "Quail whistles", "Перепел посвистывает");
+        add("subtitles.kubanhorizons.quail.hurt", "Quail hurts", "Перепелу больно");
+        add("subtitles.kubanhorizons.quail.death", "Quail dies", "Перепел умирает");
+        add("subtitles.kubanhorizons.quail.flush", "Quail flushes", "Перепел взлетает");
 
         // --- Достижения ---
         add("advancement.kubanhorizons.root.title", "Kuban Horizons", "Кубанские горизонты");

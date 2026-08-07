@@ -16,5 +16,53 @@
       "kubanhorizons:block/oil_press/work"
     ],
     "subtitle": "subtitles.kubanhorizons.oil_press.work"
+  },
+  "entity_pheasant_ambient": {
+    "sounds": [
+      "kubanhorizons:entity/pheasant/ambient"
+    ],
+    "subtitle": "subtitles.kubanhorizons.pheasant.ambient"
+  },
+  "entity_pheasant_death": {
+    "sounds": [
+      "kubanhorizons:entity/pheasant/death"
+    ],
+    "subtitle": "subtitles.kubanhorizons.pheasant.death"
+  },
+  "entity_pheasant_flush": {
+    "sounds": [
+      "kubanhorizons:entity/pheasant/flush"
+    ],
+    "subtitle": "subtitles.kubanhorizons.pheasant.flush"
+  },
+  "entity_pheasant_hurt": {
+    "sounds": [
+      "kubanhorizons:entity/pheasant/hurt"
+    ],
+    "subtitle": "subtitles.kubanhorizons.pheasant.hurt"
+  },
+  "entity_quail_ambient": {
+    "sounds": [
+      "kubanhorizons:entity/quail/ambient"
+    ],
+    "subtitle": "subtitles.kubanhorizons.quail.ambient"
+  },
+  "entity_quail_death": {
+    "sounds": [
+      "kubanhorizons:entity/quail/death"
+    ],
+    "subtitle": "subtitles.kubanhorizons.quail.death"
+  },
+  "entity_quail_flush": {
+    "sounds": [
+      "kubanhorizons:entity/quail/flush"
+    ],
+    "subtitle": "subtitles.kubanhorizons.quail.flush"
+  },
+  "entity_quail_hurt": {
+    "sounds": [
+      "kubanhorizons:entity/quail/hurt"
+    ],
+    "subtitle": "subtitles.kubanhorizons.quail.hurt"
   }
 }

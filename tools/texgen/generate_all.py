@@ -4,6 +4,7 @@
 Детерминированно пересоздаёт все PNG в assets/kubanhorizons/textures.
 """
 import gen_crops
+import gen_entities
 import gen_blocks
 import gen_items
 import gen_gui
@@ -13,4 +14,5 @@ if __name__ == "__main__":
     gen_blocks.main()
     gen_items.main()
     gen_gui.main()
+    gen_entities.main()
     print("Готово.")
