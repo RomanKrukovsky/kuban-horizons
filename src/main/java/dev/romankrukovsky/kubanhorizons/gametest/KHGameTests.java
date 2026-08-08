@@ -288,16 +288,37 @@ public final class KHGameTests {
 
     /** Мета-желания изменяют правила игры Minecraft. */
     private static void testGenieMetaRules(GameTestHelper helper) {
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = helper.makeMockServerPlayerInLevel();
         var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("Хочу чтобы криперы больше не разрушали блоки");
         helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.META_NO_CREEPER_DAMAGE,
                 "Мета-желание отключения разрушений не распознано");
 
-        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor.execute(helper.getLevel(), player, intent);
-        helper.assertTrue(result.executed(), "Мета-желание должно выполниться");
-        helper.assertTrue(!helper.getLevel().getGameRules().get(net.minecraft.world.level.gamerules.GameRules.MOB_GRIEFING),
-                "Правило mobGriefing должно стать false");
-        helper.succeed();
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) runtime.recover();
+        helper.getLevel().getGameRules().set(net.minecraft.world.level.gamerules.GameRules.MOB_GRIEFING,
+                true, helper.getLevel().getServer());
+        try {
+            var preview = runtime.previewMobGriefing(player.getUUID(), false);
+            helper.assertTrue(helper.getLevel().getGameRules().get(
+                    net.minecraft.world.level.gamerules.GameRules.MOB_GRIEFING),
+                    "Policy preview изменил gamerule");
+            var report = runtime.executePolicy(player.getUUID(),
+                    runtime.confirmPolicy(player.getUUID(), preview));
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && !helper.getLevel().getGameRules().get(
+                            net.minecraft.world.level.gamerules.GameRules.MOB_GRIEFING),
+                    "Policy не отключила mobGriefing");
+            runtime.undoPolicy(player.getUUID(), report.transactionId());
+            helper.assertTrue(helper.getLevel().getGameRules().get(
+                    net.minecraft.world.level.gamerules.GameRules.MOB_GRIEFING),
+                    "Policy undo не вернул mobGriefing");
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Policy runtime failed: " + exception.getMessage());
+        }
     }
 
     /** Движок гигантизма создаёт сущности гигантских масштабов. */

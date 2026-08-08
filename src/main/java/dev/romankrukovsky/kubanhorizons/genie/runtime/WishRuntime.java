@@ -10,6 +10,7 @@ import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedStru
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedBiomeRewrite;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedDrawing;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedWord;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedPolicy;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.plan.PlanGate;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.PreviewService;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.RestorePreview;
@@ -19,6 +20,9 @@ import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.StructureMovePrevi
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.BiomeRewritePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.DrawingPreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.WordPreview;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.PolicyPreview;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.policy.PolicyManifestStore;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.policy.PolicyService;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.recovery.RecoveryClassifier;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.recovery.RecoveryJournal;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection;
@@ -70,6 +74,7 @@ public final class WishRuntime {
     private final TransactionManifestStore manifests;
     private final RecoveryService recoveryService;
     private final RestoreTransactionService restoreService;
+    private final PolicyService policyService;
     private final Set<UUID> issuedMiniaturizeConfirmations = new HashSet<>();
     private final Set<UUID> issuedPocketSceneConfirmations = new HashSet<>();
     private final Set<UUID> issuedStructureMoveConfirmations = new HashSet<>();
@@ -100,6 +105,7 @@ public final class WishRuntime {
         recoveryService = new RecoveryService(recoveryJournal, snapshotStore, manifests);
         restoreService = new RestoreTransactionService(confirmations, previewService, snapshotStore,
                 snapshotService, recoveryJournal, ledger, locks, manifests);
+        policyService = new PolicyService(new PolicyManifestStore(root.resolve("policies")));
     }
 
     public static WishRuntime get(MinecraftServer server) {
@@ -114,6 +120,7 @@ public final class WishRuntime {
         try {
             recoveryService.recover(server());
             restoreService.cleanupExpiredUndo(Instant.now());
+            policyService.recover(server());
             ready = true;
             blockedReason = "";
         } catch (IOException | RuntimeException exception) {
@@ -488,6 +495,25 @@ public final class WishRuntime {
         if (plan == null) throw new IllegalStateException("word plan expired");
         return restoreService.applyPreparedTarget(player.level(), player.getUUID(),
                 plan.current(), plan.target(), confirmed.preview().previewDigest(), Instant.now());
+    }
+
+    public PolicyPreview previewMobGriefing(UUID actor, boolean target) {
+        requireServerThread();
+        return policyService.previewMobGriefing(actor, server, target);
+    }
+
+    public ConfirmedPolicy confirmPolicy(UUID actor, PolicyPreview preview) {
+        return policyService.confirm(actor, preview);
+    }
+
+    public TransactionReport executePolicy(UUID actor, ConfirmedPolicy confirmed) throws IOException {
+        requireServerThread();
+        return policyService.execute(actor, server, confirmed);
+    }
+
+    public TransactionReport undoPolicy(UUID actor, UUID transactionId) throws IOException {
+        requireServerThread();
+        return policyService.undo(actor, server, transactionId);
     }
 
     public RestorePreview previewRestore(ServerLevel level, UUID actor, String name) throws IOException {

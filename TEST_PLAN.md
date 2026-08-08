@@ -64,6 +64,7 @@
 | Джинния | палитра биомов входит в snapshot, transaction и retained undo | ✅ |
 | Джинния | рисунок-линия проходит preview/confirmation/transaction/undo | ✅ |
 | Джинния | блочный шрифт проходит preview/confirmation/transaction/undo | ✅ |
+| Джинния | mobGriefing проходит durable policy и undo | ✅ |
 | Джинния | условные правила переживают перезапуск и не тикают глобальным сканом | 📋 |
 | Джинния | карманные пространства изолированы и не допускают рекурсивный дюп | 📋 |
 
