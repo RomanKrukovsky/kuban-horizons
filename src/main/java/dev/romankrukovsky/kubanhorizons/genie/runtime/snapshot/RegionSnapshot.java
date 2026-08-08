@@ -19,9 +19,10 @@ public record RegionSnapshot(
         List<TickRecord> blockTicks,
         List<TickRecord> fluidTicks,
         List<EntityRecord> entities,
+        List<BiomeRecord> biomes,
         String contentDigest
 ) {
-    public static final int CURRENT_SCHEMA_VERSION = 2;
+    public static final int CURRENT_SCHEMA_VERSION = 3;
     private static final Pattern DIGEST = Pattern.compile("[0-9a-f]{64}");
 
     public RegionSnapshot {
@@ -33,6 +34,7 @@ public record RegionSnapshot(
         blockTicks = List.copyOf(Objects.requireNonNull(blockTicks, "blockTicks"));
         fluidTicks = List.copyOf(Objects.requireNonNull(fluidTicks, "fluidTicks"));
         entities = List.copyOf(Objects.requireNonNull(entities, "entities"));
+        biomes = List.copyOf(Objects.requireNonNull(biomes, "biomes"));
         Objects.requireNonNull(contentDigest, "contentDigest");
         if (schemaVersion != CURRENT_SCHEMA_VERSION || !DIGEST.matcher(contentDigest).matches()) {
             throw new IllegalArgumentException("invalid snapshot metadata");
@@ -47,7 +49,15 @@ public record RegionSnapshot(
     public RegionSnapshot(int schemaVersion, SnapshotId id, UUID ownerId, Instant capturedAt,
                           RegionSelection selection, List<BlockRecord> blocks, String contentDigest) {
         this(schemaVersion, id, ownerId, capturedAt, selection, blocks,
-                List.of(), List.of(), List.of(), contentDigest);
+                List.of(), List.of(), List.of(), List.of(), contentDigest);
+    }
+
+    public RegionSnapshot(int schemaVersion, SnapshotId id, UUID ownerId, Instant capturedAt,
+                          RegionSelection selection, List<BlockRecord> blocks,
+                          List<TickRecord> blockTicks, List<TickRecord> fluidTicks,
+                          List<EntityRecord> entities, String contentDigest) {
+        this(schemaVersion, id, ownerId, capturedAt, selection, blocks, blockTicks,
+                fluidTicks, entities, List.of(), contentDigest);
     }
 
     private static void requireInside(RegionSelection selection, int x, int y, int z) {
@@ -97,6 +107,16 @@ public record RegionSnapshot(
         @Override
         public CompoundTag data() {
             return data.copy();
+        }
+    }
+
+    /** Биом одной quart-ячейки (4×4×4 блока) в абсолютных quart-координатах. */
+    public record BiomeRecord(int quartX, int quartY, int quartZ, String biomeId) {
+        public BiomeRecord {
+            Objects.requireNonNull(biomeId, "biomeId");
+            if (!biomeId.matches("[a-z0-9_.-]+:[a-z0-9_./-]+")) {
+                throw new IllegalArgumentException("invalid biome id");
+            }
         }
     }
 }

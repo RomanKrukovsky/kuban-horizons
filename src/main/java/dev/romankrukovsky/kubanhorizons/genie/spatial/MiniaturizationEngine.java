@@ -36,7 +36,7 @@ public final class MiniaturizationEngine {
         SnapshotService.SnapshotState state = SnapshotService.captureState(level, selection);
         RegionSnapshot snapshot = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
                 new SnapshotId(UUID.randomUUID(), "miniature"), ownerId, Instant.now(), selection,
-                state.blocks(), state.blockTicks(), state.fluidTicks(), state.entities(),
+                state.blocks(), state.blockTicks(), state.fluidTicks(), state.entities(), state.biomes(),
                 SnapshotService.digest(state));
         if (snapshot.blocks().stream().allMatch(record ->
                 record.blockState().getStringOr("Name", "minecraft:air").equals("minecraft:air"))) {
@@ -91,9 +91,9 @@ public final class MiniaturizationEngine {
                 .map(record -> new RegionSnapshot.BlockRecord(record.relativeX(), record.relativeY(),
                         record.relativeZ(), air, null)).toList();
         SnapshotService.SnapshotState state = new SnapshotService.SnapshotState(blocks,
-                List.of(), List.of(), List.of());
+                List.of(), List.of(), List.of(), source.biomes());
         return new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION, source.id(), source.ownerId(),
-                source.capturedAt(), source.selection(), blocks, List.of(), List.of(), List.of(),
+                source.capturedAt(), source.selection(), blocks, List.of(), List.of(), List.of(), source.biomes(),
                 SnapshotService.digest(state));
     }
 
@@ -120,10 +120,10 @@ public final class MiniaturizationEngine {
             entities.add(new RegionSnapshot.EntityRecord(data));
         }
         SnapshotService.SnapshotState state = new SnapshotService.SnapshotState(blocks,
-                source.blockTicks(), source.fluidTicks(), entities);
+                source.blockTicks(), source.fluidTicks(), entities, source.biomes());
         return new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
                 new SnapshotId(UUID.randomUUID(), "unpacked"), source.ownerId(), Instant.now(), destination,
-                state.blocks(), state.blockTicks(), state.fluidTicks(), state.entities(), SnapshotService.digest(state));
+                state.blocks(), state.blockTicks(), state.fluidTicks(), state.entities(), state.biomes(), SnapshotService.digest(state));
     }
 
     private static void offsetEntityTree(CompoundTag data, int dx, int dy, int dz) {

@@ -47,6 +47,16 @@ public final class SnapshotCodec {
             entities.add(entity.data());
         }
         root.put("Entities", entities);
+        ListTag biomes = new ListTag();
+        for (RegionSnapshot.BiomeRecord biome : snapshot.biomes()) {
+            CompoundTag entry = new CompoundTag();
+            entry.putInt("QuartX", biome.quartX());
+            entry.putInt("QuartY", biome.quartY());
+            entry.putInt("QuartZ", biome.quartZ());
+            entry.putString("Biome", biome.biomeId());
+            biomes.add(entry);
+        }
+        root.put("Biomes", biomes);
         return root;
     }
 
@@ -80,8 +90,17 @@ public final class SnapshotCodec {
                 }
                 entities.add(new RegionSnapshot.EntityRecord(entity));
             }
+            List<RegionSnapshot.BiomeRecord> biomes = new ArrayList<>();
+            for (var tag : root.getListOrEmpty("Biomes")) {
+                if (!(tag instanceof CompoundTag entry)) {
+                    throw new IOException("snapshot contains non-compound biome record");
+                }
+                biomes.add(new RegionSnapshot.BiomeRecord(entry.getIntOr("QuartX", 0),
+                        entry.getIntOr("QuartY", 0), entry.getIntOr("QuartZ", 0),
+                        required(entry, "Biome")));
+            }
             RegionSnapshot snapshot = new RegionSnapshot(schema, id, owner, captured, selection, records,
-                    decodeTicks(root, "BlockTicks"), decodeTicks(root, "FluidTicks"), entities,
+                    decodeTicks(root, "BlockTicks"), decodeTicks(root, "FluidTicks"), entities, biomes,
                     required(root, "ContentDigest"));
             if (!SnapshotService.digest(snapshot).equals(snapshot.contentDigest())) {
                 throw new IOException("snapshot content digest mismatch");

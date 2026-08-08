@@ -7,12 +7,14 @@ import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedRest
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedMiniaturize;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedPocketScene;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedStructureMove;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedBiomeRewrite;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.plan.PlanGate;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.PreviewService;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.RestorePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.MiniaturizePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.PocketScenePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.StructureMovePreview;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.BiomeRewritePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.recovery.RecoveryClassifier;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.recovery.RecoveryJournal;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection;
@@ -67,8 +69,11 @@ public final class WishRuntime {
     private final Set<UUID> issuedMiniaturizeConfirmations = new HashSet<>();
     private final Set<UUID> issuedPocketSceneConfirmations = new HashSet<>();
     private final Set<UUID> issuedStructureMoveConfirmations = new HashSet<>();
+    private final Set<UUID> issuedBiomeRewriteConfirmations = new HashSet<>();
     private final Map<UUID, dev.romankrukovsky.kubanhorizons.genie.dimension.FlyingStructureEngine.MovePlan>
             pendingStructureMoves = new ConcurrentHashMap<>();
+    private final Map<UUID, dev.romankrukovsky.kubanhorizons.genie.expression.BiomeRewriterEngine.BiomePlan>
+            pendingBiomeRewrites = new ConcurrentHashMap<>();
     private final MinecraftServer server;
     private volatile boolean ready;
     private volatile String blockedReason = "startup recovery has not run";
@@ -250,7 +255,8 @@ public final class WishRuntime {
                 new dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotId(
                         UUID.randomUUID(), "pocket_before"), player.getUUID(), Instant.now(),
                 confirmed.preview().selection(), currentState.blocks(), currentState.blockTicks(),
-                currentState.fluidTicks(), currentState.entities(), SnapshotService.digest(currentState));
+                currentState.fluidTicks(), currentState.entities(), currentState.biomes(),
+                SnapshotService.digest(currentState));
         if (!current.contentDigest().equals(confirmed.preview().currentStateDigest())) {
             throw new IllegalStateException("world state changed after pocket scene preview");
         }
@@ -312,6 +318,54 @@ public final class WishRuntime {
         if (plan == null) {
             throw new IllegalStateException("structure move plan expired");
         }
+        return restoreService.applyPreparedTarget(player.level(), player.getUUID(),
+                plan.current(), plan.target(), confirmed.preview().previewDigest(), Instant.now());
+    }
+
+    public BiomeRewritePreview previewBiomeRewrite(ServerPlayer player, BlockPos center)
+            throws IOException {
+        requireServerThread();
+        var plan = dev.romankrukovsky.kubanhorizons.genie.expression.BiomeRewriterEngine
+                .buildSteppePlan(player.level(), center, player.getUUID());
+        ensureReady(plan.current().selection());
+        int changed = 0;
+        for (int index = 0; index < plan.current().biomes().size(); index++) {
+            if (!plan.current().biomes().get(index).equals(plan.target().biomes().get(index))) changed++;
+        }
+        UUID previewId = UUID.randomUUID();
+        Instant expiresAt = Instant.now().plus(Duration.ofMinutes(2));
+        String previewDigest = digest(previewId + "|" + player.getUUID() + "|"
+                + plan.current().contentDigest() + "|" + plan.target().contentDigest()
+                + "|" + center.asLong() + "|" + expiresAt);
+        pendingBiomeRewrites.put(previewId, plan);
+        return new BiomeRewritePreview(previewId, player.getUUID(), plan.current().selection(),
+                changed, plan.current().contentDigest(), plan.target().contentDigest(),
+                previewDigest, expiresAt);
+    }
+
+    public synchronized ConfirmedBiomeRewrite confirmBiomeRewrite(UUID actor,
+                                                                   BiomeRewritePreview preview) {
+        if (!preview.actorId().equals(actor) || !preview.expiresAt().isAfter(Instant.now())
+                || !pendingBiomeRewrites.containsKey(preview.previewId())) {
+            throw new IllegalArgumentException("biome rewrite preview is stale or unavailable");
+        }
+        UUID id = UUID.randomUUID();
+        issuedBiomeRewriteConfirmations.add(id);
+        return new ConfirmedBiomeRewrite(id, preview, Instant.now());
+    }
+
+    public TransactionReport executeBiomeRewrite(ServerPlayer player,
+                                                  ConfirmedBiomeRewrite confirmed) throws IOException {
+        requireServerThread();
+        synchronized (this) {
+            if (!confirmed.preview().actorId().equals(player.getUUID())
+                    || !confirmed.preview().expiresAt().isAfter(Instant.now())
+                    || !issuedBiomeRewriteConfirmations.remove(confirmed.confirmationId())) {
+                throw new IllegalArgumentException("biome rewrite confirmation is invalid or already used");
+            }
+        }
+        var plan = pendingBiomeRewrites.remove(confirmed.preview().previewId());
+        if (plan == null) throw new IllegalStateException("biome rewrite plan expired");
         return restoreService.applyPreparedTarget(player.level(), player.getUUID(),
                 plan.current(), plan.target(), confirmed.preview().previewDigest(), Instant.now());
     }

@@ -6,6 +6,7 @@ import dev.romankrukovsky.kubanhorizons.registry.KHAttachments;
 import dev.romankrukovsky.kubanhorizons.registry.KHBlockEntities;
 import dev.romankrukovsky.kubanhorizons.registry.KHBlocks;
 import dev.romankrukovsky.kubanhorizons.registry.KHCreativeTabs;
+import dev.romankrukovsky.kubanhorizons.registry.KHDataComponents;
 import dev.romankrukovsky.kubanhorizons.registry.KHEntities;
 import dev.romankrukovsky.kubanhorizons.registry.KHItems;
 import dev.romankrukovsky.kubanhorizons.registry.KHMenus;
@@ -41,6 +42,7 @@ public final class KubanHorizons {
         KHSounds.register(modEventBus);
         KHCreativeTabs.register(modEventBus);
         KHAttachments.register(modEventBus);
+        KHDataComponents.register(modEventBus);
         KHBiomeSources.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.registry.KHLootModifiers.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.trade.KHProfessions.register(modEventBus);

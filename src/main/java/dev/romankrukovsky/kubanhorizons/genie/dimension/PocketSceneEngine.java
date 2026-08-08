@@ -44,10 +44,10 @@ public final class PocketSceneEngine {
                     record.relativeZ(), NbtUtils.writeBlockState(state), null));
         }
         SnapshotService.SnapshotState target = new SnapshotService.SnapshotState(
-                blocks, List.of(), List.of(), List.of());
+                blocks, List.of(), List.of(), List.of(), current.biomes());
         return new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
                 new SnapshotId(UUID.randomUUID(), "pocket_beach"), ownerId, Instant.now(), selection,
-                target.blocks(), target.blockTicks(), target.fluidTicks(), target.entities(),
+                target.blocks(), target.blockTicks(), target.fluidTicks(), target.entities(), target.biomes(),
                 SnapshotService.digest(target));
     }
 

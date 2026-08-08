@@ -243,12 +243,12 @@ public final class RestoreTransactionService {
                 new dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotId(
                         UUID.randomUUID(), beforeName), actorId, now, selection,
                 current.blocks(), current.blockTicks(), current.fluidTicks(), current.entities(),
-                current.contentDigest());
+                current.biomes(), current.contentDigest());
         RegionSnapshot durableTarget = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
                 new dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotId(
                         UUID.randomUUID(), "t_" + transactionId.toString().replace("-", "")),
                 actorId, now, selection, target.blocks(), target.blockTicks(),
-                target.fluidTicks(), target.entities(), target.contentDigest());
+                target.fluidTicks(), target.entities(), target.biomes(), target.contentDigest());
         long sequence = 0L;
         boolean prepared = false;
         boolean committed = false;
@@ -425,7 +425,22 @@ public final class RestoreTransactionService {
             }
         }
         dev.romankrukovsky.kubanhorizons.KubanHorizons.LOGGER.error(
-                "Prepared target block domain matched; mismatch is in ticks or entities");
+                "Prepared target block domain matched; expected ticks {}/{}, entities {}, biomes {}; actual ticks {}/{}, entities {}, biomes {}",
+                expected.blockTicks().size(), expected.fluidTicks().size(), expected.entities().size(),
+                expected.biomes().size(),
+                SnapshotService.captureState(level, expected.selection()).blockTicks().size(),
+                SnapshotService.captureState(level, expected.selection()).fluidTicks().size(),
+                SnapshotService.captureState(level, expected.selection()).entities().size(),
+                SnapshotService.captureState(level, expected.selection()).biomes().size());
+        var actualState = SnapshotService.captureState(level, expected.selection());
+        for (int index = 0; index < Math.min(expected.biomes().size(), actualState.biomes().size()); index++) {
+            if (!expected.biomes().get(index).equals(actualState.biomes().get(index))) {
+                dev.romankrukovsky.kubanhorizons.KubanHorizons.LOGGER.error(
+                        "First biome mismatch: expected {}, actual {}",
+                        expected.biomes().get(index), actualState.biomes().get(index));
+                return;
+            }
+        }
     }
 
     public record UndoSummary(UUID transactionId, RegionSelection selection,

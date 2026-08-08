@@ -166,6 +166,9 @@ public final class KHGameTests {
         register("player_genie_vessel_and_master", KHGameTests::testPlayerGenieVesselAndMaster, 100);
         register("player_genie_progression_tiers", KHGameTests::testPlayerGenieProgressionTiers, 100);
         register("player_genie_true_omnipotence_ending", KHGameTests::testPlayerGenieTrueOmnipotenceEnding, 100);
+        register("region_snapshot_round_trip", KHGameTests::testRegionSnapshotRoundTrip, 200);
+        register("region_snapshot_respects_limit", KHGameTests::testRegionSnapshotRespectsLimit, 100);
+        register("region_payload_round_trip", KHGameTests::testRegionPayloadRoundTrip, 200);
     }
 
     private KHGameTests() {
@@ -336,12 +339,11 @@ public final class KHGameTests {
             arrow.snapTo(genie.getX() + 0.5D, genie.getY(), genie.getZ() + 0.5D, 0.0F, 0.0F);
             arrow.setDeltaMovement(new net.minecraft.world.phys.Vec3(1.0D, 0.0D, 0.0D));
             helper.getLevel().addFreshEntity(arrow);
-            helper.startSequence()
-                    .thenExecuteAfter(2, () -> {
-                        dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws.tickAuraOfLaws(genie, helper.getLevel());
-                        helper.assertTrue(arrow.getDeltaMovement().lengthSqr() < 0.001D, "Снаряд в ауре законов должен замереть");
-                    })
-                    .thenSucceed();
+            dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws
+                    .tickAuraOfLaws(genie, helper.getLevel());
+            helper.assertTrue(arrow.getDeltaMovement().lengthSqr() < 0.001D,
+                    "Снаряд в ауре законов должен замереть");
+            helper.succeed();
         } else {
             helper.succeed();
         }
@@ -401,6 +403,82 @@ public final class KHGameTests {
             event.registerTest(KHIds.of(name), new FunctionGameTestInstance(functionKey,
                     new TestData<>(env, emptyStructure, maxTicks, 0, true)));
         });
+    }
+
+    // --- Фундамент джиннии: снимок региона ---
+
+    /** Снимок региона восстанавливает каждый блок после полной очистки. */
+    private static void testRegionSnapshotRoundTrip(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos from = helper.absolutePos(new BlockPos(1, 2, 1));
+        BlockPos to = helper.absolutePos(new BlockPos(2, 3, 2));
+
+        // Уникальный узор, который нельзя получить случайно.
+        level.setBlock(from, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+        level.setBlock(from.offset(1, 0, 0), Blocks.DIAMOND_BLOCK.defaultBlockState(), 3);
+        level.setBlock(from.offset(0, 1, 1), Blocks.EMERALD_BLOCK.defaultBlockState(), 3);
+
+        var snapshot = dev.romankrukovsky.kubanhorizons.genie.world.RegionSnapshot
+                .capture(level, from, to);
+        helper.assertTrue(snapshot.isPresent(), "Снимок региона должен быть создан");
+
+        // Стираем узор: если restore ничего не делает, тест обязан упасть.
+        snapshot.get().clear(level, from);
+        helper.assertTrue(level.getBlockState(from).isAir(),
+                "После clear регион должен быть пустым");
+
+        helper.assertTrue(snapshot.get().restore(level, from),
+                "Восстановление должно сообщить об успехе");
+        helper.assertTrue(level.getBlockState(from).is(Blocks.GOLD_BLOCK),
+                "Золотой блок должен вернуться на место");
+        helper.assertTrue(level.getBlockState(from.offset(1, 0, 0)).is(Blocks.DIAMOND_BLOCK),
+                "Алмазный блок должен вернуться на место");
+        helper.assertTrue(level.getBlockState(from.offset(0, 1, 1)).is(Blocks.EMERALD_BLOCK),
+                "Изумрудный блок должен вернуться на место");
+        helper.succeed();
+    }
+
+    /** Снимок отказывается захватывать регион больше лимита конфигурации. */
+    private static void testRegionSnapshotRespectsLimit(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos from = helper.absolutePos(new BlockPos(1, 2, 1));
+        int limit = dev.romankrukovsky.kubanhorizons.config.KHServerConfig.genieMaxRegionVolume();
+        // Сторона куба заведомо превышает лимит по объёму.
+        int side = (int) Math.cbrt(limit) + 8;
+        BlockPos tooBig = from.offset(side, side, side);
+
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.world.RegionSnapshot
+                        .capture(level, from, tooBig).isEmpty(),
+                "Регион больше лимита не должен захватываться");
+        helper.succeed();
+    }
+
+    /** Предмет хранит захваченный регион и отдаёт его назад без потерь. */
+    private static void testRegionPayloadRoundTrip(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos from = helper.absolutePos(new BlockPos(1, 2, 1));
+        level.setBlock(from, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+
+        var snapshot = dev.romankrukovsky.kubanhorizons.genie.world.RegionSnapshot
+                .capture(level, from, from);
+        helper.assertTrue(snapshot.isPresent(), "Снимок должен быть создан");
+
+        ItemStack stack = new ItemStack(Items.PAPER);
+        stack.set(dev.romankrukovsky.kubanhorizons.registry.KHDataComponents.REGION_PAYLOAD.get(),
+                snapshot.get().toTag());
+
+        net.minecraft.nbt.CompoundTag stored = stack.get(
+                dev.romankrukovsky.kubanhorizons.registry.KHDataComponents.REGION_PAYLOAD.get());
+        helper.assertTrue(stored != null, "Компонент региона должен читаться из предмета");
+
+        // Стираем мир и восстанавливаем строго из данных предмета.
+        level.setBlock(from, Blocks.AIR.defaultBlockState(), 3);
+        dev.romankrukovsky.kubanhorizons.genie.world.RegionSnapshot
+                .fromTag(level, stored)
+                .restore(level, from);
+        helper.assertTrue(level.getBlockState(from).is(Blocks.GOLD_BLOCK),
+                "Регион должен восстановиться из данных предмета");
+        helper.succeed();
     }
 
     // --- Вспомогательные ---
@@ -1937,13 +2015,32 @@ public final class KHGameTests {
     /** Переписывание биома меняет палитру чанка, а не только создаёт частицы. */
     private static void testGenieBiomeRewrite(GameTestHelper helper) {
         BlockPos center = helper.absolutePos(new BlockPos(1, 2, 1));
-        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.expression.BiomeRewriterEngine
-                        .rewriteLocalBiome(helper.getLevel(), center),
-                "Движок биома отказался от допустимой области");
-        var actual = helper.getLevel().getBiome(center).unwrapKey().orElseThrow();
-        helper.assertTrue(actual.equals(KHBiomes.KUBAN_STEPPE),
-                "Биом в точке не стал кубанской степью: " + actual.identifier());
-        helper.succeed();
+        var player = helper.makeMockServerPlayerInLevel();
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) runtime.recover();
+        var before = helper.getLevel().getBiome(center).unwrapKey().orElseThrow();
+        try {
+            var preview = runtime.previewBiomeRewrite(player, center);
+            helper.assertTrue(helper.getLevel().getBiome(center).is(before),
+                    "Preview переписывания биома изменил мир");
+            var report = runtime.executeBiomeRewrite(player,
+                    runtime.confirmBiomeRewrite(player.getUUID(), preview));
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && helper.getLevel().getBiome(center).is(KHBiomes.KUBAN_STEPPE),
+                    "Биом не переписан транзакцией: " + report);
+            var undo = runtime.undo(helper.getLevel(), player.getUUID(), report.transactionId());
+            helper.assertTrue(undo.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && helper.getLevel().getBiome(center).is(before),
+                    "Undo не вернул исходный биом");
+            runtime.retireUndo(player.getUUID(), undo.transactionId());
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Runtime biome rewrite failed: " + exception.getMessage());
+        }
     }
 
     /** Обмен ролями освобождает NPC и записывает игроку полноценное состояние джинна. */

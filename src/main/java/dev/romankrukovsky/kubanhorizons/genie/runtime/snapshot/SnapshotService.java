@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.QuartPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -67,7 +68,7 @@ public final class SnapshotService {
         String digest = digest(state);
         RegionSnapshot snapshot = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
                 new SnapshotId(UUID.randomUUID(), name), ownerId, now, selection, state.blocks(),
-                state.blockTicks(), state.fluidTicks(), state.entities(), digest);
+                state.blockTicks(), state.fluidTicks(), state.entities(), state.biomes(), digest);
         store.publish(snapshot);
         return snapshot;
     }
@@ -105,9 +106,10 @@ public final class SnapshotService {
             }
         }
         entities.sort(java.util.Comparator.comparing(record -> record.data().getStringOr("id", "")));
+        List<RegionSnapshot.BiomeRecord> biomes = captureBiomes(level, selection);
         blockTicks.sort(TICK_ORDER);
         fluidTicks.sort(TICK_ORDER);
-        return new SnapshotState(blocks, blockTicks, fluidTicks, entities);
+        return new SnapshotState(blocks, blockTicks, fluidTicks, entities, biomes);
     }
 
     public static List<RegionSnapshot.BlockRecord> captureBlocks(ServerLevel level,
@@ -145,6 +147,12 @@ public final class SnapshotService {
                 for (RegionSnapshot.EntityRecord entity : state.entities()) {
                     NbtIo.write(entity.data(), output);
                 }
+                for (RegionSnapshot.BiomeRecord biome : state.biomes()) {
+                    output.writeInt(biome.quartX());
+                    output.writeInt(biome.quartY());
+                    output.writeInt(biome.quartZ());
+                    output.writeUTF(biome.biomeId());
+                }
                 output.flush();
                 return HexFormat.of().formatHex(digest.digest(bytes.toByteArray()));
             }
@@ -155,12 +163,12 @@ public final class SnapshotService {
 
     public static String digest(RegionSnapshot snapshot) throws IOException {
         return digest(new SnapshotState(snapshot.blocks(), snapshot.blockTicks(),
-                snapshot.fluidTicks(), snapshot.entities()));
+                snapshot.fluidTicks(), snapshot.entities(), snapshot.biomes()));
     }
 
     /** Оставлен для block-only проверок старых потребителей. */
     public static String digest(List<RegionSnapshot.BlockRecord> blocks) throws IOException {
-        return digest(new SnapshotState(blocks, List.of(), List.of(), List.of()));
+        return digest(new SnapshotState(blocks, List.of(), List.of(), List.of(), List.of()));
     }
 
     private static final java.util.Comparator<RegionSnapshot.TickRecord> TICK_ORDER =
@@ -195,6 +203,27 @@ public final class SnapshotService {
                 && entity.getEncodeId() != null;
     }
 
+    private static List<RegionSnapshot.BiomeRecord> captureBiomes(ServerLevel level,
+                                                                  RegionSelection selection) {
+        List<RegionSnapshot.BiomeRecord> result = new ArrayList<>();
+        int minX = QuartPos.fromBlock(selection.min().getX());
+        int minY = QuartPos.fromBlock(selection.min().getY());
+        int minZ = QuartPos.fromBlock(selection.min().getZ());
+        int maxX = QuartPos.fromBlock(selection.max().getX());
+        int maxY = QuartPos.fromBlock(selection.max().getY());
+        int maxZ = QuartPos.fromBlock(selection.max().getZ());
+        for (int quartX = minX; quartX <= maxX; quartX++) {
+            for (int quartY = minY; quartY <= maxY; quartY++) {
+                for (int quartZ = minZ; quartZ <= maxZ; quartZ++) {
+                    var holder = level.getNoiseBiome(quartX, quartY, quartZ);
+                    String id = holder.unwrapKey().orElseThrow().identifier().toString();
+                    result.add(new RegionSnapshot.BiomeRecord(quartX, quartY, quartZ, id));
+                }
+            }
+        }
+        return List.copyOf(result);
+    }
+
     private static void ensureChunksLoaded(ServerLevel level, RegionSelection selection) {
         ChunkPos first = ChunkPos.containing(selection.min());
         ChunkPos last = ChunkPos.containing(selection.max());
@@ -210,12 +239,21 @@ public final class SnapshotService {
     public record SnapshotState(List<RegionSnapshot.BlockRecord> blocks,
                                 List<RegionSnapshot.TickRecord> blockTicks,
                                 List<RegionSnapshot.TickRecord> fluidTicks,
-                                List<RegionSnapshot.EntityRecord> entities) {
+                                List<RegionSnapshot.EntityRecord> entities,
+                                List<RegionSnapshot.BiomeRecord> biomes) {
         public SnapshotState {
             blocks = List.copyOf(blocks);
             blockTicks = List.copyOf(blockTicks);
             fluidTicks = List.copyOf(fluidTicks);
             entities = List.copyOf(entities);
+            biomes = List.copyOf(biomes);
+        }
+
+        public SnapshotState(List<RegionSnapshot.BlockRecord> blocks,
+                             List<RegionSnapshot.TickRecord> blockTicks,
+                             List<RegionSnapshot.TickRecord> fluidTicks,
+                             List<RegionSnapshot.EntityRecord> entities) {
+            this(blocks, blockTicks, fluidTicks, entities, List.of());
         }
     }
 }

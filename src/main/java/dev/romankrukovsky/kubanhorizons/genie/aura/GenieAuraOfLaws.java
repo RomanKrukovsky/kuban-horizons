@@ -33,6 +33,16 @@ public final class GenieAuraOfLaws {
                 }
             }
         }
+        // Только что добавленный снаряд может ещё не попасть в section-index.
+        // Отдельно проверяем все отслеживаемые сущности уровня.
+        for (var entity : level.getAllEntities()) {
+            if (entity instanceof Projectile projectile && !projectiles.contains(projectile)
+                    && projectile.distanceToSqr(genie) <= AURA_RADIUS * AURA_RADIUS) {
+                boolean friendly = projectile.getOwner() != null
+                        && (projectile.getOwner() == genie || projectile.getOwner() == genie.getOwner());
+                if (!friendly) projectile.setDeltaMovement(Vec3.ZERO);
+            }
+        }
 
         // 2. Огонь автоматически гаснет
         BlockPos center = genie.blockPosition();

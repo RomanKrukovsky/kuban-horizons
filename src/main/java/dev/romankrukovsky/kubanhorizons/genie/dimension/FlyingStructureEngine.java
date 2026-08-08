@@ -87,15 +87,15 @@ public final class FlyingStructureEngine {
                     tick.delay(), tick.priority()));
         }
         SnapshotService.SnapshotState target = new SnapshotService.SnapshotState(
-                targetBlocks, targetBlockTicks, targetFluidTicks, java.util.List.of());
+                targetBlocks, targetBlockTicks, targetFluidTicks, java.util.List.of(), current.biomes());
         target = normalizeBlockStates(level, closure, target);
         RegionSnapshot currentSnapshot = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
                 new SnapshotId(UUID.randomUUID(), "move_before"), ownerId, Instant.now(), closure,
-                current.blocks(), current.blockTicks(), current.fluidTicks(), current.entities(),
+                current.blocks(), current.blockTicks(), current.fluidTicks(), current.entities(), current.biomes(),
                 SnapshotService.digest(current));
         RegionSnapshot targetSnapshot = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
                 new SnapshotId(UUID.randomUUID(), "flying_house"), ownerId, Instant.now(), closure,
-                target.blocks(), target.blockTicks(), target.fluidTicks(), target.entities(),
+                target.blocks(), target.blockTicks(), target.fluidTicks(), target.entities(), target.biomes(),
                 SnapshotService.digest(target));
         return new MovePlan(currentSnapshot, targetSnapshot, origin);
     }
@@ -116,7 +116,7 @@ public final class FlyingStructureEngine {
                     state.hasBlockEntity() ? record.blockEntity() : null));
         }
         return new SnapshotService.SnapshotState(normalized, target.blockTicks(),
-                target.fluidTicks(), target.entities());
+                target.fluidTicks(), target.entities(), target.biomes());
     }
 
     private static int index(RegionSelection closure, int relativeX, int relativeY, int relativeZ) {

@@ -121,6 +121,13 @@ public final class KHServerConfig {
                     "Включает региональные профессии и сделки поселенцев.")
             .define("trade.enabled", true);
 
+    // --- Джинния: изменения мира ---
+
+    private static final ModConfigSpec.IntValue GENIE_MAX_REGION_VOLUME = BUILDER
+            .comment("Maximum number of blocks the Genie may capture or move in one operation.",
+                    "Максимальное число блоков, которое джинния может захватить или перенести за одну операцию.")
+            .defineInRange("genie.maxRegionVolume", 32768, 64, 1048576);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     private KHServerConfig() {
@@ -198,5 +205,10 @@ public final class KHServerConfig {
 
     public static boolean tradeEnabled() {
         return TRADE_ENABLED.get();
+    }
+
+    /** Лимит объёма региона для операций джиннии (Закон сохранности). */
+    public static int genieMaxRegionVolume() {
+        return GENIE_MAX_REGION_VOLUME.get();
     }
 }

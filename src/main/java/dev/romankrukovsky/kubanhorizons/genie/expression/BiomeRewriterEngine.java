@@ -1,56 +1,58 @@
 package dev.romankrukovsky.kubanhorizons.genie.expression;
 
-import dev.romankrukovsky.kubanhorizons.genie.aura.MagicalSignature;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.RegionSnapshot;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotId;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotService;
+import dev.romankrukovsky.kubanhorizons.worldgen.KHBiomes;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.QuartPos;
-import net.minecraft.network.protocol.game.ClientboundChunksBiomesPacket;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.ChunkPos;
-import dev.romankrukovsky.kubanhorizons.worldgen.KHBiomes;
-import java.util.ArrayList;
-import java.util.List;
 
-/** Движок переписывания свойств биома в реальном времени (Biome Rewriter Engine). */
+/** Строит reversible target локального переписывания биома. */
 public final class BiomeRewriterEngine {
     private BiomeRewriterEngine() {
     }
 
-    public static boolean rewriteLocalBiome(ServerLevel level, BlockPos center) {
-        var biomes = level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.BIOME);
-        var target = biomes.get(KHBiomes.KUBAN_STEPPE).orElse(null);
-        if (target == null) {
-            return false;
-        }
+    public static BiomePlan buildSteppePlan(ServerLevel level, BlockPos center,
+                                            UUID ownerId) throws IOException {
         int radius = 16;
-        ChunkPos min = ChunkPos.containing(center.offset(-radius, 0, -radius));
-        ChunkPos max = ChunkPos.containing(center.offset(radius, 0, radius));
-        List<net.minecraft.world.level.chunk.LevelChunk> changedChunks = new ArrayList<>();
-        for (int chunkX = min.x(); chunkX <= max.x(); chunkX++) {
-            for (int chunkZ = min.z(); chunkZ <= max.z(); chunkZ++) {
-                var chunk = level.getChunk(chunkX, chunkZ);
-                int quartMinX = QuartPos.fromBlock(chunk.getPos().getMinBlockX());
-                int quartMinZ = QuartPos.fromBlock(chunk.getPos().getMinBlockZ());
-                for (int sectionIndex = 0; sectionIndex < chunk.getSections().length; sectionIndex++) {
-                    var section = chunk.getSection(sectionIndex);
-                    int quartMinY = QuartPos.fromSection(chunk.getMinSectionY() + sectionIndex);
-                    section.fillBiomesFromNoise((quartX, quartY, quartZ, sampler) -> {
-                        int blockX = QuartPos.toBlock(quartX) + 2;
-                        int blockZ = QuartPos.toBlock(quartZ) + 2;
-                        int dx = blockX - center.getX();
-                        int dz = blockZ - center.getZ();
-                        return dx * dx + dz * dz <= radius * radius ? target
-                                : section.getNoiseBiome(quartX & 3, quartY & 3, quartZ & 3);
-                    }, null, quartMinX, quartMinY, quartMinZ);
-                }
-                chunk.markUnsaved();
-                changedChunks.add(chunk);
-            }
+        RegionSelection selection = new RegionSelection(level.dimension().identifier().toString(),
+                center.offset(-radius, -2, -radius), center.offset(radius, 2, radius));
+        SnapshotService.SnapshotState current = SnapshotService.captureState(level, selection);
+        String targetId = KHBiomes.KUBAN_STEPPE.identifier().toString();
+        List<RegionSnapshot.BiomeRecord> targetBiomes = current.biomes().stream()
+                .map(record -> {
+                    int blockX = QuartPos.toBlock(record.quartX()) + 2;
+                    int blockZ = QuartPos.toBlock(record.quartZ()) + 2;
+                    int dx = blockX - center.getX();
+                    int dz = blockZ - center.getZ();
+                    return dx * dx + dz * dz <= radius * radius
+                            ? new RegionSnapshot.BiomeRecord(record.quartX(), record.quartY(),
+                                    record.quartZ(), targetId)
+                            : record;
+                }).toList();
+        SnapshotService.SnapshotState target = new SnapshotService.SnapshotState(current.blocks(),
+                current.blockTicks(), current.fluidTicks(), current.entities(), targetBiomes);
+        RegionSnapshot before = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
+                new SnapshotId(UUID.randomUUID(), "biome_before"), ownerId, Instant.now(), selection,
+                current.blocks(), current.blockTicks(), current.fluidTicks(), current.entities(),
+                current.biomes(), SnapshotService.digest(current));
+        RegionSnapshot after = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
+                new SnapshotId(UUID.randomUUID(), "biome_steppe"), ownerId, Instant.now(), selection,
+                target.blocks(), target.blockTicks(), target.fluidTicks(), target.entities(),
+                target.biomes(), SnapshotService.digest(target));
+        if (level.registryAccess().lookupOrThrow(Registries.BIOME).get(KHBiomes.KUBAN_STEPPE).isEmpty()) {
+            throw new IOException("Kuban steppe biome is unavailable");
         }
-        ClientboundChunksBiomesPacket packet = ClientboundChunksBiomesPacket.forChunks(changedChunks);
-        for (var player : level.players()) {
-            player.connection.send(packet);
-        }
-        MagicalSignature.cast(level, net.minecraft.world.phys.Vec3.atCenterOf(center));
-        return true;
+        return new BiomePlan(before, after, center);
+    }
+
+    public record BiomePlan(RegionSnapshot current, RegionSnapshot target, BlockPos center) {
     }
 }

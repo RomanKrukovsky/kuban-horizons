@@ -10,6 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.protocol.game.ClientboundChunksBiomesPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -17,6 +18,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.ticks.ScheduledTick;
@@ -65,10 +68,72 @@ public final class RegionRestorer {
         }
         restoreTicks(level, snapshot, origin);
         restoreEntities(level, snapshot);
+        restoreBiomes(level, snapshot);
         for (RegionSnapshot.BlockRecord record : snapshot.blocks()) {
             BlockPos pos = origin.offset(record.relativeX(), record.relativeY(), record.relativeZ());
             level.updateNeighborsAt(pos, level.getBlockState(pos).getBlock());
         }
+    }
+
+    private static void restoreBiomes(ServerLevel level, RegionSnapshot snapshot) throws IOException {
+        if (snapshot.biomes().isEmpty()) {
+            return;
+        }
+        var biomeRegistry = level.registryAccess().lookupOrThrow(Registries.BIOME);
+        java.util.Map<Long, java.util.Map<QuartCell, net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome>>>
+                bySection = new java.util.LinkedHashMap<>();
+        for (RegionSnapshot.BiomeRecord record : snapshot.biomes()) {
+            Identifier id = Identifier.tryParse(record.biomeId());
+            if (id == null) {
+                throw new IOException("invalid biome id " + record.biomeId());
+            }
+            var key = net.minecraft.resources.ResourceKey.create(Registries.BIOME, id);
+            var holder = biomeRegistry.get(key)
+                    .orElseThrow(() -> new IOException("unknown biome " + record.biomeId()));
+            long sectionKey = net.minecraft.core.SectionPos.asLong(
+                    net.minecraft.core.QuartPos.toSection(record.quartX()),
+                    net.minecraft.core.QuartPos.toSection(record.quartY()),
+                    net.minecraft.core.QuartPos.toSection(record.quartZ()));
+            bySection.computeIfAbsent(sectionKey, ignored -> new java.util.HashMap<>())
+                    .put(new QuartCell(record.quartX() & 3, record.quartY() & 3,
+                            record.quartZ() & 3), holder);
+        }
+        java.util.Set<LevelChunk> changed = new java.util.LinkedHashSet<>();
+        for (var entry : bySection.entrySet()) {
+            var sectionPos = net.minecraft.core.SectionPos.of(entry.getKey());
+            LevelChunk chunk = level.getChunk(sectionPos.x(), sectionPos.z());
+            int sectionIndex = chunk.getSectionIndexFromSectionY(sectionPos.y());
+            if (sectionIndex < 0 || sectionIndex >= chunk.getSections().length) {
+                throw new IOException("biome section lies outside chunk height");
+            }
+            var section = chunk.getSection(sectionIndex);
+            var replacements = entry.getValue();
+            var existing = new java.util.HashMap<QuartCell,
+                    net.minecraft.core.Holder<net.minecraft.world.level.biome.Biome>>();
+            for (int x = 0; x < 4; x++) {
+                for (int y = 0; y < 4; y++) {
+                    for (int z = 0; z < 4; z++) {
+                        existing.put(new QuartCell(x, y, z), section.getNoiseBiome(x, y, z));
+                    }
+                }
+            }
+            section.fillBiomesFromNoise((quartX, quartY, quartZ, sampler) ->
+                    replacements.getOrDefault(new QuartCell(quartX & 3, quartY & 3, quartZ & 3),
+                            existing.get(new QuartCell(quartX & 3, quartY & 3, quartZ & 3))),
+                    null, net.minecraft.core.QuartPos.fromSection(sectionPos.x()),
+                    net.minecraft.core.QuartPos.fromSection(sectionPos.y()),
+                    net.minecraft.core.QuartPos.fromSection(sectionPos.z()));
+            chunk.markUnsaved();
+            changed.add(chunk);
+        }
+        ClientboundChunksBiomesPacket packet = ClientboundChunksBiomesPacket.forChunks(
+                java.util.List.copyOf(changed));
+        for (var player : level.players()) {
+            player.connection.send(packet);
+        }
+    }
+
+    private record QuartCell(int x, int y, int z) {
     }
 
     private static void restoreTicks(ServerLevel level, RegionSnapshot snapshot,
