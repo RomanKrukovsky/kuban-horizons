@@ -9,6 +9,7 @@ import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedPock
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedStructureMove;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedBiomeRewrite;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedDrawing;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedWord;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.plan.PlanGate;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.PreviewService;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.RestorePreview;
@@ -17,6 +18,7 @@ import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.PocketScenePreview
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.StructureMovePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.BiomeRewritePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.DrawingPreview;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.WordPreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.recovery.RecoveryClassifier;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.recovery.RecoveryJournal;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection;
@@ -73,12 +75,15 @@ public final class WishRuntime {
     private final Set<UUID> issuedStructureMoveConfirmations = new HashSet<>();
     private final Set<UUID> issuedBiomeRewriteConfirmations = new HashSet<>();
     private final Set<UUID> issuedDrawingConfirmations = new HashSet<>();
+    private final Set<UUID> issuedWordConfirmations = new HashSet<>();
     private final Map<UUID, dev.romankrukovsky.kubanhorizons.genie.dimension.FlyingStructureEngine.MovePlan>
             pendingStructureMoves = new ConcurrentHashMap<>();
     private final Map<UUID, dev.romankrukovsky.kubanhorizons.genie.expression.BiomeRewriterEngine.BiomePlan>
             pendingBiomeRewrites = new ConcurrentHashMap<>();
     private final Map<UUID, dev.romankrukovsky.kubanhorizons.genie.expression.MagicDrawingHandler.DrawingPlan>
             pendingDrawings = new ConcurrentHashMap<>();
+    private final Map<UUID, dev.romankrukovsky.kubanhorizons.genie.expression.WordMaterializer.WordPlan>
+            pendingWords = new ConcurrentHashMap<>();
     private final MinecraftServer server;
     private volatile boolean ready;
     private volatile String blockedReason = "startup recovery has not run";
@@ -435,6 +440,52 @@ public final class WishRuntime {
         }
         var plan = pendingDrawings.remove(confirmed.preview().previewId());
         if (plan == null) throw new IllegalStateException("drawing plan expired");
+        return restoreService.applyPreparedTarget(player.level(), player.getUUID(),
+                plan.current(), plan.target(), confirmed.preview().previewDigest(), Instant.now());
+    }
+
+    public WordPreview previewWord(ServerPlayer player, String word) throws IOException {
+        requireServerThread();
+        var plan = dev.romankrukovsky.kubanhorizons.genie.expression.WordMaterializer
+                .buildWordPlan(player.level(), player.blockPosition().above(3), word, player.getUUID());
+        ensureReady(plan.current().selection());
+        int changed = 0;
+        for (int index = 0; index < plan.current().blocks().size(); index++) {
+            if (!plan.current().blocks().get(index).blockState()
+                    .equals(plan.target().blocks().get(index).blockState())) changed++;
+        }
+        UUID previewId = UUID.randomUUID();
+        Instant expiresAt = Instant.now().plus(Duration.ofMinutes(2));
+        String previewDigest = digest(previewId + "|" + player.getUUID() + "|"
+                + plan.current().contentDigest() + "|" + plan.target().contentDigest()
+                + "|" + plan.word() + "|" + expiresAt);
+        pendingWords.put(previewId, plan);
+        return new WordPreview(previewId, player.getUUID(), plan.current().selection(), plan.word(),
+                changed, plan.current().contentDigest(), plan.target().contentDigest(),
+                previewDigest, expiresAt);
+    }
+
+    public synchronized ConfirmedWord confirmWord(UUID actor, WordPreview preview) {
+        if (!preview.actorId().equals(actor) || !preview.expiresAt().isAfter(Instant.now())
+                || !pendingWords.containsKey(preview.previewId())) {
+            throw new IllegalArgumentException("word preview is stale or unavailable");
+        }
+        UUID id = UUID.randomUUID();
+        issuedWordConfirmations.add(id);
+        return new ConfirmedWord(id, preview, Instant.now());
+    }
+
+    public TransactionReport executeWord(ServerPlayer player, ConfirmedWord confirmed) throws IOException {
+        requireServerThread();
+        synchronized (this) {
+            if (!confirmed.preview().actorId().equals(player.getUUID())
+                    || !confirmed.preview().expiresAt().isAfter(Instant.now())
+                    || !issuedWordConfirmations.remove(confirmed.confirmationId())) {
+                throw new IllegalArgumentException("word confirmation is invalid or already used");
+            }
+        }
+        var plan = pendingWords.remove(confirmed.preview().previewId());
+        if (plan == null) throw new IllegalStateException("word plan expired");
         return restoreService.applyPreparedTarget(player.level(), player.getUUID(),
                 plan.current(), plan.target(), confirmed.preview().previewDigest(), Instant.now());
     }

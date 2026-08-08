@@ -1972,17 +1972,33 @@ public final class KHGameTests {
 
     /** Материализация строит читаемый набор блоков, а не один декоративный куб. */
     private static void testGenieMaterializedWord(GameTestHelper helper) {
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var player = helper.makeMockServerPlayerInLevel();
         player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(
                 helper.absolutePos(new BlockPos(1, 2, 1))));
-        dev.romankrukovsky.kubanhorizons.genie.expression.WordMaterializer
-                .materializeWord(helper.getLevel(), player, "GOLD");
-        long gold = BlockPos.betweenClosedStream(
-                        helper.absolutePos(new BlockPos(0, 3, 0)),
-                        helper.absolutePos(new BlockPos(20, 10, 3)))
-                .filter(pos -> helper.getLevel().getBlockState(pos).is(Blocks.GOLD_BLOCK)).count();
-        helper.assertTrue(gold >= 20, "Слово GOLD не стало набором букв: блоков " + gold);
-        helper.succeed();
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) runtime.recover();
+        try {
+            var preview = runtime.previewWord(player, "GOLD");
+            helper.assertTrue(preview.changedBlocks() >= 20,
+                    "Preview слова содержит слишком мало блоков");
+            var report = runtime.executeWord(player, runtime.confirmWord(player.getUUID(), preview));
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED,
+                    "Слово не материализовано транзакцией: " + report);
+            long gold = BlockPos.betweenClosedStream(preview.selection().min(), preview.selection().max())
+                    .filter(pos -> helper.getLevel().getBlockState(pos).is(Blocks.GOLD_BLOCK)).count();
+            helper.assertTrue(gold >= 20, "Слово GOLD не стало набором букв: блоков " + gold);
+            var undo = runtime.undo(helper.getLevel(), player.getUUID(), report.transactionId());
+            helper.assertTrue(undo.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED,
+                    "Undo слова не завершился");
+            runtime.retireUndo(player.getUUID(), undo.transactionId());
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Runtime word failed: " + exception.getMessage());
+        }
     }
 
     /** Гибрид действительно летает и светится, свойства сохраняются в NBT сущности. */

@@ -1,9 +1,16 @@
 package dev.romankrukovsky.kubanhorizons.genie.expression;
 
-import dev.romankrukovsky.kubanhorizons.genie.aura.MagicalSignature;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.RegionSnapshot;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotId;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotService;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -12,22 +19,21 @@ public final class WordMaterializer {
     private WordMaterializer() {
     }
 
-    public static void materializeWord(ServerLevel level, Player player, String word) {
+    public static WordPlan buildWordPlan(ServerLevel level, BlockPos origin, String word,
+                                         UUID ownerId) throws IOException {
         String normalized = word == null ? "" : word.trim().toUpperCase(java.util.Locale.ROOT);
-        if (normalized.equals("RAIN") || normalized.equals("ДОЖДЬ")) {
-            level.setRainLevel(1.0F);
-            level.setThunderLevel(0.0F);
-            MagicalSignature.cast(level, player.position());
-            return;
-        }
         normalized = normalized.replaceAll("[^A-ZА-ЯЁ0-9 ]", "");
         if (normalized.isBlank()) {
-            return;
+            throw new IllegalArgumentException("word is empty");
         }
         normalized = normalized.substring(0, Math.min(12, normalized.length()));
         BlockState material = normalized.equals("GOLD") || normalized.equals("ЗОЛОТО")
                 ? Blocks.GOLD_BLOCK.defaultBlockState() : Blocks.AMETHYST_BLOCK.defaultBlockState();
-        BlockPos pos = player.blockPosition().above(3);
+        int width = Math.max(3, normalized.length() * 4 - 1);
+        RegionSelection selection = new RegionSelection(level.dimension().identifier().toString(),
+                origin, origin.offset(width - 1, 4, 0));
+        SnapshotService.SnapshotState current = SnapshotService.captureState(level, selection);
+        var targetBlocks = new ArrayList<RegionSnapshot.BlockRecord>(current.blocks());
         int cursor = 0;
         for (char letter : normalized.toCharArray()) {
             if (letter == ' ') {
@@ -38,13 +44,30 @@ public final class WordMaterializer {
             for (int row = 0; row < 5; row++) {
                 for (int column = 0; column < 3; column++) {
                     if ((glyph[row] & (1 << (2 - column))) != 0) {
-                        level.setBlock(pos.offset(cursor + column, 4 - row, 0), material, 3);
+                        int rx = cursor + column;
+                        int ry = 4 - row;
+                        int index = ry * width + rx;
+                        targetBlocks.set(index, new RegionSnapshot.BlockRecord(rx, ry, 0,
+                                NbtUtils.writeBlockState(material), null));
                     }
                 }
             }
             cursor += 4;
         }
-        MagicalSignature.cast(level, net.minecraft.world.phys.Vec3.atCenterOf(pos));
+        SnapshotService.SnapshotState target = new SnapshotService.SnapshotState(targetBlocks,
+                current.blockTicks(), current.fluidTicks(), current.entities(), current.biomes());
+        RegionSnapshot before = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
+                new SnapshotId(UUID.randomUUID(), "word_before"), ownerId, Instant.now(), selection,
+                current.blocks(), current.blockTicks(), current.fluidTicks(), current.entities(),
+                current.biomes(), SnapshotService.digest(current));
+        RegionSnapshot after = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
+                new SnapshotId(UUID.randomUUID(), "word_materialized"), ownerId, Instant.now(), selection,
+                target.blocks(), target.blockTicks(), target.fluidTicks(), target.entities(),
+                target.biomes(), SnapshotService.digest(target));
+        return new WordPlan(before, after, normalized);
+    }
+
+    public record WordPlan(RegionSnapshot current, RegionSnapshot target, String word) {
     }
 
     private static int[] glyph(char letter) {
