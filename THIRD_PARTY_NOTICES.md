@@ -34,8 +34,6 @@ Minecraft принадлежит Mojang AB / Microsoft. Проект не рас
 | `assets/kubanhorizons/sounds/entity/nutria/death.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/entity/locust/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/entity/locust/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
-| `assets/kubanhorizons/sounds/entity/caucasian_bee/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
-| `assets/kubanhorizons/sounds/entity/caucasian_bee/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/entity/caucasian_shepherd/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/entity/caucasian_shepherd/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/entity/caucasian_shepherd/death.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |

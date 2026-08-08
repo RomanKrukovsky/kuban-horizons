@@ -67,10 +67,6 @@ public final class KHItemTagsProvider extends BlockTagCopyingItemTagProvider {
                 .add(KHItems.RICE_PANICLE.getKey())
                 .add(KHItems.TOMATO.getKey());
         // Пчела: нектароносы — цветущие части растений.
-        tag(ItemTags.create(KHIds.of("caucasian_bee_foods")))
-                .add(KHItems.SUNFLOWER_HEAD.getKey())
-                .add(KHItems.GRAPES.getKey())
-                .add(KHItems.TEA_LEAVES.getKey());
         // Чайка — падальщик побережья: рыба и любые объедки.
         tag(ItemTags.create(KHIds.of("gull_foods")))
                 .add(KHItems.RAW_STURGEON.getKey())

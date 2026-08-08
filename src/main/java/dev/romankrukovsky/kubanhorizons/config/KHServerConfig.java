@@ -102,11 +102,6 @@ public final class KHServerConfig {
                     "Включает половодье в пойме: заливает низкие грядки, обогащая луг.")
             .define("pressure.enableFlooding", true);
 
-    private static final ModConfigSpec.BooleanValue POLLINATION_ENABLED = BUILDER
-            .comment("Enable Caucasian bee pollination yield bonus.",
-                    "Включает бонус к урожаю от опыления кавказской пчелой.")
-            .define("wildlife.enablePollination", true);
-
     // --- Мир ---
 
     private static final ModConfigSpec.BooleanValue WORLDGEN_ENABLED = BUILDER
@@ -195,9 +190,6 @@ public final class KHServerConfig {
         return PRESSURE_ENABLED.get() && FLOODING_ENABLED.get();
     }
 
-    public static boolean pollinationEnabled() {
-        return POLLINATION_ENABLED.get();
-    }
 
     public static boolean worldgenEnabled() {
         return WORLDGEN_ENABLED.get();

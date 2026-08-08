@@ -39,7 +39,6 @@ final class KHEntityLoot extends EntityLootSubProvider {
                 KHEntities.WILD_BOAR.get(),
                 KHEntities.NUTRIA.get(),
                 KHEntities.LOCUST.get(),
-                KHEntities.CAUCASIAN_BEE.get(),
                 KHEntities.CAUCASIAN_SHEPHERD.get(),
                 KHEntities.STURGEON.get(),
                 KHEntities.GULL.get(),
@@ -70,7 +69,6 @@ final class KHEntityLoot extends EntityLootSubProvider {
         // мелка, пчела и овчарка — не добыча. Таблица всё равно нужна: без неё
         // датаген падает, а сущность считается недоделанной.
         add(KHEntities.LOCUST.get(), LootTable.lootTable());
-        add(KHEntities.CAUCASIAN_BEE.get(), LootTable.lootTable());
         add(KHEntities.CAUCASIAN_SHEPHERD.get(), LootTable.lootTable());
     }
 

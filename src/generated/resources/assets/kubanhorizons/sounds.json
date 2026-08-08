@@ -17,18 +17,6 @@
     ],
     "subtitle": "subtitles.kubanhorizons.oil_press.work"
   },
-  "entity_caucasian_bee_ambient": {
-    "sounds": [
-      "kubanhorizons:entity/caucasian_bee/ambient"
-    ],
-    "subtitle": "subtitles.kubanhorizons.caucasian_bee.ambient"
-  },
-  "entity_caucasian_bee_hurt": {
-    "sounds": [
-      "kubanhorizons:entity/caucasian_bee/hurt"
-    ],
-    "subtitle": "subtitles.kubanhorizons.caucasian_bee.hurt"
-  },
   "entity_caucasian_shepherd_ambient": {
     "sounds": [
       "kubanhorizons:entity/caucasian_shepherd/ambient"

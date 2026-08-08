@@ -391,10 +391,6 @@ public final class KHItems {
             ITEMS.registerItem("nutria_spawn_egg", SpawnEggItem::new,
                     p -> p.component(DataComponents.ENTITY_DATA,
                             TypedEntityData.of(KHEntities.NUTRIA.get(), new net.minecraft.nbt.CompoundTag())));
-    public static final DeferredItem<SpawnEggItem> CAUCASIAN_BEE_SPAWN_EGG =
-            ITEMS.registerItem("caucasian_bee_spawn_egg", SpawnEggItem::new,
-                    p -> p.component(DataComponents.ENTITY_DATA,
-                            TypedEntityData.of(KHEntities.CAUCASIAN_BEE.get(), new net.minecraft.nbt.CompoundTag())));
     public static final DeferredItem<SpawnEggItem> CAUCASIAN_SHEPHERD_SPAWN_EGG =
             ITEMS.registerItem("caucasian_shepherd_spawn_egg", SpawnEggItem::new,
                     p -> p.component(DataComponents.ENTITY_DATA,

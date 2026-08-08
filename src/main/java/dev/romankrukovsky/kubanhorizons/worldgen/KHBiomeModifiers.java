@@ -41,8 +41,6 @@ public final class KHBiomeModifiers {
             createKey("add_wild_boar_spawns");
     public static final ResourceKey<BiomeModifier> ADD_NUTRIA_SPAWNS =
             createKey("add_nutria_spawns");
-    public static final ResourceKey<BiomeModifier> ADD_CAUCASIAN_BEE_SPAWNS =
-            createKey("add_caucasian_bee_spawns");
     public static final ResourceKey<BiomeModifier> ADD_GULL_SPAWNS =
             createKey("add_gull_spawns");
     public static final ResourceKey<BiomeModifier> ADD_HERON_SPAWNS =
@@ -132,15 +130,6 @@ public final class KHBiomeModifiers {
 
         // Пчела: цветущая степь и предгорья. Единственный полезный агент
         // давления, поэтому вес высокий — её должно быть легко найти.
-        context.register(ADD_CAUCASIAN_BEE_SPAWNS,
-                BiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(
-                        HolderSet.direct(
-                                biomes.getOrThrow(KHBiomes.KUBAN_STEPPE),
-                                biomes.getOrThrow(Biomes.MEADOW),
-                                biomes.getOrThrow(Biomes.SUNFLOWER_PLAINS),
-                                biomes.getOrThrow(Biomes.FLOWER_FOREST)),
-                        new Weighted<>(new MobSpawnSettings.SpawnerData(
-                                KHEntities.CAUCASIAN_BEE.get(), 2, 4), 10)));
 
         // Чайка: побережья и лиманы — примета берега.
         context.register(ADD_GULL_SPAWNS, BiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(

@@ -145,7 +145,6 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.WILD_BOAR_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.NUTRIA_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.LOCUST_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
-        itemModels.generateFlatItem(KHItems.CAUCASIAN_BEE_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.CAUCASIAN_SHEPHERD_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.STURGEON_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.GULL_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);

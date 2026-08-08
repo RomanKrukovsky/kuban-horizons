@@ -32,11 +32,6 @@ public final class KHAttachments {
             ATTACHMENTS.register("chunk_fertility",
                     () -> AttachmentType.serializable(ChunkFertilityData::new).build());
 
-    /** Метки опыления грядок чанка. Пустая карта не сериализуется. */
-    public static final Supplier<AttachmentType<dev.romankrukovsky.kubanhorizons.soil.ChunkPollinationData>> CHUNK_POLLINATION =
-            ATTACHMENTS.register("chunk_pollination",
-                    () -> AttachmentType.serializable(
-                            dev.romankrukovsky.kubanhorizons.soil.ChunkPollinationData::new).build());
 
     /** Память мира о Кубанской Джиннии. */
     public static final Supplier<AttachmentType<WorldGenieMemory>> GENIE_WORLD_MEMORY =

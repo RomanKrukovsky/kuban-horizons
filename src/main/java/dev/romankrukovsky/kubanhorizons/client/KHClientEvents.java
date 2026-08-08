@@ -47,8 +47,6 @@ public final class KHClientEvents {
     /** Насекомые: одна сетка, разные пропорции брюшка и ног. */
     public static final ModelLayerLocation LOCUST_LAYER =
             new ModelLayerLocation(KHIds.of("locust"), "main");
-    public static final ModelLayerLocation CAUCASIAN_BEE_LAYER =
-            new ModelLayerLocation(KHIds.of("caucasian_bee"), "main");
     /** Водные птицы: чайка летает, цапля стоит на ходулях. */
     public static final ModelLayerLocation GULL_LAYER =
             new ModelLayerLocation(KHIds.of("gull"), "main");
@@ -83,8 +81,6 @@ public final class KHClientEvents {
         event.registerLayerDefinition(LOCUST_LAYER,
                 () -> InsectModel.createBodyLayer(6, 3));
         // Пчела: короче и с короткими лапками.
-        event.registerLayerDefinition(CAUCASIAN_BEE_LAYER,
-                () -> InsectModel.createBodyLayer(4, 2));
         event.registerLayerDefinition(GULL_LAYER, GullModel::createBodyLayer);
         event.registerLayerDefinition(HERON_LAYER, HeronModel::createBodyLayer);
         event.registerLayerDefinition(STURGEON_LAYER, SturgeonModel::createBodyLayer);
@@ -109,9 +105,6 @@ public final class KHClientEvents {
         event.registerEntityRenderer(KHEntities.NUTRIA.get(), NutriaRenderer::new);
         event.registerEntityRenderer(KHEntities.LOCUST.get(),
                 context -> new InsectRenderer(context, LOCUST_LAYER, "locust"));
-        event.registerEntityRenderer(KHEntities.CAUCASIAN_BEE.get(),
-                context -> new InsectRenderer(context, CAUCASIAN_BEE_LAYER,
-                        "caucasian_bee"));
         event.registerEntityRenderer(KHEntities.GULL.get(),
                 context -> new WaterBirdRenderer(context, GULL_LAYER, "gull",
                         0.3F, true));

@@ -44,8 +44,6 @@ public final class KHSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> NUTRIA_DEATH = register("entity.nutria.death");
     public static final DeferredHolder<SoundEvent, SoundEvent> LOCUST_AMBIENT = register("entity.locust.ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> LOCUST_HURT = register("entity.locust.hurt");
-    public static final DeferredHolder<SoundEvent, SoundEvent> CAUCASIAN_BEE_AMBIENT = register("entity.caucasian_bee.ambient");
-    public static final DeferredHolder<SoundEvent, SoundEvent> CAUCASIAN_BEE_HURT = register("entity.caucasian_bee.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> CAUCASIAN_SHEPHERD_AMBIENT = register("entity.caucasian_shepherd.ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> CAUCASIAN_SHEPHERD_HURT = register("entity.caucasian_shepherd.hurt");
     public static final DeferredHolder<SoundEvent, SoundEvent> CAUCASIAN_SHEPHERD_DEATH = register("entity.caucasian_shepherd.death");

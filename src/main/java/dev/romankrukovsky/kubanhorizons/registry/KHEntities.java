@@ -88,14 +88,6 @@ public final class KHEntities {
                     .clientTrackingRange(8)
                     .build(key("locust")));
 
-    /** Кавказская пчела: опыление и медовая цепочка. */
-    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.CaucasianBee>> CAUCASIAN_BEE =
-            ENTITIES.register("caucasian_bee", () -> EntityType.Builder
-                    .of(dev.romankrukovsky.kubanhorizons.entity.CaucasianBee::new, MobCategory.CREATURE)
-                    .sized(0.4F, 0.4F)
-                    .eyeHeight(0.3F)
-                    .clientTrackingRange(8)
-                    .build(key("caucasian_bee")));
 
     /**
      * Кавказская овчарка: ответ игрока на давление.

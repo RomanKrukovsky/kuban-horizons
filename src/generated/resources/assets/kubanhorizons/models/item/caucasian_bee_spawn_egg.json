@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "kubanhorizons:item/caucasian_bee_spawn_egg"
-  }
-}

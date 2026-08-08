@@ -72,7 +72,6 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.WILD_BOAR_SPAWN_EGG.get());
                         output.accept(KHItems.NUTRIA_SPAWN_EGG.get());
                         output.accept(KHItems.LOCUST_SPAWN_EGG.get());
-                        output.accept(KHItems.CAUCASIAN_BEE_SPAWN_EGG.get());
                         output.accept(KHItems.CAUCASIAN_SHEPHERD_SPAWN_EGG.get());
                         output.accept(KHItems.STURGEON_SPAWN_EGG.get());
                         output.accept(KHItems.GULL_SPAWN_EGG.get());

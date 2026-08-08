@@ -123,8 +123,6 @@ public final class KHGameTests {
         // Давление на хозяйство: механики, уничтожающие собственность игрока.
         register("nutria_gnaws_only_wooden_channel",
                 KHGameTests::testNutriaGnawsOnlyWoodenChannel, 220);
-        register("pollination_mark_lifecycle",
-                KHGameTests::testPollinationMarkLifecycle, 100);
         register("dry_wind_spares_watered_and_sheltered",
                 KHGameTests::testDryWindSparesWateredAndSheltered, 100);
         register("flooding_washes_crop_but_enriches_soil",
@@ -800,7 +798,6 @@ public final class KHGameTests {
     private static void testFaunaNaturalSpawns(GameTestHelper helper) {
         assertSpawnsIn(helper, KHBiomes.KUBAN_STEPPE, KHEntities.PHEASANT.get());
         assertSpawnsIn(helper, KHBiomes.KUBAN_STEPPE, KHEntities.QUAIL.get());
-        assertSpawnsIn(helper, KHBiomes.KUBAN_STEPPE, KHEntities.CAUCASIAN_BEE.get());
         assertSpawnsIn(helper, KHBiomes.PLAVNI, KHEntities.NUTRIA.get());
         assertSpawnsIn(helper, KHBiomes.PLAVNI, KHEntities.HERON.get());
         assertSpawnsIn(helper, KHBiomes.LIMAN, KHEntities.NUTRIA.get());
@@ -847,7 +844,6 @@ public final class KHGameTests {
         assertTagNotEmpty(helper, "ground_bird_foods");
         assertTagNotEmpty(helper, "wild_boar_foods");
         assertTagNotEmpty(helper, "nutria_foods");
-        assertTagNotEmpty(helper, "caucasian_bee_foods");
         assertTagNotEmpty(helper, "gull_foods");
         assertTagNotEmpty(helper, "heron_foods");
         assertTagNotEmpty(helper, "caucasian_shepherd_foods");
@@ -2490,40 +2486,6 @@ public final class KHGameTests {
             nutria.discard();
             helper.succeed();
         });
-    }
-
-    /**
-     * Опыление: метка ставится, читается и снимается.
-     *
-     * <p>Проверяется публичный контракт {@link dev.romankrukovsky.kubanhorizons.soil.Pollination},
-     * а не полёт пчелы: сама пчела ставит метку по таймеру, и тест на её
-     * перемещение проверял бы навигацию, а не бонус к урожаю.</p>
-     */
-    private static void testPollinationMarkLifecycle(GameTestHelper helper) {
-        if (!dev.romankrukovsky.kubanhorizons.config.KHServerConfig.pollinationEnabled()) {
-            helper.succeed();
-            return;
-        }
-        ServerLevel level = helper.getLevel();
-        BlockPos cropPos = preparedFarmland(helper, new BlockPos(1, 1, 1));
-        BlockPos soil = helper.absolutePos(cropPos.below());
-
-        helper.assertTrue(
-                !dev.romankrukovsky.kubanhorizons.soil.Pollination.isPollinated(level, soil),
-                "Свежая грядка не должна считаться опылённой");
-
-        dev.romankrukovsky.kubanhorizons.soil.Pollination.mark(level, soil);
-        helper.assertTrue(
-                dev.romankrukovsky.kubanhorizons.soil.Pollination.isPollinated(level, soil),
-                "Метка опыления не поставилась: бонус к урожаю недостижим");
-
-        // Снятие метки: опыление — разовый бонус за визит пчелы, а не
-        // постоянное свойство грядки.
-        dev.romankrukovsky.kubanhorizons.soil.Pollination.consume(level, soil);
-        helper.assertTrue(
-                !dev.romankrukovsky.kubanhorizons.soil.Pollination.isPollinated(level, soil),
-                "Метка не снялась после сбора: бонус стал бы бесконечным");
-        helper.succeed();
     }
 
     /**

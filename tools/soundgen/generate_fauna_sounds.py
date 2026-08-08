@@ -3,11 +3,10 @@
 """
 Генератор голосов фауны давления Kuban Horizons и погодных звуков.
 
-Синтезирует двадцать звуков полностью программно, без сторонних сэмплов:
+Синтезирует девятнадцать звуков полностью программно, без сторонних сэмплов:
   кабан    — ambient (низкое хрюканье), hurt, death
   нутрия   — ambient (писк грызуна), hurt, death
   саранча  — ambient (сухая стридуляция), hurt
-  пчела    — ambient (жужжание), hurt
   овчарка  — ambient (низкий лай), hurt, death
   осётр    — flop (шлепок мокрой рыбы)
   чайка    — ambient (резкий хохочущий крик), hurt
@@ -220,40 +219,6 @@ def locust_hurt() -> np.ndarray:
 
 
 # ----------------------------------------------------------------------------
-# Кавказская пчела: тональное жужжание с биением крыльев
-# ----------------------------------------------------------------------------
-
-def bee_ambient() -> np.ndarray:
-    """Жужжание: низкая гармоническая основа + амплитудное биение ~28 Гц."""
-    dur = 1.40
-    t = t_axis(dur)
-    base = 212.0
-    # Лёгкий дрейф частоты: живая пчела не держит тон идеально.
-    f = base * (1.0 + 0.03 * np.sin(2 * np.pi * 1.7 * t)
-                + 0.015 * np.sin(2 * np.pi * 4.3 * t))
-    phase = 2 * np.pi * np.cumsum(f) / SR
-    sig = np.zeros_like(t)
-    for h in range(1, 8):
-        sig += np.sin(h * phase) / (h ** 1.25)
-    # Биение крыла: жужжание пульсирует, а не гудит ровно.
-    sig *= 0.72 + 0.28 * np.sin(2 * np.pi * 28.0 * t)
-    # Шумовая шероховатость крыла.
-    sig += 0.12 * fft_bandpass(rng.standard_normal(len(t)), 1400.0, 4200.0)
-    # Плавный вход-выход: пчела пролетает мимо.
-    env = np.minimum(1.0, np.minimum(t / 0.18, (dur - t) / 0.30))
-    return normalize(apply_fades(sig * env))
-
-
-def bee_hurt() -> np.ndarray:
-    out = np.zeros(int(0.26 * SR))
-    # Резкий срыв жужжания вверх.
-    place(out, syllable(0.16, 520.0, 240.0, harmonics=6, attack=0.002,
-                        vibrato=0.10, rasp=0.3,
-                        rasp_lo=200.0, rasp_hi=1200.0), 0.01)
-    return normalize(apply_fades(out))
-
-
-# ----------------------------------------------------------------------------
 # Кавказская овчарка: крупная собака, низкий резкий лай
 # ----------------------------------------------------------------------------
 
@@ -422,8 +387,6 @@ def main() -> None:
         "entity/nutria/death.ogg": nutria_death(),
         "entity/locust/ambient.ogg": locust_ambient(),
         "entity/locust/hurt.ogg": locust_hurt(),
-        "entity/caucasian_bee/ambient.ogg": bee_ambient(),
-        "entity/caucasian_bee/hurt.ogg": bee_hurt(),
         "entity/caucasian_shepherd/ambient.ogg": shepherd_ambient(),
         "entity/caucasian_shepherd/hurt.ogg": shepherd_hurt(),
         "entity/caucasian_shepherd/death.ogg": shepherd_death(),

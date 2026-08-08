@@ -50,8 +50,6 @@ public final class KHSoundDefinitionsProvider extends SoundDefinitionsProvider {
         bird("nutria", KHSounds.NUTRIA_DEATH.get(), "death");
         bird("locust", KHSounds.LOCUST_AMBIENT.get(), "ambient");
         bird("locust", KHSounds.LOCUST_HURT.get(), "hurt");
-        bird("caucasian_bee", KHSounds.CAUCASIAN_BEE_AMBIENT.get(), "ambient");
-        bird("caucasian_bee", KHSounds.CAUCASIAN_BEE_HURT.get(), "hurt");
         bird("caucasian_shepherd", KHSounds.CAUCASIAN_SHEPHERD_AMBIENT.get(), "ambient");
         bird("caucasian_shepherd", KHSounds.CAUCASIAN_SHEPHERD_HURT.get(), "hurt");
         bird("caucasian_shepherd", KHSounds.CAUCASIAN_SHEPHERD_DEATH.get(), "death");

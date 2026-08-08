@@ -132,7 +132,6 @@ final class KHTranslations {
         add("entity.kubanhorizons.wild_boar", "Wild Boar", "Дикий кабан");
         add("entity.kubanhorizons.nutria", "Nutria", "Нутрия");
         add("entity.kubanhorizons.locust", "Locust", "Саранча");
-        add("entity.kubanhorizons.caucasian_bee", "Caucasian Bee", "Кавказская пчела");
         add("entity.kubanhorizons.caucasian_shepherd", "Caucasian Shepherd",
                 "Кавказская овчарка");
         add("entity.kubanhorizons.sturgeon", "Sturgeon", "Осётр");
@@ -153,8 +152,6 @@ final class KHTranslations {
                 "Яйцо появления нутрии");
         add("item.kubanhorizons.locust_spawn_egg", "Locust Spawn Egg",
                 "Яйцо появления саранчи");
-        add("item.kubanhorizons.caucasian_bee_spawn_egg", "Caucasian Bee Spawn Egg",
-                "Яйцо появления кавказской пчелы");
         add("item.kubanhorizons.caucasian_shepherd_spawn_egg", "Caucasian Shepherd Spawn Egg",
                 "Яйцо появления кавказской овчарки");
         add("item.kubanhorizons.sturgeon_spawn_egg", "Sturgeon Spawn Egg",
@@ -593,8 +590,6 @@ final class KHTranslations {
         add("subtitles.kubanhorizons.nutria.death", "Nutria dies", "Нутрия умирает");
         add("subtitles.kubanhorizons.locust.ambient", "Locust rasps", "Саранча стрекочет");
         add("subtitles.kubanhorizons.locust.hurt", "Locust crunches", "Саранча хрустит");
-        add("subtitles.kubanhorizons.caucasian_bee.ambient", "Bee buzzes", "Пчела жужжит");
-        add("subtitles.kubanhorizons.caucasian_bee.hurt", "Bee hurts", "Пчеле больно");
         add("subtitles.kubanhorizons.caucasian_shepherd.ambient", "Shepherd barks",
                 "Овчарка лает");
         add("subtitles.kubanhorizons.caucasian_shepherd.hurt", "Shepherd yelps",
