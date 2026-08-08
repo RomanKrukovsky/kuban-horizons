@@ -5,12 +5,14 @@ import java.util.Objects;
 import java.util.UUID;
 
 public record PolicyPreview(UUID previewId, UUID actorId, String ruleId,
-                            boolean beforeValue, boolean targetValue,
+                            String beforeValue, String targetValue,
                             Instant expiresAt) {
     public PolicyPreview {
         Objects.requireNonNull(previewId, "previewId");
         Objects.requireNonNull(actorId, "actorId");
         Objects.requireNonNull(ruleId, "ruleId");
+        Objects.requireNonNull(beforeValue, "beforeValue");
+        Objects.requireNonNull(targetValue, "targetValue");
         Objects.requireNonNull(expiresAt, "expiresAt");
     }
 }

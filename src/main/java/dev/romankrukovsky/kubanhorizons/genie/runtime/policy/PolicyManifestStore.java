@@ -73,8 +73,8 @@ public final class PolicyManifestStore {
         tag.putString("TransactionId", value.transactionId().toString());
         tag.putString("ActorId", value.actorId().toString());
         tag.putString("RuleId", value.ruleId());
-        tag.putBoolean("Before", value.beforeValue());
-        tag.putBoolean("Target", value.targetValue());
+        tag.putString("Before", value.beforeValue());
+        tag.putString("Target", value.targetValue());
         tag.putLong("CreatedSecond", value.createdAt().getEpochSecond());
         tag.putString("State", value.state().name());
         return tag;
@@ -85,7 +85,7 @@ public final class PolicyManifestStore {
             if (tag.getIntOr("SchemaVersion", -1) != SCHEMA) throw new IOException("unsupported policy schema");
             return new PolicyManifest(UUID.fromString(tag.getStringOr("TransactionId", "")),
                     UUID.fromString(tag.getStringOr("ActorId", "")), tag.getStringOr("RuleId", ""),
-                    tag.getBooleanOr("Before", false), tag.getBooleanOr("Target", false),
+                    tag.getStringOr("Before", "false"), tag.getStringOr("Target", "false"),
                     Instant.ofEpochSecond(tag.getLongOr("CreatedSecond", 0L)),
                     PolicyManifest.PolicyState.valueOf(tag.getStringOr("State", "PREPARED")));
         } catch (IllegalArgumentException exception) {

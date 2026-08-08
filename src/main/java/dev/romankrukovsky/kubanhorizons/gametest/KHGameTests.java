@@ -142,6 +142,7 @@ public final class KHGameTests {
         register("genie_defense_irony", KHGameTests::testGenieDefenseIrony, 100);
         register("genie_phantom_death", KHGameTests::testGeniePhantomDeath, 100);
         register("genie_meta_rules", KHGameTests::testGenieMetaRules, 100);
+        register("genie_weather_policy", KHGameTests::testGenieWeatherPolicy, 100);
         register("genie_gigantism_engine", KHGameTests::testGenieGigantismEngine, 100);
         register("genie_world_memory", KHGameTests::testGenieWorldMemory, 100);
         register("genie_inviolability", KHGameTests::testGenieInviolabilityAndKillIntercept, 100);
@@ -318,6 +319,34 @@ public final class KHGameTests {
             helper.succeed();
         } catch (IOException | RuntimeException exception) {
             helper.fail("Policy runtime failed: " + exception.getMessage());
+        }
+    }
+
+    /** Погода проходит durable policy lifecycle и возвращается undo. */
+    private static void testGenieWeatherPolicy(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        helper.getLevel().setRainLevel(0.0F);
+        helper.getLevel().setThunderLevel(0.0F);
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) runtime.recover();
+        try {
+            var preview = runtime.previewWeather(player.getUUID(), 1.0F, 0.0F);
+            helper.assertTrue(helper.getLevel().getRainLevel(1.0F) == 0.0F,
+                    "Weather preview изменил уровень дождя");
+            var report = runtime.executePolicy(player.getUUID(),
+                    runtime.confirmPolicy(player.getUUID(), preview));
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && helper.getLevel().getRainLevel(1.0F) == 1.0F,
+                    "Weather policy не включила дождь");
+            runtime.undoPolicy(player.getUUID(), report.transactionId());
+            helper.assertTrue(helper.getLevel().getRainLevel(1.0F) == 0.0F,
+                    "Weather undo не вернул ясную погоду");
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Weather policy failed: " + exception.getMessage());
         }
     }
 

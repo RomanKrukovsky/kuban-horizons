@@ -502,6 +502,11 @@ public final class WishRuntime {
         return policyService.previewMobGriefing(actor, server, target);
     }
 
+    public PolicyPreview previewWeather(UUID actor, float rain, float thunder) {
+        requireServerThread();
+        return policyService.previewWeather(actor, server, rain, thunder);
+    }
+
     public ConfirmedPolicy confirmPolicy(UUID actor, PolicyPreview preview) {
         return policyService.confirm(actor, preview);
     }
