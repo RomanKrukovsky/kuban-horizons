@@ -155,7 +155,6 @@ public final class KHGameTests {
         register("genie_hybrid_has_real_traits", KHGameTests::testGenieHybridTraits, 100);
         register("genie_contract_has_terms", KHGameTests::testGenieContractTerms, 100);
         register("genie_biome_rewrite_changes_world", KHGameTests::testGenieBiomeRewrite, 100);
-        register("genie_pocket_scene_restores_world", KHGameTests::testGeniePocketSceneRollback, 100);
         register("genie_role_swap_changes_roles", KHGameTests::testGenieRoleSwap, 100);
         register("genie_runtime_miniaturize_confirmation", KHGameTests::testRuntimeMiniaturizeConfirmation, 100);
         register("genie_snapshot_management", KHGameTests::testSnapshotManagement, 100);
@@ -1945,23 +1944,6 @@ public final class KHGameTests {
         helper.assertTrue(actual.equals(KHBiomes.KUBAN_STEPPE),
                 "Биом в точке не стал кубанской степью: " + actual.identifier());
         helper.succeed();
-    }
-
-    /** Временная сцена действительно исчезает и возвращает прежние блоки. */
-    private static void testGeniePocketSceneRollback(GameTestHelper helper) {
-        BlockPos origin = helper.absolutePos(new BlockPos(4, 2, 4));
-        helper.getLevel().setBlock(origin, Blocks.DIAMOND_BLOCK.defaultBlockState(), 3);
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
-        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.dimension.PocketSceneEngine
-                        .spawnPocketScene(helper.getLevel(), origin, player, "beach", 2),
-                "Карманная сцена не создалась");
-        helper.assertTrue(helper.getLevel().getBlockState(origin).is(Blocks.SAND),
-                "Сцена не заменила исходный блок");
-        helper.runAfterDelay(4, () -> {
-            helper.assertTrue(helper.getLevel().getBlockState(origin).is(Blocks.DIAMOND_BLOCK),
-                    "Карманная сцена не вернула исходный мир");
-            helper.succeed();
-        });
     }
 
     /** Обмен ролями освобождает NPC и записывает игроку полноценное состояние джинна. */

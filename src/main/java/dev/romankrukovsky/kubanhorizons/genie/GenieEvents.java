@@ -19,7 +19,6 @@ public final class GenieEvents {
         if (event.getLevel() instanceof ServerLevel level) {
             WishborneDefenseHandler.tickServer(level);
             PhantomDeathController.tickServer(level);
-            dev.romankrukovsky.kubanhorizons.genie.dimension.PocketSceneEngine.tickServer(level);
             for (var player : level.players()) {
                 dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieTransformationController
                         .tickTransformation(level, player);
