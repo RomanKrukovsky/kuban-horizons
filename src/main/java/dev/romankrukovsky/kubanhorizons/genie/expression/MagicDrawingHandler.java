@@ -12,7 +12,23 @@ public final class MagicDrawingHandler {
     }
 
     public static void materializeDrawing(ServerLevel level, Player player, BlockPos startPos, BlockPos endPos) {
-        level.setBlock(endPos, Blocks.OAK_PLANKS.defaultBlockState(), 3);
+        int dx = endPos.getX() - startPos.getX();
+        int dy = endPos.getY() - startPos.getY();
+        int dz = endPos.getZ() - startPos.getZ();
+        int steps = Math.max(Math.abs(dx), Math.max(Math.abs(dy), Math.abs(dz)));
+        if (steps > 64) {
+            return;
+        }
+        for (int step = 0; step <= steps; step++) {
+            double progress = steps == 0 ? 0.0D : (double) step / steps;
+            BlockPos pos = new BlockPos(
+                    startPos.getX() + (int) Math.round(dx * progress),
+                    startPos.getY() + (int) Math.round(dy * progress),
+                    startPos.getZ() + (int) Math.round(dz * progress));
+            if (level.isEmptyBlock(pos)) {
+                level.setBlock(pos, Blocks.OAK_PLANKS.defaultBlockState(), 3);
+            }
+        }
         MagicalSignature.cast(level, net.minecraft.world.phys.Vec3.atCenterOf(endPos));
     }
 }

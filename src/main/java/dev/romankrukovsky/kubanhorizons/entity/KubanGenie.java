@@ -3,6 +3,7 @@ package dev.romankrukovsky.kubanhorizons.entity;
 import dev.romankrukovsky.kubanhorizons.genie.GeniePersonality;
 import dev.romankrukovsky.kubanhorizons.genie.GenieBrain;
 import dev.romankrukovsky.kubanhorizons.genie.GenieDecision;
+import dev.romankrukovsky.kubanhorizons.genie.WishborneState;
 import dev.romankrukovsky.kubanhorizons.genie.aura.EmotionalAuraEngine;
 import dev.romankrukovsky.kubanhorizons.genie.aura.KubanSteppeResonance;
 import dev.romankrukovsky.kubanhorizons.genie.defense.WishborneDefenseHandler;
@@ -70,6 +71,7 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
     private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
     private final GeniePersonality personality = new GeniePersonality();
     private final GenieBrain brain = new GenieBrain();
+    private final WishborneState wishborneState = new WishborneState();
     private UUID ownerId;
 
     public KubanGenie(EntityType<? extends PathfinderMob> type, Level level) {
@@ -111,6 +113,11 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
     @Override
     protected void customServerAiStep(ServerLevel level) {
         super.customServerAiStep(level);
+
+        if (!wishborneState.canAct()) {
+            getNavigation().stop();
+            return;
+        }
 
         if (tickCount % 20 == 0) {
             EmotionalAuraEngine.tickAura(this, level);
@@ -379,12 +386,22 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
         return ownerId != null && ownerId.equals(player.getUUID());
     }
 
+    /** Освобождает социальную связь; истинная Wishborne-личность не меняется. */
+    public void releaseOwner() {
+        ownerId = null;
+        getNavigation().stop();
+    }
+
     public GeniePersonality personality() {
         return personality;
     }
 
     public GenieBrain brain() {
         return brain;
+    }
+
+    public WishborneState wishborneState() {
+        return wishborneState;
     }
 
     @Override
@@ -396,6 +413,7 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
         }
         personality.save(output.child("Personality"));
         brain.save(output.child("Brain"));
+        wishborneState.save(output.child("WishborneState"));
     }
 
     @Override
@@ -409,6 +427,7 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
         }
         personality.load(input.childOrEmpty("Personality"));
         brain.load(input.childOrEmpty("Brain"));
+        wishborneState.load(input.childOrEmpty("WishborneState"));
     }
 
     @Override

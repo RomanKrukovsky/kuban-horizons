@@ -91,6 +91,17 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_copper", this.has(Items.COPPER_INGOT))
                 .save(this.output);
 
+        // Магическое зеркало — двухточечный инструмент безопасных снимков области.
+        this.shaped(RecipeCategory.TOOLS, KHItems.MAGIC_MIRROR.get())
+                .pattern("AGA")
+                .pattern("GPG")
+                .pattern("AGA")
+                .define('A', Items.AMETHYST_SHARD)
+                .define('G', Items.GOLD_INGOT)
+                .define('P', Items.ENDER_PEARL)
+                .unlockedBy("has_amethyst", this.has(Items.AMETHYST_SHARD))
+                .save(this.output);
+
         // Початок → зёрна (2 шт.).
         this.shapeless(RecipeCategory.MISC, KHItems.CORN_KERNELS.get(), 2)
                 .requires(KHItems.CORN_COB.get())

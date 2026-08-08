@@ -282,6 +282,10 @@ final class KHTranslations {
         add("item.kubanhorizons.sonic_boom_item", "Frozen Sonic Wave", "Застывший звуковой вал");
         add("item.kubanhorizons.magic_mirror", "Magic Mirror", "Магическое зеркало");
         add("item.kubanhorizons.miniature_world", "Miniature Pocket World", "Сжатый карманный мир");
+        add("item.kubanhorizons.wish_contract", "Wish Contract", "Контракт желания");
+        add("message.kubanhorizons.genie.lamp.unbound",
+                "This lamp is not bound to a Genie identity.",
+                "Эта лампа не связана с личностью джинна.");
 
         // --- Желания без слов, память и шёпот блоков ---
         add("message.kubanhorizons.genie.wordless.farmland",
@@ -505,6 +509,62 @@ final class KHTranslations {
                 "Экономика поселения преобразована магией.");
 
         add("message.kubanhorizons.genie.ai.reply", "Genie: %s", "Джинния: %s");
+        add("message.kubanhorizons.genie.runtime.snapshot_created",
+                "Snapshot '%s' published: %s blocks in %s chunks.",
+                "Снимок «%s» опубликован: %s блоков в %s чанках.");
+        add("message.kubanhorizons.genie.runtime.snapshot_list_header",
+                "Your snapshots: %s.", "Ваши снимки: %s.");
+        add("message.kubanhorizons.genie.runtime.snapshot_list_entry",
+                "- %s: %s blocks, %s chunks, %s.",
+                "- %s: %s блоков, %s чанков, %s.");
+        add("message.kubanhorizons.genie.runtime.snapshot_inspect",
+                "Snapshot %s (%s): %s blocks, %s chunks, %s, captured %s.",
+                "Снимок %s (%s): %s блоков, %s чанков, %s, создан %s.");
+        add("message.kubanhorizons.genie.runtime.snapshot_deleted",
+                "Snapshot '%s' deleted.", "Снимок «%s» удалён.");
+        add("message.kubanhorizons.genie.runtime.miniaturize_preview",
+                "Miniaturize: %s non-air blocks, %s block entities, %s entities. Risk: %s.",
+                "Миниатюризация: %s непустых блоков, %s блочных сущностей, %s сущностей. Риск: %s.");
+        add("message.kubanhorizons.genie.runtime.undo_list_header",
+                "Available retained undo entries: %s.", "Доступные отмены: %s.");
+        add("message.kubanhorizons.genie.runtime.undo_list_entry",
+                "- %s: %s blocks in %s, expires %s.",
+                "- %s: %s блоков в %s, истекает %s.");
+        add("message.kubanhorizons.genie.runtime.scene_preview",
+                "Pocket scene: %s changed blocks for %s ticks. Risk: %s.",
+                "Карманная сцена: %s изменённых блоков на %s тиков. Риск: %s.");
+        add("message.kubanhorizons.genie.runtime.move_preview",
+                "Structure move: %s blocks will change.",
+                "Перенос структуры: изменится %s блоков.");
+        add("message.kubanhorizons.genie.runtime.selection_first",
+                "First corner selected at %s, %s, %s. Use the mirror on the opposite corner.",
+                "Первая точка выбрана: %s, %s, %s. Примените зеркало ко второй точке.");
+        add("message.kubanhorizons.genie.runtime.selection_complete",
+                "Selection ready: %s blocks in %s chunks. Create a named snapshot with /genie snapshot create <name>.",
+                "Область готова: %s блоков в %s чанках. Создайте снимок: /genie snapshot create <имя>.");
+        add("message.kubanhorizons.genie.miniature.compressed",
+                "The selected region now exists inside the miniature world.",
+                "Выбранная область теперь существует внутри миниатюрного мира.");
+        add("message.kubanhorizons.genie.miniature.blocked",
+                "The miniature needs an empty region of the same size.",
+                "Для разворачивания миниатюры нужна пустая область того же размера.");
+        add("message.kubanhorizons.genie.runtime.preview",
+                "Restore '%s': %s blocks and %s block entities will change. Risk: %s. Use /genie snapshot confirm.",
+                "Восстановление «%s»: изменятся %s блоков и %s блочных сущностей. Риск: %s. Введите /genie snapshot confirm.");
+        add("message.kubanhorizons.genie.runtime.confirmed",
+                "Consent recorded. Use /genie snapshot execute before the preview expires.",
+                "Согласие записано. Введите /genie snapshot execute до истечения предпросмотра.");
+        add("message.kubanhorizons.genie.runtime.no_preview",
+                "Create a restore preview first.", "Сначала создайте предпросмотр восстановления.");
+        add("message.kubanhorizons.genie.runtime.no_confirmation",
+                "This restore has no valid confirmation.", "Для этого восстановления нет действующего подтверждения.");
+        add("message.kubanhorizons.genie.runtime.outcome",
+                "Strong wish result: %s; changed blocks: %s; transaction: %s.",
+                "Результат сильного желания: %s; изменено блоков: %s; транзакция: %s.");
+        add("message.kubanhorizons.genie.runtime.status",
+                "Strong-wish runtime ready: %s (%s).", "Готовность сильных желаний: %s (%s).");
+        add("message.kubanhorizons.genie.runtime.failed",
+                "Strong wish rejected: %s", "Сильное желание отклонено: %s");
 
         // --- Профессии ---
         add("entity.minecraft.villager.kubanhorizons.oil_presser", "Oil Presser", "Маслодел");

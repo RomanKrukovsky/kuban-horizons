@@ -90,6 +90,11 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.CARVED_WINDOW_CASING.get());
                         output.accept(KHItems.WATTLE.get());
                         output.accept(KHItems.WATTLE_GATE.get());
+                        output.accept(KHItems.WOODEN_SPOON.get());
+                        output.accept(KHItems.SONIC_BOOM_ITEM.get());
+                        output.accept(KHItems.MAGIC_MIRROR.get());
+                        output.accept(KHItems.MINIATURE_WORLD.get());
+                        output.accept(KHItems.PLAYER_GENIE_LAMP.get());
                     })
                     .build());
 

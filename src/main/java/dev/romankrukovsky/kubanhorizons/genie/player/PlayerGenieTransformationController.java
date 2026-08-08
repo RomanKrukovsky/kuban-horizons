@@ -28,9 +28,13 @@ public final class PlayerGenieTransformationController {
 
     public static void startTransformation(ServerLevel level, ServerPlayer player, WishIntent.Target wishTarget) {
         PlayerGenieAttachment attachment = player.getData(KHAttachments.PLAYER_GENIE_DATA);
+        if (attachment.isGenie() && attachment.getStage() != PlayerGenieAttachment.Stage.HUMAN) {
+            return;
+        }
         attachment.setGenie(true);
         attachment.setStage(PlayerGenieAttachment.Stage.BODY_REWRITE);
         attachment.setWishProgressPercent(63); // Запуск с 63% выполнения Желания №1
+        attachment.setNextTransformationTick(level.getGameTime() + 40L);
 
         // Стадия 1: Смертность удалена, переписывание тела
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.stage1_status"));
@@ -38,30 +42,49 @@ public final class PlayerGenieTransformationController {
         MagicalSignature.cast(level, player.position());
         level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, player.getX(), player.getY() + 1.0, player.getZ(), 50, 0.5, 1.0, 0.5, 0.05);
 
-        // Стадия 2: Ноги в дымовой хвост & полёт
-        advanceToStage2(level, player, attachment);
+    }
+
+    /** Продвигает кинематографичную сцену по сохранённому серверному времени. */
+    public static void tickTransformation(ServerLevel level, ServerPlayer player) {
+        PlayerGenieAttachment attachment = player.getData(KHAttachments.PLAYER_GENIE_DATA);
+        if (!attachment.isGenie() || attachment.getStage() == PlayerGenieAttachment.Stage.HUMAN
+                || attachment.getStage() == PlayerGenieAttachment.Stage.FULL_GENIE
+                || level.getGameTime() < attachment.getNextTransformationTick()) {
+            return;
+        }
+        switch (attachment.getStage()) {
+            case BODY_REWRITE -> advanceToStage2(level, player, attachment);
+            case TAIL_FORMATION -> advanceToStage3(level, player, attachment);
+            case AVATAR_CUSTOMIZATION -> advanceToStage4(level, player, attachment);
+            case INVULNERABILITY_TEST -> finalizeTransformation(level, player, attachment);
+            case HUMAN, FULL_GENIE -> {
+                // Эти состояния обработаны выше.
+            }
+        }
     }
 
     public static void advanceToStage2(ServerLevel level, ServerPlayer player, PlayerGenieAttachment attachment) {
         attachment.setStage(PlayerGenieAttachment.Stage.TAIL_FORMATION);
         player.getAbilities().mayfly = true;
         player.getAbilities().flying = true;
-        player.onUpdateAbilities();
+        if (player.connection != null) {
+            player.onUpdateAbilities();
+        }
 
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.stage2_flight"));
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.stage2_anatomical"));
         level.sendParticles(ParticleTypes.PORTAL, player.getX(), player.getY(), player.getZ(), 80, 0.4, 0.6, 0.4, 0.02);
-
-        // Переход к стадии 3 и 4
-        advanceToStage3And4(level, player, attachment);
+        attachment.setNextTransformationTick(level.getGameTime() + 40L);
     }
 
-    private static void advanceToStage3And4(ServerLevel level, ServerPlayer player, PlayerGenieAttachment attachment) {
+    private static void advanceToStage3(ServerLevel level, ServerPlayer player, PlayerGenieAttachment attachment) {
         attachment.setStage(PlayerGenieAttachment.Stage.AVATAR_CUSTOMIZATION);
         attachment.setAvatarStyle("KUBAN_DJINNIA_AVATAR");
-
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.stage3_form_dialogue"));
+        attachment.setNextTransformationTick(level.getGameTime() + 60L);
+    }
 
+    private static void advanceToStage4(ServerLevel level, ServerPlayer player, PlayerGenieAttachment attachment) {
         attachment.setStage(PlayerGenieAttachment.Stage.INVULNERABILITY_TEST);
 
         // Стадия 4: Демонстрация неуязвимости (спавн скелета и стрела)
@@ -85,20 +108,26 @@ public final class PlayerGenieTransformationController {
 
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.stage4_damage_ignored"));
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.stage4_genie_quote"));
-
-        // Стадия 5: Полная форма джиннии и выдача собственной лампы
-        finalizeTransformation(level, player, attachment);
+        attachment.setNextTransformationTick(level.getGameTime() + 60L);
     }
 
     public static void finalizeTransformation(ServerLevel level, ServerPlayer player, PlayerGenieAttachment attachment) {
         attachment.setStage(PlayerGenieAttachment.Stage.FULL_GENIE);
+        attachment.setNextTransformationTick(0L);
 
-        ItemStack playerLamp = new ItemStack(KHItems.PLAYER_GENIE_LAMP.get());
-        playerLamp.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,
-                Component.translatable("item.kubanhorizons.player_genie_lamp", player.getName().getString()));
+        if (!attachment.isVesselCreated()) {
+            ItemStack playerLamp = new ItemStack(KHItems.PLAYER_GENIE_LAMP.get());
+            playerLamp.set(net.minecraft.core.component.DataComponents.CUSTOM_NAME,
+                    Component.translatable("item.kubanhorizons.player_genie_lamp", player.getName().getString()));
+            net.minecraft.nbt.CompoundTag lampData = new net.minecraft.nbt.CompoundTag();
+            lampData.putString("GeniePlayer", player.getUUID().toString());
+            net.minecraft.world.item.component.CustomData.set(
+                    net.minecraft.core.component.DataComponents.CUSTOM_DATA, playerLamp, lampData);
 
-        if (!player.getInventory().add(playerLamp)) {
-            player.drop(playerLamp, false);
+            if (!player.getInventory().add(playerLamp)) {
+                player.drop(playerLamp, false);
+            }
+            attachment.setVesselCreated(true);
         }
 
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.vessel_created"));

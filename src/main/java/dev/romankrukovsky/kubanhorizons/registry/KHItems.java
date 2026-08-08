@@ -440,11 +440,15 @@ public final class KHItems {
 
     /** Магическое зеркало — смартфон Джиннии. */
     public static final DeferredItem<Item> MAGIC_MIRROR =
-            ITEMS.registerSimpleItem("magic_mirror", p -> p.stacksTo(1));
+            ITEMS.registerItem("magic_mirror",
+                    dev.romankrukovsky.kubanhorizons.genie.item.MagicMirrorItem::new,
+                    p -> p.stacksTo(1));
 
     /** Сжатый карманный мир — 100x100 область мира на ладони. */
     public static final DeferredItem<Item> MINIATURE_WORLD =
-            ITEMS.registerSimpleItem("miniature_world", p -> p.stacksTo(1));
+            ITEMS.registerItem("miniature_world",
+                    dev.romankrukovsky.kubanhorizons.genie.item.MiniatureWorldItem::new,
+                    p -> p.stacksTo(1));
 
     /** Лампа превращённого игрока-Джиннии (сосуд существования). */
     public static final DeferredItem<Item> PLAYER_GENIE_LAMP =

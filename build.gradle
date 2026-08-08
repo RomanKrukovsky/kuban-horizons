@@ -93,6 +93,23 @@ configurations {
 
 dependencies {
     implementation "maven.modrinth:geckolib:${geckolib_version}"
+
+    testImplementation files('build/moddev/artifacts/minecraft-patched-26.2.0.48-beta-merged.jar')
+    testImplementation "net.neoforged:neoforge:${neo_version}:universal"
+    testImplementation 'it.unimi.dsi:fastutil:8.5.18'
+    testImplementation 'com.mojang:datafixerupper:10.0.21'
+    testImplementation 'io.netty:netty-codec-base:4.2.15.Final'
+    testImplementation 'io.netty:netty-handler:4.2.15.Final'
+    testImplementation 'org.joml:joml:1.10.8'
+    testImplementation 'com.mojang:authlib:9.0.75'
+    testImplementation 'com.mojang:logging:1.7.12'
+    testImplementation platform('org.junit:junit-bom:5.13.4')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test', Test).configure {
+    useJUnitPlatform()
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {

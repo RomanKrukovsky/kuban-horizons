@@ -65,6 +65,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
@@ -147,6 +148,19 @@ public final class KHGameTests {
         register("genie_aura_of_laws", KHGameTests::testGenieAuraOfLaws, 100);
         register("genie_literal_wish", KHGameTests::testLiteralWishEngine, 100);
         register("genie_visual_effects", KHGameTests::testGenieTailEngineAndCartoonAnatomy, 100);
+        register("genie_magical_defeat_state", KHGameTests::testGenieMagicalDefeatState, 100);
+        register("genie_runtime_restores_region", KHGameTests::testGenieRuntimeRestoresRegion, 200);
+        register("genie_miniaturization_round_trip", KHGameTests::testGenieMiniaturizationRoundTrip, 100);
+        register("genie_materialized_word_has_letters", KHGameTests::testGenieMaterializedWord, 100);
+        register("genie_hybrid_has_real_traits", KHGameTests::testGenieHybridTraits, 100);
+        register("genie_contract_has_terms", KHGameTests::testGenieContractTerms, 100);
+        register("genie_biome_rewrite_changes_world", KHGameTests::testGenieBiomeRewrite, 100);
+        register("genie_pocket_scene_restores_world", KHGameTests::testGeniePocketSceneRollback, 100);
+        register("genie_role_swap_changes_roles", KHGameTests::testGenieRoleSwap, 100);
+        register("genie_runtime_miniaturize_confirmation", KHGameTests::testRuntimeMiniaturizeConfirmation, 100);
+        register("genie_snapshot_management", KHGameTests::testSnapshotManagement, 100);
+        register("genie_runtime_pocket_scene", KHGameTests::testRuntimePocketScene, 100);
+        register("genie_runtime_structure_move", KHGameTests::testRuntimeStructureMove, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -349,6 +363,25 @@ public final class KHGameTests {
         dev.romankrukovsky.kubanhorizons.genie.visual.GenieTailEngine.tickTail(genie, helper.getLevel());
         dev.romankrukovsky.kubanhorizons.genie.visual.CartoonAnatomyEngine.triggerFlatten(genie, helper.getLevel());
         helper.assertTrue(genie.isAlive(), "Джинния должна остаться живой после мультяшного сплющивания");
+        helper.succeed();
+    }
+
+    /** Печать побеждает аватар через якорение, не нанося фиктивный урон. */
+    private static void testGenieMagicalDefeatState(GameTestHelper helper) {
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+        var state = genie.wishborneState();
+        helper.assertTrue(state.canAct() && state.anchoring() == 0,
+                "Новый Wishborne-аватар должен быть проявлен и свободен");
+        helper.assertTrue(!state.applyAnchoring(37) && state.anchoring() == 37,
+                "Неполная печать должна только увеличить якорение");
+        helper.assertTrue(state.applyAnchoring(63),
+                "Якорение 100% должно запечатать аватар");
+        helper.assertTrue(state.presence()
+                        == dev.romankrukovsky.kubanhorizons.genie.WishborneState.Presence.SEALED
+                        && !state.canAct(),
+                "Запечатанная джинния не должна выполнять обычные действия");
+        state.weakenAnchoring(100);
+        helper.assertTrue(state.canAct(), "Разрушение всех рун должно вернуть аватар");
         helper.succeed();
     }
 
@@ -1749,6 +1782,345 @@ public final class KHGameTests {
         helper.succeed();
     }
 
+    /** Strong-wish runtime возвращает блоки и содержимое block entity после явного подтверждения. */
+    private static void testGenieRuntimeRestoresRegion(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos first = helper.absolutePos(new BlockPos(1, 2, 1));
+        BlockPos second = helper.absolutePos(new BlockPos(2, 2, 1));
+        level.setBlock(first, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+        level.setBlock(second, Blocks.CHEST.defaultBlockState(), 3);
+        var chest = (net.minecraft.world.level.block.entity.ChestBlockEntity) level.getBlockEntity(second);
+        helper.assertTrue(chest != null, "Сундук не создал block entity");
+        chest.setItem(0, new ItemStack(Items.DIAMOND, 7));
+        chest.setChanged();
+        var pig = EntityTypes.PIG.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        helper.assertTrue(pig != null, "Свинья для снимка не создалась");
+        pig.snapTo(first.getX() + 0.5D, first.getY(), first.getZ() + 0.5D, 0.0F, 0.0F);
+        UUID pigId = pig.getUUID();
+        level.addFreshEntity(pig);
+        level.scheduleTick(first, Blocks.GOLD_BLOCK, 200);
+
+        UUID owner = UUID.randomUUID();
+        String name = "gametest_" + owner.toString().replace("-", "");
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime.get(level.getServer());
+        if (!runtime.ready()) {
+            runtime.recover();
+        }
+        try {
+            var selection = new dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection(
+                    level.dimension().identifier().toString(), first, second);
+            runtime.createSnapshot(level, owner, name, selection);
+
+            pig.discard();
+            level.getBlockTicks().clearArea(
+                    net.minecraft.world.level.levelgen.structure.BoundingBox.fromCorners(first, second));
+            level.setBlock(first, Blocks.DIRT.defaultBlockState(), 3);
+            level.setBlock(second, Blocks.AIR.defaultBlockState(), 3);
+            var preview = runtime.previewRestore(level, owner, name);
+            var confirmation = runtime.confirm(owner, preview);
+            var report = runtime.restore(level, owner, confirmation);
+
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED,
+                    "Транзакция восстановления не завершилась: " + report);
+            helper.assertTrue(level.getBlockState(first).is(Blocks.GOLD_BLOCK),
+                    "Первый блок снимка не восстановлен");
+            var restoredChest = (net.minecraft.world.level.block.entity.ChestBlockEntity)
+                    level.getBlockEntity(second);
+            helper.assertTrue(restoredChest != null, "Block entity сундука не восстановлена");
+            helper.assertTrue(restoredChest.getItem(0).is(Items.DIAMOND)
+                            && restoredChest.getItem(0).getCount() == 7,
+                    "Инвентарь сундука не восстановлен");
+            helper.assertTrue(level.getEntity(pigId) != null,
+                    "Обычная сущность из снимка не восстановлена");
+            helper.assertTrue(level.getBlockTicks().hasScheduledTick(first, Blocks.GOLD_BLOCK),
+                    "Scheduled block tick из снимка не восстановлен");
+            var undo = runtime.undo(level, owner, report.transactionId());
+            helper.assertTrue(undo.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED,
+                    "Retained undo не завершился: " + undo);
+            helper.assertTrue(level.getBlockState(first).is(Blocks.DIRT)
+                            && level.getBlockState(second).isAir(),
+                    "Undo не вернул состояние до восстановления");
+            helper.assertTrue(level.getEntity(pigId) == null
+                            && !level.getBlockTicks().hasScheduledTick(first, Blocks.GOLD_BLOCK),
+                    "Undo не удалил восстановленные сущность и scheduled tick");
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Strong-wish runtime failed: " + exception.getMessage());
+        }
+    }
+
+    /** Сжатая область исчезает из мира и разворачивается блок-в-блок в другом месте. */
+    private static void testGenieMiniaturizationRoundTrip(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var player = helper.makeMockServerPlayerInLevel();
+        BlockPos sourceMin = helper.absolutePos(new BlockPos(1, 2, 1));
+        BlockPos sourceMax = helper.absolutePos(new BlockPos(2, 2, 1));
+        BlockPos target = helper.absolutePos(new BlockPos(1, 2, 4));
+        level.setBlock(sourceMin, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+        level.setBlock(sourceMax, Blocks.EMERALD_BLOCK.defaultBlockState(), 3);
+        var selection = new dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection(
+                level.dimension().identifier().toString(), sourceMin, sourceMax);
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) {
+            runtime.recover();
+        }
+        runtime.setSelection(player.getUUID(), selection);
+        ItemStack miniature;
+        try {
+            var preview = runtime.previewMiniaturizeSelected(player);
+            miniature = runtime.executeMiniaturize(player,
+                    runtime.confirmMiniaturize(player.getUUID(), preview));
+        } catch (IOException exception) {
+            helper.fail("Miniaturization preview failed: " + exception.getMessage());
+            return;
+        }
+
+        helper.assertTrue(!miniature.isEmpty(), "Миниатюризация не создала предмет");
+        helper.assertTrue(level.isEmptyBlock(sourceMin) && level.isEmptyBlock(sourceMax),
+                "Исходная область осталась в мире после сжатия");
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.spatial.MiniaturizationEngine
+                        .uncompressRegion(level, target, miniature),
+                "Миниатюра не развернулась в пустой области");
+        helper.assertTrue(level.getBlockState(target).is(Blocks.GOLD_BLOCK)
+                        && level.getBlockState(target.east()).is(Blocks.EMERALD_BLOCK),
+                "Развёрнутая область отличается от исходной");
+        helper.assertTrue(miniature.isEmpty(), "Предмет миниатюры не израсходован");
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Материализация строит читаемый набор блоков, а не один декоративный куб. */
+    private static void testGenieMaterializedWord(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setPos(net.minecraft.world.phys.Vec3.atCenterOf(
+                helper.absolutePos(new BlockPos(1, 2, 1))));
+        dev.romankrukovsky.kubanhorizons.genie.expression.WordMaterializer
+                .materializeWord(helper.getLevel(), player, "GOLD");
+        long gold = BlockPos.betweenClosedStream(
+                        helper.absolutePos(new BlockPos(0, 3, 0)),
+                        helper.absolutePos(new BlockPos(20, 10, 3)))
+                .filter(pos -> helper.getLevel().getBlockState(pos).is(Blocks.GOLD_BLOCK)).count();
+        helper.assertTrue(gold >= 20, "Слово GOLD не стало набором букв: блоков " + gold);
+        helper.succeed();
+    }
+
+    /** Гибрид действительно летает и светится, свойства сохраняются в NBT сущности. */
+    private static void testGenieHybridTraits(GameTestHelper helper) {
+        var hybrid = dev.romankrukovsky.kubanhorizons.genie.entity.HybridSpeciesEngine.synthesizeHybrid(
+                helper.getLevel(), helper.absoluteVec(new net.minecraft.world.phys.Vec3(1, 2, 1)),
+                "flying glowing fox");
+        helper.assertTrue(hybrid != null && hybrid.isNoGravity() && hybrid.isCurrentlyGlowing(),
+                "Гибрид не получил заявленные свойства полёта и свечения");
+        helper.assertTrue(hybrid.getPersistentData().getBooleanOr("KubanHybrid", false),
+                "Признаки гибрида не помечены как персистентные");
+        helper.succeed();
+    }
+
+    /** Контракт — реальная письменная книга с условием, сроком, мелким текстом и лазейкой. */
+    private static void testGenieContractTerms(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        ItemStack contract = dev.romankrukovsky.kubanhorizons.genie.wish.WishContractEngine
+                .createContractBook(helper.getLevel(), player, "Restore my house");
+        WrittenBookContent content = contract.get(DataComponents.WRITTEN_BOOK_CONTENT);
+        helper.assertTrue(content != null && content.pages().size() == 4,
+                "Контракт не содержит четыре обязательных раздела");
+        String text = content.getPages(false).stream().map(Component::getString)
+                .collect(java.util.stream.Collectors.joining(" "));
+        helper.assertTrue(text.contains("Restore my house") && text.contains("Fine print")
+                        && text.contains("Loophole") && text.contains("world tick"),
+                "В контракте нет формулировки, срока, мелкого текста или лазейки");
+        helper.succeed();
+    }
+
+    /** Переписывание биома меняет палитру чанка, а не только создаёт частицы. */
+    private static void testGenieBiomeRewrite(GameTestHelper helper) {
+        BlockPos center = helper.absolutePos(new BlockPos(1, 2, 1));
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.expression.BiomeRewriterEngine
+                        .rewriteLocalBiome(helper.getLevel(), center),
+                "Движок биома отказался от допустимой области");
+        var actual = helper.getLevel().getBiome(center).unwrapKey().orElseThrow();
+        helper.assertTrue(actual.equals(KHBiomes.KUBAN_STEPPE),
+                "Биом в точке не стал кубанской степью: " + actual.identifier());
+        helper.succeed();
+    }
+
+    /** Временная сцена действительно исчезает и возвращает прежние блоки. */
+    private static void testGeniePocketSceneRollback(GameTestHelper helper) {
+        BlockPos origin = helper.absolutePos(new BlockPos(4, 2, 4));
+        helper.getLevel().setBlock(origin, Blocks.DIAMOND_BLOCK.defaultBlockState(), 3);
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.dimension.PocketSceneEngine
+                        .spawnPocketScene(helper.getLevel(), origin, player, "beach", 2),
+                "Карманная сцена не создалась");
+        helper.assertTrue(helper.getLevel().getBlockState(origin).is(Blocks.SAND),
+                "Сцена не заменила исходный блок");
+        helper.runAfterDelay(4, () -> {
+            helper.assertTrue(helper.getLevel().getBlockState(origin).is(Blocks.DIAMOND_BLOCK),
+                    "Карманная сцена не вернула исходный мир");
+            helper.succeed();
+        });
+    }
+
+    /** Обмен ролями освобождает NPC и записывает игроку полноценное состояние джинна. */
+    private static void testGenieRoleSwap(GameTestHelper helper) {
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+        var player = helper.makeMockServerPlayerInLevel();
+        genie.mobInteract(player, net.minecraft.world.InteractionHand.MAIN_HAND);
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.evolution.GenieRoleSwap
+                        .swapRoles(genie, helper.getLevel(), player),
+                "Обмен ролями не произошёл при действующей связи");
+        var data = player.getData(dev.romankrukovsky.kubanhorizons.registry.KHAttachments.PLAYER_GENIE_DATA);
+        helper.assertTrue(data.isGenie() && data.getStage()
+                        == dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment.Stage.FULL_GENIE,
+                "Игрок не получил полную форму джинна");
+        helper.assertTrue(genie.getOwner() == null, "NPC-джинния не стала свободной");
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Сжатие через runtime требует preview и одноразовое подтверждение. */
+    private static void testRuntimeMiniaturizeConfirmation(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        BlockPos source = helper.absolutePos(new BlockPos(1, 2, 1));
+        helper.getLevel().setBlock(source, Blocks.EMERALD_BLOCK.defaultBlockState(), 3);
+        var selection = new dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection(
+                helper.getLevel().dimension().identifier().toString(), source, source);
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) {
+            runtime.recover();
+        }
+        runtime.setSelection(player.getUUID(), selection);
+        try {
+            var preview = runtime.previewMiniaturizeSelected(player);
+            helper.assertTrue(helper.getLevel().getBlockState(source).is(Blocks.EMERALD_BLOCK),
+                    "Preview миниатюризации изменил мир");
+            var confirmation = runtime.confirmMiniaturize(player.getUUID(), preview);
+            ItemStack miniature = runtime.executeMiniaturize(player, confirmation);
+            helper.assertTrue(miniature.is(KHItems.MINIATURE_WORLD.get())
+                            && helper.getLevel().getBlockState(source).isAir(),
+                    "Подтверждённая миниатюризация не создала предмет и не очистила область");
+            boolean rejectedReuse = false;
+            try {
+                runtime.executeMiniaturize(player, confirmation);
+            } catch (IllegalArgumentException expected) {
+                rejectedReuse = true;
+            }
+            helper.assertTrue(rejectedReuse,
+                    "Одно подтверждение миниатюризации сработало повторно");
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Runtime miniaturization failed: " + exception.getMessage());
+        }
+    }
+
+    /** Список изолирован по владельцу, удаление работает и не трогает чужой снимок. */
+    private static void testSnapshotManagement(GameTestHelper helper) {
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) {
+            runtime.recover();
+        }
+        BlockPos pos = helper.absolutePos(new BlockPos(1, 2, 1));
+        helper.getLevel().setBlock(pos, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+        var selection = new dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection(
+                helper.getLevel().dimension().identifier().toString(), pos, pos);
+        UUID first = UUID.randomUUID();
+        UUID second = UUID.randomUUID();
+        try {
+            runtime.createSnapshot(helper.getLevel(), first, "shared_name", selection);
+            runtime.createSnapshot(helper.getLevel(), second, "shared_name", selection);
+            helper.assertTrue(runtime.listSnapshots(first).size() == 1
+                            && runtime.listSnapshots(second).size() == 1,
+                    "Список снимков смешал владельцев");
+            helper.assertTrue(runtime.inspectSnapshot(first, "shared_name").blocks() == 1,
+                    "Inspect не вернул метаданные снимка");
+            runtime.deleteSnapshot(first, "shared_name");
+            helper.assertTrue(runtime.listSnapshots(first).isEmpty()
+                            && runtime.listSnapshots(second).size() == 1,
+                    "Удаление снимка затронуло неверного владельца");
+            runtime.deleteSnapshot(second, "shared_name");
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Snapshot management failed: " + exception.getMessage());
+        }
+    }
+
+    /** Карманная сцена проходит preview/confirmation/transaction и откатывается через retained undo. */
+    private static void testRuntimePocketScene(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        BlockPos origin = helper.absolutePos(new BlockPos(4, 2, 4));
+        helper.getLevel().setBlock(origin, Blocks.DIAMOND_BLOCK.defaultBlockState(), 3);
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) {
+            runtime.recover();
+        }
+        try {
+            var preview = runtime.previewPocketScene(player, origin, 20);
+            helper.assertTrue(helper.getLevel().getBlockState(origin).is(Blocks.DIAMOND_BLOCK),
+                    "Preview карманной сцены изменил мир");
+            var report = runtime.executePocketScene(player,
+                    runtime.confirmPocketScene(player.getUUID(), preview));
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && helper.getLevel().getBlockState(origin).is(Blocks.SANDSTONE),
+                    "Транзакционная карманная сцена не создалась: " + report);
+            var rollback = runtime.undo(helper.getLevel(), player.getUUID(), report.transactionId());
+            helper.assertTrue(rollback.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && helper.getLevel().getBlockState(origin).is(Blocks.DIAMOND_BLOCK),
+                    "Карманная сцена не вернула исходный мир через retained undo");
+            runtime.retireUndo(player.getUUID(), rollback.transactionId());
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Runtime pocket scene failed: " + exception.getMessage());
+        }
+    }
+
+    /** Небольшой дом переносится через preview/confirmation/transaction и возвращается undo. */
+    private static void testRuntimeStructureMove(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        BlockPos origin = helper.absolutePos(new BlockPos(4, 2, 4));
+        helper.getLevel().setBlock(origin, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+        helper.getLevel().setBlock(origin.east(), Blocks.EMERALD_BLOCK.defaultBlockState(), 3);
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) {
+            runtime.recover();
+        }
+        try {
+            var preview = runtime.previewStructureMove(player, origin);
+            helper.assertTrue(helper.getLevel().getBlockState(origin).is(Blocks.GOLD_BLOCK),
+                    "Preview переноса изменил исходный дом");
+            var report = runtime.executeStructureMove(player,
+                    runtime.confirmStructureMove(player.getUUID(), preview));
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED,
+                    "Перенос структуры не завершился: " + report);
+            helper.assertTrue(helper.getLevel().getBlockState(origin).isAir()
+                            && helper.getLevel().getBlockState(origin.above(10)).is(Blocks.GOLD_BLOCK)
+                            && helper.getLevel().getBlockState(origin.east().above(10)).is(Blocks.EMERALD_BLOCK),
+                    "Дом не переместился блок-в-блок");
+            var undo = runtime.undo(helper.getLevel(), player.getUUID(), report.transactionId());
+            helper.assertTrue(undo.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && helper.getLevel().getBlockState(origin).is(Blocks.GOLD_BLOCK)
+                            && helper.getLevel().getBlockState(origin.above(10)).isAir(),
+                    "Undo не вернул дом на место");
+            runtime.retireUndo(player.getUUID(), undo.transactionId());
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Runtime structure move failed: " + exception.getMessage());
+        }
+    }
+
     /** Распознавание искажённого желания высшего порядка «Я хочу стать всемогущим». */
     private static void testPlayerGenieDistortedWishParse(GameTestHelper helper) {
         var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("Я хочу стать всемогущим.");
@@ -1773,16 +2145,28 @@ public final class KHGameTests {
         helper.succeed();
     }
 
-    /** Контроллер 5-стадийной трансформации активирует полёт и неуязвимость. */
+    /** Контроллер проходит стадии по времени, а не завершает всю сцену одним вызовом. */
     private static void testPlayerGenieTransformationController(GameTestHelper helper) {
-        var player = helper.makeMockPlayer(GameType.SURVIVAL);
-        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
-            dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieTransformationController.startTransformation(
-                    helper.getLevel(), serverPlayer, dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.OMNIPOTENCE);
-            var data = serverPlayer.getData(dev.romankrukovsky.kubanhorizons.registry.KHAttachments.PLAYER_GENIE_DATA);
-            helper.assertTrue(data.isGenie(), "Игрок не получил джинновское состояние");
-            helper.assertTrue(serverPlayer.getAbilities().mayfly, "Игроку не привязан полёт");
-        }
+        var player = helper.makeMockServerPlayerInLevel();
+        dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieTransformationController.startTransformation(
+                helper.getLevel(), player,
+                dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.OMNIPOTENCE);
+        var data = player.getData(dev.romankrukovsky.kubanhorizons.registry.KHAttachments.PLAYER_GENIE_DATA);
+        helper.assertTrue(data.isGenie(), "Игрок не получил джинновское состояние");
+        helper.assertTrue(data.getStage()
+                        == dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment.Stage.BODY_REWRITE,
+                "Сцена должна остановиться на первой стадии до следующего времени");
+        helper.assertTrue(data.getNextTransformationTick() > helper.getLevel().getGameTime(),
+                "Следующая стадия не получила серверный таймер");
+
+        data.setNextTransformationTick(helper.getLevel().getGameTime());
+        dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieTransformationController
+                .tickTransformation(helper.getLevel(), player);
+        helper.assertTrue(data.getStage()
+                        == dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment.Stage.TAIL_FORMATION,
+                "Вторая стадия не наступила после серверного таймера");
+        helper.assertTrue(player.getAbilities().mayfly, "Вторая стадия не открыла полёт");
+        player.discard();
         helper.succeed();
     }
 

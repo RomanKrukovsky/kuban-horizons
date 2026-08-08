@@ -31,6 +31,8 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
     private Optional<UUID> masterUUID = Optional.empty();
     private Optional<BlockPos> boundVesselPos = Optional.empty();
     private String avatarStyle = "DEFAULT_KUBAN";
+    private long nextTransformationTick = 0L;
+    private boolean vesselCreated = false;
 
     public PlayerGenieAttachment() {
     }
@@ -88,7 +90,23 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
     }
 
     public void setAvatarStyle(String avatarStyle) {
-        this.avatarStyle = avatarStyle;
+        this.avatarStyle = avatarStyle == null || avatarStyle.isBlank() ? "DEFAULT_KUBAN" : avatarStyle;
+    }
+
+    public long getNextTransformationTick() {
+        return nextTransformationTick;
+    }
+
+    public void setNextTransformationTick(long nextTransformationTick) {
+        this.nextTransformationTick = Math.max(0L, nextTransformationTick);
+    }
+
+    public boolean isVesselCreated() {
+        return vesselCreated;
+    }
+
+    public void setVesselCreated(boolean vesselCreated) {
+        this.vesselCreated = vesselCreated;
     }
 
     @Override
@@ -99,6 +117,10 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
         output.putInt("WishProgressPercent", wishProgressPercent);
         output.putInt("TierLevel", tierLevel);
         output.putString("AvatarStyle", avatarStyle);
+        output.putLong("NextTransformationTick", nextTransformationTick);
+        output.putBoolean("VesselCreated", vesselCreated);
+        masterUUID.ifPresent(uuid -> output.putString("Master", uuid.toString()));
+        boundVesselPos.ifPresent(pos -> output.putLong("BoundVesselPos", pos.asLong()));
     }
 
     @Override
@@ -109,8 +131,18 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
         } catch (IllegalArgumentException e) {
             stage = Stage.HUMAN;
         }
-        wishProgressPercent = input.getIntOr("WishProgressPercent", 0);
-        tierLevel = input.getIntOr("TierLevel", 1);
+        wishProgressPercent = Math.clamp(input.getIntOr("WishProgressPercent", 0), 0, 100);
+        tierLevel = Math.clamp(input.getIntOr("TierLevel", 1), 1, 5);
         avatarStyle = input.getStringOr("AvatarStyle", "DEFAULT_KUBAN");
+        nextTransformationTick = Math.max(0L, input.getLongOr("NextTransformationTick", 0L));
+        vesselCreated = input.getBooleanOr("VesselCreated", false);
+        String master = input.getStringOr("Master", "");
+        try {
+            masterUUID = master.isEmpty() ? Optional.empty() : Optional.of(UUID.fromString(master));
+        } catch (IllegalArgumentException ignored) {
+            masterUUID = Optional.empty();
+        }
+        long vesselPos = input.getLongOr("BoundVesselPos", Long.MIN_VALUE);
+        boundVesselPos = vesselPos == Long.MIN_VALUE ? Optional.empty() : Optional.of(BlockPos.of(vesselPos));
     }
 }

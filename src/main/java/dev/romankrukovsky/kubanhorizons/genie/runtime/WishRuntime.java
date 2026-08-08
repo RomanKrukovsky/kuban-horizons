@@ -1,0 +1,452 @@
+package dev.romankrukovsky.kubanhorizons.genie.runtime;
+
+import dev.romankrukovsky.kubanhorizons.KubanHorizons;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.capability.CapabilityRegistry;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmationAuthority;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedRestore;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedMiniaturize;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedPocketScene;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedStructureMove;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.plan.PlanGate;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.PreviewService;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.RestorePreview;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.MiniaturizePreview;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.PocketScenePreview;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.StructureMovePreview;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.recovery.RecoveryClassifier;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.recovery.RecoveryJournal;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.selection.SelectionService;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.RegionSnapshot;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotService;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotStore;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.CausalLedger;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.RecoveryService;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.RegionLockManager;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.RestoreTransactionService;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionManifestStore;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionReport;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.Duration;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.item.ItemStack;
+
+/** Серверный фасад безопасных сильных желаний для одного мира. */
+public final class WishRuntime {
+    private static final String ROOT = "kubanhorizons/genie_runtime";
+    private static final Map<MinecraftServer, WishRuntime> INSTANCES = new ConcurrentHashMap<>();
+
+    private final CapabilityRegistry capabilities = new CapabilityRegistry();
+    private final PlanGate planGate = new PlanGate(capabilities);
+    private final SnapshotStore snapshotStore;
+    private final SelectionService selections = new SelectionService();
+    private final SnapshotService snapshotService;
+    private final PreviewService previewService = new PreviewService();
+    private final ConfirmationAuthority confirmations = new ConfirmationAuthority();
+    private final RecoveryJournal recoveryJournal;
+    private final TransactionManifestStore manifests;
+    private final RecoveryService recoveryService;
+    private final RestoreTransactionService restoreService;
+    private final Set<UUID> issuedMiniaturizeConfirmations = new HashSet<>();
+    private final Set<UUID> issuedPocketSceneConfirmations = new HashSet<>();
+    private final Set<UUID> issuedStructureMoveConfirmations = new HashSet<>();
+    private final Map<UUID, dev.romankrukovsky.kubanhorizons.genie.dimension.FlyingStructureEngine.MovePlan>
+            pendingStructureMoves = new ConcurrentHashMap<>();
+    private final MinecraftServer server;
+    private volatile boolean ready;
+    private volatile String blockedReason = "startup recovery has not run";
+
+    private WishRuntime(MinecraftServer server) {
+        this.server = server;
+        Path root = server.getWorldPath(LevelResource.ROOT).resolve(ROOT);
+        snapshotStore = new SnapshotStore(root.resolve("snapshots"));
+        snapshotService = new SnapshotService(snapshotStore);
+        recoveryJournal = new RecoveryJournal(root.resolve("recovery.journal"));
+        manifests = new TransactionManifestStore(root.resolve("transactions"));
+        CausalLedger ledger = new CausalLedger(root.resolve("causal-ledger.tsv"));
+        RegionLockManager locks = new RegionLockManager();
+        recoveryService = new RecoveryService(recoveryJournal, snapshotStore, manifests);
+        restoreService = new RestoreTransactionService(confirmations, previewService, snapshotStore,
+                snapshotService, recoveryJournal, ledger, locks, manifests);
+    }
+
+    public static WishRuntime get(MinecraftServer server) {
+        return INSTANCES.computeIfAbsent(Objects.requireNonNull(server, "server"), WishRuntime::new);
+    }
+
+    public static void remove(MinecraftServer server) {
+        INSTANCES.remove(server);
+    }
+
+    public void recover() {
+        try {
+            recoveryService.recover(server());
+            restoreService.cleanupExpiredUndo(Instant.now());
+            ready = true;
+            blockedReason = "";
+        } catch (IOException | RuntimeException exception) {
+            ready = false;
+            blockedReason = exception.getMessage();
+            KubanHorizons.LOGGER.error("Strong-wish runtime entered failed-safe mode", exception);
+        }
+    }
+
+    public RegionSnapshot createSnapshot(ServerLevel level, UUID actor, String name,
+                                         RegionSelection selection) throws IOException {
+        ensureReady(selection);
+        requireServerThread();
+        return snapshotService.capture(level, actor, name, selection, Instant.now());
+    }
+
+    public RegionSnapshot createSelectedSnapshot(ServerLevel level, UUID actor,
+                                                 String name) throws IOException {
+        RegionSelection selection = selections.requireCompleted(actor);
+        RegionSnapshot snapshot = createSnapshot(level, actor, name, selection);
+        selections.clear(actor);
+        return snapshot;
+    }
+
+    public SelectionService.SelectionUpdate select(ServerPlayer player, BlockPos pos) {
+        if (!ready) {
+            throw new IllegalStateException("strong wishes are blocked: " + blockedReason);
+        }
+        return selections.select(player, pos);
+    }
+
+    public void setSelection(UUID actor, RegionSelection selection) {
+        selections.setCompleted(actor, selection);
+    }
+
+    public MiniaturizePreview previewMiniaturizeSelected(ServerPlayer player) throws IOException {
+        requireServerThread();
+        RegionSelection selection = selections.requireCompleted(player.getUUID());
+        ensureReady(selection);
+        var snapshot = dev.romankrukovsky.kubanhorizons.genie.spatial.MiniaturizationEngine
+                .captureSelection(player.level(), selection, player.getUUID());
+        int nonAir = (int) snapshot.blocks().stream().filter(record ->
+                !record.blockState().getStringOr("Name", "minecraft:air").equals("minecraft:air")).count();
+        int blockEntities = (int) snapshot.blocks().stream()
+                .filter(record -> record.blockEntity() != null).count();
+        var risk = selection.chunkCount() > 16 || nonAir > 4_096
+                ? dev.romankrukovsky.kubanhorizons.genie.runtime.capability.CapabilityRisk.HIGH
+                : dev.romankrukovsky.kubanhorizons.genie.runtime.capability.CapabilityRisk.ELEVATED;
+        UUID previewId = UUID.randomUUID();
+        Instant expiresAt = Instant.now().plus(Duration.ofMinutes(2));
+        String digest = digest(previewId + "|" + player.getUUID() + "|" + snapshot.contentDigest()
+                + "|" + selection.dimension() + "|" + selection.min().asLong() + "|"
+                + selection.max().asLong() + "|" + nonAir + "|" + blockEntities + "|"
+                + snapshot.entities().size() + "|" + risk + "|" + expiresAt);
+        return new MiniaturizePreview(previewId, player.getUUID(), selection, nonAir,
+                blockEntities, snapshot.entities().size(), risk, snapshot.contentDigest(), digest, expiresAt);
+    }
+
+    public synchronized ConfirmedMiniaturize confirmMiniaturize(UUID actor,
+                                                                MiniaturizePreview preview) {
+        Instant now = Instant.now();
+        if (!preview.actorId().equals(actor) || !preview.expiresAt().isAfter(now)) {
+            throw new IllegalArgumentException("miniaturization preview is stale or belongs to another actor");
+        }
+        UUID id = UUID.randomUUID();
+        issuedMiniaturizeConfirmations.add(id);
+        return new ConfirmedMiniaturize(id, preview, now);
+    }
+
+    public ItemStack executeMiniaturize(ServerPlayer player, ConfirmedMiniaturize confirmed) throws IOException {
+        requireServerThread();
+        Instant now = Instant.now();
+        synchronized (this) {
+            if (!confirmed.preview().actorId().equals(player.getUUID())
+                    || !confirmed.preview().expiresAt().isAfter(now)
+                    || !issuedMiniaturizeConfirmations.remove(confirmed.confirmationId())) {
+                throw new IllegalArgumentException("miniaturization confirmation is invalid or already used");
+            }
+        }
+        RegionSelection selection = confirmed.preview().selection();
+        ensureReady(selection);
+        RegionSnapshot source = dev.romankrukovsky.kubanhorizons.genie.spatial.MiniaturizationEngine
+                .captureSelection(player.level(), selection, player.getUUID());
+        if (!source.contentDigest().equals(confirmed.preview().currentStateDigest())) {
+            throw new IllegalStateException("world state changed after miniaturization preview");
+        }
+        RegionSnapshot empty = dev.romankrukovsky.kubanhorizons.genie.spatial.MiniaturizationEngine
+                .emptyTarget(source);
+        var report = restoreService.applyPreparedTarget(player.level(), player.getUUID(), source, empty,
+                confirmed.preview().previewDigest(), now);
+        if (report.outcome() != dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                && report.outcome() != dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED_WITH_WARNINGS) {
+            throw new IllegalStateException("miniaturization transaction failed: " + report.detail());
+        }
+        selections.clear(player.getUUID());
+        return dev.romankrukovsky.kubanhorizons.genie.spatial.MiniaturizationEngine
+                .createMiniatureItem(source);
+    }
+
+    public PocketScenePreview previewPocketScene(ServerPlayer player, BlockPos origin,
+                                                 int durationTicks) throws IOException {
+        requireServerThread();
+        RegionSnapshot target = dev.romankrukovsky.kubanhorizons.genie.dimension.PocketSceneEngine
+                .buildBeachTarget(player.level(), origin, player.getUUID());
+        ensureReady(target.selection());
+        SnapshotService.SnapshotState current = SnapshotService.captureState(player.level(), target.selection());
+        int changed = 0;
+        for (int index = 0; index < target.blocks().size(); index++) {
+            if (!target.blocks().get(index).blockState().equals(current.blocks().get(index).blockState())
+                    || !Objects.equals(target.blocks().get(index).blockEntity(),
+                    current.blocks().get(index).blockEntity())) {
+                changed++;
+            }
+        }
+        String currentDigest = SnapshotService.digest(current);
+        UUID previewId = UUID.randomUUID();
+        Instant expiresAt = Instant.now().plus(Duration.ofMinutes(2));
+        String previewDigest = digest(previewId + "|" + player.getUUID() + "|" + currentDigest
+                + "|" + target.contentDigest() + "|" + durationTicks + "|" + expiresAt);
+        return new PocketScenePreview(previewId, player.getUUID(), target.selection(), changed,
+                durationTicks, dev.romankrukovsky.kubanhorizons.genie.runtime.capability.CapabilityRisk.ELEVATED,
+                currentDigest, target.contentDigest(), previewDigest, expiresAt);
+    }
+
+    public synchronized ConfirmedPocketScene confirmPocketScene(UUID actor,
+                                                                 PocketScenePreview preview) {
+        Instant now = Instant.now();
+        if (!preview.actorId().equals(actor) || !preview.expiresAt().isAfter(now)) {
+            throw new IllegalArgumentException("pocket scene preview is stale or belongs to another actor");
+        }
+        UUID id = UUID.randomUUID();
+        issuedPocketSceneConfirmations.add(id);
+        return new ConfirmedPocketScene(id, preview, now);
+    }
+
+    public TransactionReport executePocketScene(ServerPlayer player,
+                                                ConfirmedPocketScene confirmed) throws IOException {
+        requireServerThread();
+        synchronized (this) {
+            if (!confirmed.preview().actorId().equals(player.getUUID())
+                    || !confirmed.preview().expiresAt().isAfter(Instant.now())
+                    || !issuedPocketSceneConfirmations.remove(confirmed.confirmationId())) {
+                throw new IllegalArgumentException("pocket scene confirmation is invalid or already used");
+            }
+        }
+        SnapshotService.SnapshotState currentState = SnapshotService.captureState(
+                player.level(), confirmed.preview().selection());
+        RegionSnapshot current = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
+                new dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotId(
+                        UUID.randomUUID(), "pocket_before"), player.getUUID(), Instant.now(),
+                confirmed.preview().selection(), currentState.blocks(), currentState.blockTicks(),
+                currentState.fluidTicks(), currentState.entities(), SnapshotService.digest(currentState));
+        if (!current.contentDigest().equals(confirmed.preview().currentStateDigest())) {
+            throw new IllegalStateException("world state changed after pocket scene preview");
+        }
+        RegionSnapshot target = dev.romankrukovsky.kubanhorizons.genie.dimension.PocketSceneEngine
+                .buildBeachTarget(player.level(), confirmed.preview().selection().min().offset(3, 0, 3),
+                        player.getUUID());
+        if (!target.contentDigest().equals(confirmed.preview().targetDigest())) {
+            throw new IllegalStateException("pocket scene target changed after preview");
+        }
+        return restoreService.applyPreparedTarget(player.level(), player.getUUID(), current, target,
+                confirmed.preview().previewDigest(), Instant.now());
+    }
+
+    public StructureMovePreview previewStructureMove(ServerPlayer player, BlockPos origin)
+            throws IOException {
+        requireServerThread();
+        var plan = dev.romankrukovsky.kubanhorizons.genie.dimension.FlyingStructureEngine
+                .buildMovePlan(player.level(), origin, player.getUUID());
+        ensureReady(plan.current().selection());
+        int changed = 0;
+        for (int index = 0; index < plan.current().blocks().size(); index++) {
+            if (!plan.current().blocks().get(index).blockState()
+                    .equals(plan.target().blocks().get(index).blockState())) {
+                changed++;
+            }
+        }
+        UUID previewId = UUID.randomUUID();
+        Instant expiresAt = Instant.now().plus(Duration.ofMinutes(2));
+        String previewDigest = digest(previewId + "|" + player.getUUID() + "|"
+                + plan.current().contentDigest() + "|" + plan.target().contentDigest()
+                + "|" + origin.asLong() + "|" + expiresAt);
+        pendingStructureMoves.put(previewId, plan);
+        return new StructureMovePreview(previewId, player.getUUID(), plan.current().selection(), changed,
+                plan.current().contentDigest(), plan.target().contentDigest(), previewDigest, expiresAt);
+    }
+
+    public synchronized ConfirmedStructureMove confirmStructureMove(UUID actor,
+                                                                     StructureMovePreview preview) {
+        if (!preview.actorId().equals(actor) || !preview.expiresAt().isAfter(Instant.now())
+                || !pendingStructureMoves.containsKey(preview.previewId())) {
+            throw new IllegalArgumentException("structure move preview is stale or unavailable");
+        }
+        UUID id = UUID.randomUUID();
+        issuedStructureMoveConfirmations.add(id);
+        return new ConfirmedStructureMove(id, preview, Instant.now());
+    }
+
+    public TransactionReport executeStructureMove(ServerPlayer player,
+                                                   ConfirmedStructureMove confirmed) throws IOException {
+        requireServerThread();
+        synchronized (this) {
+            if (!confirmed.preview().actorId().equals(player.getUUID())
+                    || !confirmed.preview().expiresAt().isAfter(Instant.now())
+                    || !issuedStructureMoveConfirmations.remove(confirmed.confirmationId())) {
+                throw new IllegalArgumentException("structure move confirmation is invalid or already used");
+            }
+        }
+        var plan = pendingStructureMoves.remove(confirmed.preview().previewId());
+        if (plan == null) {
+            throw new IllegalStateException("structure move plan expired");
+        }
+        return restoreService.applyPreparedTarget(player.level(), player.getUUID(),
+                plan.current(), plan.target(), confirmed.preview().previewDigest(), Instant.now());
+    }
+
+    public RestorePreview previewRestore(ServerLevel level, UUID actor, String name) throws IOException {
+        RegionSnapshot snapshot = snapshotStore.findOwnedByName(actor, name)
+                .orElseThrow(() -> new IllegalArgumentException("snapshot not found"));
+        requireServerThread();
+        ensureReady(snapshot.selection());
+        return previewService.preview(level, actor, snapshot, Instant.now());
+    }
+
+    public List<SnapshotSummary> listSnapshots(UUID actor) throws IOException {
+        requireServerThread();
+        return snapshotStore.listOwned(actor).stream().map(snapshot -> new SnapshotSummary(
+                snapshot.id().name(), snapshot.id().value(), snapshot.selection().dimension(),
+                snapshot.selection().volume(), snapshot.selection().chunkCount(), snapshot.capturedAt()))
+                .toList();
+    }
+
+    public SnapshotSummary inspectSnapshot(UUID actor, String name) throws IOException {
+        requireServerThread();
+        RegionSnapshot snapshot = snapshotStore.findOwnedByName(actor, name)
+                .orElseThrow(() -> new IllegalArgumentException("snapshot not found"));
+        return new SnapshotSummary(snapshot.id().name(), snapshot.id().value(),
+                snapshot.selection().dimension(), snapshot.selection().volume(),
+                snapshot.selection().chunkCount(), snapshot.capturedAt());
+    }
+
+    public void deleteSnapshot(UUID actor, String name) throws IOException {
+        requireServerThread();
+        RegionSnapshot snapshot = snapshotStore.findOwnedByName(actor, name)
+                .orElseThrow(() -> new IllegalArgumentException("snapshot not found"));
+        if (manifests.referencesSnapshot(snapshot.id().value())) {
+            throw new IllegalStateException("snapshot is protected by recovery or retained undo");
+        }
+        snapshotStore.remove(snapshot.id().value());
+    }
+
+    public ConfirmedRestore confirm(UUID actor, RestorePreview preview) {
+        ensureReady(preview.selection());
+        return confirmations.issue(actor, preview, Instant.now());
+    }
+
+    public TransactionReport restore(ServerLevel level, UUID actor,
+                                     ConfirmedRestore confirmation) throws IOException {
+        ensureReady(confirmation.preview().selection());
+        requireServerThread();
+        RegionSnapshot snapshot = snapshotStore.load(confirmation.preview().snapshotId().value())
+                .orElseThrow(() -> new IOException("target snapshot disappeared"));
+        if (!snapshot.ownerId().equals(actor)) {
+            throw new IllegalArgumentException("snapshot belongs to another player");
+        }
+        return restoreService.restore(level, actor, confirmation, Instant.now());
+    }
+
+    public TransactionReport undo(ServerLevel level, UUID actor, UUID transactionId) throws IOException {
+        requireServerThread();
+        return restoreService.undo(level, actor, transactionId, Instant.now());
+    }
+
+    public List<RestoreTransactionService.UndoSummary> availableUndo(UUID actor) throws IOException {
+        requireServerThread();
+        restoreService.cleanupExpiredUndo(Instant.now());
+        return restoreService.availableUndo(actor, Instant.now());
+    }
+
+    public void retireUndo(UUID actor, UUID transactionId) throws IOException {
+        requireServerThread();
+        restoreService.retireUndo(transactionId, actor, Instant.now());
+    }
+
+    public CapabilityRegistry capabilities() {
+        return capabilities;
+    }
+
+    public PlanGate planGate() {
+        return planGate;
+    }
+
+    public boolean ready() {
+        return ready;
+    }
+
+    public String blockedReason() {
+        return blockedReason;
+    }
+
+    private void ensureReady(RegionSelection selection) {
+        if (!ready) {
+            throw new IllegalStateException("strong wishes are blocked: " + blockedReason);
+        }
+        try {
+            var admission = RecoveryClassifier.classify(recoveryJournal.scan())
+                    .check(new dev.romankrukovsky.kubanhorizons.genie.runtime.recovery.AffectedScope(
+                            selection.dimension(),
+                            net.minecraft.world.level.ChunkPos.containing(selection.min()).x(),
+                            net.minecraft.world.level.ChunkPos.containing(selection.min()).z(),
+                            net.minecraft.world.level.ChunkPos.containing(selection.max()).x(),
+                            net.minecraft.world.level.ChunkPos.containing(selection.max()).z()));
+            if (!admission.permitted()) {
+                throw new IllegalStateException("recovery gate blocks this region: "
+                        + admission.reason().orElseThrow());
+            }
+        } catch (IOException exception) {
+            throw new IllegalStateException("recovery journal cannot be verified", exception);
+        }
+    }
+
+    private MinecraftServer server() {
+        return server;
+    }
+
+    private void requireServerThread() {
+        if (!server.isSameThread()) {
+            throw new IllegalStateException("strong wish world access must run on the server thread");
+        }
+    }
+
+    private static String digest(String value) {
+        try {
+            return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
+                    .digest(value.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
+    public record SnapshotSummary(String name, UUID id, String dimension, long blocks,
+                                  int chunks, Instant capturedAt) {
+        public SnapshotSummary {
+            Objects.requireNonNull(name, "name");
+            Objects.requireNonNull(id, "id");
+            Objects.requireNonNull(dimension, "dimension");
+            Objects.requireNonNull(capturedAt, "capturedAt");
+        }
+    }
+}

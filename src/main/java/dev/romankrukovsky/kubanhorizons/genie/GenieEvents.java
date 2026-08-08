@@ -19,6 +19,11 @@ public final class GenieEvents {
         if (event.getLevel() instanceof ServerLevel level) {
             WishborneDefenseHandler.tickServer(level);
             PhantomDeathController.tickServer(level);
+            dev.romankrukovsky.kubanhorizons.genie.dimension.PocketSceneEngine.tickServer(level);
+            for (var player : level.players()) {
+                dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieTransformationController
+                        .tickTransformation(level, player);
+            }
         }
     }
 
@@ -28,5 +33,18 @@ public final class GenieEvents {
                 event.getEntity(), event.getSource(), event.getAmount())) {
             event.setCanceled(true);
         }
+        if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player
+                && event.getAmount() >= player.getHealth()) {
+            var genies = player.level().getEntities(
+                    net.minecraft.world.level.entity.EntityTypeTest.forClass(
+                            dev.romankrukovsky.kubanhorizons.entity.KubanGenie.class),
+                    player.getBoundingBox().inflate(32.0D), genie -> genie.isOwnedBy(player));
+            if (!genies.isEmpty()
+                    && dev.romankrukovsky.kubanhorizons.genie.vessel.OwnerDeathProtocol
+                            .rescueNow(genies.getFirst(), player.level(), player)) {
+                event.setCanceled(true);
+            }
+        }
     }
+
 }

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": "minecraft:amethyst_shard",
+    "G": "minecraft:gold_ingot",
+    "P": "minecraft:ender_pearl"
+  },
+  "pattern": [
+    "AGA",
+    "GPG",
+    "AGA"
+  ],
+  "result": {
+    "id": "kubanhorizons:magic_mirror"
+  }
+}
