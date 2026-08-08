@@ -29,7 +29,8 @@ import java.util.concurrent.CompletableFuture;
 public final class KHLootTableProvider extends LootTableProvider {
     public KHLootTableProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
         super(output, Set.of(),
-                List.of(new SubProviderEntry(KHBlockLoot::new, LootContextParamSets.BLOCK)),
+                List.of(new SubProviderEntry(KHBlockLoot::new, LootContextParamSets.BLOCK),
+                        new SubProviderEntry(KHEntityLoot::new, LootContextParamSets.ENTITY)),
                 registries);
     }
 
@@ -42,9 +43,11 @@ public final class KHLootTableProvider extends LootTableProvider {
         protected void generate() {
             dropSelf(KHBlocks.OIL_PRESS.get());
             dropSelf(KHBlocks.IRRIGATION_CHANNEL.get());
+            dropSelf(KHBlocks.STONE_IRRIGATION_CHANNEL.get());
             dropSelf(KHBlocks.WATER_INTAKE.get());
             dropSelf(KHBlocks.DRYING_RACK.get());
             dropSelf(KHBlocks.HAND_MILL.get());
+            dropSelf(KHBlocks.CUTTING_BOARD.get());
 
             // Строительные блоки (этап 7). Плиты дают два предмета — иначе
             // разбор двойной плиты терял бы половину материала.

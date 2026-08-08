@@ -58,6 +58,9 @@ public final class KHSounds {
     /** Суховей: шум сухого степного ветра над полем. */
     public static final DeferredHolder<SoundEvent, SoundEvent> DRY_WIND = register("weather.dry_wind");
 
+    /** Магический щелчок Кубанской Джиннии при исполнении желаний. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> GENIE_SNAP = register("entity.genie.snap");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name.replace('.', '_'),
                 () -> SoundEvent.createVariableRangeEvent(KHIds.of(name.replace('.', '_'))));

@@ -600,6 +600,7 @@ def main():
          "heron_spawn_egg")
     save(spawn_egg_item((104, 108, 96, 255), (208, 202, 180, 255)),
          "sturgeon_spawn_egg")
+    save(bottle((212, 172, 60, 255), (255, 220, 100, 255)), "player_genie_lamp")
 
 
 if __name__ == "__main__":

@@ -430,6 +430,28 @@ public final class KHItems {
     public static final DeferredItem<Item> NUTRIA_PELT =
             ITEMS.registerSimpleItem("nutria_pelt");
 
+    /** Деревянная ложка — иронический предмет подмены при атаке мечом. */
+    public static final DeferredItem<Item> WOODEN_SPOON =
+            ITEMS.registerSimpleItem("wooden_spoon");
+
+    /** Застывший звуковой вал — материализованная звуковая волна Вардена. */
+    public static final DeferredItem<Item> SONIC_BOOM_ITEM =
+            ITEMS.registerSimpleItem("sonic_boom_item");
+
+    /** Магическое зеркало — смартфон Джиннии. */
+    public static final DeferredItem<Item> MAGIC_MIRROR =
+            ITEMS.registerSimpleItem("magic_mirror", p -> p.stacksTo(1));
+
+    /** Сжатый карманный мир — 100x100 область мира на ладони. */
+    public static final DeferredItem<Item> MINIATURE_WORLD =
+            ITEMS.registerSimpleItem("miniature_world", p -> p.stacksTo(1));
+
+    /** Лампа превращённого игрока-Джиннии (сосуд существования). */
+    public static final DeferredItem<Item> PLAYER_GENIE_LAMP =
+            ITEMS.registerItem("player_genie_lamp",
+                    p -> new dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieLampItem(p),
+                    p -> p.stacksTo(1));
+
     private KHItems() {
     }
 

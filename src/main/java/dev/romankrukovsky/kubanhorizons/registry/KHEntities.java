@@ -3,6 +3,7 @@ package dev.romankrukovsky.kubanhorizons.registry;
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
 import dev.romankrukovsky.kubanhorizons.entity.Pheasant;
 import dev.romankrukovsky.kubanhorizons.entity.Quail;
+import dev.romankrukovsky.kubanhorizons.entity.KubanGenie;
 import dev.romankrukovsky.kubanhorizons.util.KHIds;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -32,6 +33,14 @@ public final class KHEntities {
                     .eyeHeight(0.4F)
                     .clientTrackingRange(8)
                     .build(key("quail")));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<KubanGenie>> KUBAN_GENIE =
+            ENTITIES.register("kuban_genie", () -> EntityType.Builder
+                    .of(KubanGenie::new, MobCategory.CREATURE)
+                    .sized(0.8F, 2.4F)
+                    .eyeHeight(2.05F)
+                    .clientTrackingRange(10)
+                    .build(key("kuban_genie")));
 
     /**
      * Дикий кабан: давление на незащищённое хозяйство.
@@ -129,6 +138,15 @@ public final class KHEntities {
                     .eyeHeight(1.3F)
                     .clientTrackingRange(10)
                     .build(key("heron")));
+
+    /** Магический клон-двойник игрока. */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.MagicDoppelgangerEntity>> MAGIC_DOPPELGANGER =
+            ENTITIES.register("magic_doppelganger", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.MagicDoppelgangerEntity::new, MobCategory.CREATURE)
+                    .sized(0.6F, 1.8F)
+                    .eyeHeight(1.6F)
+                    .clientTrackingRange(10)
+                    .build(key("magic_doppelganger")));
 
     private KHEntities() {
     }

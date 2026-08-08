@@ -25,6 +25,9 @@ public final class KHSoundDefinitionsProvider extends SoundDefinitionsProvider {
         add(KHSounds.OIL_PRESS_FINISH.get(), definition()
                 .subtitle("subtitles.kubanhorizons.oil_press.finish")
                 .with(sound(KHIds.of("block/oil_press/finish"))));
+        add(KHSounds.GENIE_SNAP.get(), definition()
+                .subtitle("subtitles.kubanhorizons.entity.genie.snap")
+                .with(sound(KHIds.of("entity/genie/snap"))));
 
         // Фауна. Без этих определений зарегистрированные события звучат как
         // тишина: игрок видит птицу и не слышит её.

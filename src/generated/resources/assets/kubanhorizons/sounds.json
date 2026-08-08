@@ -17,6 +17,12 @@
     ],
     "subtitle": "subtitles.kubanhorizons.oil_press.work"
   },
+  "entity_genie_snap": {
+    "sounds": [
+      "kubanhorizons:entity/genie/snap"
+    ],
+    "subtitle": "subtitles.kubanhorizons.entity.genie.snap"
+  },
   "entity_pheasant_ambient": {
     "sounds": [
       "kubanhorizons:entity/pheasant/ambient"

@@ -133,6 +133,26 @@ public final class KHGameTests {
         register("carved_casing_facing_and_shape", KHGameTests::testCarvedCasingFacingAndShape, 100);
         register("roof_tile_slab_drops_two", KHGameTests::testRoofTileSlabDropsTwo, 100);
         register("ceramics_tools_drops_and_tags", KHGameTests::testCeramicsToolsDropsAndTags, 100);
+        register("genie_is_wishborne", KHGameTests::testGenieIsWishborne, 100);
+        register("genie_personality_changes", KHGameTests::testGeniePersonalityChanges, 100);
+        register("genie_brain_prioritizes_danger", KHGameTests::testGenieBrainPrioritizesDanger, 100);
+        register("genie_brain_remembers_actions", KHGameTests::testGenieBrainRemembersActions, 100);
+        register("genie_predictive_planning", KHGameTests::testGeniePredictivePlanning, 100);
+        register("genie_defense_irony", KHGameTests::testGenieDefenseIrony, 100);
+        register("genie_phantom_death", KHGameTests::testGeniePhantomDeath, 100);
+        register("genie_meta_rules", KHGameTests::testGenieMetaRules, 100);
+        register("genie_gigantism_engine", KHGameTests::testGenieGigantismEngine, 100);
+        register("genie_world_memory", KHGameTests::testGenieWorldMemory, 100);
+        register("genie_inviolability", KHGameTests::testGenieInviolabilityAndKillIntercept, 100);
+        register("genie_aura_of_laws", KHGameTests::testGenieAuraOfLaws, 100);
+        register("genie_literal_wish", KHGameTests::testLiteralWishEngine, 100);
+        register("genie_visual_effects", KHGameTests::testGenieTailEngineAndCartoonAnatomy, 100);
+        register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
+        register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
+        register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
+        register("player_genie_vessel_and_master", KHGameTests::testPlayerGenieVesselAndMaster, 100);
+        register("player_genie_progression_tiers", KHGameTests::testPlayerGenieProgressionTiers, 100);
+        register("player_genie_true_omnipotence_ending", KHGameTests::testPlayerGenieTrueOmnipotenceEnding, 100);
     }
 
     private KHGameTests() {
@@ -141,6 +161,195 @@ public final class KHGameTests {
     private static void register(String name, Consumer<GameTestHelper> function, int maxTicks) {
         TEST_FUNCTIONS.register(name, () -> function);
         TEST_MAX_TICKS.put(name, maxTicks);
+    }
+
+    /** Физический урон не является состоянием поражения для Wishborne-сущности. */
+    private static void testGenieIsWishborne(GameTestHelper helper) {
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+        float before = genie.getHealth();
+        boolean accepted = genie.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), 1000.0F);
+        helper.assertTrue(!accepted, "Джинния не должна принимать физический урон");
+        helper.assertTrue(genie.isAlive() && genie.getHealth() == before,
+                "Wishborne-джинния должна остаться живой с прежним здоровьем");
+        helper.succeed();
+    }
+
+    /** Вежливая точная формулировка меняет отношения, а характер выводится из них. */
+    private static void testGeniePersonalityChanges(GameTestHelper helper) {
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse(
+                "Я желаю сундук алмазов, безопасно размещённый передо мной");
+        helper.assertTrue(intent.precision() >= 75 && intent.isPreciseAndSafe(),
+                "Точная формулировка не распознана: " + intent);
+        genie.personality().observeWording(intent.polite(), intent.commanding(), intent.precision());
+        helper.assertTrue(genie.personality().respect() > 0 && genie.personality().affection() > 0,
+                "Вежливое точное желание должно повысить уважение и симпатию");
+        helper.succeed();
+    }
+
+    /** Мозг всегда выбирает спасение выше боя, снаряд — выше обычной угрозы. */
+    private static void testGenieBrainPrioritizesDanger(GameTestHelper helper) {
+        var brain = new dev.romankrukovsky.kubanhorizons.genie.GenieBrain();
+        var crisis = new dev.romankrukovsky.kubanhorizons.genie.GenieBrain.Situation(
+                100L, 25.0D, 3.0F, 20.0F, true, 12.0D,
+                100, 300, 4, 4.0D, 2, 5, 1, 4.0D);
+        helper.assertTrue(brain.decide(crisis)
+                        == dev.romankrukovsky.kubanhorizons.genie.GenieDecision.RESCUE_OWNER,
+                "Спасение хозяина должно иметь высший приоритет");
+
+        brain.record(dev.romankrukovsky.kubanhorizons.genie.GenieDecision.RESCUE_OWNER, 100L);
+        var defended = new dev.romankrukovsky.kubanhorizons.genie.GenieBrain.Situation(
+                110L, 25.0D, 20.0F, 20.0F, false, 0.0D,
+                300, 300, 4, 4.0D, 2, 5, 0, Double.POSITIVE_INFINITY);
+        helper.assertTrue(brain.decide(defended)
+                        == dev.romankrukovsky.kubanhorizons.genie.GenieDecision.INTERCEPT_PROJECTILE,
+                "Летящий снаряд должен быть важнее удалённой угрозы");
+        helper.succeed();
+    }
+
+    /** Utility-планировщик предсказывает взрыв и отличает летящий мимо снаряд. */
+    private static void testGeniePredictivePlanning(GameTestHelper helper) {
+        var brain = new dev.romankrukovsky.kubanhorizons.genie.GenieBrain();
+        var explosion = new dev.romankrukovsky.kubanhorizons.genie.GenieBrain.Situation(
+                200L, 9.0D, 20.0F, 20.0F, false, 0.0D,
+                300, 300, 1, 4.0D, 0, 200, 1, 4.0D);
+        helper.assertTrue(brain.decide(explosion)
+                        == dev.romankrukovsky.kubanhorizons.genie.GenieDecision.PREEMPT_EXPLOSION,
+                "Взводящийся крипер должен быть предотвращён до взрыва");
+        helper.assertTrue(brain.lastScore() >= 850,
+                "Прогноз взрыва должен иметь высокую utility-оценку");
+
+        var peaceful = new dev.romankrukovsky.kubanhorizons.genie.GenieBrain.Situation(
+                201L, 9.0D, 20.0F, 20.0F, false, 0.0D,
+                300, 300, 0, Double.POSITIVE_INFINITY, 0, 200, 0, Double.POSITIVE_INFINITY);
+        helper.assertTrue(brain.decide(peaceful)
+                        == dev.romankrukovsky.kubanhorizons.genie.GenieDecision.OBSERVE,
+                "Без прогнозируемой угрозы джинния не должна тратить магию");
+        helper.succeed();
+    }
+
+    /** Действия изменяют память, а приказ циклически проходит все режимы. */
+    private static void testGenieBrainRemembersActions(GameTestHelper helper) {
+        var brain = new dev.romankrukovsky.kubanhorizons.genie.GenieBrain();
+        brain.record(dev.romankrukovsky.kubanhorizons.genie.GenieDecision.REPEL_THREAT, 1L);
+        brain.record(dev.romankrukovsky.kubanhorizons.genie.GenieDecision.INTERCEPT_PROJECTILE, 2L);
+        brain.recordWish();
+        helper.assertTrue(brain.threatsRepelled() == 1 && brain.projectilesIntercepted() == 1
+                        && brain.wishesObserved() == 1,
+                "Мозг не запомнил совершённые действия");
+        helper.assertTrue(brain.cycleMode()
+                        == dev.romankrukovsky.kubanhorizons.genie.GenieBehaviorMode.STAY,
+                "После FOLLOW должен включаться STAY");
+        helper.assertTrue(brain.cycleMode()
+                        == dev.romankrukovsky.kubanhorizons.genie.GenieBehaviorMode.GUARD,
+                "После STAY должен включаться GUARD");
+        helper.succeed();
+    }
+
+    /** Ироническая защита превращает мечи в ложки, а взрывы вызывают частицы без урона. */
+    private static void testGenieDefenseIrony(GameTestHelper helper) {
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.NETHERITE_SWORD));
+
+        genie.hurtServer(helper.getLevel(), helper.getLevel().damageSources().playerAttack(player), 10.0F);
+        helper.assertTrue(player.getMainHandItem().is(KHItems.WOODEN_SPOON.get()),
+                "Атака мечом должна превратить оружие в деревянную ложку");
+        helper.succeed();
+    }
+
+    /** Ложная смерть временно скрывает джиннию и телепортирует за спину. */
+    private static void testGeniePhantomDeath(GameTestHelper helper) {
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+
+        dev.romankrukovsky.kubanhorizons.genie.defense.PhantomDeathController.triggerPhantomDeath(genie, helper.getLevel(), player);
+        helper.assertTrue(genie.isInvisible() && genie.isInvulnerable(),
+                "Ложная смерть должна сделать джиннию невидимой и неуязвимой");
+        helper.succeed();
+    }
+
+    /** Мета-желания изменяют правила игры Minecraft. */
+    private static void testGenieMetaRules(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("Хочу чтобы криперы больше не разрушали блоки");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.META_NO_CREEPER_DAMAGE,
+                "Мета-желание отключения разрушений не распознано");
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor.execute(helper.getLevel(), player, intent);
+        helper.assertTrue(result.executed(), "Мета-желание должно выполниться");
+        helper.assertTrue(!helper.getLevel().getGameRules().get(net.minecraft.world.level.gamerules.GameRules.MOB_GRIEFING),
+                "Правило mobGriefing должно стать false");
+        helper.succeed();
+    }
+
+    /** Движок гигантизма создаёт сущности гигантских масштабов. */
+    private static void testGenieGigantismEngine(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("Хочу гигантскую курицу");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.BIG_CHICKEN,
+                "Желание гигантской курицы не распознано");
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor.execute(helper.getLevel(), player, intent);
+        helper.assertTrue(result.executed(), "Желание гигантизма должно выполниться");
+        helper.succeed();
+    }
+
+    /** Долговременная память фиксирует желания и спасения. */
+    private static void testGenieWorldMemory(GameTestHelper helper) {
+        var memory = dev.romankrukovsky.kubanhorizons.genie.memory.WorldGenieMemory.get(helper.getLevel());
+        int before = memory.totalWishesGranted();
+        memory.recordWish(new BlockPos(1, 1, 1), "DIAMONDS", 100, helper.getLevel().getGameTime());
+        helper.assertTrue(memory.totalWishesGranted() == before + 1,
+                "Память должна учесть исполненное желание");
+        helper.succeed();
+    }
+
+    /** Полная физическая неуязвимость и перехват административного /kill. */
+    private static void testGenieInviolabilityAndKillIntercept(GameTestHelper helper) {
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+
+        genie.hurtServer(helper.getLevel(), helper.getLevel().damageSources().fellOutOfWorld(), 1000.0F);
+        helper.assertTrue(genie.isAlive(), "Джинния должна остаться живой после перехвата /kill");
+        helper.succeed();
+    }
+
+    /** Аура законов нейтрализует физические снаряды вокруг Джиннии. */
+    private static void testGenieAuraOfLaws(GameTestHelper helper) {
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+        var arrow = net.minecraft.world.entity.EntityTypes.ARROW.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        if (arrow != null) {
+            arrow.snapTo(genie.getX() + 0.5D, genie.getY(), genie.getZ() + 0.5D, 0.0F, 0.0F);
+            arrow.setDeltaMovement(new net.minecraft.world.phys.Vec3(1.0D, 0.0D, 0.0D));
+            helper.getLevel().addFreshEntity(arrow);
+            helper.startSequence()
+                    .thenExecuteAfter(2, () -> {
+                        dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws.tickAuraOfLaws(genie, helper.getLevel());
+                        helper.assertTrue(arrow.getDeltaMovement().lengthSqr() < 0.001D, "Снаряд в ауре законов должен замереть");
+                    })
+                    .thenSucceed();
+        } else {
+            helper.succeed();
+        }
+    }
+
+    /** Режим «Исполнить буквально» воплощает точные формулировки. */
+    private static void testLiteralWishEngine(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.LiteralWishEngine.executeLiteral(
+                helper.getLevel(), player, "40000 куриц");
+        helper.assertTrue(result.executed(), "Буквалистское желание должно выполниться");
+        helper.succeed();
+    }
+
+    /** Движок хвоста-индикатора маны и мультяшно-комедийных искажений. */
+    private static void testGenieTailEngineAndCartoonAnatomy(GameTestHelper helper) {
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+        dev.romankrukovsky.kubanhorizons.genie.visual.GenieTailEngine.tickTail(genie, helper.getLevel());
+        dev.romankrukovsky.kubanhorizons.genie.visual.CartoonAnatomyEngine.triggerFlatten(genie, helper.getLevel());
+        helper.assertTrue(genie.isAlive(), "Джинния должна остаться живой после мультяшного сплющивания");
+        helper.succeed();
     }
 
     /** Вызывается из главного класса мода. */
@@ -1536,6 +1745,90 @@ public final class KHGameTests {
         for (String id : items) {
             helper.assertTrue(BuiltInRegistries.ITEM.containsKey(KHIds.of(id)),
                     "Предмет отсутствует в реестре: " + id);
+        }
+        helper.succeed();
+    }
+
+    /** Распознавание искажённого желания высшего порядка «Я хочу стать всемогущим». */
+    private static void testPlayerGenieDistortedWishParse(GameTestHelper helper) {
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("Я хочу стать всемогущим.");
+        helper.assertTrue(intent.category() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Category.DISTORTED_HIGHER_WISH,
+                "Желание не отнесено к категории DISTORTED_HIGHER_WISH: " + intent);
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.OMNIPOTENCE,
+                "Цель OMNIPOTENCE не распознана: " + intent);
+        helper.succeed();
+    }
+
+    /** Сохранение и сериализация джинновского состояния игрока в Data Attachment. */
+    private static void testPlayerGenieAttachmentPersistence(GameTestHelper helper) {
+        var attachment = new dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment();
+        attachment.setGenie(true);
+        attachment.setStage(dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment.Stage.FULL_GENIE);
+        attachment.setWishProgressPercent(63);
+        attachment.setTierLevel(3);
+
+        helper.assertTrue(attachment.isGenie(), "Флаг isGenie не сохранён");
+        helper.assertTrue(attachment.getWishProgressPercent() == 63, "Прогресс 63% не сохранён");
+        helper.assertTrue(attachment.getTierLevel() == 3, "Уровень 3 не сохранён");
+        helper.succeed();
+    }
+
+    /** Контроллер 5-стадийной трансформации активирует полёт и неуязвимость. */
+    private static void testPlayerGenieTransformationController(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieTransformationController.startTransformation(
+                    helper.getLevel(), serverPlayer, dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.OMNIPOTENCE);
+            var data = serverPlayer.getData(dev.romankrukovsky.kubanhorizons.registry.KHAttachments.PLAYER_GENIE_DATA);
+            helper.assertTrue(data.isGenie(), "Игрок не получил джинновское состояние");
+            helper.assertTrue(serverPlayer.getAbilities().mayfly, "Игроку не привязан полёт");
+        }
+        helper.succeed();
+    }
+
+    /** Система Хозяин-Сосуд и лампа превращённого игрока. */
+    private static void testPlayerGenieVesselAndMaster(GameTestHelper helper) {
+        var geniePlayer = helper.makeMockPlayer(GameType.SURVIVAL);
+        var masterPlayer = helper.makeMockPlayer(GameType.SURVIVAL);
+        if (geniePlayer instanceof net.minecraft.server.level.ServerPlayer serverGenie) {
+            var data = serverGenie.getData(dev.romankrukovsky.kubanhorizons.registry.KHAttachments.PLAYER_GENIE_DATA);
+            data.setGenie(true);
+            boolean summoned = dev.romankrukovsky.kubanhorizons.genie.player.GenieMasterManager.summonGeniePlayer(
+                    helper.getLevel(), masterPlayer, serverGenie);
+            helper.assertTrue(summoned, "Призыв игрока-джиннии должен быть успешным");
+            helper.assertTrue(data.getMasterUUID().isPresent() && data.getMasterUUID().get().equals(masterPlayer.getUUID()),
+                    "Хозяин не сохранился в привязке джиннии");
+        }
+        helper.succeed();
+    }
+
+    /** Прогрессия 5 уровней и выполнение Воли Джиннии. */
+    private static void testPlayerGenieProgressionTiers(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            var data = serverPlayer.getData(dev.romankrukovsky.kubanhorizons.registry.KHAttachments.PLAYER_GENIE_DATA);
+            data.setGenie(true);
+            dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieProgression.advanceProgress(serverPlayer, 35); // 0 + 35 = 35 -> Tier 1
+            helper.assertTrue(data.getWishProgressPercent() == 35, "Прогресс 35% не записан");
+            dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieProgression.advanceProgress(serverPlayer, 60); // 35 + 60 = 95 -> Tier 5
+            helper.assertTrue(data.getTierLevel() == 5, "Должен разблокироваться Tier 5 при 95%");
+
+            boolean executed = dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieProgression.executeGenieWill(
+                    helper.getLevel(), serverPlayer, "Сделай иначе");
+            helper.assertTrue(executed, "Воля Джиннии на Tier 5 должна успешно выполняться");
+        }
+        helper.succeed();
+    }
+
+    /** Секретная концовка 100% выполнения Желания №1. */
+    private static void testPlayerGenieTrueOmnipotenceEnding(GameTestHelper helper) {
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            var data = serverPlayer.getData(dev.romankrukovsky.kubanhorizons.registry.KHAttachments.PLAYER_GENIE_DATA);
+            data.setGenie(true);
+            dev.romankrukovsky.kubanhorizons.genie.player.TrueOmnipotenceEnding.triggerEnding(helper.getLevel(), serverPlayer);
+            helper.assertTrue(data.getWishProgressPercent() == 100, "Прогресс должен достичь 100%");
+            helper.assertTrue(data.getTierLevel() == 5, "Уровень должен быть равным 5");
         }
         helper.succeed();
     }

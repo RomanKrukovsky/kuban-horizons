@@ -122,6 +122,55 @@ def irrigation_channel_water():
     return im
 
 
+
+# ---------- Каменный желоб и разделочный стол ----------
+
+def stone_irrigation_channel():
+    """Каменный желоб: тёсаный камень, суше и холоднее деревянного.
+
+    Отличается от ракушечника отсутствием каверн: это обработанный камень,
+    а не природный известняк, и апгрейд сети должен читаться как рукотворный.
+    """
+    im = img()
+    rect(im, 0, 0, 15, 15, PAL["stone"])
+    checker_noise(im, 0, 0, 15, 15, PAL["stone"], PAL["stone_dark"], 4)
+    # Тёска: горизонтальные борозды инструмента.
+    for y in (3, 8, 12):
+        hline(im, y, 1, 14, PAL["stone_dark"])
+    hline(im, 0, 0, 15, PAL["stone_hi"])
+    vline(im, 0, 0, 15, PAL["stone_hi"])
+    hline(im, 15, 0, 15, PAL["stone_dark"])
+    vline(im, 15, 0, 15, PAL["stone_dark"])
+    return im
+
+
+def stone_irrigation_channel_inner():
+    """Внутренняя поверхность: темнее и с потёками, как у деревянного."""
+    im = img()
+    rect(im, 0, 0, 15, 15, PAL["stone_dark"])
+    checker_noise(im, 0, 0, 15, 15, PAL["stone_dark"], PAL["stone"], 5)
+    for x in (3, 8, 12):
+        vline(im, x, 2, 13, PAL["chernozem_dark"])
+    return im
+
+
+def cutting_board_top():
+    """Столешница: доска со следами ножа вдоль волокна."""
+    im = plank_texture(PAL["wood_hi"], PAL["paper"], PAL["wood"], PAL["wood_dark"])
+    # Порезы — подпись именно разделочного стола, а не просто доски.
+    for x, y0, y1 in ((4, 2, 9), (7, 5, 13), (11, 3, 11), (13, 7, 14)):
+        vline(im, x, y0, y1, PAL["wood_dark"])
+    for y, x0, x1 in ((6, 2, 6), (11, 8, 14)):
+        hline(im, y, x0, x1, PAL["wood_dark"])
+    return im
+
+
+def cutting_board_side():
+    """Бок: чистая доска, торец волокна."""
+    return plank_texture(PAL["wood"], PAL["wood_hi"], PAL["wood_dark"],
+                         PAL["wood_darker"])
+
+
 # ---------- Водозабор ----------
 
 def water_intake_side():
@@ -448,6 +497,11 @@ def main():
     save(irrigation_channel_wood(), "irrigation_channel_wood")
     save(irrigation_channel_inner(), "irrigation_channel_inner")
     save(irrigation_channel_water(), "irrigation_channel_water")
+
+    save(stone_irrigation_channel(), "stone_irrigation_channel")
+    save(stone_irrigation_channel_inner(), "stone_irrigation_channel_inner")
+    save(cutting_board_top(), "cutting_board_top")
+    save(cutting_board_side(), "cutting_board_side")
 
     save(water_intake_side(), "water_intake_side")
     save(water_intake_top(), "water_intake_top")

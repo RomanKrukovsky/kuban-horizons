@@ -14,6 +14,7 @@ import dev.romankrukovsky.kubanhorizons.client.render.KubanQuadrupedModel;
 import dev.romankrukovsky.kubanhorizons.client.render.KubanQuadrupedRenderer;
 import dev.romankrukovsky.kubanhorizons.client.render.NutriaModel;
 import dev.romankrukovsky.kubanhorizons.client.render.NutriaRenderer;
+import dev.romankrukovsky.kubanhorizons.client.render.KubanGenieRenderer;
 import dev.romankrukovsky.kubanhorizons.client.screen.OilPressScreen;
 import dev.romankrukovsky.kubanhorizons.registry.KHEntities;
 import dev.romankrukovsky.kubanhorizons.registry.KHMenus;
@@ -118,5 +119,6 @@ public final class KHClientEvents {
                 context -> new WaterBirdRenderer(context, HERON_LAYER, "heron",
                         0.4F, false));
         event.registerEntityRenderer(KHEntities.STURGEON.get(), SturgeonRenderer::new);
+        event.registerEntityRenderer(KHEntities.KUBAN_GENIE.get(), KubanGenieRenderer::new);
     }
 }

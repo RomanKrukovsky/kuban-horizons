@@ -2,8 +2,8 @@
   "parent": "minecraft:block/block",
   "textures": {
     "particle": "kubanhorizons:block/stone_irrigation_channel",
-    "inner": "kubanhorizons:block/stone_irrigation_channel_inner",
-    "stone": "kubanhorizons:block/stone_irrigation_channel"
+    "stone": "kubanhorizons:block/stone_irrigation_channel",
+    "inner": "kubanhorizons:block/stone_irrigation_channel_inner"
   },
   "elements": [
     {

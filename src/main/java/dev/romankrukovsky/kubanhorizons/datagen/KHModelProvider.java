@@ -142,6 +142,25 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.COOKED_PHEASANT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.RAW_QUAIL.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.COOKED_QUAIL.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.WILD_BOAR_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.NUTRIA_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.LOCUST_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.CAUCASIAN_BEE_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.CAUCASIAN_SHEPHERD_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.STURGEON_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.GULL_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.HERON_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.RAW_BOAR.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.COOKED_BOAR.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.RAW_STURGEON.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.COOKED_STURGEON.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.NUTRIA_PELT.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.STURGEON_BUCKET.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.WOODEN_SPOON.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
+        itemModels.generateFlatItem(KHItems.SONIC_BOOM_ITEM.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.MAGIC_MIRROR.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.MINIATURE_WORLD.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.PLAYER_GENIE_LAMP.get(), ModelTemplates.FLAT_ITEM);
     }
 
     /**

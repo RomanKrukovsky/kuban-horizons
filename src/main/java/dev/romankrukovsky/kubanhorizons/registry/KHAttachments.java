@@ -3,6 +3,7 @@ package dev.romankrukovsky.kubanhorizons.registry;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
+import dev.romankrukovsky.kubanhorizons.genie.memory.WorldGenieMemory;
 import dev.romankrukovsky.kubanhorizons.soil.ChunkFertilityData;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -37,6 +38,11 @@ public final class KHAttachments {
                     () -> AttachmentType.serializable(
                             dev.romankrukovsky.kubanhorizons.soil.ChunkPollinationData::new).build());
 
+    /** Память мира о Кубанской Джиннии. */
+    public static final Supplier<AttachmentType<WorldGenieMemory>> GENIE_WORLD_MEMORY =
+            ATTACHMENTS.register("genie_world_memory",
+                    () -> AttachmentType.serializable(WorldGenieMemory::new).build());
+
     /** Флаг «путеводитель выдан» на игроке; переживает смерть. */
     public static final Supplier<AttachmentType<Boolean>> GUIDE_GIVEN =
             ATTACHMENTS.register("guide_given",
@@ -44,6 +50,14 @@ public final class KHAttachments {
                             .serialize(GUIDE_GIVEN_CODEC)
                             .copyOnDeath()
                             .build());
+
+    /** Состояние превращённого игрока-Джиннии; переживает смерть. */
+    public static final Supplier<AttachmentType<dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment>> PLAYER_GENIE_DATA =
+            ATTACHMENTS.register("player_genie_data",
+                    () -> AttachmentType.serializable(dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment::new)
+                            .copyOnDeath()
+                            .build());
+
 
     private KHAttachments() {
     }

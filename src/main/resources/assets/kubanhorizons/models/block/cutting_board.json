@@ -1,0 +1,36 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "kubanhorizons:block/cutting_board_top",
+    "top": "kubanhorizons:block/cutting_board_top",
+    "side": "kubanhorizons:block/cutting_board_side"
+  },
+  "elements": [
+    {
+      "__comment": "Столешница: низкая доска на всю клетку, как у ванильной плиты, но тоньше — режут на ней, а не стоят.",
+      "from": [0, 0, 0],
+      "to": [16, 3, 16],
+      "faces": {
+        "down": {"texture": "#side", "cullface": "down"},
+        "up": {"texture": "#top"},
+        "north": {"texture": "#side", "cullface": "north"},
+        "south": {"texture": "#side", "cullface": "south"},
+        "west": {"texture": "#side", "cullface": "west"},
+        "east": {"texture": "#side", "cullface": "east"}
+      }
+    },
+    {
+      "__comment": "Бортик по задней кромке: указывает лицевую сторону, поэтому FACING читается в мире.",
+      "from": [0, 3, 0],
+      "to": [16, 4, 2],
+      "faces": {
+        "up": {"texture": "#top"},
+        "down": {"texture": "#side"},
+        "north": {"texture": "#side", "cullface": "north"},
+        "south": {"texture": "#side"},
+        "west": {"texture": "#side", "cullface": "west"},
+        "east": {"texture": "#side", "cullface": "east"}
+      }
+    }
+  ]
+}

@@ -22,6 +22,14 @@ sourceSets.main.resources {
 }
 
 repositories {
+    mavenCentral()
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+        content {
+            includeGroup 'maven.modrinth'
+        }
+    }
 }
 
 base {
@@ -84,6 +92,7 @@ configurations {
 }
 
 dependencies {
+    implementation "maven.modrinth:geckolib:${geckolib_version}"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
@@ -91,6 +100,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
             neo_version            : neo_version,
+            geckolib_version       : geckolib_version,
             mod_id                 : mod_id,
             mod_name               : mod_name,
             mod_license            : mod_license,
