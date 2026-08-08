@@ -139,11 +139,21 @@ public final class Locust extends PathfinderMob {
     }
 
     /**
-     * Объедает культуру под собой: откатывает возраст на одну стадию, а
+     * Объедает культуру рядом: откатывает возраст на одну стадию, а
      * незрелую — уничтожает. Не трогает плодородие: саранча ест растение, а не
      * портит почву, в отличие от кабана.
      */
     private final class EatCropGoal extends net.minecraft.world.entity.ai.goal.Goal {
+        /**
+         * Радиус поиска посева по горизонтали.
+         *
+         * <p>Один блок, а не больше: саранча объедает то, на чём сидит, и не
+         * тянется через грядку. С радиусом 2 особь дотягивалась до чужого
+         * участка — в прогоне тестов рой из одного сценария объел посев
+         * соседнего, что и есть модель «саранча грызёт не своё поле».</p>
+         */
+        private static final int REACH = 1;
+
         @Override
         public boolean canUse() {
             return KHServerConfig.pressureEnabled()
@@ -156,22 +166,49 @@ public final class Locust extends PathfinderMob {
             if (!(level() instanceof ServerLevel level)) {
                 return;
             }
-            BlockPos pos = blockPosition();
-            for (int dy = 0; dy >= -2; dy--) {
-                BlockPos candidate = pos.offset(0, dy, 0);
-                BlockState state = level.getBlockState(candidate);
-                if (!state.is(BlockTags.CROPS)) {
-                    continue;
-                }
-                if (state.getBlock() instanceof CropBlock crop && crop.getAge(state) > 0) {
-                    level.setBlockAndUpdate(candidate, crop.getStateForAge(crop.getAge(state) - 1));
-                } else {
-                    level.destroyBlock(candidate, false, Locust.this);
-                }
-                level.playSound(null, candidate, KHSounds.LOCUST_AMBIENT.get(),
-                        net.minecraft.sounds.SoundSource.HOSTILE, 0.3F, 1.0F);
+            BlockPos found = findCrop(level);
+            if (found == null) {
                 return;
             }
+            BlockState state = level.getBlockState(found);
+            if (state.getBlock() instanceof CropBlock crop && crop.getAge(state) > 0) {
+                level.setBlockAndUpdate(found, crop.getStateForAge(crop.getAge(state) - 1));
+            } else {
+                level.destroyBlock(found, false, Locust.this);
+            }
+            level.playSound(null, found, KHSounds.LOCUST_AMBIENT.get(),
+                    net.minecraft.sounds.SoundSource.HOSTILE, 0.3F, 1.0F);
+        }
+
+        /**
+         * Ближайший посев вокруг особи.
+         *
+         * <p>Поиск идёт по небольшому объёму, а не строго вниз: саранча парит и
+         * почти никогда не оказывается ровно над стеблем в нужный тик. С поиском
+         * только под собой рой пролетал над полем, не тронув ни одного растения,
+         * — механика существовала в коде и не работала в игре.</p>
+         */
+        private BlockPos findCrop(ServerLevel level) {
+            BlockPos origin = blockPosition();
+            BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+            BlockPos best = null;
+            double bestDistance = Double.MAX_VALUE;
+            for (int dy = 1; dy >= -3; dy--) {
+                for (int dx = -REACH; dx <= REACH; dx++) {
+                    for (int dz = -REACH; dz <= REACH; dz++) {
+                        cursor.set(origin.getX() + dx, origin.getY() + dy, origin.getZ() + dz);
+                        if (!level.getBlockState(cursor).is(BlockTags.CROPS)) {
+                            continue;
+                        }
+                        double distance = cursor.distSqr(origin);
+                        if (distance < bestDistance) {
+                            bestDistance = distance;
+                            best = cursor.immutable();
+                        }
+                    }
+                }
+            }
+            return best;
         }
     }
 }

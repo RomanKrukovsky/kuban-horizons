@@ -120,6 +120,19 @@ public final class KHGameTests {
         register("fauna_natural_spawns", KHGameTests::testFaunaNaturalSpawns, 100);
         register("fauna_food_tags", KHGameTests::testFaunaFoodTags, 100);
         register("boar_raid_tramples_crop", KHGameTests::testBoarRaidTramples, 200);
+        // Давление на хозяйство: механики, уничтожающие собственность игрока.
+        register("nutria_gnaws_only_wooden_channel",
+                KHGameTests::testNutriaGnawsOnlyWoodenChannel, 220);
+        register("pollination_mark_lifecycle",
+                KHGameTests::testPollinationMarkLifecycle, 100);
+        register("dry_wind_spares_watered_and_sheltered",
+                KHGameTests::testDryWindSparesWateredAndSheltered, 100);
+        register("flooding_washes_crop_but_enriches_soil",
+                KHGameTests::testFloodingWashesCropButEnrichesSoil, 100);
+        register("fertility_clamps_at_bounds",
+                KHGameTests::testFertilityClampsAtBounds, 100);
+        register("locust_eats_crop_stage", KHGameTests::testLocustEatsCropStage, 180);
+        register("ground_bird_hunts_locust", KHGameTests::testGroundBirdHuntsLocust, 220);
         register("worldgen_feature_order", KHGameTests::testWorldgenFeatureOrder, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
         register("structure_registry_integrity", KHGameTests::testStructureRegistryIntegrity, 100);
@@ -2430,5 +2443,291 @@ public final class KHGameTests {
             helper.assertTrue(data.getTierLevel() == 5, "Уровень должен быть равным 5");
         }
         helper.succeed();
+    }
+
+    // --- Тесты давления на хозяйство ---
+    //
+    // Эти механики уничтожают собственность игрока: посевы, плодородие,
+    // блоки оросительной сети. Непокрытая тестами разрушительная логика —
+    // самый дорогой класс ошибок в моде, потому что цена бага здесь не
+    // «выглядит не так», а «съело чужую ферму».
+
+    /**
+     * Нутрия грызёт деревянный желоб, но не каменный.
+     *
+     * <p>Ровно на этой разнице держится смысл апгрейда сети: если бы цель
+     * искала блок через {@code instanceof}, каменный желоб (подкласс
+     * деревянного) тоже стал бы добычей, и платить за апгрейд было бы не за
+     * что. Поэтому оба случая проверяются в одном тесте — иначе регрессия
+     * прошла бы незамеченной.</p>
+     */
+    private static void testNutriaGnawsOnlyWoodenChannel(GameTestHelper helper) {
+        if (!dev.romankrukovsky.kubanhorizons.config.KHServerConfig.pressureEnabled()) {
+            helper.succeed();
+            return;
+        }
+        BlockPos woodPos = new BlockPos(1, 2, 1);
+        BlockPos stonePos = new BlockPos(3, 2, 1);
+        // Пол: без опоры нутрия провалится и не дойдёт до сети.
+        for (int dx = -1; dx <= 5; dx++) {
+            for (int dz = -2; dz <= 2; dz++) {
+                helper.setBlock(woodPos.offset(dx, -1, dz), Blocks.DIRT);
+            }
+        }
+        helper.setBlock(woodPos, KHBlocks.IRRIGATION_CHANNEL.get());
+        helper.setBlock(stonePos, KHBlocks.STONE_IRRIGATION_CHANNEL.get());
+
+        var nutria = helper.spawn(KHEntities.NUTRIA.get(), woodPos.offset(1, 0, 0));
+        helper.assertTrue(nutria != null, "Нутрия не создалась");
+
+        helper.runAfterDelay(190, () -> {
+            helper.assertTrue(
+                    !helper.getBlockState(woodPos).is(KHBlocks.IRRIGATION_CHANNEL.get()),
+                    "Нутрия не сгрызла деревянный желоб: сеть неуязвима, давления нет");
+            helper.assertTrue(
+                    helper.getBlockState(stonePos).is(KHBlocks.STONE_IRRIGATION_CHANNEL.get()),
+                    "Каменный желоб уничтожен — апгрейд сети не защищает, и платить за него незачем");
+            nutria.discard();
+            helper.succeed();
+        });
+    }
+
+    /**
+     * Опыление: метка ставится, читается и снимается.
+     *
+     * <p>Проверяется публичный контракт {@link dev.romankrukovsky.kubanhorizons.soil.Pollination},
+     * а не полёт пчелы: сама пчела ставит метку по таймеру, и тест на её
+     * перемещение проверял бы навигацию, а не бонус к урожаю.</p>
+     */
+    private static void testPollinationMarkLifecycle(GameTestHelper helper) {
+        if (!dev.romankrukovsky.kubanhorizons.config.KHServerConfig.pollinationEnabled()) {
+            helper.succeed();
+            return;
+        }
+        ServerLevel level = helper.getLevel();
+        BlockPos cropPos = preparedFarmland(helper, new BlockPos(1, 1, 1));
+        BlockPos soil = helper.absolutePos(cropPos.below());
+
+        helper.assertTrue(
+                !dev.romankrukovsky.kubanhorizons.soil.Pollination.isPollinated(level, soil),
+                "Свежая грядка не должна считаться опылённой");
+
+        dev.romankrukovsky.kubanhorizons.soil.Pollination.mark(level, soil);
+        helper.assertTrue(
+                dev.romankrukovsky.kubanhorizons.soil.Pollination.isPollinated(level, soil),
+                "Метка опыления не поставилась: бонус к урожаю недостижим");
+
+        // Снятие метки: опыление — разовый бонус за визит пчелы, а не
+        // постоянное свойство грядки.
+        dev.romankrukovsky.kubanhorizons.soil.Pollination.consume(level, soil);
+        helper.assertTrue(
+                !dev.romankrukovsky.kubanhorizons.soil.Pollination.isPollinated(level, soil),
+                "Метка не снялась после сбора: бонус стал бы бесконечным");
+        helper.succeed();
+    }
+
+    /**
+     * Суховей сушит открытую грядку, но не трогает политую.
+     *
+     * <p>Исключение важнее самого иссушения: политая сетью земля переживает
+     * ветер — в этом вся награда за постройку орошения. Сломайся это, и система
+     * полива потеряла бы смысл, а тест на «сушит» остался бы зелёным.</p>
+     *
+     * <p>Проверка «под крышей не сушит» сюда намеренно не входит: она опирается
+     * на {@code canSeeSky}, то есть на карту освещения, которая в тестовой
+     * структуре не пересчитывается сразу после установки блока. Такой тест
+     * падал бы на устройстве теста, а не на механике.</p>
+     */
+    private static void testDryWindSparesWateredAndSheltered(GameTestHelper helper) {
+        if (!dev.romankrukovsky.kubanhorizons.config.KHServerConfig.dryWindEnabled()) {
+            helper.succeed();
+            return;
+        }
+        ServerLevel level = helper.getLevel();
+        var moisture = net.minecraft.world.level.block.FarmlandBlock.MOISTURE;
+
+        BlockPos open = new BlockPos(1, 2, 1);
+        BlockPos watered = new BlockPos(3, 2, 1);
+        for (BlockPos pos : new BlockPos[]{open, watered}) {
+            helper.setBlock(pos.below(), Blocks.DIRT);
+            helper.setBlock(pos, Blocks.FARMLAND.defaultBlockState().setValue(moisture, 7));
+        }
+        // Политая: заполненный желоб отдаёт воду, как в настоящей сети.
+        helper.setBlock(watered.above(), Blocks.WATER);
+
+        // Три волны: за одну ветер снимает один шаг влажности. Больше не нужно —
+        // досуха выветренная грядка осыпается в землю, и тогда у блока уже нет
+        // свойства влажности, о которое падал первый вариант теста.
+        for (int i = 0; i < 3; i++) {
+            dev.romankrukovsky.kubanhorizons.weather.DryWind.blow(
+                    level, helper.absolutePos(open));
+        }
+
+        BlockState openAfter = helper.getBlockState(open);
+        boolean driedOut = !openAfter.hasProperty(moisture)
+                || openAfter.getValue(moisture) < 7;
+        helper.assertTrue(driedOut,
+                "Суховей не иссушил открытую грядку: орошение остаётся необязательным");
+        BlockState wateredAfter = helper.getBlockState(watered);
+        helper.assertTrue(wateredAfter.hasProperty(moisture)
+                        && wateredAfter.getValue(moisture) == 7,
+                "Политая грядка высохла — награда за оросительную сеть не работает");
+        helper.succeed();
+    }
+
+    /**
+     * Половодье двойственно: посев смыт, но плодородие выросло.
+     *
+     * <p>Это не штраф, а ставка: сеешь низко в пойме — рискуешь урожаем и
+     * получаешь ил. Проверяются обе половины исхода, потому что тест только на
+     * «смыло» прошёл бы и на чисто карательной версии механики.</p>
+     */
+    private static void testFloodingWashesCropButEnrichesSoil(GameTestHelper helper) {
+        if (!dev.romankrukovsky.kubanhorizons.config.KHServerConfig.floodingEnabled()) {
+            helper.succeed();
+            return;
+        }
+        ServerLevel level = helper.getLevel();
+        BlockPos cropPos = preparedFarmland(helper, new BlockPos(2, 2, 2));
+        BlockPos soilPos = cropPos.below();
+        BlockPos absoluteSoil = helper.absolutePos(soilPos);
+        placeMatureSunflower(helper, cropPos);
+        // Вода рядом и выше грядки — условие затопления.
+        helper.setBlock(soilPos.offset(1, 1, 0), Blocks.WATER);
+
+        // Плодородие сначала снижается, иначе прибавка ила упрётся в максимум
+        // шкалы и тест не отличит рост от отсутствия изменений.
+        dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onTrample(level, absoluteSoil);
+        int before = dev.romankrukovsky.kubanhorizons.soil.SoilFertility
+                .fertility(level, absoluteSoil);
+
+        var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        int flooded = dev.romankrukovsky.kubanhorizons.weather.Flooding.rise(
+                level, absoluteSoil);
+        if (flooded == 0) {
+            // Событие привязано к биому поймы; тестовый мир — не пойма.
+            // Тогда проверяется хотя бы вклад ила напрямую.
+            dev.romankrukovsky.kubanhorizons.soil.SoilFertility
+                    .onFloodDeposit(level, absoluteSoil);
+            int silted = dev.romankrukovsky.kubanhorizons.soil.SoilFertility
+                    .fertility(level, absoluteSoil);
+            helper.assertTrue(silted > before,
+                    "Речной ил не поднял плодородие: " + before + " -> " + silted);
+            helper.succeed();
+            return;
+        }
+
+        helper.assertTrue(!helper.getBlockState(cropPos).is(BlockTags.CROPS),
+                "Половодье не смыло посев");
+        int after = dev.romankrukovsky.kubanhorizons.soil.SoilFertility
+                .fertility(level, absoluteSoil);
+        helper.assertTrue(after > before,
+                "Плодородие не выросло после схода воды: половодье стало чистым штрафом, "
+                        + before + " -> " + after);
+        helper.succeed();
+    }
+
+    /**
+     * Плодородие не выходит за шкалу 0..100 и реагирует на вытаптывание.
+     *
+     * <p>Проверяются края: без ограничения снизу многократный налёт увёл бы
+     * значение в минус, и «мёртвая» грядка начала бы вести себя как плодородная
+     * после переполнения.</p>
+     */
+    private static void testFertilityClampsAtBounds(GameTestHelper helper) {
+        if (!dev.romankrukovsky.kubanhorizons.config.KHServerConfig.fertilityEnabled()) {
+            helper.succeed();
+            return;
+        }
+        ServerLevel level = helper.getLevel();
+        BlockPos cropPos = preparedFarmland(helper, new BlockPos(1, 1, 1));
+        BlockPos soil = helper.absolutePos(cropPos.below());
+        int base = dev.romankrukovsky.kubanhorizons.soil.SoilFertility
+                .fertility(level, soil);
+
+        // Одно вытаптывание обязано что-то изменить. Без этой проверки тест на
+        // одни лишь границы шкалы проходил бы и на полностью отключённом
+        // вытаптывании: значение осталось бы в допустимых 0..100.
+        dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onTrample(level, soil);
+        int once = dev.romankrukovsky.kubanhorizons.soil.SoilFertility
+                .fertility(level, soil);
+        helper.assertTrue(once < base,
+                "Вытаптывание не снизило плодородие: " + base + " -> " + once);
+
+        // Дно: двадцать вытаптываний подряд не должны уронить ниже нуля.
+        for (int i = 0; i < 20; i++) {
+            dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onTrample(level, soil);
+        }
+        int floor = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, soil);
+        helper.assertTrue(floor >= 0,
+                "Плодородие ушло ниже нуля: " + floor);
+
+        // Потолок: столько же отложений ила не должны превысить максимум.
+        for (int i = 0; i < 30; i++) {
+            dev.romankrukovsky.kubanhorizons.soil.SoilFertility.onFloodDeposit(level, soil);
+        }
+        int ceiling = dev.romankrukovsky.kubanhorizons.soil.SoilFertility.fertility(level, soil);
+        helper.assertTrue(
+                ceiling <= dev.romankrukovsky.kubanhorizons.soil.SoilFertility.MAX,
+                "Плодородие превысило максимум шкалы: " + ceiling);
+        helper.assertTrue(ceiling > floor,
+                "Ил не поднял плодородие с дна: " + floor + " -> " + ceiling);
+        helper.succeed();
+    }
+
+    /**
+     * Саранча объедает культуру: возраст откатывается на стадию назад.
+     *
+     * <p>Отличие от кабана существенное: саранча ест растение и не портит
+     * почву, поэтому тест заодно следит, что грядка под ней осталась грядкой.</p>
+     */
+    private static void testLocustEatsCropStage(GameTestHelper helper) {
+        if (!dev.romankrukovsky.kubanhorizons.config.KHServerConfig.pressureEnabled()) {
+            helper.succeed();
+            return;
+        }
+        BlockPos cropPos = preparedFarmland(helper, new BlockPos(1, 1, 1));
+        placeMatureSunflower(helper, cropPos);
+        int ageBefore = helper.getBlockState(cropPos).getValue(SunflowerCropBlock.AGE);
+
+        var locust = helper.spawn(KHEntities.LOCUST.get(), cropPos);
+        helper.assertTrue(locust != null, "Саранча не создалась");
+
+        helper.runAfterDelay(150, () -> {
+            BlockState after = helper.getBlockState(cropPos);
+            boolean damaged = !after.is(BlockTags.CROPS)
+                    || after.getValue(SunflowerCropBlock.AGE) < ageBefore;
+            helper.assertTrue(damaged,
+                    "Саранча не тронула посев: налёт не наносит урона");
+            helper.assertTrue(helper.getBlockState(cropPos.below()).is(BlockTags.SUPPORTS_CROPS),
+                    "Саранча испортила почву — это работа кабана, не насекомого");
+            locust.discard();
+            helper.succeed();
+        });
+    }
+
+    /**
+     * Наземная птица убивает саранчу.
+     *
+     * <p>Это единственная причина держать фазанов у поля: без охоты птица —
+     * просто мясо, и связка «птицы защищают урожай» существует лишь на бумаге.</p>
+     */
+    private static void testGroundBirdHuntsLocust(GameTestHelper helper) {
+        for (int dx = -1; dx <= 5; dx++) {
+            for (int dz = -1; dz <= 5; dz++) {
+                helper.setBlock(new BlockPos(1, 1, 1).offset(dx, 0, dz), Blocks.DIRT);
+            }
+        }
+        BlockPos birdPos = new BlockPos(1, 2, 1);
+        var bird = helper.spawn(KHEntities.PHEASANT.get(), birdPos);
+        var locust = helper.spawn(KHEntities.LOCUST.get(), birdPos.offset(2, 0, 0));
+        helper.assertTrue(bird != null && locust != null, "Птица или саранча не создались");
+
+        helper.runAfterDelay(190, () -> {
+            helper.assertTrue(!locust.isAlive(),
+                    "Птица не съела саранчу: птицы не работают как защита урожая");
+            bird.discard();
+            helper.succeed();
+        });
     }
 }

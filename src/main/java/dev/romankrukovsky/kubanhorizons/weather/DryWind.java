@@ -36,13 +36,25 @@ public final class DryWind {
      * @return число иссушённых грядок
      */
     public static int blow(ServerLevel level, ServerPlayer player) {
+        return blow(level, player.blockPosition());
+    }
+
+    /**
+     * Одна волна суховея вокруг произвольной точки.
+     *
+     * <p>Отдельная перегрузка по координате, а не по игроку: ветру нужен только
+     * центр волны, и привязка к {@link ServerPlayer} делала механику
+     * непроверяемой — в тестовом окружении настоящего серверного игрока нет.</p>
+     *
+     * @return число иссушённых грядок
+     */
+    public static int blow(ServerLevel level, BlockPos origin) {
         if (!KHServerConfig.dryWindEnabled() || KHServerConfig.pressureSeverity() <= 0.0D) {
             return 0;
         }
         if (level.isRaining()) {
             return 0;
         }
-        BlockPos origin = player.blockPosition();
         int dried = 0;
         int inspected = 0;
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();

@@ -37,10 +37,22 @@ public final class Flooding {
      * @return число обогащённых илом грядок
      */
     public static int rise(ServerLevel level, ServerPlayer player) {
+        return rise(level, player.blockPosition());
+    }
+
+    /**
+     * Одна волна половодья вокруг произвольной точки.
+     *
+     * <p>Отдельная перегрузка по координате, а не по игроку: воде нужен только
+     * центр волны, и привязка к {@link ServerPlayer} делала механику
+     * непроверяемой — в тестовом окружении настоящего серверного игрока нет.</p>
+     *
+     * @return число обогащённых илом грядок
+     */
+    public static int rise(ServerLevel level, BlockPos origin) {
         if (!KHServerConfig.floodingEnabled() || KHServerConfig.pressureSeverity() <= 0.0D) {
             return 0;
         }
-        BlockPos origin = player.blockPosition();
         if (!level.getBiome(origin).is(
                 dev.romankrukovsky.kubanhorizons.util.KHIds.of("river_floodplain"))) {
             return 0;
