@@ -507,6 +507,11 @@ public final class WishRuntime {
         return policyService.previewWeather(actor, server, rain, thunder);
     }
 
+    public PolicyPreview previewClockRate(UUID actor, float rate) {
+        requireServerThread();
+        return policyService.previewClockRate(actor, server, rate);
+    }
+
     public ConfirmedPolicy confirmPolicy(UUID actor, PolicyPreview preview) {
         return policyService.confirm(actor, preview);
     }

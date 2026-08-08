@@ -143,6 +143,7 @@ public final class KHGameTests {
         register("genie_phantom_death", KHGameTests::testGeniePhantomDeath, 100);
         register("genie_meta_rules", KHGameTests::testGenieMetaRules, 100);
         register("genie_weather_policy", KHGameTests::testGenieWeatherPolicy, 100);
+        register("genie_clock_policy", KHGameTests::testGenieClockPolicy, 100);
         register("genie_gigantism_engine", KHGameTests::testGenieGigantismEngine, 100);
         register("genie_world_memory", KHGameTests::testGenieWorldMemory, 100);
         register("genie_inviolability", KHGameTests::testGenieInviolabilityAndKillIntercept, 100);
@@ -347,6 +348,34 @@ public final class KHGameTests {
             helper.succeed();
         } catch (IOException | RuntimeException exception) {
             helper.fail("Weather policy failed: " + exception.getMessage());
+        }
+    }
+
+    /** Длинная ночь меняет скорость WorldClock и откатывается policy undo. */
+    private static void testGenieClockPolicy(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        var server = helper.getLevel().getServer();
+        var clock = server.registryAccess().getOrThrow(net.minecraft.world.clock.WorldClocks.OVERWORLD);
+        server.clockManager().setRate(clock, 1.0F);
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime.get(server);
+        if (!runtime.ready()) runtime.recover();
+        try {
+            var preview = runtime.previewClockRate(player.getUUID(), 0.5F);
+            helper.assertTrue(server.clockManager().getRate(clock) == 1.0F,
+                    "Clock preview изменил скорость времени");
+            var report = runtime.executePolicy(player.getUUID(),
+                    runtime.confirmPolicy(player.getUUID(), preview));
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && server.clockManager().getRate(clock) == 0.5F,
+                    "Clock policy не замедлила ночь");
+            runtime.undoPolicy(player.getUUID(), report.transactionId());
+            helper.assertTrue(server.clockManager().getRate(clock) == 1.0F,
+                    "Clock undo не вернул обычную скорость");
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Clock policy failed: " + exception.getMessage());
         }
     }
 

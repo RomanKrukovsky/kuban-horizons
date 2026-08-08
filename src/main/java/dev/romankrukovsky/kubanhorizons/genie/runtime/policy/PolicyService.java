@@ -13,11 +13,13 @@ import java.util.Set;
 import java.util.UUID;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.gamerules.GameRules;
+import net.minecraft.world.clock.WorldClocks;
 
 /** Reversible policy runtime для глобального mobGriefing. */
 public final class PolicyService {
     public static final String MOB_GRIEFING = "minecraft:mob_griefing";
     public static final String WEATHER = "minecraft:weather";
+    public static final String OVERWORLD_CLOCK_RATE = "minecraft:overworld_clock_rate";
     private static final Duration PREVIEW_TTL = Duration.ofMinutes(2);
     private final PolicyManifestStore store;
     private final Set<UUID> issued = new HashSet<>();
@@ -39,6 +41,16 @@ public final class PolicyService {
                 encodeWeather(server.overworld().getRainLevel(1.0F),
                         server.overworld().getThunderLevel(1.0F)),
                 encodeWeather(rain, thunder), Instant.now().plus(PREVIEW_TTL));
+    }
+
+    public PolicyPreview previewClockRate(UUID actor, MinecraftServer server, float targetRate) {
+        if (!Float.isFinite(targetRate) || targetRate <= 0.0F || targetRate > 20.0F) {
+            throw new IllegalArgumentException("clock rate must be between 0 and 20");
+        }
+        return new PolicyPreview(UUID.randomUUID(), actor, OVERWORLD_CLOCK_RATE,
+                Float.toString(server.clockManager().getRate(
+                        server.registryAccess().getOrThrow(WorldClocks.OVERWORLD))),
+                Float.toString(targetRate), Instant.now().plus(PREVIEW_TTL));
     }
 
     public synchronized ConfirmedPolicy confirm(UUID actor, PolicyPreview preview) {
@@ -129,6 +141,8 @@ public final class PolicyService {
             case MOB_GRIEFING -> Boolean.toString(server.getGameRules().get(GameRules.MOB_GRIEFING));
             case WEATHER -> encodeWeather(server.overworld().getRainLevel(1.0F),
                     server.overworld().getThunderLevel(1.0F));
+            case OVERWORLD_CLOCK_RATE -> Float.toString(server.clockManager().getRate(
+                    server.registryAccess().getOrThrow(WorldClocks.OVERWORLD)));
             default -> throw new IllegalArgumentException("unknown policy " + ruleId);
         };
     }
@@ -147,6 +161,8 @@ public final class PolicyService {
                     level.setThunderLevel(thunder);
                 }
             }
+            case OVERWORLD_CLOCK_RATE -> server.clockManager().setRate(
+                    server.registryAccess().getOrThrow(WorldClocks.OVERWORLD), Float.parseFloat(value));
             default -> throw new IllegalArgumentException("unknown policy " + ruleId);
         }
     }
