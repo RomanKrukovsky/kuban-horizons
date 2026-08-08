@@ -585,6 +585,30 @@ final class KHTranslations {
         add("subtitles.kubanhorizons.quail.hurt", "Quail hurts", "Перепелу больно");
         add("subtitles.kubanhorizons.quail.death", "Quail dies", "Перепел умирает");
         add("subtitles.kubanhorizons.quail.flush", "Quail flushes", "Перепел взлетает");
+        add("subtitles.kubanhorizons.wild_boar.ambient", "Boar grunts", "Кабан хрюкает");
+        add("subtitles.kubanhorizons.wild_boar.hurt", "Boar hurts", "Кабану больно");
+        add("subtitles.kubanhorizons.wild_boar.death", "Boar dies", "Кабан умирает");
+        add("subtitles.kubanhorizons.nutria.ambient", "Nutria squeaks", "Нутрия пищит");
+        add("subtitles.kubanhorizons.nutria.hurt", "Nutria hurts", "Нутрии больно");
+        add("subtitles.kubanhorizons.nutria.death", "Nutria dies", "Нутрия умирает");
+        add("subtitles.kubanhorizons.locust.ambient", "Locust rasps", "Саранча стрекочет");
+        add("subtitles.kubanhorizons.locust.hurt", "Locust crunches", "Саранча хрустит");
+        add("subtitles.kubanhorizons.caucasian_bee.ambient", "Bee buzzes", "Пчела жужжит");
+        add("subtitles.kubanhorizons.caucasian_bee.hurt", "Bee hurts", "Пчеле больно");
+        add("subtitles.kubanhorizons.caucasian_shepherd.ambient", "Shepherd barks",
+                "Овчарка лает");
+        add("subtitles.kubanhorizons.caucasian_shepherd.hurt", "Shepherd yelps",
+                "Овчарка взвизгивает");
+        add("subtitles.kubanhorizons.caucasian_shepherd.death", "Shepherd dies",
+                "Овчарка умирает");
+        add("subtitles.kubanhorizons.sturgeon.flop", "Sturgeon flops", "Осётр бьётся");
+        add("subtitles.kubanhorizons.gull.ambient", "Gull cries", "Чайка кричит");
+        add("subtitles.kubanhorizons.gull.hurt", "Gull hurts", "Чайке больно");
+        add("subtitles.kubanhorizons.heron.ambient", "Heron croaks", "Цапля скрипит");
+        add("subtitles.kubanhorizons.heron.hurt", "Heron hurts", "Цапле больно");
+        add("subtitles.kubanhorizons.weather.dry_wind", "Dry wind blows", "Суховей дует");
+        add("subtitles.kubanhorizons.entity.genie.snap", "Genie snaps fingers",
+                "Джинн щёлкает пальцами");
 
         // --- Достижения ---
         add("advancement.kubanhorizons.root.title", "Kuban Horizons", "Кубанские горизонты");

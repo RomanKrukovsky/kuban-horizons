@@ -17,11 +17,95 @@
     ],
     "subtitle": "subtitles.kubanhorizons.oil_press.work"
   },
+  "entity_caucasian_bee_ambient": {
+    "sounds": [
+      "kubanhorizons:entity/caucasian_bee/ambient"
+    ],
+    "subtitle": "subtitles.kubanhorizons.caucasian_bee.ambient"
+  },
+  "entity_caucasian_bee_hurt": {
+    "sounds": [
+      "kubanhorizons:entity/caucasian_bee/hurt"
+    ],
+    "subtitle": "subtitles.kubanhorizons.caucasian_bee.hurt"
+  },
+  "entity_caucasian_shepherd_ambient": {
+    "sounds": [
+      "kubanhorizons:entity/caucasian_shepherd/ambient"
+    ],
+    "subtitle": "subtitles.kubanhorizons.caucasian_shepherd.ambient"
+  },
+  "entity_caucasian_shepherd_death": {
+    "sounds": [
+      "kubanhorizons:entity/caucasian_shepherd/death"
+    ],
+    "subtitle": "subtitles.kubanhorizons.caucasian_shepherd.death"
+  },
+  "entity_caucasian_shepherd_hurt": {
+    "sounds": [
+      "kubanhorizons:entity/caucasian_shepherd/hurt"
+    ],
+    "subtitle": "subtitles.kubanhorizons.caucasian_shepherd.hurt"
+  },
   "entity_genie_snap": {
     "sounds": [
       "kubanhorizons:entity/genie/snap"
     ],
     "subtitle": "subtitles.kubanhorizons.entity.genie.snap"
+  },
+  "entity_gull_ambient": {
+    "sounds": [
+      "kubanhorizons:entity/gull/ambient"
+    ],
+    "subtitle": "subtitles.kubanhorizons.gull.ambient"
+  },
+  "entity_gull_hurt": {
+    "sounds": [
+      "kubanhorizons:entity/gull/hurt"
+    ],
+    "subtitle": "subtitles.kubanhorizons.gull.hurt"
+  },
+  "entity_heron_ambient": {
+    "sounds": [
+      "kubanhorizons:entity/heron/ambient"
+    ],
+    "subtitle": "subtitles.kubanhorizons.heron.ambient"
+  },
+  "entity_heron_hurt": {
+    "sounds": [
+      "kubanhorizons:entity/heron/hurt"
+    ],
+    "subtitle": "subtitles.kubanhorizons.heron.hurt"
+  },
+  "entity_locust_ambient": {
+    "sounds": [
+      "kubanhorizons:entity/locust/ambient"
+    ],
+    "subtitle": "subtitles.kubanhorizons.locust.ambient"
+  },
+  "entity_locust_hurt": {
+    "sounds": [
+      "kubanhorizons:entity/locust/hurt"
+    ],
+    "subtitle": "subtitles.kubanhorizons.locust.hurt"
+  },
+  "entity_nutria_ambient": {
+    "sounds": [
+      "kubanhorizons:entity/nutria/ambient"
+    ],
+    "subtitle": "subtitles.kubanhorizons.nutria.ambient"
+  },
+  "entity_nutria_death": {
+    "sounds": [
+      "kubanhorizons:entity/nutria/death"
+    ],
+    "subtitle": "subtitles.kubanhorizons.nutria.death"
+  },
+  "entity_nutria_hurt": {
+    "sounds": [
+      "kubanhorizons:entity/nutria/hurt"
+    ],
+    "subtitle": "subtitles.kubanhorizons.nutria.hurt"
   },
   "entity_pheasant_ambient": {
     "sounds": [
@@ -70,5 +154,35 @@
       "kubanhorizons:entity/quail/hurt"
     ],
     "subtitle": "subtitles.kubanhorizons.quail.hurt"
+  },
+  "entity_sturgeon_flop": {
+    "sounds": [
+      "kubanhorizons:entity/sturgeon/flop"
+    ],
+    "subtitle": "subtitles.kubanhorizons.sturgeon.flop"
+  },
+  "entity_wild_boar_ambient": {
+    "sounds": [
+      "kubanhorizons:entity/wild_boar/ambient"
+    ],
+    "subtitle": "subtitles.kubanhorizons.wild_boar.ambient"
+  },
+  "entity_wild_boar_death": {
+    "sounds": [
+      "kubanhorizons:entity/wild_boar/death"
+    ],
+    "subtitle": "subtitles.kubanhorizons.wild_boar.death"
+  },
+  "entity_wild_boar_hurt": {
+    "sounds": [
+      "kubanhorizons:entity/wild_boar/hurt"
+    ],
+    "subtitle": "subtitles.kubanhorizons.wild_boar.hurt"
+  },
+  "weather_dry_wind": {
+    "sounds": [
+      "kubanhorizons:weather/dry_wind"
+    ],
+    "subtitle": "subtitles.kubanhorizons.weather.dry_wind"
   }
 }

@@ -26,6 +26,31 @@ Minecraft принадлежит Mojang AB / Microsoft. Проект не рас
 | `assets/kubanhorizons/sounds/block/oil_press/creak.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/block/oil_press/work.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/block/oil_press/finish.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/wild_boar/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/wild_boar/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/wild_boar/death.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/nutria/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/nutria/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/nutria/death.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/locust/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/locust/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/caucasian_bee/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/caucasian_bee/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/caucasian_shepherd/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/caucasian_shepherd/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/caucasian_shepherd/death.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/sturgeon/flop.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/gull/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/gull/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/heron/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/heron/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/genie/snap.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/weather/dry_wind.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+
+Голоса фауны давления, погодный суховей и щелчок джинна сгенерированы
+детерминированным скриптом `tools/soundgen/generate_fauna_sounds.py`
+(Python 3 + numpy, без сторонних сэмплов). Целостность связки
+«событие → файл → субтитр» проверяется `tools/soundgen/check_sounds.py`.
 
 Звуки маслопресса сгенерированы детерминированным скриптом
 `tools/soundgen/generate_press_sounds.py` (Python 3 + numpy, без сторонних
