@@ -160,6 +160,7 @@ public final class KHGameTests {
         register("genie_snapshot_management", KHGameTests::testSnapshotManagement, 100);
         register("genie_runtime_pocket_scene", KHGameTests::testRuntimePocketScene, 100);
         register("genie_runtime_structure_move", KHGameTests::testRuntimeStructureMove, 100);
+        register("genie_runtime_magic_drawing", KHGameTests::testRuntimeMagicDrawing, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -2200,6 +2201,43 @@ public final class KHGameTests {
             helper.succeed();
         } catch (IOException | RuntimeException exception) {
             helper.fail("Runtime structure move failed: " + exception.getMessage());
+        }
+    }
+
+    /** Рисунок-линия проходит preview/confirmation/transaction и retained undo. */
+    private static void testRuntimeMagicDrawing(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        BlockPos from = helper.absolutePos(new BlockPos(1, 3, 1));
+        BlockPos to = helper.absolutePos(new BlockPos(5, 3, 1));
+        var selection = new dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection(
+                helper.getLevel().dimension().identifier().toString(), from, to);
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) runtime.recover();
+        runtime.setSelection(player.getUUID(), selection);
+        try {
+            var preview = runtime.previewSelectedDrawing(player);
+            helper.assertTrue(helper.getLevel().getBlockState(from).isAir(),
+                    "Preview рисунка изменил мир");
+            var report = runtime.executeDrawing(player,
+                    runtime.confirmDrawing(player.getUUID(), preview));
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED,
+                    "Рисунок не выполнен транзакцией: " + report);
+            for (BlockPos pos : BlockPos.betweenClosed(from, to)) {
+                helper.assertTrue(helper.getLevel().getBlockState(pos).is(Blocks.OAK_PLANKS),
+                        "Линия рисунка имеет разрыв в " + pos);
+            }
+            var undo = runtime.undo(helper.getLevel(), player.getUUID(), report.transactionId());
+            helper.assertTrue(undo.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && helper.getLevel().getBlockState(from).isAir(),
+                    "Undo не убрал рисунок");
+            runtime.retireUndo(player.getUUID(), undo.transactionId());
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Runtime drawing failed: " + exception.getMessage());
         }
     }
 
