@@ -2173,8 +2173,11 @@ public final class KHGameTests {
         if (!runtime.ready()) {
             runtime.recover();
         }
+        var source = new dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection(
+                helper.getLevel().dimension().identifier().toString(), origin, origin.east());
+        runtime.setSelection(player.getUUID(), source);
         try {
-            var preview = runtime.previewStructureMove(player, origin);
+            var preview = runtime.previewSelectedStructureMove(player, new BlockPos(0, 10, 0));
             helper.assertTrue(helper.getLevel().getBlockState(origin).is(Blocks.GOLD_BLOCK),
                     "Preview переноса изменил исходный дом");
             var report = runtime.executeStructureMove(player,

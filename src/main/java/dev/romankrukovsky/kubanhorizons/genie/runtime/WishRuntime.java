@@ -272,9 +272,24 @@ public final class WishRuntime {
 
     public StructureMovePreview previewStructureMove(ServerPlayer player, BlockPos origin)
             throws IOException {
+        return previewStructureMove(player,
+                new RegionSelection(player.level().dimension().identifier().toString(),
+                        origin, origin.offset(1, 1, 1)), new BlockPos(0, 10, 0));
+    }
+
+    public StructureMovePreview previewSelectedStructureMove(ServerPlayer player,
+                                                             BlockPos offset) throws IOException {
+        RegionSelection source = selections.requireCompleted(player.getUUID());
+        StructureMovePreview preview = previewStructureMove(player, source, offset);
+        selections.clear(player.getUUID());
+        return preview;
+    }
+
+    private StructureMovePreview previewStructureMove(ServerPlayer player, RegionSelection source,
+                                                      BlockPos offset) throws IOException {
         requireServerThread();
         var plan = dev.romankrukovsky.kubanhorizons.genie.dimension.FlyingStructureEngine
-                .buildMovePlan(player.level(), origin, player.getUUID());
+                .buildMovePlan(player.level(), source, offset, player.getUUID());
         ensureReady(plan.current().selection());
         int changed = 0;
         for (int index = 0; index < plan.current().blocks().size(); index++) {
@@ -287,7 +302,7 @@ public final class WishRuntime {
         Instant expiresAt = Instant.now().plus(Duration.ofMinutes(2));
         String previewDigest = digest(previewId + "|" + player.getUUID() + "|"
                 + plan.current().contentDigest() + "|" + plan.target().contentDigest()
-                + "|" + origin.asLong() + "|" + expiresAt);
+                + "|" + offset.asLong() + "|" + expiresAt);
         pendingStructureMoves.put(previewId, plan);
         return new StructureMovePreview(previewId, player.getUUID(), plan.current().selection(), changed,
                 plan.current().contentDigest(), plan.target().contentDigest(), previewDigest, expiresAt);

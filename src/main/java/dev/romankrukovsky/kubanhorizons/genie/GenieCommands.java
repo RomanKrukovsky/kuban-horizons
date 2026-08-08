@@ -102,7 +102,14 @@ public final class GenieCommands {
                                         .executes(context -> executeScene(context.getSource().getPlayerOrException()))))
                         .then(Commands.literal("move_house")
                                 .then(Commands.literal("preview")
-                                        .executes(context -> previewMove(context.getSource().getPlayerOrException())))
+                                        .then(Commands.argument("dx", com.mojang.brigadier.arguments.IntegerArgumentType.integer(-64, 64))
+                                                .then(Commands.argument("dy", com.mojang.brigadier.arguments.IntegerArgumentType.integer(-64, 64))
+                                                        .then(Commands.argument("dz", com.mojang.brigadier.arguments.IntegerArgumentType.integer(-64, 64))
+                                                                .executes(context -> previewMove(
+                                                                        context.getSource().getPlayerOrException(),
+                                                                        com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(context, "dx"),
+                                                                        com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(context, "dy"),
+                                                                        com.mojang.brigadier.arguments.IntegerArgumentType.getInteger(context, "dz")))))))
                                 .then(Commands.literal("confirm")
                                         .executes(context -> confirmMove(context.getSource().getPlayerOrException())))
                                 .then(Commands.literal("execute")
@@ -370,10 +377,10 @@ public final class GenieCommands {
         }
     }
 
-    private static int previewMove(ServerPlayer player) {
+    private static int previewMove(ServerPlayer player, int dx, int dy, int dz) {
         try {
             StructureMovePreview preview = WishRuntime.get(player.level().getServer())
-                    .previewStructureMove(player, player.blockPosition());
+                    .previewSelectedStructureMove(player, new net.minecraft.core.BlockPos(dx, dy, dz));
             PENDING_MOVE_PREVIEWS.put(player.getUUID(), preview);
             PENDING_MOVE_CONFIRMATIONS.remove(player.getUUID());
             player.sendSystemMessage(Component.translatable(
