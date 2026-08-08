@@ -308,7 +308,12 @@ public class ManulModel extends QuadrupedModel<ManulRenderState> {
      */
     private void poseSitting(ManulRenderState state, float time) {
         body.xRot = (Mth.PI / 2.0F) + 0.28F;
-        body.y = 19.5F;
+        // 13.7, а не «на глаз»: при xRot = pi/2 + 0.28 нижняя точка куба
+        // корпуса (-10..+6 по y, -7..+1 по z) опускается на 9.5 px ниже
+        // pivot, поэтому pivot 19.5 утопил бы зверя в землю почти на пять
+        // пикселей. Значение посчитано так, чтобы низ корпуса лёг на пол
+        // (y = 24) с запасом под раздутую шубу.
+        body.y = 13.7F;
         body.zRot = 0.0F;
 
         head.y = 15.5F;
@@ -317,10 +322,12 @@ public class ManulModel extends QuadrupedModel<ManulRenderState> {
         head.yRot = state.yRot * (Mth.PI / 180.0F) * 0.5F;
 
         // Лапы убраны под корпус: наружу почти ничего не торчит.
+        // 17.8, а не 20.5: куб лапы растёт вниз от pivot на 6 px, поэтому
+        // pivot 20.5 воткнул бы передние лапы в землю на 2.7 px.
         rightFrontLeg.xRot = -0.15F;
         leftFrontLeg.xRot = -0.15F;
-        rightFrontLeg.y = 20.5F;
-        leftFrontLeg.y = 20.5F;
+        rightFrontLeg.y = 17.8F;
+        leftFrontLeg.y = 17.8F;
         rightHindLeg.xRot = -1.55F;
         leftHindLeg.xRot = -1.55F;
         rightHindLeg.y = 21.5F;
@@ -348,13 +355,17 @@ public class ManulModel extends QuadrupedModel<ManulRenderState> {
      */
     private void poseSleeping(ManulRenderState state, float time) {
         body.xRot = (Mth.PI / 2.0F) + 0.1F;
-        body.y = 21.0F;
+        // Как и в позе сидя, значение посчитано, а не подобрано глазом:
+        // при xRot = pi/2 + 0.1 низ корпуса уходит на 8 px ниже pivot.
+        body.y = 15.2F;
         body.zRot = 0.0F;
 
         // Голова прижата к боку и опущена — клубок замыкается.
-        head.y = 20.0F;
+        // 16.7 при наклоне 0.35: при 20.0/0.55 морда уходила под пол на 3.6 px.
+        // Наклон тоже уменьшен — так морда ложится на лапы, а не зарывается.
+        head.y = 16.7F;
         head.z = 3.0F;
-        head.xRot = 0.55F;
+        head.xRot = 0.35F;
         head.yRot = 1.15F;
         head.zRot = 0.35F;
 

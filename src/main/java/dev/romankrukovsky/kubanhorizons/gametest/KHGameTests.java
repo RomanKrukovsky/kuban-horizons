@@ -198,6 +198,7 @@ public final class KHGameTests {
         register("manul_kill_lowers_reputation", KHGameTests::testManulKillLowersReputation, 100);
         register("manul_shelter_becomes_occupied", KHGameTests::testManulShelterBecomesOccupied, 100);
         register("manul_criteria_are_reachable", KHGameTests::testManulCriteriaAreReachable, 100);
+        register("manul_steals_fish_from_trader", KHGameTests::testManulStealsFishFromTrader, 100);
     }
 
     private KHGameTests() {

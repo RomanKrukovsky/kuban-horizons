@@ -25,6 +25,15 @@ ENTITY_DIR = os.path.join(os.path.dirname(__file__), "..", "..",
                           "src/main/resources/assets/kubanhorizons/textures/entity")
 
 # (имя, u, v, w, h, d) — ровно как texOffs/addBox в моделях.
+# Развёртка манула одна на все четыре окраса, поэтому вынесена в константу:
+# четыре копии списка разъехались бы при первой же правке модели.
+MANUL_PARTS = [
+    ("head", 0, 0, 8, 8, 8), ("body", 28, 8, 10, 16, 8),
+    ("leg", 0, 16, 4, 6, 4), ("right_ear", 0, 32, 3, 2, 1),
+    ("left_ear", 8, 32, 3, 2, 1), ("ruff", 16, 32, 10, 4, 2),
+    ("tail", 42, 32, 3, 10, 3),
+]
+
 MODELS = {
     "wild_boar": [
         ("head", 0, 0, 8, 8, 8), ("body", 28, 8, 10, 16, 8),
@@ -45,6 +54,14 @@ MODELS = {
         ("left_hind", 52, 5, 2, 3, 2), ("right_front", 26, 8, 2, 3, 2),
         ("left_front", 34, 8, 2, 3, 2),
     ],
+    # Манул: ванильная развёртка четвероногого плюс свои части ниже y=32.
+    # Оболочка «шуба» намеренно переиспользует слот корпуса (28,8) — это та же
+    # геометрия, раздутая CubeDeformation, поэтому она обязана делить UV с
+    # корпусом и в список не входит: иначе проверка сочла бы это конфликтом.
+    "manul_steppe": MANUL_PARTS,
+    "manul_sand": MANUL_PARTS,
+    "manul_mountain": MANUL_PARTS,
+    "manul_silver": MANUL_PARTS,
 }
 
 

@@ -169,7 +169,7 @@ public final class Manul extends TamableAnimal {
         goalSelector.addGoal(4, new ManulRetreatGoal(this));
         goalSelector.addGoal(5, new ManulOfferingGoal(this));
         // Любопытство: подойти и разглядывать. Ниже отхода — страх сильнее
-        // интереса, — но выше прогулки, иначе characteristic никогда бы не
+        // интереса, — но выше прогулки, иначе характер никогда бы не
         // проявился и curiosity() остался бы мёртвым числом.
         goalSelector.addGoal(6, new ManulObserveGoal(this));
         goalSelector.addGoal(7, new BreedGoal(this, 1.0D));
