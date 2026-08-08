@@ -1,0 +1,240 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "minecraft:block/oak_log",
+    "log": "minecraft:block/oak_log",
+    "log_top": "minecraft:block/oak_log_top",
+    "stone": "minecraft:block/cobblestone",
+    "hay": "minecraft:block/hay_block_side",
+    "hay_top": "minecraft:block/hay_block_top",
+    "roof": "minecraft:block/oak_planks"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        3,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#stone",
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#stone"
+        },
+        "north": {
+          "texture": "#stone"
+        },
+        "south": {
+          "texture": "#stone"
+        },
+        "west": {
+          "texture": "#stone"
+        },
+        "east": {
+          "texture": "#stone"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        3,
+        0
+      ],
+      "to": [
+        4,
+        12,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#log"
+        },
+        "up": {
+          "texture": "#log_top"
+        },
+        "north": {
+          "texture": "#log_top"
+        },
+        "south": {
+          "texture": "#log_top"
+        },
+        "west": {
+          "texture": "#log"
+        },
+        "east": {
+          "texture": "#log"
+        }
+      }
+    },
+    {
+      "from": [
+        12,
+        3,
+        0
+      ],
+      "to": [
+        16,
+        12,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#log"
+        },
+        "up": {
+          "texture": "#log_top"
+        },
+        "north": {
+          "texture": "#log_top"
+        },
+        "south": {
+          "texture": "#log_top"
+        },
+        "west": {
+          "texture": "#log"
+        },
+        "east": {
+          "texture": "#log"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        3,
+        0
+      ],
+      "to": [
+        12,
+        12,
+        3
+      ],
+      "faces": {
+        "down": {
+          "texture": "#log"
+        },
+        "up": {
+          "texture": "#log_top"
+        },
+        "north": {
+          "texture": "#log",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#log"
+        },
+        "west": {
+          "texture": "#log_top"
+        },
+        "east": {
+          "texture": "#log_top"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        3,
+        3
+      ],
+      "to": [
+        12,
+        5,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#hay_top"
+        },
+        "north": {
+          "texture": "#hay"
+        },
+        "south": {
+          "texture": "#hay"
+        },
+        "west": {
+          "texture": "#hay"
+        },
+        "east": {
+          "texture": "#hay"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        12,
+        0
+      ],
+      "to": [
+        16,
+        15,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#roof"
+        },
+        "up": {
+          "texture": "#roof",
+          "cullface": "up"
+        },
+        "north": {
+          "texture": "#roof"
+        },
+        "south": {
+          "texture": "#roof"
+        },
+        "west": {
+          "texture": "#roof"
+        },
+        "east": {
+          "texture": "#roof"
+        }
+      }
+    },
+    {
+      "__comment": "Соломенная завеса в лазу",
+      "from": [
+        4,
+        5,
+        14.5
+      ],
+      "to": [
+        12,
+        12,
+        15.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hay"
+        },
+        "south": {
+          "texture": "#hay"
+        },
+        "west": {
+          "texture": "#hay"
+        },
+        "east": {
+          "texture": "#hay"
+        },
+        "up": {
+          "texture": "#hay_top"
+        },
+        "down": {
+          "texture": "#hay_top"
+        }
+      }
+    }
+  ],
+  "__comment": "Занятое укрытие: лаз прикрыт соломенной завесой — по ней игрок видит, что манул поселился, не заглядывая внутрь."
+}

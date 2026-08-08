@@ -42,6 +42,11 @@ Minecraft принадлежит Mojang AB / Microsoft. Проект не рас
 | `assets/kubanhorizons/sounds/entity/gull/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/entity/heron/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/entity/heron/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/manul/ambient.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/manul/hiss.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/manul/purr.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/manul/hurt.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/entity/manul/death.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/entity/genie/snap.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/weather/dry_wind.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 
@@ -54,12 +59,28 @@ Minecraft принадлежит Mojang AB / Microsoft. Проект не рас
 `tools/soundgen/generate_press_sounds.py` (Python 3 + numpy, без сторонних
 сэмплов); кодирование в OGG Vorbis — python-модуль `soundfile` (libsndfile).
 
+Голос кубанского манула (ambient, hiss, purr, hurt, death) сгенерирован
+детерминированным скриптом `tools/soundgen/generate_manul_sounds.py`
+(Python 3 + numpy, без сторонних сэмплов). Шипение синтезировано как
+широкополосная турбулентность без тонального ядра, мурлыканье — как
+амплитудная модуляция низкого шума частотой работы гортани (~25 Гц).
+Скрипт дополнительно канонизирует serial number потока Ogg: libvorbis
+выбирает его случайно, из-за чего одинаковый звук давал разные байты и
+детерминизм нельзя было проверить контрольными суммами.
+
 ## Текстуры и модели
 
 Все текстуры и модели — собственные (CC BY-SA 4.0, см. LICENSE-ASSETS).
 Текстуры генерируются детерминированными скриптами `tools/texgen/`
 (один запуск `python3 tools/texgen/generate_all.py` пересоздаёт все PNG).
 Сторонние текстуры и модели не используются.
+
+Четыре окраса кубанского манула (`textures/entity/manul_steppe.png`,
+`manul_sand.png`, `manul_mountain.png`, `manul_silver.png`) генерируются
+скриптом `tools/texgen/gen_manul.py`: одна развёртка, разные палитры.
+Палитра — собственная, построена от опорной таблицы ART_BIBLE §2; фотографии
+и чужие текстуры при этом не трассировались. Контраст и заполнение
+проверяются `tools/texgen/check_entity_textures.py`.
 
 ## Шрифты
 

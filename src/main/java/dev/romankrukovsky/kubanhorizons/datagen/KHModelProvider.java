@@ -92,6 +92,8 @@ public final class KHModelProvider extends ModelProvider {
                         .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
         blockModels.registerSimpleItemModel(cuttingBoard.asItem(), KHIds.of("block/cutting_board"));
 
+        registerManulShelter(blockModels);
+
         registerBuildingFamilies(blockModels);
 
         // Резной наличник: ручная тонкая модель + горизонтальные повороты.
@@ -147,6 +149,7 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.LOCUST_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.CAUCASIAN_SHEPHERD_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.STURGEON_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.MANUL_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.GULL_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.HERON_SPAWN_EGG.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.RAW_BOAR.get(), ModelTemplates.FLAT_ITEM);
@@ -197,6 +200,28 @@ public final class KHModelProvider extends ModelProvider {
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(leaves)
                 .with(PropertyDispatch.initial(dev.romankrukovsky.kubanhorizons.crop.FruitLeavesBlock.AGE)
                         .generate(age -> plainVariant(models[age]))));
+    }
+
+    /**
+     * Укрытие манула: две вручную написанные модели (свободное и занятое) с
+     * горизонтальными поворотами.
+     *
+     * <p>Занятость влияет на модель, а не только на данные: игрок должен
+     * видеть, что зверь поселился, не заглядывая в отладку. Модели ручные —
+     * геометрия с лазом не описывается шаблонами (допустимое исключение
+     * AD-005, как у желоба).</p>
+     */
+    private void registerManulShelter(BlockModelGenerators blockModels) {
+        Block shelter = KHBlocks.MANUL_SHELTER.get();
+        Identifier free = KHIds.of("block/manul_shelter");
+        Identifier occupied = KHIds.of("block/manul_shelter_occupied");
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(shelter)
+                .with(PropertyDispatch.initial(
+                                dev.romankrukovsky.kubanhorizons.block.ManulShelterBlock.OCCUPIED)
+                        .generate(isOccupied -> plainVariant(isOccupied ? occupied : free)))
+                .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        // В инвентаре укрытие всегда пустое: предмет — это ещё не дом.
+        blockModels.registerSimpleItemModel(shelter.asItem(), free);
     }
 
     /**

@@ -68,6 +68,17 @@ public final class KHServerConfig {
                     "Включает естественный спавн фазанов и перепелов. Требует перезапуска сервера.")
             .define("wildlife.enableGroundBirdSpawns", true);
 
+    private static final ModConfigSpec.BooleanValue MANUL_SPAWNS = BUILDER
+            .comment("Enable natural manul spawning. Requires a server restart.",
+                    "Включает естественный спавн манула. Требует перезапуска сервера.")
+            .define("wildlife.enableManulSpawns", true);
+
+    private static final ModConfigSpec.BooleanValue MANUL_NOCTURNAL = BUILDER
+            .comment("Restrict natural manul spawning to dusk, night and dawn.",
+                    "Ограничивает естественный спавн манула сумерками, ночью и рассветом.",
+                    "Выключенный — манул может появиться и днём, встреча становится частой.")
+            .define("wildlife.manulNocturnalSpawns", true);
+
     // --- Давление на хозяйство ---
 
     private static final ModConfigSpec.BooleanValue PRESSURE_ENABLED = BUILDER
@@ -162,6 +173,22 @@ public final class KHServerConfig {
 
     public static boolean groundBirdSpawnsEnabled() {
         return GROUND_BIRD_SPAWNS.get();
+    }
+
+    /** Включён ли естественный спавн манула. */
+    public static boolean manulSpawnsEnabled() {
+        return MANUL_SPAWNS.get();
+    }
+
+    /**
+     * Ограничен ли спавн манула сумерками и ночью.
+     *
+     * <p>Отдельный флаг, а не константа: «редкая ночная встреча» — вопрос
+     * вкуса, и сервер должен уметь сделать манула обычным дневным зверем,
+     * не отключая его целиком.</p>
+     */
+    public static boolean manulNocturnalSpawns() {
+        return MANUL_NOCTURNAL.get();
     }
 
     /** Главный выключатель давления на хозяйство. */

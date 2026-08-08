@@ -77,6 +77,36 @@
     ],
     "subtitle": "subtitles.kubanhorizons.locust.hurt"
   },
+  "entity_manul_ambient": {
+    "sounds": [
+      "kubanhorizons:entity/manul/ambient"
+    ],
+    "subtitle": "subtitles.kubanhorizons.manul.ambient"
+  },
+  "entity_manul_death": {
+    "sounds": [
+      "kubanhorizons:entity/manul/death"
+    ],
+    "subtitle": "subtitles.kubanhorizons.manul.death"
+  },
+  "entity_manul_hiss": {
+    "sounds": [
+      "kubanhorizons:entity/manul/hiss"
+    ],
+    "subtitle": "subtitles.kubanhorizons.manul.hiss"
+  },
+  "entity_manul_hurt": {
+    "sounds": [
+      "kubanhorizons:entity/manul/hurt"
+    ],
+    "subtitle": "subtitles.kubanhorizons.manul.hurt"
+  },
+  "entity_manul_purr": {
+    "sounds": [
+      "kubanhorizons:entity/manul/purr"
+    ],
+    "subtitle": "subtitles.kubanhorizons.manul.purr"
+  },
   "entity_nutria_ambient": {
     "sounds": [
       "kubanhorizons:entity/nutria/ambient"

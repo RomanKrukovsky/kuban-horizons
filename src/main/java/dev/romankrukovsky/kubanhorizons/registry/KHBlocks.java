@@ -332,6 +332,26 @@ public final class KHBlocks {
                             net.minecraft.sounds.SoundEvents.FENCE_GATE_CLOSE),
                     solidOn(wattleProperties()));
 
+    /**
+     * Укрытие для манула — дрова, сено и камень у сарая.
+     *
+     * <p>Смешанный материал, поэтому и звук смешанный: сено глушит шаги
+     * ({@link SoundType#GRASS}), а прочность взята по дровам, не по камню —
+     * укрытие должно разбираться топором за пару секунд, иначе игрок не
+     * станет переставлять его, подбирая место для манула.</p>
+     *
+     * <p>{@code noOcclusion} обязателен: у блока есть лаз, и без него
+     * освещение соседних блоков считалось бы как за глухим кубом.</p>
+     */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.block.ManulShelterBlock> MANUL_SHELTER =
+            BLOCKS.registerBlock("manul_shelter",
+                    dev.romankrukovsky.kubanhorizons.block.ManulShelterBlock::new,
+                    p -> p.mapColor(MapColor.WOOD)
+                            .strength(2.0F)
+                            .sound(SoundType.GRASS)
+                            .ignitedByLava()
+                            .noOcclusion());
+
     /** Свойства самана — по образцу ванильного грязевого кирпича. */
     private static java.util.function.UnaryOperator<BlockBehaviour.Properties> adobeProperties() {
         return p -> p.mapColor(MapColor.TERRACOTTA_YELLOW)

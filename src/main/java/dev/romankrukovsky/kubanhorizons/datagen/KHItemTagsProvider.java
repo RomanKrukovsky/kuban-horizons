@@ -66,7 +66,6 @@ public final class KHItemTagsProvider extends BlockTagCopyingItemTagProvider {
                 .add(KHItems.RICE_SEEDLINGS.getKey())
                 .add(KHItems.RICE_PANICLE.getKey())
                 .add(KHItems.TOMATO.getKey());
-        // Пчела: нектароносы — цветущие части растений.
         // Чайка — падальщик побережья: рыба и любые объедки.
         tag(ItemTags.create(KHIds.of("gull_foods")))
                 .add(KHItems.RAW_STURGEON.getKey())
@@ -74,6 +73,14 @@ public final class KHItemTagsProvider extends BlockTagCopyingItemTagProvider {
         // Цапля ест только рыбу — она рыбоядный хищник.
         tag(ItemTags.create(KHIds.of("heron_foods")))
                 .add(KHItems.RAW_STURGEON.getKey());
+        // Манул: подношения, за которые растёт доверие. Сырое мясо и рыба —
+        // то, что зверь ест в природе; жареное тоже принимает, но природная
+        // добыча честнее по смыслу механики.
+        tag(ItemTags.create(KHIds.of("manul_offerings")))
+                .add(KHItems.RAW_PHEASANT.getKey())
+                .add(KHItems.RAW_QUAIL.getKey())
+                .add(KHItems.RAW_STURGEON.getKey())
+                .add(KHItems.RAW_BOAR.getKey());
         // Овчарка: мясо. Приручение — сырым мясом, разведение — готовым,
         // чтобы приручить было проще, чем развести.
         tag(ItemTags.create(KHIds.of("caucasian_shepherd_taming")))

@@ -48,6 +48,9 @@ public final class KHLootTableProvider extends LootTableProvider {
             dropSelf(KHBlocks.DRYING_RACK.get());
             dropSelf(KHBlocks.HAND_MILL.get());
             dropSelf(KHBlocks.CUTTING_BOARD.get());
+            // Укрытие манула разбирается целиком: игрок должен свободно
+            // переставлять его, подбирая место, где зверь согласится жить.
+            dropSelf(KHBlocks.MANUL_SHELTER.get());
 
             // Строительные блоки (этап 7). Плиты дают два предмета — иначе
             // разбор двойной плиты терял бы половину материала.

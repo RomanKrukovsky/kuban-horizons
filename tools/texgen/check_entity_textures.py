@@ -22,8 +22,13 @@ ENTITY_DIR = os.path.join(os.path.dirname(__file__), "..", "..",
                           "src/main/resources/assets/kubanhorizons/textures/entity")
 
 # Текстуры мода (глиняный глечик и джинния рисуются вручную — не наши).
-TARGETS = ["locust", "caucasian_bee", "gull", "heron", "sturgeon",
-           "wild_boar", "caucasian_shepherd", "nutria", "pheasant", "quail"]
+# Кавказская пчела удалена из мода: она дублировала ванильную.
+# Четыре окраса манула проверяются как отдельные текстуры: у них общая
+# развёртка, и расхождение размера между ними означало бы, что один из
+# вариантов рисуется по другой раскладке.
+TARGETS = ["locust", "gull", "heron", "sturgeon",
+           "wild_boar", "caucasian_shepherd", "nutria", "pheasant", "quail",
+           "manul_steppe", "manul_sand", "manul_mountain", "manul_silver"]
 
 # ART_BIBLE §2 говорит про 8-10 оттенков. Глаз, блик и клюв — точечные акценты
 # по 1-2 px, они формально раздувают счётчик: у фазана, принятого за эталон, их
@@ -74,9 +79,17 @@ def stats(path):
     }
 
 
-def ascii_render(im, scale=1):
-    """Яркость -> символы. Прозрачное — точка-разделитель, чтобы виден силуэт."""
+def ascii_render(im, scale=1, lo=None, hi=None):
+    """Яркость -> символы. Прозрачное — точка-разделитель, чтобы виден силуэт.
+
+    lo/hi растягивают шкалу по фактическому диапазону текстуры: у кабана всё
+    живёт в 24..160, и на линейной шкале 0..255 половина градаций сливается —
+    именно так плоская заливка и проходит незамеченной.
+    """
     w, h = im.size
+    lo = 0 if lo is None else lo
+    hi = 255 if hi is None else hi
+    span = max(1.0, hi - lo)
     out = []
     for y in range(0, h, scale):
         row = []
@@ -85,14 +98,15 @@ def ascii_render(im, scale=1):
             if p[3] == 0:
                 row.append("·")
             else:
-                idx = int(luma(p) / 256.0 * len(RAMP))
-                row.append(RAMP[min(idx, len(RAMP) - 1)])
+                t = (luma(p) - lo) / span
+                idx = int(max(0.0, min(1.0, t)) * (len(RAMP) - 1))
+                row.append(RAMP[idx])
         out.append("".join(row))
     return out
 
 
-def region_ascii(im, x0, y0, x1, y1):
-    return ascii_render(im.crop((x0, y0, x1 + 1, y1 + 1)))
+def region_ascii(im, x0, y0, x1, y1, lo=None, hi=None):
+    return ascii_render(im.crop((x0, y0, x1 + 1, y1 + 1)), lo=lo, hi=hi)
 
 
 def main():
@@ -161,7 +175,7 @@ def main():
             s = stats(cur)
             print(f"\n--- {name} ({s['size'][0]}x{s['size'][1]}, "
                   f"{s['shades']} оттенков, разброс {int(s['spread'])}) ---")
-            for row in ascii_render(s["image"]):
+            for row in ascii_render(s["image"], lo=s["lmin"], hi=s["lmax"]):
                 print(row)
 
     for spec in args.regions:
@@ -169,7 +183,9 @@ def main():
         x0, y0, x1, y1 = (int(v) for v in box.split(","))
         im = Image.open(os.path.join(ENTITY_DIR, name + ".png")).convert("RGBA")
         print(f"\n--- {name} крупный план [{x0},{y0}..{x1},{y1}] ---")
-        for row in region_ascii(im, x0, y0, x1, y1):
+        rs = stats(os.path.join(ENTITY_DIR, name + ".png"))
+        for row in region_ascii(im, x0, y0, x1, y1,
+                                lo=rs["lmin"], hi=rs["lmax"]):
             print(row)
 
     if failures:

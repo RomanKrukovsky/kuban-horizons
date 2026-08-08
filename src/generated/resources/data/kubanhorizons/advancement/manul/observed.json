@@ -1,0 +1,25 @@
+{
+  "parent": "kubanhorizons:root",
+  "criteria": {
+    "observed_wild_manul": {
+      "trigger": "kubanhorizons:manul_observed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.manul_observed.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:manul_spawn_egg"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.manul_observed.title"
+    }
+  },
+  "requirements": [
+    [
+      "observed_wild_manul"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

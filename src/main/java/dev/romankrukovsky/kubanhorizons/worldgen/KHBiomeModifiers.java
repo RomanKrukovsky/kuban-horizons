@@ -47,6 +47,8 @@ public final class KHBiomeModifiers {
             createKey("add_heron_spawns");
     public static final ResourceKey<BiomeModifier> ADD_STURGEON_SPAWNS =
             createKey("add_sturgeon_spawns");
+    public static final ResourceKey<BiomeModifier> ADD_MANUL_SPAWNS =
+            createKey("add_manul_spawns");
 
     private KHBiomeModifiers() {
     }
@@ -156,5 +158,31 @@ public final class KHBiomeModifiers {
                         biomes.getOrThrow(KHBiomes.LIMAN)),
                 new Weighted<>(new MobSpawnSettings.SpawnerData(
                         KHEntities.STURGEON.get(), 2, 4), 8)));
+
+        // Манул: степь, сухие склоны, каменистые балки и горные пастбища.
+        //
+        // Вес 1 против 8-10 у остальной фауны и группа строго из одной особи —
+        // это и есть «встретить манула должно быть событием». Более высокий вес
+        // превратил бы талисман в фоновое животное, а группа из двух-трёх —
+        // в стадо, чего у одиночного кота не бывает.
+        //
+        // Биомы подобраны по местам обитания из задания: кубанская степь;
+        // саванна и плато саванны как выгоревшие предгорные пастбища; badlands
+        // как каменистые балки и осыпи; windswept-склоны как горные луга.
+        // Пойма и плавни намеренно исключены — манул сухолюб, и в сырых
+        // биомах он выглядел бы приезжим.
+        context.register(ADD_MANUL_SPAWNS, BiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(
+                HolderSet.direct(
+                        biomes.getOrThrow(KHBiomes.KUBAN_STEPPE),
+                        biomes.getOrThrow(Biomes.SAVANNA),
+                        biomes.getOrThrow(Biomes.SAVANNA_PLATEAU),
+                        biomes.getOrThrow(Biomes.BADLANDS),
+                        biomes.getOrThrow(Biomes.WOODED_BADLANDS),
+                        biomes.getOrThrow(Biomes.WINDSWEPT_HILLS),
+                        biomes.getOrThrow(Biomes.WINDSWEPT_GRAVELLY_HILLS),
+                        biomes.getOrThrow(Biomes.MEADOW),
+                        biomes.getOrThrow(Biomes.STONY_PEAKS)),
+                new Weighted<>(new MobSpawnSettings.SpawnerData(
+                        KHEntities.MANUL.get(), 1, 1), 1)));
     }
 }

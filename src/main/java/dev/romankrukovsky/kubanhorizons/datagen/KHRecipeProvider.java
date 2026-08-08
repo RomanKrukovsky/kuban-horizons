@@ -165,6 +165,19 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_string", this.has(Items.STRING))
                 .save(this.output);
 
+        // Укрытие для манула: дрова по бокам, сено внутри, камень в основании.
+        // Рецепт читается как разрез постройки — так игрок понимает, из чего
+        // она сложена, ещё до установки.
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.MANUL_SHELTER.get())
+                .pattern("LLL")
+                .pattern("LHL")
+                .pattern("SSS")
+                .define('L', net.minecraft.tags.ItemTags.LOGS)
+                .define('H', Items.HAY_BLOCK)
+                .define('S', Items.COBBLESTONE)
+                .unlockedBy("has_hay", this.has(Items.HAY_BLOCK))
+                .save(this.output);
+
         // Ручная мельница: камень + палка.
         this.shaped(RecipeCategory.DECORATIONS, KHItems.HAND_MILL.get())
                 .pattern(" T ")

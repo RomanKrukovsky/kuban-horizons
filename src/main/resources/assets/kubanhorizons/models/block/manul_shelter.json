@@ -1,0 +1,92 @@
+{
+  "__comment": "Укрытие для манула: дрова, сено и камень. Текстуры ванильные — блок собран из знакомых материалов, и своя графика ему не нужна.",
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "minecraft:block/oak_log",
+    "log": "minecraft:block/oak_log",
+    "log_top": "minecraft:block/oak_log_top",
+    "stone": "minecraft:block/cobblestone",
+    "hay": "minecraft:block/hay_block_side",
+    "hay_top": "minecraft:block/hay_block_top",
+    "roof": "minecraft:block/oak_planks"
+  },
+  "elements": [
+    {
+      "__comment": "Каменное основание: дровяник ставят на камень, чтобы дрова не мокли",
+      "from": [0, 0, 0],
+      "to": [16, 3, 16],
+      "faces": {
+        "down": {"texture": "#stone", "cullface": "down"},
+        "up": {"texture": "#stone"},
+        "north": {"texture": "#stone"},
+        "south": {"texture": "#stone"},
+        "west": {"texture": "#stone"},
+        "east": {"texture": "#stone"}
+      }
+    },
+    {
+      "__comment": "Левая стенка из дров",
+      "from": [0, 3, 0],
+      "to": [4, 12, 16],
+      "faces": {
+        "down": {"texture": "#log"},
+        "up": {"texture": "#log_top"},
+        "north": {"texture": "#log_top"},
+        "south": {"texture": "#log_top"},
+        "west": {"texture": "#log"},
+        "east": {"texture": "#log"}
+      }
+    },
+    {
+      "__comment": "Правая стенка из дров",
+      "from": [12, 3, 0],
+      "to": [16, 12, 16],
+      "faces": {
+        "down": {"texture": "#log"},
+        "up": {"texture": "#log_top"},
+        "north": {"texture": "#log_top"},
+        "south": {"texture": "#log_top"},
+        "west": {"texture": "#log"},
+        "east": {"texture": "#log"}
+      }
+    },
+    {
+      "__comment": "Задняя стенка: лаз остаётся только спереди (по FACING)",
+      "from": [4, 3, 0],
+      "to": [12, 12, 3],
+      "faces": {
+        "down": {"texture": "#log"},
+        "up": {"texture": "#log_top"},
+        "north": {"texture": "#log", "cullface": "north"},
+        "south": {"texture": "#log"},
+        "west": {"texture": "#log_top"},
+        "east": {"texture": "#log_top"}
+      }
+    },
+    {
+      "__comment": "Сено внутри — лежанка зверя",
+      "from": [4, 3, 3],
+      "to": [12, 5, 16],
+      "faces": {
+        "up": {"texture": "#hay_top"},
+        "north": {"texture": "#hay"},
+        "south": {"texture": "#hay"},
+        "west": {"texture": "#hay"},
+        "east": {"texture": "#hay"}
+      }
+    },
+    {
+      "__comment": "Кровля из досок",
+      "from": [0, 12, 0],
+      "to": [16, 15, 16],
+      "faces": {
+        "down": {"texture": "#roof"},
+        "up": {"texture": "#roof", "cullface": "up"},
+        "north": {"texture": "#roof"},
+        "south": {"texture": "#roof"},
+        "west": {"texture": "#roof"},
+        "east": {"texture": "#roof"}
+      }
+    }
+  ]
+}

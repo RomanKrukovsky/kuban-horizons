@@ -213,6 +213,10 @@ public final class KHItems {
     public static final DeferredItem<BlockItem> CUTTING_BOARD =
             ITEMS.registerSimpleBlockItem("cutting_board", KHBlocks.CUTTING_BOARD);
 
+    /** Укрытие для манула (предмет). */
+    public static final DeferredItem<BlockItem> MANUL_SHELTER =
+            ITEMS.registerSimpleBlockItem("manul_shelter", KHBlocks.MANUL_SHELTER);
+
     /**
      * Ведро с осетром: ванильный способ переноса рыбы.
      *
@@ -399,6 +403,10 @@ public final class KHItems {
             ITEMS.registerItem("locust_spawn_egg", SpawnEggItem::new,
                     p -> p.component(DataComponents.ENTITY_DATA,
                             TypedEntityData.of(KHEntities.LOCUST.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> MANUL_SPAWN_EGG =
+            ITEMS.registerItem("manul_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.MANUL.get(), new net.minecraft.nbt.CompoundTag())));
     public static final DeferredItem<SpawnEggItem> STURGEON_SPAWN_EGG =
             ITEMS.registerItem("sturgeon_spawn_egg", SpawnEggItem::new,
                     p -> p.component(DataComponents.ENTITY_DATA,

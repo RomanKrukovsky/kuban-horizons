@@ -46,6 +46,9 @@ public final class KubanHorizons {
         KHBiomeSources.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.registry.KHLootModifiers.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.trade.KHProfessions.register(modEventBus);
+        // Триггеры достижений про манула: без регистрации критерии не
+        // существуют, и достижения не могут сработать в принципе.
+        dev.romankrukovsky.kubanhorizons.entity.ManulCriteria.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.gametest.KHGameTests.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.SERVER, KHServerConfig.SPEC);

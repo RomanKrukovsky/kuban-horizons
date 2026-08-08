@@ -5,6 +5,8 @@ import dev.romankrukovsky.kubanhorizons.client.render.GroundBirdModel;
 import dev.romankrukovsky.kubanhorizons.client.render.GroundBirdRenderer;
 import dev.romankrukovsky.kubanhorizons.client.render.GullModel;
 import dev.romankrukovsky.kubanhorizons.client.render.HeronModel;
+import dev.romankrukovsky.kubanhorizons.client.render.ManulModel;
+import dev.romankrukovsky.kubanhorizons.client.render.ManulRenderer;
 import dev.romankrukovsky.kubanhorizons.client.render.InsectModel;
 import dev.romankrukovsky.kubanhorizons.client.render.InsectRenderer;
 import dev.romankrukovsky.kubanhorizons.client.render.SturgeonModel;
@@ -52,6 +54,9 @@ public final class KHClientEvents {
             new ModelLayerLocation(KHIds.of("gull"), "main");
     public static final ModelLayerLocation HERON_LAYER =
             new ModelLayerLocation(KHIds.of("heron"), "main");
+    /** Манул: талисман мода, ванильная сетка четвероногого. */
+    public static final ModelLayerLocation MANUL_LAYER =
+            new ModelLayerLocation(KHIds.of("manul"), "main");
     /** Осётр: два сегмента тела для волнообразного хода. */
     public static final ModelLayerLocation STURGEON_LAYER =
             new ModelLayerLocation(KHIds.of("sturgeon"), "main");
@@ -80,9 +85,9 @@ public final class KHClientEvents {
         // Саранча: вытянутое брюшко и длинные прыжковые ноги.
         event.registerLayerDefinition(LOCUST_LAYER,
                 () -> InsectModel.createBodyLayer(6, 3));
-        // Пчела: короче и с короткими лапками.
         event.registerLayerDefinition(GULL_LAYER, GullModel::createBodyLayer);
         event.registerLayerDefinition(HERON_LAYER, HeronModel::createBodyLayer);
+        event.registerLayerDefinition(MANUL_LAYER, ManulModel::createBodyLayer);
         event.registerLayerDefinition(STURGEON_LAYER, SturgeonModel::createBodyLayer);
     }
 
@@ -111,6 +116,8 @@ public final class KHClientEvents {
         event.registerEntityRenderer(KHEntities.HERON.get(),
                 context -> new WaterBirdRenderer(context, HERON_LAYER, "heron",
                         0.4F, false));
+        event.registerEntityRenderer(KHEntities.MANUL.get(),
+                context -> new ManulRenderer(context, MANUL_LAYER));
         event.registerEntityRenderer(KHEntities.STURGEON.get(), SturgeonRenderer::new);
         event.registerEntityRenderer(KHEntities.KUBAN_GENIE.get(), KubanGenieRenderer::new);
     }

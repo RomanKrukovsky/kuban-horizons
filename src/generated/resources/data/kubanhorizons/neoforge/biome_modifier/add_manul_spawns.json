@@ -1,0 +1,20 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "kubanhorizons:kuban_steppe",
+    "minecraft:savanna",
+    "minecraft:savanna_plateau",
+    "minecraft:badlands",
+    "minecraft:wooded_badlands",
+    "minecraft:windswept_hills",
+    "minecraft:windswept_gravelly_hills",
+    "minecraft:meadow",
+    "minecraft:stony_peaks"
+  ],
+  "spawners": {
+    "type": "kubanhorizons:manul",
+    "maxCount": 1,
+    "minCount": 1,
+    "weight": 1
+  }
+}

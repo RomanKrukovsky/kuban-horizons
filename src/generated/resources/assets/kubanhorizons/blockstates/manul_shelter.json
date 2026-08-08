@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,occupied=false": {
+      "model": "kubanhorizons:block/manul_shelter",
+      "y": 90
+    },
+    "facing=east,occupied=true": {
+      "model": "kubanhorizons:block/manul_shelter_occupied",
+      "y": 90
+    },
+    "facing=north,occupied=false": {
+      "model": "kubanhorizons:block/manul_shelter"
+    },
+    "facing=north,occupied=true": {
+      "model": "kubanhorizons:block/manul_shelter_occupied"
+    },
+    "facing=south,occupied=false": {
+      "model": "kubanhorizons:block/manul_shelter",
+      "y": 180
+    },
+    "facing=south,occupied=true": {
+      "model": "kubanhorizons:block/manul_shelter_occupied",
+      "y": 180
+    },
+    "facing=west,occupied=false": {
+      "model": "kubanhorizons:block/manul_shelter",
+      "y": 270
+    },
+    "facing=west,occupied=true": {
+      "model": "kubanhorizons:block/manul_shelter_occupied",
+      "y": 270
+    }
+  }
+}

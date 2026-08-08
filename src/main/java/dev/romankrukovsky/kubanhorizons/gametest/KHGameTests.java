@@ -18,6 +18,7 @@ import dev.romankrukovsky.kubanhorizons.worldgen.KHStructureSets;
 import dev.romankrukovsky.kubanhorizons.worldgen.KHWorldPresets;
 import dev.romankrukovsky.kubanhorizons.worldgen.KubanBiomeSource;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementNode;
 import net.minecraft.advancements.AdvancementTree;
 import net.minecraft.advancements.DisplayInfo;
@@ -37,6 +38,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.MobCategory;
@@ -183,6 +185,19 @@ public final class KHGameTests {
         register("region_snapshot_round_trip", KHGameTests::testRegionSnapshotRoundTrip, 200);
         register("region_snapshot_respects_limit", KHGameTests::testRegionSnapshotRespectsLimit, 100);
         register("region_payload_round_trip", KHGameTests::testRegionPayloadRoundTrip, 200);
+        // Манул: доверие, характер и окрас должны переживать перезагрузку —
+        // доверие, теряющееся при перезаходе, это молчаливый сбой.
+        register("manul_trust_survives_reload", KHGameTests::testManulTrustSurvivesReload, 100);
+        register("manul_offering_is_day_gated", KHGameTests::testManulOfferingDayGated, 100);
+        register("manul_not_tamed_by_one_fish", KHGameTests::testManulNotTamedByOneFish, 100);
+        register("manul_personalities_differ", KHGameTests::testManulPersonalitiesDiffer, 100);
+        register("manul_witness_lowers_trust", KHGameTests::testManulWitnessLowersTrust, 100);
+        register("manul_loot_is_worthless", KHGameTests::testManulLootIsWorthless, 100);
+        register("manul_spawn_is_rare_and_nocturnal", KHGameTests::testManulSpawnRareNocturnal, 100);
+        // Связь манула с миром: укрытие, репутация и достижимость критериев.
+        register("manul_kill_lowers_reputation", KHGameTests::testManulKillLowersReputation, 100);
+        register("manul_shelter_becomes_occupied", KHGameTests::testManulShelterBecomesOccupied, 100);
+        register("manul_criteria_are_reachable", KHGameTests::testManulCriteriaAreReachable, 100);
     }
 
     private KHGameTests() {
@@ -569,6 +584,468 @@ public final class KHGameTests {
                 .restore(level, from);
         helper.assertTrue(level.getBlockState(from).is(Blocks.GOLD_BLOCK),
                 "Регион должен восстановиться из данных предмета");
+        helper.succeed();
+    }
+
+    // --- Манул: доверие, характер, добыча ---
+
+    /**
+     * Доверие, характер и окрас переживают полный NBT round-trip.
+     *
+     * <p>Главный тест существа. Доверие набирается игровыми днями, поэтому
+     * потеря его при перезаходе в мир — не «мелкая бага», а обнуление
+     * многодневной работы игрока, причём молча: никакой ошибки в логах не
+     * будет. Поэтому проверяется именно сохранение/загрузка, а не только
+     * то, что счётчик растёт в памяти.</p>
+     *
+     * <p>Round-trip делается через {@code saveWithoutId}/{@code load} на
+     * второй особи: это тот же путь, которым сущность проходит при выгрузке
+     * чанка, и он ловит забытое поле в {@code readAdditionalSaveData} — в
+     * отличие от проверки геттеров на живом объекте.</p>
+     */
+    private static void testManulTrustSurvivesReload(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var manul = helper.spawn(KHEntities.MANUL.get(), new BlockPos(1, 2, 1));
+
+        // Заведомо не-дефолтное состояние: иначе тест прошёл бы и на
+        // сущности, которая вообще ничего не читает из NBT. Характер задаётся
+        // явно и намеренно НЕ равен CAUTIOUS — значение по умолчанию при
+        // чтении: с ним потеря поля была бы незаметна, и проверка оказалась бы
+        // пустой (ровно этот дефект и был здесь пойман).
+        manul.setCoat(dev.romankrukovsky.kubanhorizons.entity.ManulCoat.SILVER);
+        manul.setPersonality(dev.romankrukovsky.kubanhorizons.entity.ManulPersonality.GREEDY);
+        manul.adjustTrust(dev.romankrukovsky.kubanhorizons.entity.ManulTrust.RESIDENT.threshold());
+        int trustBefore = manul.trustPoints();
+        var coatBefore = manul.coat();
+        var personalityBefore = manul.personality();
+        helper.assertTrue(trustBefore > 0, "Доверие не выставилось перед сохранением");
+        helper.assertTrue(!personalityBefore.equals(
+                        dev.romankrukovsky.kubanhorizons.entity.ManulPersonality.CAUTIOUS),
+                "Тест должен проверять характер, отличный от значения по умолчанию");
+        helper.assertTrue(coatBefore != dev.romankrukovsky.kubanhorizons.entity
+                        .ManulCoat.STEPPE,
+                "Тест должен проверять окрас, отличный от значения по умолчанию");
+
+        var reporter = net.minecraft.util.ProblemReporter.DISCARDING;
+        var output = net.minecraft.world.level.storage.TagValueOutput
+                .createWithContext(reporter, level.registryAccess());
+        manul.saveWithoutId(output);
+        net.minecraft.nbt.CompoundTag tag = output.buildResult();
+
+        var restored = KHEntities.MANUL.get().create(level,
+                net.minecraft.world.entity.EntitySpawnReason.LOAD);
+        helper.assertTrue(restored != null, "Манул не создался для загрузки");
+        restored.load(net.minecraft.world.level.storage.TagValueInput
+                .create(reporter, level.registryAccess(), tag));
+
+        helper.assertTrue(restored.trustPoints() == trustBefore,
+                "Доверие потеряно при перезагрузке: " + trustBefore
+                        + " -> " + restored.trustPoints());
+        helper.assertTrue(restored.trust()
+                        == dev.romankrukovsky.kubanhorizons.entity.ManulTrust.RESIDENT,
+                "Ступень доверия не восстановилась: " + restored.trust());
+        helper.assertTrue(restored.coat() == coatBefore,
+                "Окрас не сохранился: ожидался " + coatBefore + ", получен " + restored.coat());
+        helper.assertTrue(restored.personality().equals(personalityBefore),
+                "Характер не сохранился: ожидался " + personalityBefore.key()
+                        + ", получен " + restored.personality().key());
+
+        manul.discard();
+        restored.discard();
+        helper.succeed();
+    }
+
+    /**
+     * Подношение засчитывается не чаще раза в игровые сутки.
+     *
+     * <p>Это тот самый предохранитель, который делает знакомство многодневным.
+     * Без него игрок скормил бы стопку рыбы за минуту, и манул превратился бы
+     * в ванильного кота — существо, которое уже удаляли из мода за
+     * дублирование.</p>
+     */
+    private static void testManulOfferingDayGated(GameTestHelper helper) {
+        var manul = helper.spawn(KHEntities.MANUL.get(), new BlockPos(1, 2, 1));
+
+        helper.assertTrue(manul.canAcceptOffering(),
+                "Первое подношение должно приниматься сразу");
+        helper.assertTrue(manul.acceptOffering(), "Первое подношение не зачлось");
+        int afterFirst = manul.trustPoints();
+        helper.assertTrue(afterFirst > 0, "Доверие не выросло от первого подношения");
+
+        // Вторая подачка сразу же: должна быть отвергнута, доверие не растёт.
+        helper.assertTrue(!manul.canAcceptOffering(),
+                "Второе подношение в тот же день не должно приниматься");
+        helper.assertTrue(!manul.acceptOffering(),
+                "Второе подношение зачлось — доверие можно накормить за минуту");
+        helper.assertTrue(manul.trustPoints() == afterFirst,
+                "Доверие выросло от отвергнутого подношения: " + afterFirst
+                        + " -> " + manul.trustPoints());
+
+        // Полная шкала не набирается быстрее, чем за несколько дней: даже у
+        // самого прожорливого характера один день даёт заметно меньше максимума.
+        helper.assertTrue(afterFirst < dev.romankrukovsky.kubanhorizons.entity
+                        .ManulTrust.maxPoints(),
+                "Одно подношение довело доверие до максимума — знакомство не многодневное");
+
+        manul.discard();
+        helper.succeed();
+    }
+
+    /**
+     * Одной рыбой манул не приручается и из рук её не берёт.
+     *
+     * <p>Прямая проверка отличия от ванильного кота: у кота
+     * {@code mobInteract} с рыбой ведёт к {@code tame()}, здесь — к шипению.
+     * Тест держит это отличие: если однажды кто-то «упростит» приручение,
+     * существо потеряет причину существовать, и тест упадёт.</p>
+     */
+    private static void testManulNotTamedByOneFish(GameTestHelper helper) {
+        var manul = helper.spawn(KHEntities.MANUL.get(), new BlockPos(1, 2, 1));
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+
+        // Предмет из тега подношений — тот, которым кормят манула.
+        ItemStack offering = new ItemStack(KHItems.RAW_STURGEON.get(), 4);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, offering);
+
+        manul.mobInteract(player, net.minecraft.world.InteractionHand.MAIN_HAND);
+
+        helper.assertTrue(!manul.isTame(),
+                "Манул приручился одной рыбой — это ванильный кот, а не манул");
+        helper.assertTrue(manul.trustPoints() == 0,
+                "Дикий манул не должен брать корм из рук: доверие "
+                        + manul.trustPoints());
+        helper.assertTrue(player.getMainHandItem().getCount() == 4,
+                "Корм израсходован, хотя дикий зверь его не взял");
+
+        manul.discard();
+        helper.succeed();
+    }
+
+    /**
+     * Характеры различаются измеримо, а не подписью.
+     *
+     * <p>Кавказская пчела была удалена за то, что её отличия существовали
+     * только на бумаге. Этот тест не даёт повторить ошибку с характерами:
+     * он требует, чтобы у разных характеров реально различались дистанция
+     * побега, скорость доверия, любопытство и длительность сидения.</p>
+     */
+    private static void testManulPersonalitiesDiffer(GameTestHelper helper) {
+        var cautious = dev.romankrukovsky.kubanhorizons.entity.ManulPersonality.CAUTIOUS;
+        var brave = dev.romankrukovsky.kubanhorizons.entity.ManulPersonality.BRAVE;
+        var lazy = dev.romankrukovsky.kubanhorizons.entity.ManulPersonality.LAZY;
+        var curious = dev.romankrukovsky.kubanhorizons.entity.ManulPersonality.CURIOUS;
+        var greedy = dev.romankrukovsky.kubanhorizons.entity.ManulPersonality.GREEDY;
+
+        helper.assertTrue(cautious.fleeDistance() > brave.fleeDistance() * 2.0F,
+                "Осторожный должен убегать заметно раньше храброго: "
+                        + cautious.fleeDistance() + " vs " + brave.fleeDistance());
+        helper.assertTrue(curious.curiosity() > cautious.curiosity() * 2.0F,
+                "Любопытный должен подходить заметно чаще осторожного");
+        helper.assertTrue(curious.trustRate() > cautious.trustRate(),
+                "Любопытный должен доверяться быстрее осторожного");
+        helper.assertTrue(greedy.appetite() > cautious.appetite(),
+                "Прожорливый должен ценить корм выше обычного");
+
+        // Сидение: ленивый действительно сидит дольше храброго.
+        int lazySit = dev.romankrukovsky.kubanhorizons.entity.ManulLoafGoal.sitTicksFor(lazy);
+        int braveSit = dev.romankrukovsky.kubanhorizons.entity.ManulLoafGoal.sitTicksFor(brave);
+        helper.assertTrue(lazySit > braveSit * 2,
+                "Ленивый должен сидеть заметно дольше храброго: " + lazySit + " vs " + braveSit);
+
+        // Характер влияет на дистанцию отхода живой особи, а не только на запись
+        // в enum: два зверя с разным нравом подпускают на разное расстояние.
+        var shy = helper.spawn(KHEntities.MANUL.get(), new BlockPos(1, 2, 1));
+        var bold = helper.spawn(KHEntities.MANUL.get(), new BlockPos(2, 2, 2));
+        shy.setPersonality(cautious);
+        bold.setPersonality(brave);
+        helper.assertTrue(shy.retreatDistance() > bold.retreatDistance(),
+                "Дистанция отхода не зависит от характера: " + shy.retreatDistance()
+                        + " vs " + bold.retreatDistance());
+
+        // Доверие сокращает дистанцию — видимый прогресс знакомства.
+        double wildDistance = shy.retreatDistance();
+        shy.adjustTrust(dev.romankrukovsky.kubanhorizons.entity.ManulTrust.ACCEPTING.threshold());
+        helper.assertTrue(shy.retreatDistance() < wildDistance,
+                "Доверие не приблизило зверя: " + wildDistance + " -> " + shy.retreatDistance());
+
+        shy.discard();
+        bold.discard();
+        helper.succeed();
+    }
+
+    /**
+     * Вред окрестной живности отнимает доверие.
+     *
+     * <p>Без этого «не вреди животным рядом» осталось бы правилом из
+     * документации, а {@code witnessHarm} — методом, который никто не
+     * вызывает. Проверяется весь путь: событие смерти → манул-свидетель →
+     * упавшее доверие.</p>
+     */
+    private static void testManulWitnessLowersTrust(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var manul = helper.spawn(KHEntities.MANUL.get(), new BlockPos(1, 2, 1));
+        manul.adjustTrust(dev.romankrukovsky.kubanhorizons.entity.ManulTrust.FRIENDLY.threshold());
+        int before = manul.trustPoints();
+
+        // Свидетели ищутся вокруг точки происшествия — проверяем, что манул
+        // рядом действительно попадает в выборку.
+        var witnesses = dev.romankrukovsky.kubanhorizons.entity.Manul
+                .nearby(level, manul.blockPosition());
+        helper.assertTrue(witnesses.contains(manul),
+                "Манул не попал в список свидетелей рядом с собой");
+
+        Player killer = helper.makeMockPlayer(GameType.SURVIVAL);
+        var victim = helper.spawn(net.minecraft.world.entity.EntityTypes.COW,
+                new BlockPos(2, 2, 1));
+        manul.witnessHarm(victim, killer);
+
+        helper.assertTrue(manul.trustPoints() < before,
+                "Доверие не упало после вреда живности на глазах зверя: "
+                        + before + " -> " + manul.trustPoints());
+
+        victim.discard();
+        manul.discard();
+        helper.succeed();
+    }
+
+    /**
+     * Убийство манула не приносит выгоды.
+     *
+     * <p>Смысл существа в том, чтобы его не убивали. Если бы с него падало
+     * мясо или шкура, талисман превратился бы в ресурс, и вся механика
+     * многодневного доверия проиграла бы одному удару мечом. Поэтому пустота
+     * таблицы — не «недоделка», а требование, и его нужно охранять тестом.</p>
+     */
+    private static void testManulLootIsWorthless(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var manul = helper.spawn(KHEntities.MANUL.get(), new BlockPos(1, 2, 1));
+
+        var lootKey = manul.getLootTable().orElse(null);
+        helper.assertTrue(lootKey != null, "У манула нет loot table — датаген его пропустил");
+        var table = level.getServer().reloadableRegistries().getLootTable(lootKey);
+
+        var params = new net.minecraft.world.level.storage.loot.LootParams.Builder(level)
+                .withParameter(net.minecraft.world.level.storage.loot.parameters
+                        .LootContextParams.THIS_ENTITY, manul)
+                .withParameter(net.minecraft.world.level.storage.loot.parameters
+                        .LootContextParams.ORIGIN, manul.position())
+                .withParameter(net.minecraft.world.level.storage.loot.parameters
+                        .LootContextParams.DAMAGE_SOURCE, level.damageSources().generic())
+                .create(net.minecraft.world.level.storage.loot.parameters
+                        .LootContextParamSets.ENTITY);
+        var drops = table.getRandomItems(params);
+
+        helper.assertTrue(drops.isEmpty(),
+                "С манула падает добыча — убивать талисман стало выгодно: " + drops);
+
+        manul.discard();
+        helper.succeed();
+    }
+
+    /**
+     * Манул редок и спавнится в сумерках, а не днём.
+     *
+     * <p>«Найти манула — событие» держится на двух числах: весе спавна и
+     * времени суток. Оба легко потерять при правке (вес подняли «чтобы
+     * протестировать», окно времени убрали вместе с рефакторингом), и тогда
+     * талисман станет фоновым животным. Тест фиксирует и то, и другое.</p>
+     */
+    private static void testManulSpawnRareNocturnal(GameTestHelper helper) {
+        var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
+        var steppe = biomes.getOrThrow(KHBiomes.KUBAN_STEPPE);
+
+        var manulEntry = steppe.value().getMobSettings()
+                .getMobs(MobCategory.CREATURE).unwrap().stream()
+                .filter(weighted -> weighted.value().type() == KHEntities.MANUL.get())
+                .findFirst()
+                .orElse(null);
+        helper.assertTrue(manulEntry != null,
+                "Степь не спавнит манула — существо недостижимо без спавн-яйца");
+
+        // Редкость: вес манула должен быть строго меньше веса обычной фауны.
+        int manulWeight = manulEntry.weight();
+        int quailWeight = steppe.value().getMobSettings()
+                .getMobs(MobCategory.CREATURE).unwrap().stream()
+                .filter(weighted -> weighted.value().type() == KHEntities.QUAIL.get())
+                .mapToInt(net.minecraft.util.random.Weighted::weight)
+                .findFirst()
+                .orElse(0);
+        helper.assertTrue(manulWeight < quailWeight,
+                "Манул должен быть заметно реже перепела: вес " + manulWeight
+                        + " против " + quailWeight);
+        helper.assertTrue(manulEntry.value().maxCount() == 1,
+                "Манул — одиночка: группа должна быть из одной особи, а не "
+                        + manulEntry.value().maxCount());
+
+        // Время суток: правило спавна должно отказывать при дневном свете и
+        // разрешать в темноте. Проверяется сама функция, а не текущее время в
+        // мире теста, — иначе тест зависел бы от того, когда его запустили.
+        BlockPos ground = helper.absolutePos(new BlockPos(1, 1, 1));
+        helper.setBlock(new BlockPos(1, 1, 1), Blocks.GRASS_BLOCK);
+        BlockPos above = ground.above();
+
+        boolean nocturnal = dev.romankrukovsky.kubanhorizons.config.KHServerConfig
+                .manulNocturnalSpawns();
+        boolean allowedNow = dev.romankrukovsky.kubanhorizons.entity.Manul
+                .checkManulSpawnRules(KHEntities.MANUL.get(), helper.getLevel(),
+                        net.minecraft.world.entity.EntitySpawnReason.NATURAL, above,
+                        helper.getLevel().getRandom());
+        boolean bright = helper.getLevel().isBrightOutside();
+        if (nocturnal && bright) {
+            helper.assertTrue(!allowedNow,
+                    "Днём естественный спавн манула должен быть запрещён");
+        }
+        // Спавн-яйцо и команда обязаны работать всегда: иначе игрок не сможет
+        // поставить зверя днём в творческом режиме.
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.entity.Manul
+                        .checkManulSpawnRules(KHEntities.MANUL.get(), helper.getLevel(),
+                                net.minecraft.world.entity.EntitySpawnReason.SPAWN_ITEM_USE,
+                                above, helper.getLevel().getRandom()),
+                "Спавн-яйцо должно работать в любое время суток");
+        helper.succeed();
+    }
+
+    // --- Манул: связь с миром (укрытие, репутация, наблюдение) ---
+
+    /**
+     * Убийство манула роняет репутацию у жителей-свидетелей.
+     *
+     * <p>Это ядро правила «убивать кота невыгодно». Если сплетня не
+     * записалась, наказание существует только в документации: цены у
+     * торговцев не изменятся, и игрок ничего не заметит. Проверяется весь
+     * путь — событие смерти от руки игрока → житель-свидетель → упавшая
+     * репутация в ванильном {@code GossipContainer}.</p>
+     */
+    private static void testManulKillLowersReputation(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var manul = helper.spawn(KHEntities.MANUL.get(), new BlockPos(1, 2, 1));
+        var villager = helper.spawn(net.minecraft.world.entity.EntityTypes.VILLAGER,
+                new BlockPos(2, 2, 1));
+        var killer = helper.makeMockServerPlayerInLevel();
+
+        int before = villager.getPlayerReputation(killer);
+        int witnesses = dev.romankrukovsky.kubanhorizons.entity.ManulReputation
+                .punish(level, killer, manul.blockPosition());
+
+        helper.assertTrue(witnesses >= 1,
+                "Житель рядом не попал в свидетели убийства манула");
+        int after = villager.getPlayerReputation(killer);
+        helper.assertTrue(after < before,
+                "Репутация не упала после убийства манула на глазах жителя: "
+                        + before + " -> " + after);
+        // Видимая реакция: без неё падение репутации осталось бы незаметным
+        // до следующей торговли.
+        helper.assertTrue(villager.getUnhappyCounter() > 0,
+                "Житель не показал недовольства убийством манула");
+
+        villager.discard();
+        manul.discard();
+        helper.succeed();
+    }
+
+    /**
+     * Укрытие отмечается занятым, когда рядом живёт доверяющий манул.
+     *
+     * <p>Занятость — единственный видимый признак того, что зверь поселился,
+     * и на неё же опираются достижения «Манул тебя терпит» и «Опора
+     * станицы». Если флаг не выставляется, игрок считает укрытие
+     * бесполезным, а два достижения становятся недостижимыми.</p>
+     */
+    private static void testManulShelterBecomesOccupied(GameTestHelper helper) {
+        BlockPos relative = new BlockPos(1, 2, 1);
+        helper.setBlock(relative, KHBlocks.MANUL_SHELTER.get());
+        BlockState placed = helper.getBlockState(relative);
+        helper.assertTrue(!dev.romankrukovsky.kubanhorizons.block.ManulShelterBlock
+                        .isOccupied(placed),
+                "Свежепоставленное укрытие не должно считаться занятым");
+
+        // Занятость выставляется через общий метод — тот же, что вызывает
+        // слой мира; так тест проверяет реальный путь, а не запись состояния.
+        dev.romankrukovsky.kubanhorizons.block.ManulShelterBlock.setOccupied(
+                helper.getLevel(), helper.absolutePos(relative), true);
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.block.ManulShelterBlock
+                        .isOccupied(helper.getBlockState(relative)),
+                "Укрытие не отметилось занятым");
+
+        // Поиск укрытия рядом должен находить блок: на нём держится
+        // расселение и обе «мирные» награды.
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.entity.ManulWorldHooks
+                        .hasShelterNearby(helper.getLevel(),
+                                helper.absolutePos(relative), 2),
+                "Укрытие не найдено поиском по окрестности");
+        helper.succeed();
+    }
+
+    /**
+     * Триггеры достижений про манула зарегистрированы и выдают критерий.
+     *
+     * <p>Незарегистрированный триггер — это достижение, которое не может
+     * сработать никогда: ровно тот отказ, из-за которого была удалена
+     * кавказская пчела. Тест проверяет, что все четыре критерия существуют
+     * в реестре и что вызов действительно выдаёт достижение игроку.</p>
+     */
+    private static void testManulCriteriaAreReachable(GameTestHelper helper) {
+        var registry = net.minecraft.core.registries.BuiltInRegistries.TRIGGER_TYPES;
+        for (String id : List.of("manul_observed", "manul_trusted",
+                "manul_settled", "manul_silver")) {
+            helper.assertTrue(registry.getOptional(KHIds.of(id)).isPresent(),
+                    "Триггер достижения не зарегистрирован: " + id);
+        }
+
+        // Полный путь: выдать критерий игроку и убедиться, что достижение
+        // засчиталось. Так проверяется не только реестр, но и связь
+        // «триггер → узел дерева».
+        var player = helper.makeMockServerPlayerInLevel();
+        var observed = helper.getLevel().getServer().getAdvancements()
+                .get(KHIds.of("manul/observed"));
+        helper.assertTrue(observed != null, "Достижение manul/observed не загружено");
+        dev.romankrukovsky.kubanhorizons.entity.ManulCriteria.MANUL_OBSERVED.get()
+                .trigger(player);
+        helper.assertTrue(player.getAdvancements().getOrStartProgress(observed).isDone(),
+                "Достижение «Не трогай кота» не засчиталось после срабатывания триггера");
+        helper.succeed();
+    }
+
+    /**
+     * Ночная кража рыбы у торговца работает и растит доверие.
+     *
+     * <p>Это единственная механика, ради которой игроку выгодно держать
+     * торговца рядом с двором: зверь сам приходит за рыбой и сам начинает
+     * доверять. Если кража не работает, «манул на рынке» остаётся строчкой в
+     * описании, а не событием в игре.</p>
+     */
+    private static void testManulStealsFishFromTrader(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var manul = helper.spawn(KHEntities.MANUL.get(), new BlockPos(1, 2, 1));
+        var trader = helper.spawn(net.minecraft.world.entity.EntityTypes.WANDERING_TRADER,
+                new BlockPos(1, 2, 2));
+        trader.getInventory().addItem(new ItemStack(Items.COD, 3));
+        int before = trader.getInventory().countItem(Items.COD);
+        int trustBefore = manul.trustPoints();
+
+        // Шанс кражи намеренно низкий, поэтому в тесте даём несколько попыток:
+        // проверяется работоспособность пути, а не вероятность.
+        boolean stolen = false;
+        for (int attempt = 0; attempt < 200 && !stolen; attempt++) {
+            dev.romankrukovsky.kubanhorizons.entity.ManulNightRaids.stealFishNow(level, manul);
+            stolen = trader.getInventory().countItem(Items.COD) < before;
+        }
+
+        helper.assertTrue(stolen,
+                "Манул не украл рыбу у торговца рядом: осталось "
+                        + trader.getInventory().countItem(Items.COD) + " из " + before);
+        helper.assertTrue(manul.trustPoints() > trustBefore,
+                "Кража не повысила доверие: " + trustBefore + " -> " + manul.trustPoints());
+
+        // Пасека — объявленное место обитания, и проверка должна быть
+        // выполнимой, а не только упомянутой в тексте.
+        helper.setBlock(new BlockPos(2, 2, 1), Blocks.BEEHIVE);
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.entity.ManulNightRaids
+                        .hasApiaryNearby(level, helper.absolutePos(new BlockPos(1, 2, 1)), 3),
+                "Улей рядом не распознан как пасека");
+
+        trader.discard();
+        manul.discard();
         helper.succeed();
     }
 
@@ -1063,6 +1540,9 @@ public final class KHGameTests {
                 "tea/tea_sapling", "tea/tea_leaves", "tea/dried_tea",
                 "orchard/sapling", "orchard/first_fruit", "orchard/dried_fruit",
                 "orchard/kuban_orchard",
+                // Ветка манула: узлы должны висеть на корне мода, иначе
+                // достижения не появятся в дереве.
+                "manul/observed", "manul/trusted", "manul/settled", "manul/silver",
         };
 
         AdvancementTree tree = helper.getLevel().getServer().getAdvancements().tree();

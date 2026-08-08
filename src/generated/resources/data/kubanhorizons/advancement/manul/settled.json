@@ -1,0 +1,26 @@
+{
+  "parent": "kubanhorizons:manul/trusted",
+  "criteria": {
+    "settled_near_homestead": {
+      "trigger": "kubanhorizons:manul_settled"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.manul_settled.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "id": "kubanhorizons:manul_shelter"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.manul_settled.title"
+    }
+  },
+  "requirements": [
+    [
+      "settled_near_homestead"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

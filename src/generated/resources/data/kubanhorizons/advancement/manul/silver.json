@@ -1,0 +1,27 @@
+{
+  "parent": "kubanhorizons:manul/observed",
+  "criteria": {
+    "met_silver_manul": {
+      "trigger": "kubanhorizons:manul_silver"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.manul_silver.description"
+    },
+    "frame": "challenge",
+    "hidden": true,
+    "icon": {
+      "id": "kubanhorizons:manul_spawn_egg"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.manul_silver.title"
+    }
+  },
+  "requirements": [
+    [
+      "met_silver_manul"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

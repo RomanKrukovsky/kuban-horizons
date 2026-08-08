@@ -30,6 +30,7 @@ public final class KHEntityEvents {
         event.put(KHEntities.STURGEON.get(), Sturgeon.createAttributes().build());
         event.put(KHEntities.GULL.get(), Gull.createAttributes().build());
         event.put(KHEntities.HERON.get(), Heron.createAttributes().build());
+        event.put(KHEntities.MANUL.get(), Manul.createAttributes().build());
         event.put(KHEntities.KUBAN_GENIE.get(), KubanGenie.createAttributes().build());
         event.put(KHEntities.MAGIC_DOPPELGANGER.get(), MagicDoppelgangerEntity.createAttributes().build());
     }
@@ -57,6 +58,9 @@ public final class KHEntityEvents {
         event.register(KHEntities.HERON.get(), SpawnPlacementTypes.ON_GROUND,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Animal::checkAnimalSpawnRules,
                 RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        event.register(KHEntities.MANUL.get(), SpawnPlacementTypes.ON_GROUND,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Manul::checkManulSpawnRules,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE);
         // Осётр — водная рыба: ванильные правила спавна для WaterAnimal.
         event.register(KHEntities.STURGEON.get(), SpawnPlacementTypes.IN_WATER,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
@@ -70,6 +74,13 @@ public final class KHEntityEvents {
     public static void limitNaturalSpawns(FinalizeSpawnEvent event) {
         if (!KHServerConfig.groundBirdSpawnsEnabled()
                 && event.getEntity() instanceof AbstractGroundBird
+                && event.getSpawnType() == EntitySpawnReason.NATURAL) {
+            event.setSpawnCancelled(true);
+        }
+        // Манул выключается отдельно от птиц: он талисман, а не давление, и
+        // сервер может убрать его, не трогая остальную фауну.
+        if (!KHServerConfig.manulSpawnsEnabled()
+                && event.getEntity() instanceof Manul
                 && event.getSpawnType() == EntitySpawnReason.NATURAL) {
             event.setSpawnCancelled(true);
         }

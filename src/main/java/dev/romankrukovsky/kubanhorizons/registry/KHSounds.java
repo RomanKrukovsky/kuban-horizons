@@ -53,6 +53,12 @@ public final class KHSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> HERON_AMBIENT = register("entity.heron.ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> HERON_HURT = register("entity.heron.hurt");
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> MANUL_AMBIENT = register("entity.manul.ambient");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MANUL_HISS = register("entity.manul.hiss");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MANUL_PURR = register("entity.manul.purr");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MANUL_HURT = register("entity.manul.hurt");
+    public static final DeferredHolder<SoundEvent, SoundEvent> MANUL_DEATH = register("entity.manul.death");
+
     /** Суховей: шум сухого степного ветра над полем. */
     public static final DeferredHolder<SoundEvent, SoundEvent> DRY_WIND = register("weather.dry_wind");
 

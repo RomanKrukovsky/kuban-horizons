@@ -1,0 +1,26 @@
+{
+  "parent": "kubanhorizons:manul/observed",
+  "criteria": {
+    "max_trust": {
+      "trigger": "kubanhorizons:manul_trusted"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.manul_trusted.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "kubanhorizons:manul_shelter"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.manul_trusted.title"
+    }
+  },
+  "requirements": [
+    [
+      "max_trust"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

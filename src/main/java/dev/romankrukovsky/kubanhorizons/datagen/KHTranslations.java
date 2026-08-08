@@ -76,6 +76,7 @@ final class KHTranslations {
         add("block.kubanhorizons.carved_window_casing", "Carved Window Casing", "Резной оконный наличник");
         add("block.kubanhorizons.wattle", "Wattle Fence", "Плетень");
         add("block.kubanhorizons.wattle_gate", "Wattle Gate", "Калитка плетня");
+        add("block.kubanhorizons.manul_shelter", "Manul Shelter", "Укрытие для манула");
 
         // --- Предметы ---
         add("item.kubanhorizons.sunflower_seeds", "Sunflower Seeds", "Семечки подсолнечника");
@@ -137,6 +138,13 @@ final class KHTranslations {
         add("entity.kubanhorizons.sturgeon", "Sturgeon", "Осётр");
         add("entity.kubanhorizons.gull", "Gull", "Чайка");
         add("entity.kubanhorizons.heron", "Heron", "Цапля");
+        add("entity.kubanhorizons.manul", "Kuban Manul", "Кубанский манул");
+        add("manul.personality.cautious", "Cautious", "Осторожный");
+        add("manul.personality.lazy", "Lazy", "Ленивый");
+        add("manul.personality.curious", "Curious", "Любопытный");
+        add("manul.personality.grumpy", "Grumpy", "Ворчливый");
+        add("manul.personality.brave", "Brave", "Храбрый");
+        add("manul.personality.greedy", "Greedy", "Прожорливый");
         add("entity.kubanhorizons.kuban_genie", "Kuban Genie", "Кубанская джинния");
 
         add("item.kubanhorizons.raw_boar", "Raw Boar", "Сырая кабанина");
@@ -156,6 +164,8 @@ final class KHTranslations {
                 "Яйцо появления кавказской овчарки");
         add("item.kubanhorizons.sturgeon_spawn_egg", "Sturgeon Spawn Egg",
                 "Яйцо появления осетра");
+        add("item.kubanhorizons.manul_spawn_egg", "Manul Spawn Egg",
+                "Яйцо появления манула");
         add("item.kubanhorizons.gull_spawn_egg", "Gull Spawn Egg",
                 "Яйцо появления чайки");
         add("item.kubanhorizons.heron_spawn_egg", "Heron Spawn Egg",
@@ -601,6 +611,11 @@ final class KHTranslations {
         add("subtitles.kubanhorizons.gull.hurt", "Gull hurts", "Чайке больно");
         add("subtitles.kubanhorizons.heron.ambient", "Heron croaks", "Цапля скрипит");
         add("subtitles.kubanhorizons.heron.hurt", "Heron hurts", "Цапле больно");
+        add("subtitles.kubanhorizons.manul.ambient", "Manul grumbles", "Манул ворчит");
+        add("subtitles.kubanhorizons.manul.hiss", "Manul hisses", "Манул шипит");
+        add("subtitles.kubanhorizons.manul.purr", "Manul purrs", "Манул урчит");
+        add("subtitles.kubanhorizons.manul.hurt", "Manul hurts", "Манулу больно");
+        add("subtitles.kubanhorizons.manul.death", "Manul dies", "Манул умирает");
         add("subtitles.kubanhorizons.weather.dry_wind", "Dry wind blows", "Суховей дует");
         add("subtitles.kubanhorizons.entity.genie.snap", "Genie snaps fingers",
                 "Джинн щёлкает пальцами");
@@ -676,6 +691,43 @@ final class KHTranslations {
         add("advancement.kubanhorizons.kuban_orchard.description",
                 "Gather peach, apricot, plum and walnut",
                 "Соберите персик, абрикос, сливу и грецкий орех");
+
+        // --- Достижения: манул ---
+        add("advancement.kubanhorizons.manul_observed.title", "Don't Touch the Cat", "Не трогай кота");
+        add("advancement.kubanhorizons.manul_observed.description",
+                "Watch a wild manul for a long while without coming closer",
+                "Долго наблюдайте за диким манулом, не приближаясь к нему");
+        add("advancement.kubanhorizons.manul_trusted.title", "The Manul Tolerates You",
+                "Манул тебя терпит");
+        add("advancement.kubanhorizons.manul_trusted.description",
+                "Earn a manul's full trust with patience and offerings",
+                "Заслужите полное доверие манула терпением и подношениями");
+        add("advancement.kubanhorizons.manul_settled.title", "Pillar of the Stanitsa",
+                "Опора станицы");
+        add("advancement.kubanhorizons.manul_settled.description",
+                "A manul settles in a shelter beside your homestead",
+                "Манул поселился в укрытии рядом с вашей усадьбой");
+        add("advancement.kubanhorizons.manul_silver.title", "The Kuban One", "Кубанский");
+        add("advancement.kubanhorizons.manul_silver.description",
+                "Meet the rarest of them all — the silver manul",
+                "Встретьте самого редкого — серебристого манула");
+
+        // --- Манул: репутация и легенды станицы ---
+        add("message.kubanhorizons.manul.killed_witnessed",
+                "The villagers saw you kill the manul",
+                "Жители видели, как вы убили манула");
+        add("message.kubanhorizons.manul.legend.1",
+                "Villager: While the manul keeps the yard, the mice keep away from the grain.",
+                "Житель: «Пока манул при дворе — мыши от зерна подальше».");
+        add("message.kubanhorizons.manul.legend.2",
+                "Villager: They say a manul on the roof means the house will stand a hundred years.",
+                "Житель: «Говорят, манул на крыше — дом сто лет простоит».");
+        add("message.kubanhorizons.manul.legend.3",
+                "Villager: Meeting a manul is good luck. Just don't reach out to pet it.",
+                "Житель: «Встретить манула — к удаче. Только гладить не тянись».");
+        add("message.kubanhorizons.manul.legend.4",
+                "Villager: My grandfather never chased one off the hay. He said the steppe would take offence.",
+                "Житель: «Дед мой манула с сена никогда не гонял. Говорил — степь обидится».");
 
         // --- Конфигурация (переводы ключей) ---
         add("config.kubanhorizons.crops.growthSpeed", "Crop growth speed", "Скорость роста культур");

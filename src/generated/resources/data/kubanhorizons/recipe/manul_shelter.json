@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "H": "minecraft:hay_block",
+    "L": "#minecraft:logs",
+    "S": "minecraft:cobblestone"
+  },
+  "pattern": [
+    "LLL",
+    "LHL",
+    "SSS"
+  ],
+  "result": {
+    "id": "kubanhorizons:manul_shelter"
+  }
+}

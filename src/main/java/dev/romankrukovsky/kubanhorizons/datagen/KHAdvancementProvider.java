@@ -1,5 +1,6 @@
 package dev.romankrukovsky.kubanhorizons.datagen;
 
+import dev.romankrukovsky.kubanhorizons.entity.ManulCriteria;
 import dev.romankrukovsky.kubanhorizons.registry.KHItems;
 import dev.romankrukovsky.kubanhorizons.util.KHIds;
 import net.minecraft.advancements.Advancement;
@@ -261,6 +262,66 @@ public final class KHAdvancementProvider extends AdvancementProvider {
                     .addCriterion("has_walnut",
                             InventoryChangeTrigger.TriggerInstance.hasItems(KHItems.WALNUT.get()))
                     .save(output, KHIds.of("orchard/kuban_orchard").toString());
+
+            generateManul(output, root);
+        }
+
+        /**
+         * Ветка манула: от случайной встречи до постоянного жителя двора.
+         *
+         * <p>Корень ветки — наблюдение, а не предмет: манула нельзя
+         * «раздобыть», и любое условие через инвентарь тут было бы ложью.
+         * Поэтому ветка растёт от «Не трогай кота» — единственного, что
+         * игрок может сделать со зверем, ничего не имея: посмотреть на него
+         * и не подойти.</p>
+         *
+         * <p>Порядок узлов повторяет порядок в игре: наблюдение → доверие →
+         * расселение. Секретное «Кубанский» висит отдельной веткой от того
+         * же корня, потому что редкий окрас можно встретить в любой момент,
+         * в том числе до всякого доверия.</p>
+         */
+        private static void generateManul(Consumer<AdvancementHolder> output,
+                                         AdvancementHolder root) {
+            // «Не трогай кота» — вход в ветку: выдержка вместо предмета.
+            AdvancementHolder observed = Advancement.Builder.advancement()
+                    .parent(root)
+                    .display(KHItems.MANUL_SPAWN_EGG.get(),
+                            title("manul_observed"), description("manul_observed"),
+                            null, AdvancementType.TASK, true, true, false)
+                    .addCriterion("observed_wild_manul",
+                            ManulCriteria.criterion(ManulCriteria.MANUL_OBSERVED))
+                    .save(output, KHIds.of("manul/observed").toString());
+
+            // «Манул тебя терпит» — максимум доверия: цель, а не задача.
+            AdvancementHolder trusted = Advancement.Builder.advancement()
+                    .parent(observed)
+                    .display(KHItems.MANUL_SHELTER.get(),
+                            title("manul_trusted"), description("manul_trusted"),
+                            null, AdvancementType.GOAL, true, true, false)
+                    .addCriterion("max_trust",
+                            ManulCriteria.criterion(ManulCriteria.MANUL_TRUSTED))
+                    .save(output, KHIds.of("manul/trusted").toString());
+
+            // «Опора станицы» — зверь поселился во дворе: завершение ветки.
+            Advancement.Builder.advancement()
+                    .parent(trusted)
+                    .display(KHItems.MANUL_SHELTER.get(),
+                            title("manul_settled"), description("manul_settled"),
+                            null, AdvancementType.CHALLENGE, true, true, false)
+                    .addCriterion("settled_near_homestead",
+                            ManulCriteria.criterion(ManulCriteria.MANUL_SETTLED))
+                    .save(output, KHIds.of("manul/settled").toString());
+
+            // Секретное «Кубанский»: hidden=true — узел не виден в дереве,
+            // пока не выполнен, поэтому редкий окрас остаётся находкой.
+            Advancement.Builder.advancement()
+                    .parent(observed)
+                    .display(KHItems.MANUL_SPAWN_EGG.get(),
+                            title("manul_silver"), description("manul_silver"),
+                            null, AdvancementType.CHALLENGE, true, true, true)
+                    .addCriterion("met_silver_manul",
+                            ManulCriteria.criterion(ManulCriteria.MANUL_SILVER))
+                    .save(output, KHIds.of("manul/silver").toString());
         }
 
         private static Component title(String key) {

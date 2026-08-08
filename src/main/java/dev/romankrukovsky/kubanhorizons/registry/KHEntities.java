@@ -140,6 +140,22 @@ public final class KHEntities {
                     .clientTrackingRange(10)
                     .build(key("magic_doppelganger")));
 
+    /**
+     * Кубанский манул: талисман мода.
+     *
+     * <p>CREATURE и приручаемый в смысле «признал участок», но не питомец:
+     * доверие набирается днями, а следовать за игроком он не станет ни на
+     * какой ступени. Радиус трекинга большой — встреча должна начинаться с
+     * того, что зверь заметил игрока первым.</p>
+     */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.Manul>> MANUL =
+            ENTITIES.register("manul", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.Manul::new, MobCategory.CREATURE)
+                    .sized(0.7F, 0.6F)
+                    .eyeHeight(0.5F)
+                    .clientTrackingRange(10)
+                    .build(key("manul")));
+
     private KHEntities() {
     }
 

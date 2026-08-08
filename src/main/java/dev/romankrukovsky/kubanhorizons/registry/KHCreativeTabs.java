@@ -59,6 +59,7 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.DRIED_FRUIT.get());
                         output.accept(KHItems.HAND_MILL.get());
                         output.accept(KHItems.CUTTING_BOARD.get());
+                        output.accept(KHItems.MANUL_SHELTER.get());
                         output.accept(KHItems.FLOUR.get());
                         output.accept(KHItems.CORNMEAL.get());
                         output.accept(KHItems.HOMEMADE_BREAD.get());
@@ -73,6 +74,7 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.NUTRIA_SPAWN_EGG.get());
                         output.accept(KHItems.LOCUST_SPAWN_EGG.get());
                         output.accept(KHItems.CAUCASIAN_SHEPHERD_SPAWN_EGG.get());
+                        output.accept(KHItems.MANUL_SPAWN_EGG.get());
                         output.accept(KHItems.STURGEON_SPAWN_EGG.get());
                         output.accept(KHItems.GULL_SPAWN_EGG.get());
                         output.accept(KHItems.HERON_SPAWN_EGG.get());

@@ -58,6 +58,11 @@ public final class KHSoundDefinitionsProvider extends SoundDefinitionsProvider {
         bird("gull", KHSounds.GULL_HURT.get(), "hurt");
         bird("heron", KHSounds.HERON_AMBIENT.get(), "ambient");
         bird("heron", KHSounds.HERON_HURT.get(), "hurt");
+        bird("manul", KHSounds.MANUL_AMBIENT.get(), "ambient");
+        bird("manul", KHSounds.MANUL_HISS.get(), "hiss");
+        bird("manul", KHSounds.MANUL_PURR.get(), "purr");
+        bird("manul", KHSounds.MANUL_HURT.get(), "hurt");
+        bird("manul", KHSounds.MANUL_DEATH.get(), "death");
 
         // Погода: суховей играется как событие над полем, а не как реплика,
         // поэтому лежит вне entity/ и заводится отдельной строкой.

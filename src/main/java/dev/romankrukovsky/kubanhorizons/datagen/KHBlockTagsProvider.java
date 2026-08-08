@@ -24,6 +24,10 @@ public final class KHBlockTagsProvider extends BlockTagsProvider {
         tag(BlockTags.MINEABLE_WITH_AXE).add(KHBlocks.IRRIGATION_CHANNEL.getKey());
         tag(BlockTags.MINEABLE_WITH_AXE).add(KHBlocks.GRAPE_TRELLIS.getKey());
         tag(BlockTags.MINEABLE_WITH_AXE).add(KHBlocks.DRYING_RACK.getKey());
+        // Укрытие манула — в основе дрова, поэтому топор; без тега блок
+        // ломался бы рукой так же быстро, как топором, и апгрейд инструмента
+        // не имел бы смысла.
+        tag(BlockTags.MINEABLE_WITH_AXE).add(KHBlocks.MANUL_SHELTER.getKey());
         // Водозабор и мельница добываются киркой.
         tag(BlockTags.MINEABLE_WITH_PICKAXE).add(KHBlocks.WATER_INTAKE.getKey());
         tag(BlockTags.MINEABLE_WITH_PICKAXE).add(KHBlocks.HAND_MILL.getKey());

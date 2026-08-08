@@ -42,7 +42,8 @@ final class KHEntityLoot extends EntityLootSubProvider {
                 KHEntities.CAUCASIAN_SHEPHERD.get(),
                 KHEntities.STURGEON.get(),
                 KHEntities.GULL.get(),
-                KHEntities.HERON.get());
+                KHEntities.HERON.get(),
+                KHEntities.MANUL.get());
     }
 
     @Override
@@ -68,6 +69,9 @@ final class KHEntityLoot extends EntityLootSubProvider {
         // Пустые таблицы там, где добыча была бы бессмысленной: саранча слишком
         // мелка, пчела и овчарка — не добыча. Таблица всё равно нужна: без неё
         // датаген падает, а сущность считается недоделанной.
+        // Манул: убийство намеренно ничего не даёт. Талисман мода не должен
+        // быть источником ресурсов, иначе его начнут "фармить".
+        add(KHEntities.MANUL.get(), LootTable.lootTable());
         add(KHEntities.LOCUST.get(), LootTable.lootTable());
         add(KHEntities.CAUCASIAN_SHEPHERD.get(), LootTable.lootTable());
     }
