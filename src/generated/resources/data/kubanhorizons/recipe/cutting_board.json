@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "L": "#minecraft:logs",
+    "P": "#minecraft:planks"
+  },
+  "pattern": [
+    "PPP",
+    "L L"
+  ],
+  "result": {
+    "id": "kubanhorizons:cutting_board"
+  }
+}

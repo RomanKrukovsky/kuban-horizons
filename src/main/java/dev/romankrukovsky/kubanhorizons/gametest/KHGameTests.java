@@ -114,6 +114,8 @@ public final class KHGameTests {
         register("fruit_pick_resets", KHGameTests::testFruitPickResets, 200);
         register("sapling_grows_tree", KHGameTests::testSaplingGrowsTree, 400);
         register("drying_rack_dries_tea", KHGameTests::testDryingRack, 400);
+        register("smokehouse_smokes_with_fuel_only",
+                KHGameTests::testSmokehouseSmokes, 200);
         register("hand_mill_grinds_wheat", KHGameTests::testHandMill, 300);
         register("kuban_guide_content", KHGameTests::testKubanGuideContent, 100);
         register("kuban_steppe_world_preset", KHGameTests::testKubanSteppeWorldPreset, 100);
@@ -195,6 +197,7 @@ public final class KHGameTests {
         register("manul_anger_cools_down", KHGameTests::testManulAngerCoolsDown, 260);
         register("fauna_chain_is_reachable", KHGameTests::testFaunaChainReachable, 100);
         register("cutting_board_cuts", KHGameTests::testCuttingBoardCuts, 100);
+        register("every_device_is_craftable", KHGameTests::testDevicesCraftable, 100);
         register("manul_personalities_differ", KHGameTests::testManulPersonalitiesDiffer, 100);
         register("manul_witness_lowers_trust", KHGameTests::testManulWitnessLowersTrust, 100);
         register("manul_loot_is_worthless", KHGameTests::testManulLootIsWorthless, 100);
@@ -1196,7 +1199,10 @@ public final class KHGameTests {
 
         // И обязан остыть. Проверяется по таймеру сущности, а не по поведению
         // навигации: важен сам факт, что агрессия конечна.
-        helper.runAfterDelay(dev.romankrukovsky.kubanhorizons.entity.Manul.RETALIATION_TICKS + 20,
+        // succeedWhen вместо фиксированной задержки: тик остывания и тик
+        // проверки могут разойтись на кадр, и жёсткое ожидание падало изредка
+        // на границе. Тот же изъян уже правился в тестах охоты и сна.
+        helper.succeedWhen(
                 () -> {
                     helper.assertTrue(!manul.isRetaliating(),
                             "Злость не погасла за отведённое время: манул превратился "
@@ -1204,7 +1210,6 @@ public final class KHGameTests {
                     helper.assertTrue(manul.getTarget() == null,
                             "Цель осталась после остывания — зверь так и гонится за игроком");
                     manul.discard();
-                    helper.succeed();
                 });
     }
 
@@ -1307,6 +1312,45 @@ public final class KHGameTests {
             helper.assertItemEntityPresent(KHItems.TOMATO_SEEDS.get(), pos, 2.0);
             helper.succeed();
         });
+    }
+
+    /**
+     * Каждое перерабатывающее устройство можно скрафтить.
+     *
+     * <p>Существует из-за конкретного промаха: разделочный стол получил семь
+     * рецептов нарезки и при этом не имел рецепта самого блока — то есть все
+     * семь висели за запертой дверью, а в выживании устройство было
+     * недостижимо. Регистрация выглядела полной, поэтому глазами это не
+     * ловилось.</p>
+     *
+     * <p>Проверяется наличие пути получения, а не «предмет существует»: список
+     * растёт вместе с устройствами, и новое устройство без рецепта уронит тест
+     * сразу, а не через месяц.</p>
+     */
+    private static void testDevicesCraftable(GameTestHelper helper) {
+        var recipes = helper.getLevel().recipeAccess();
+        var devices = new java.util.LinkedHashMap<String, net.minecraft.world.item.Item>();
+        devices.put("маслопресс", KHItems.OIL_PRESS.get());
+        devices.put("ручная мельница", KHItems.HAND_MILL.get());
+        devices.put("сушильная рама", KHItems.DRYING_RACK.get());
+        devices.put("разделочный стол", KHItems.CUTTING_BOARD.get());
+        devices.put("оросительный желоб", KHItems.IRRIGATION_CHANNEL.get());
+        devices.put("каменный желоб", KHItems.STONE_IRRIGATION_CHANNEL.get());
+        devices.put("водозабор", KHItems.WATER_INTAKE.get());
+
+        devices.forEach((name, item) -> {
+            boolean craftable = recipes.recipeMap().values().stream()
+                    .anyMatch(holder -> {
+                        var display = holder.value().display();
+                        return display.stream().anyMatch(d -> d.result()
+                                .resolveForFirstStack(net.minecraft.world.item.crafting.display
+                                        .SlotDisplayContext.fromLevel(helper.getLevel()))
+                                .is(item));
+                    });
+            helper.assertTrue(craftable,
+                    "Нет рецепта крафта: " + name + " — устройство недостижимо в выживании");
+        });
+        helper.succeed();
     }
 
     // --- Вспомогательные ---
@@ -2119,6 +2163,81 @@ public final class KHGameTests {
                     ItemStack out = rack.removeLast(helper.getLevel());
                     helper.assertTrue(out.is(KHItems.DRIED_TEA.get()),
                             "Ожидался сушёный чай, получено: " + out);
+                })
+                .thenSucceed();
+    }
+
+    /**
+     * Коптильня: без дров не коптит, с дровами превращает осетра в копчёность.
+     *
+     * <p>Проверяется именно то, что делает устройство устройством, а не
+     * декорацией: сначала продукт лежит в коптильне без топлива и заведомо
+     * достаточное время — и не меняется; затем подбрасываются дрова, и тот же
+     * продукт коптится. Без первой половины теста механика дров была бы
+     * непроверенной, и коптильня могла бы молча работать как сушилка.</p>
+     */
+    private static void testSmokehouseSmokes(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, KHBlocks.SMOKEHOUSE.get());
+
+        helper.startSequence()
+                .thenExecute(() -> {
+                    var smokehouse = helper.getBlockEntity(pos,
+                            dev.romankrukovsky.kubanhorizons.blockentity.SmokehouseBlockEntity.class);
+
+                    // Рецепт копчения обязан существовать, иначе блок бесполезен
+                    // навсегда — ровно тот дефект, что был у разделочного стола.
+                    ItemStack raw = new ItemStack(KHItems.RAW_STURGEON.get(), 1);
+                    helper.assertTrue(smokehouse.insert(helper.getLevel(), raw),
+                            "Коптильня не приняла осетра: рецепта копчения нет, блок бесполезен");
+                    helper.assertTrue(raw.isEmpty(), "Осётр должен быть изъят из стека");
+
+                    // Мусор не принимается: слот только под то, что коптится.
+                    helper.assertTrue(!smokehouse.insert(helper.getLevel(),
+                                    new ItemStack(Items.DIAMOND, 1)),
+                            "Коптильня приняла алмаз — проверка рецепта не работает");
+
+                    // --- Половина первая: без дров ничего не происходит ---
+                    helper.assertTrue(smokehouse.fuelTicks() == 0,
+                            "Новая коптильня не должна иметь запаса дров");
+                    helper.assertTrue(!smokehouse.isLit(),
+                            "Коптильня без дров не должна считаться работающей");
+                    // Времени заведомо больше, чем нужно на копчение (1200).
+                    smokehouse.advanceSmoking(helper.getLevel(), 6000);
+                    helper.assertTrue(smokehouse.item(0).is(KHItems.RAW_STURGEON.get()),
+                            "Без дров осётр не должен коптиться, а получено: "
+                                    + smokehouse.item(0));
+
+                    // Не-дрова топкой не считаются.
+                    helper.assertTrue(!smokehouse.addFuel(helper.getLevel(),
+                                    new ItemStack(Items.DIAMOND, 1)),
+                            "Алмаз принят как дрова — проверка топлива не работает");
+                    helper.assertTrue(smokehouse.fuelTicks() == 0,
+                            "Запас дров вырос от не-дров");
+
+                    // --- Половина вторая: с дровами коптится ---
+                    ItemStack log = new ItemStack(Items.OAK_LOG, 1);
+                    helper.assertTrue(smokehouse.addFuel(helper.getLevel(), log),
+                            "Коптильня не приняла дубовое бревно как дрова");
+                    helper.assertTrue(log.isEmpty(), "Бревно должно быть изъято из стека");
+                    helper.assertTrue(smokehouse.fuelTicks() > 0,
+                            "Запас дров не вырос после подброса бревна");
+                    helper.assertTrue(smokehouse.isLit(),
+                            "Коптильня с дровами и продуктом должна работать");
+
+                    smokehouse.advanceSmoking(helper.getLevel(), 1300);
+                })
+                .thenExecuteAfter(2, () -> {
+                    var smokehouse = helper.getBlockEntity(pos,
+                            dev.romankrukovsky.kubanhorizons.blockentity.SmokehouseBlockEntity.class);
+                    ItemStack out = smokehouse.removeLast(helper.getLevel());
+                    helper.assertTrue(out.is(KHItems.SMOKED_FISH.get()),
+                            "Ожидалась копчёная рыба, получено: " + out);
+                    // Дрова израсходованы копчением, а не остались нетронутыми.
+                    helper.assertTrue(smokehouse.fuelTicks()
+                                    < dev.romankrukovsky.kubanhorizons.blockentity
+                                    .SmokehouseBlockEntity.FUEL_TICKS_LOG,
+                            "Копчение не израсходовало дрова: топливо декоративно");
                 })
                 .thenSucceed();
     }

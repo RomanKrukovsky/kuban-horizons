@@ -11,6 +11,7 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
@@ -175,6 +176,20 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_string", this.has(Items.STRING))
                 .save(this.output);
 
+        // Коптильня: деревянный сруб на каменном основании (топка внизу).
+        // Рецепт читается как разрез устройства — доски-стенки вокруг пустой
+        // камеры, кирпич снизу, где горят дрова. Кирпич обязателен: он
+        // отделяет коптильню от чисто деревянной рамы и по цене, и по смыслу
+        // (в деревянной коробке огонь не держат).
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.SMOKEHOUSE.get())
+                .pattern("PPP")
+                .pattern("P P")
+                .pattern("BBB")
+                .define('P', ItemTags.PLANKS)
+                .define('B', Items.BRICK)
+                .unlockedBy("has_brick", this.has(Items.BRICK))
+                .save(this.output);
+
         // Укрытие для манула: дрова по бокам, сено внутри, камень в основании.
         // Рецепт читается как разрез постройки — так игрок понимает, из чего
         // она сложена, ещё до установки.
@@ -186,6 +201,18 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .define('H', Items.HAY_BLOCK)
                 .define('S', Items.COBBLESTONE)
                 .unlockedBy("has_hay", this.has(Items.HAY_BLOCK))
+                .save(this.output);
+
+        // Разделочный стол: доски и брёвна. Рецепта не было вовсе — блок
+        // существовал, крафтился только в креативе и в выживании был
+        // недостижим, то есть все семь рецептов нарезки висели за запертой
+        // дверью. Дешёвый намеренно: это первое устройство кухни, а не награда.
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.CUTTING_BOARD.get())
+                .pattern("PPP")
+                .pattern("L L")
+                .define('P', net.minecraft.tags.ItemTags.PLANKS)
+                .define('L', net.minecraft.tags.ItemTags.LOGS)
+                .unlockedBy("has_planks", this.has(net.minecraft.tags.ItemTags.PLANKS))
                 .save(this.output);
 
         // Ручная мельница: камень + палка.
@@ -234,6 +261,17 @@ public final class KHRecipeProvider extends RecipeProvider {
         drying("dried_fruit_from_apricot", KHItems.APRICOT.get(), KHItems.DRIED_FRUIT.get(), 2400);
         drying("dried_fruit_from_plum", KHItems.PLUM.get(), KHItems.DRIED_FRUIT.get(), 2400);
         drying("dried_fruit_from_grapes", KHItems.GRAPES.get(), KHItems.DRIED_FRUIT.get(), 2400);
+
+        // Рецепты копчения. Рыба коптится быстрее мяса — тонкая тушка
+        // прокапчивается насквозь раньше, чем кабаний окорок.
+        smoking("smoked_fish_from_sturgeon",
+                KHItems.RAW_STURGEON.get(), KHItems.SMOKED_FISH.get(), 1200);
+        smoking("smoked_meat_from_boar",
+                KHItems.RAW_BOAR.get(), KHItems.SMOKED_MEAT.get(), 2400);
+        smoking("smoked_meat_from_pheasant",
+                KHItems.RAW_PHEASANT.get(), KHItems.SMOKED_MEAT.get(), 1800);
+        smoking("smoked_meat_from_quail",
+                KHItems.RAW_QUAIL.get(), KHItems.SMOKED_MEAT.get(), 1800);
 
         // --- Кухня ---
 
@@ -477,6 +515,26 @@ public final class KHRecipeProvider extends RecipeProvider {
         this.output.accept(
                 ResourceKey.create(Registries.RECIPE, KHIds.of("drying/" + name)),
                 new dev.romankrukovsky.kubanhorizons.processing.DryingRecipe(
+                        new Recipe.CommonInfo(true), "",
+                        Ingredient.of(input),
+                        new ItemStackTemplate(result.asItem()),
+                        ticks),
+                null);
+    }
+
+    /**
+     * Рецепт копчения в коптильне.
+     *
+     * <p>Времена заметно больше, чем у печи (200 тиков): копчение — не способ
+     * пожарить побыстрее, а отдельная, более дорогая ветка, за которую игрок
+     * получает продукт с бо́льшим насыщением. Плюс расход дров в самой
+     * коптильне, которого печь для этого продукта не требует.</p>
+     */
+    private void smoking(String name, net.minecraft.world.level.ItemLike input,
+            net.minecraft.world.level.ItemLike result, int ticks) {
+        this.output.accept(
+                ResourceKey.create(Registries.RECIPE, KHIds.of("smoking_process/" + name)),
+                new dev.romankrukovsky.kubanhorizons.processing.SmokingProcessRecipe(
                         new Recipe.CommonInfo(true), "",
                         Ingredient.of(input),
                         new ItemStackTemplate(result.asItem()),
