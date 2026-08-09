@@ -60,6 +60,9 @@ public final class KHClientEvents {
     /** Осётр: два сегмента тела для волнообразного хода. */
     public static final ModelLayerLocation STURGEON_LAYER =
             new ModelLayerLocation(KHIds.of("sturgeon"), "main");
+    /** Хвост игрока-джиннии: слой поверх ванильной модели игрока. */
+    public static final ModelLayerLocation GENIE_TAIL_LAYER =
+            new ModelLayerLocation(KHIds.of("genie_tail"), "main");
 
     private KHClientEvents() {
     }
@@ -89,6 +92,8 @@ public final class KHClientEvents {
         event.registerLayerDefinition(HERON_LAYER, HeronModel::createBodyLayer);
         event.registerLayerDefinition(MANUL_LAYER, ManulModel::createBodyLayer);
         event.registerLayerDefinition(STURGEON_LAYER, SturgeonModel::createBodyLayer);
+        event.registerLayerDefinition(GENIE_TAIL_LAYER,
+                dev.romankrukovsky.kubanhorizons.client.render.GenieTailModel::createLayer);
     }
 
     @SubscribeEvent
@@ -120,5 +125,57 @@ public final class KHClientEvents {
                 context -> new ManulRenderer(context, MANUL_LAYER));
         event.registerEntityRenderer(KHEntities.STURGEON.get(), SturgeonRenderer::new);
         event.registerEntityRenderer(KHEntities.KUBAN_GENIE.get(), KubanGenieRenderer::new);
+    }
+
+    /**
+     * Кладёт стадию превращения в состояние рендера игрока.
+     *
+     * <p>Слой рендера получает только {@code AvatarRenderState} и не видит ни
+     * сущность, ни attachment, поэтому стадия попадает туда здесь — один раз за
+     * кадр, штатным путём NeoForge. Чтение серверных данных прямо из отрисовки
+     * было бы гонкой.</p>
+     */
+    @SubscribeEvent
+    static void onRegisterRenderStateModifiers(
+            net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent event) {
+        event.registerAvatarEntityModifier(
+                new net.neoforged.neoforge.client.renderstate.AvatarRenderStateModifier() {
+                    @Override
+                    public <T extends net.minecraft.world.entity.Avatar
+                                    & net.minecraft.client.entity.ClientAvatarEntity>
+                            void accept(T avatar,
+                                    net.minecraft.client.renderer.entity.state.AvatarRenderState state) {
+                        var data = avatar.getData(
+                                dev.romankrukovsky.kubanhorizons.registry.KHAttachments.PLAYER_GENIE_DATA);
+                        // Не джинния — ключ не ставится вовсе, слой тогда просто
+                        // ничего не рисует и не платит за проверку стадии.
+                        if (data.isGenie()) {
+                            state.setRenderData(
+                                    dev.romankrukovsky.kubanhorizons.client.render.GenieRenderStateKeys.GENIE_STAGE,
+                                    data.getStage());
+                        }
+                    }
+                });
+    }
+
+    /**
+     * Вешает хвост на все модели игрока — и обычную, и slim.
+     *
+     * <p>Обе, а не одна: {@code getSkins()} возвращает оба типа модели, и слой,
+     * добавленный только к одному, у половины игроков не появился бы вовсе.</p>
+     */
+    @SubscribeEvent
+    static void onAddLayers(EntityRenderersEvent.AddLayers event) {
+        var tailLayer = event.getContext().getModelSet().bakeLayer(GENIE_TAIL_LAYER);
+        for (var skin : event.getSkins()) {
+            net.minecraft.client.renderer.entity.player.AvatarRenderer<
+                            net.minecraft.client.player.AbstractClientPlayer> renderer =
+                    event.getPlayerRenderer(skin);
+            if (renderer != null) {
+                renderer.addLayer(new dev.romankrukovsky.kubanhorizons.client.render.GenieTailLayer(
+                        renderer,
+                        new dev.romankrukovsky.kubanhorizons.client.render.GenieTailModel(tailLayer)));
+            }
+        }
     }
 }

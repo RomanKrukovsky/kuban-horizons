@@ -1,6 +1,9 @@
 package dev.romankrukovsky.kubanhorizons.genie.player;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.common.util.ValueIOSerializable;
@@ -22,6 +25,45 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
         AVATAR_CUSTOMIZATION,
         INVULNERABILITY_TEST,
         FULL_GENIE
+    }
+
+    /**
+     * Сетевой кодек: только то, что нужно рендеру, а не всё состояние.
+     *
+     * <p>Превращение решается на сервере, а рисуется на клиенте, и до этого
+     * кодека клиент вообще не знал, что игрок стал джиннией — поэтому хвоста не
+     * было видно, хотя серверные стадии проходились и сохранялись.</p>
+     *
+     * <p>Передаются три поля: флаг, стадия и стиль аватара. Прогресс желания,
+     * хозяин, позиция сосуда и тик следующего перехода остаются серверными —
+     * это игровая логика, клиенту она не нужна, а лишние поля в кодеке
+     * означали бы рассылку при каждом их изменении.</p>
+     *
+     * <p>Стадия едет как порядковый номер, а не как строка: имена enum'а —
+     * внутренняя деталь, и {@code ordinal} на входе проверяется по длине
+     * массива, поэтому испорченный или устаревший пакет даёт {@code HUMAN},
+     * а не исключение при рендере.</p>
+     */
+    public static final StreamCodec<ByteBuf, PlayerGenieAttachment> STREAM_CODEC =
+            StreamCodec.composite(
+                    ByteBufCodecs.BOOL,
+                    PlayerGenieAttachment::isGenie,
+                    ByteBufCodecs.VAR_INT,
+                    attachment -> attachment.getStage().ordinal(),
+                    ByteBufCodecs.STRING_UTF8,
+                    PlayerGenieAttachment::getAvatarStyle,
+                    PlayerGenieAttachment::fromNetwork);
+
+    /** Собирает клиентскую копию: только визуальные поля, остальные — по умолчанию. */
+    private static PlayerGenieAttachment fromNetwork(boolean isGenie, int stageOrdinal, String avatarStyle) {
+        PlayerGenieAttachment attachment = new PlayerGenieAttachment();
+        attachment.isGenie = isGenie;
+        Stage[] stages = Stage.values();
+        attachment.stage = stageOrdinal >= 0 && stageOrdinal < stages.length
+                ? stages[stageOrdinal]
+                : Stage.HUMAN;
+        attachment.avatarStyle = avatarStyle;
+        return attachment;
     }
 
     private boolean isGenie = false;

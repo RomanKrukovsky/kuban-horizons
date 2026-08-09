@@ -47,10 +47,19 @@ public final class KHAttachments {
                             .build());
 
     /** Состояние превращённого игрока-Джиннии; переживает смерть. */
+    /**
+     * Джинновское состояние игрока. Синхронизируется: рендер живёт на клиенте.
+     *
+     * <p>Без {@code sync} превращение было целиком серверным — стадии проходились,
+     * урон отменялся, но клиент не знал об этом, поэтому игрок-джинния выглядел
+     * обычным человеком. Кодек везёт только визуальные поля, см.
+     * {@link dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment#STREAM_CODEC}.</p>
+     */
     public static final Supplier<AttachmentType<dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment>> PLAYER_GENIE_DATA =
             ATTACHMENTS.register("player_genie_data",
                     () -> AttachmentType.serializable(dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment::new)
                             .copyOnDeath()
+                            .sync(dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment.STREAM_CODEC)
                             .build());
 
 
