@@ -2,6 +2,10 @@ package dev.romankrukovsky.kubanhorizons.genie.player;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.Level;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.storage.ValueInput;
@@ -72,6 +76,7 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
     private int tierLevel = 1;
     private Optional<UUID> masterUUID = Optional.empty();
     private Optional<BlockPos> boundVesselPos = Optional.empty();
+    private Optional<ResourceKey<Level>> boundVesselDimension = Optional.empty();
     private String avatarStyle = "DEFAULT_KUBAN";
     private long nextTransformationTick = 0L;
     private boolean vesselCreated = false;
@@ -127,6 +132,22 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
         this.boundVesselPos = Optional.ofNullable(boundVesselPos);
     }
 
+    /**
+     * Измерение, из которого игрока затянуло в сосуд.
+     *
+     * <p>Отдельно от позиции, потому что одной позиции недостаточно:
+     * затянутый из Нижнего мира вернулся бы на те же координаты, но в
+     * оверворлде — то есть в случайное место под землёй. Хранится как
+     * {@code ResourceKey}, а сериализуется строкой идентификатора.</p>
+     */
+    public Optional<ResourceKey<Level>> getBoundVesselDimension() {
+        return boundVesselDimension;
+    }
+
+    public void setBoundVesselDimension(ResourceKey<Level> dimension) {
+        this.boundVesselDimension = Optional.ofNullable(dimension);
+    }
+
     public String getAvatarStyle() {
         return avatarStyle;
     }
@@ -163,6 +184,7 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
         output.putBoolean("VesselCreated", vesselCreated);
         masterUUID.ifPresent(uuid -> output.putString("Master", uuid.toString()));
         boundVesselPos.ifPresent(pos -> output.putLong("BoundVesselPos", pos.asLong()));
+        boundVesselDimension.ifPresent(key -> output.putString("BoundVesselDim", key.identifier().toString()));
     }
 
     @Override
@@ -186,5 +208,12 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
         }
         long vesselPos = input.getLongOr("BoundVesselPos", Long.MIN_VALUE);
         boundVesselPos = vesselPos == Long.MIN_VALUE ? Optional.empty() : Optional.of(BlockPos.of(vesselPos));
+        String dim = input.getStringOr("BoundVesselDim", "");
+        // Неизвестное измерение — то же, что отсутствующее: выход тогда идёт
+        // через точку возрождения, а не в сохранённые координаты чужого мира.
+        Identifier dimId = dim.isEmpty() ? null : Identifier.tryParse(dim);
+        boundVesselDimension = dimId == null
+                ? Optional.empty()
+                : Optional.of(ResourceKey.create(Registries.DIMENSION, dimId));
     }
 }
