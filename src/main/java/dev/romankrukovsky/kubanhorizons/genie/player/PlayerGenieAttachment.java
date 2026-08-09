@@ -80,6 +80,8 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
     private String avatarStyle = "DEFAULT_KUBAN";
     private long nextTransformationTick = 0L;
     private boolean vesselCreated = false;
+    private int corruption = 0;
+    private long lastWishTick = 0L;
 
     public PlayerGenieAttachment() {
     }
@@ -172,6 +174,40 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
         this.vesselCreated = vesselCreated;
     }
 
+    /**
+     * Искажение желаниями у самого игрока, 0..100.
+     *
+     * <p>Своё поле, а не {@code corruption} джиннии: тот параметр принадлежит
+     * ей и описывает, во что её превратил хозяин. У игрока-джиннии счёт
+     * отдельный — он отвечает за свои желания, а не за её прошлое.</p>
+     *
+     * <p>Из этого числа выводится окно затягивания в сосуд: чем больше
+     * жестоких и крупных желаний, тем короче окно и тем быстрее натягивается
+     * хвост.</p>
+     */
+    public int getCorruption() {
+        return corruption;
+    }
+
+    public void setCorruption(int corruption) {
+        this.corruption = Math.clamp(corruption, 0, 100);
+    }
+
+    /**
+     * Игровое время последнего желания.
+     *
+     * <p>Нужно для закона сосуда: тишина обесценивает выход, а желание
+     * обнуляет отсчёт. Хранится игровое время, а не системное — иначе выход
+     * из игры на неделю обнулял бы риск реальным временем.</p>
+     */
+    public long getLastWishTick() {
+        return lastWishTick;
+    }
+
+    public void setLastWishTick(long lastWishTick) {
+        this.lastWishTick = Math.max(0L, lastWishTick);
+    }
+
     @Override
     public void serialize(ValueOutput output) {
         output.putInt("SchemaVersion", CURRENT_SCHEMA_VERSION);
@@ -182,6 +218,8 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
         output.putString("AvatarStyle", avatarStyle);
         output.putLong("NextTransformationTick", nextTransformationTick);
         output.putBoolean("VesselCreated", vesselCreated);
+        output.putInt("Corruption", corruption);
+        output.putLong("LastWishTick", lastWishTick);
         masterUUID.ifPresent(uuid -> output.putString("Master", uuid.toString()));
         boundVesselPos.ifPresent(pos -> output.putLong("BoundVesselPos", pos.asLong()));
         boundVesselDimension.ifPresent(key -> output.putString("BoundVesselDim", key.identifier().toString()));
@@ -200,6 +238,8 @@ public class PlayerGenieAttachment implements ValueIOSerializable {
         avatarStyle = input.getStringOr("AvatarStyle", "DEFAULT_KUBAN");
         nextTransformationTick = Math.max(0L, input.getLongOr("NextTransformationTick", 0L));
         vesselCreated = input.getBooleanOr("VesselCreated", false);
+        corruption = Math.clamp(input.getIntOr("Corruption", 0), 0, 100);
+        lastWishTick = Math.max(0L, input.getLongOr("LastWishTick", 0L));
         String master = input.getStringOr("Master", "");
         try {
             masterUUID = master.isEmpty() ? Optional.empty() : Optional.of(UUID.fromString(master));

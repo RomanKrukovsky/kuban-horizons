@@ -479,6 +479,14 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.leash.taut",
                 "Your tail is drawn taut as a string. Moving is hard.",
                 "Хвост натянут как струна. Двигаться тяжело.");
+        // Предупреждение перед затягиванием — или намёк, по темпераменту.
+        // DANGEROUS не говорит ничего: у молчания есть мотив, а не баг.
+        add("message.kubanhorizons.genie.pull.warned",
+                "\"The vessel is calling you back. It always does — I should have said so sooner.\"",
+                "«Сосуд зовёт тебя назад. Он всегда зовёт — надо было сказать раньше.»");
+        add("message.kubanhorizons.genie.pull.hinted",
+                "\"Feel that? Something of yours has grown impatient.\"",
+                "«Чувствуешь? Кое-что твоё заждалось.»");
         add("message.kubanhorizons.genie.vessel.new_rule_master",
                 "New rule discovered: Vessel owner has the right to state a wish.",
                 "Новое правило обнаружено: Владелец сосуда имеет право произнести желание.");
@@ -658,6 +666,28 @@ final class KHTranslations {
         add("subtitles.kubanhorizons.weather.dry_wind", "Dry wind blows", "Суховей дует");
         add("subtitles.kubanhorizons.entity.genie.snap", "Genie snaps fingers",
                 "Джинн щёлкает пальцами");
+
+        // --- Атмосфера биомов ---
+        // Субтитр есть у каждой петли и у каждого вкрапления: со включёнными
+        // субтитрами игрок должен видеть, что именно звучит, иначе атмосфера
+        // существует только для слышащих. Формулировки короткие и именные,
+        // как в ванили («Eerie noise»), а не предложениями.
+        add("subtitles.kubanhorizons.ambient.steppe.loop",
+                "Steppe wind", "Степной ветер");
+        add("subtitles.kubanhorizons.ambient.steppe.additions",
+                "Wind whistles in the weeds", "Ветер посвистывает в бурьяне");
+        add("subtitles.kubanhorizons.ambient.floodplain.loop",
+                "Floodplain rustles", "Пойма шелестит");
+        add("subtitles.kubanhorizons.ambient.floodplain.additions",
+                "Water laps the bank", "Вода плещет у берега");
+        add("subtitles.kubanhorizons.ambient.plavni.loop",
+                "Reeds whisper", "Тростник шепчет");
+        add("subtitles.kubanhorizons.ambient.plavni.additions",
+                "Wings beat in the reeds", "Крылья хлопают в камыше");
+        add("subtitles.kubanhorizons.ambient.liman.loop",
+                "Estuary breathes", "Лиман дышит");
+        add("subtitles.kubanhorizons.ambient.liman.additions",
+                "A distant cry over the shallows", "Далёкий крик над отмелью");
 
         // --- Достижения ---
         add("advancement.kubanhorizons.root.title", "Kuban Horizons", "Кубанские горизонты");

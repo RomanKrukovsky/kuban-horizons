@@ -76,7 +76,44 @@ public final class GenieEvents {
                         || previous != null) {
                     dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.announce(player, tension);
                 }
+                // Струна — последняя стадия перед затягиванием, и единственный
+                // момент, когда предупреждение ещё имеет смысл.
+                if (tension == dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.Tension.TAUT) {
+                    dev.romankrukovsky.kubanhorizons.genie.vessel.VesselPull.warnIfWilling(level, player);
+                }
             }
+            tickPull(level, player);
+        }
+    }
+
+    /**
+     * Назначает и исполняет затягивание в сосуд.
+     *
+     * <p>Момент назначается один раз — при первом тике свободного игрока-джиннии
+     * с ненулевым искажением. Нулевое искажение не назначает ничего: игрок,
+     * который не злоупотреблял желаниями, живёт снаружи спокойно, и это то
+     * различие, ради которого искажение вообще считается.</p>
+     */
+    private static void tickPull(ServerLevel level, net.minecraft.server.level.ServerPlayer player) {
+        var attachment = player.getData(
+                dev.romankrukovsky.kubanhorizons.registry.KHAttachments.PLAYER_GENIE_DATA);
+        if (!attachment.isGenie()
+                || dev.romankrukovsky.kubanhorizons.genie.vessel.VesselConfinement.isConfined(player)) {
+            return;
+        }
+        if (attachment.getCorruption() <= 0) {
+            return;
+        }
+        if (attachment.getNextTransformationTick() <= 0L) {
+            dev.romankrukovsky.kubanhorizons.genie.vessel.VesselPull.schedule(
+                    level, player, level.getRandom());
+            return;
+        }
+        if (dev.romankrukovsky.kubanhorizons.genie.vessel.VesselPull.isDue(level, player)) {
+            // Обнулить до затягивания, а не после: confine() телепортирует, и
+            // повторный вызов на следующем тике назначил бы новое окно изнутри.
+            attachment.setNextTransformationTick(0L);
+            dev.romankrukovsky.kubanhorizons.genie.vessel.VesselConfinement.confine(player);
         }
     }
 
