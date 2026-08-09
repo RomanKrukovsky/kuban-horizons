@@ -17,6 +17,7 @@ import dev.romankrukovsky.kubanhorizons.client.render.KubanQuadrupedRenderer;
 import dev.romankrukovsky.kubanhorizons.client.render.NutriaModel;
 import dev.romankrukovsky.kubanhorizons.client.render.NutriaRenderer;
 import dev.romankrukovsky.kubanhorizons.client.render.KubanGenieRenderer;
+import dev.romankrukovsky.kubanhorizons.client.render.MagicDoppelgangerRenderer;
 import dev.romankrukovsky.kubanhorizons.client.screen.OilPressScreen;
 import dev.romankrukovsky.kubanhorizons.registry.KHEntities;
 import dev.romankrukovsky.kubanhorizons.registry.KHMenus;
@@ -125,6 +126,10 @@ public final class KHClientEvents {
                 context -> new ManulRenderer(context, MANUL_LAYER));
         event.registerEntityRenderer(KHEntities.STURGEON.get(), SturgeonRenderer::new);
         event.registerEntityRenderer(KHEntities.KUBAN_GENIE.get(), KubanGenieRenderer::new);
+        // Без этой строки любой двойник в кадре роняет рендер-поток на
+        // NullPointerException, а сохранённый в мир — делает мир незагружаемым.
+        event.registerEntityRenderer(KHEntities.MAGIC_DOPPELGANGER.get(),
+                MagicDoppelgangerRenderer::new);
     }
 
     /**

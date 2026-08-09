@@ -1,6 +1,12 @@
 package dev.romankrukovsky.kubanhorizons.entity;
 
 import java.util.UUID;
+import com.geckolib.animatable.GeoEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -25,8 +31,12 @@ import net.minecraft.world.level.storage.ValueOutput;
  * неуязвимость джиннии копировалась бы вместе с внешностью, и клон стал бы
  * бессмертным щитом.</p>
  */
-public class MagicDoppelgangerEntity extends PathfinderMob {
+public class MagicDoppelgangerEntity extends PathfinderMob implements GeoEntity {
     private static final int SCHEMA_VERSION = 1;
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.idle");
+    private static final RawAnimation MOVE = RawAnimation.begin().thenLoop("animation.move");
+
+    private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
 
     private UUID sourceGenieId;
 
@@ -93,5 +103,21 @@ public class MagicDoppelgangerEntity extends PathfinderMob {
         } catch (IllegalArgumentException ignored) {
             sourceGenieId = null;
         }
+    }
+
+    /**
+     * Двойник анимирован тем же контроллером, что и джинния, но без
+     * триггеров: у отражения нет ни жестов приветствия, ни каста — только
+     * покой и ходьба. Всё остальное принадлежит настоящей сущности.
+     */
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<MagicDoppelgangerEntity>(
+                "movement", 5, state -> state.setAndContinue(state.isMoving() ? MOVE : IDLE)));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animationCache;
     }
 }
