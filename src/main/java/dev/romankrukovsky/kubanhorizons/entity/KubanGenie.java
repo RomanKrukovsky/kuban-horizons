@@ -110,6 +110,22 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
         return true;
     }
 
+    /**
+     * Джинния не исчезает, когда игрок отходит далеко.
+     *
+     * <p>Ванильный despawn удалял единственную личность мира просто за то, что
+     * хозяин отошёл: спутница пропадала за спиной без всякой причины.</p>
+     */
+    @Override
+    public boolean removeWhenFarAway(double distSqr) {
+        return false;
+    }
+
+    @Override
+    public boolean requiresCustomPersistence() {
+        return true;
+    }
+
     @Override
     protected void customServerAiStep(ServerLevel level) {
         super.customServerAiStep(level);
@@ -125,6 +141,9 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
             dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws.tickAuraOfLaws(this, level);
             dev.romankrukovsky.kubanhorizons.genie.visual.GenieTailEngine.tickTail(this, level);
             ConditionalWishEngine.tickConditionalWishes(this, level);
+            // Место запоминается, пока джинния прогружена: после выгрузки чанка
+            // поводок ищет её именно по этой записи.
+            dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.rememberLocation(this, level);
         }
 
         if (tickCount % 10 != 0) {
@@ -301,7 +320,7 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
 
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
-        return WishborneDefenseHandler.handleHurt(this, level, source, amount);
+        return WishborneDefenseHandler.handleHurt(this, level, source);
     }
 
     @Override
@@ -402,6 +421,19 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
 
     public WishborneState wishborneState() {
         return wishborneState;
+    }
+
+    /** Снимает личность в переносимый вид, чтобы мир помнил её и без сущности. */
+    public dev.romankrukovsky.kubanhorizons.genie.memory.GenieStateSnapshot captureSnapshot() {
+        return dev.romankrukovsky.kubanhorizons.genie.memory.GenieStateSnapshot.capture(
+                ownerId, personality, brain, wishborneState, registryAccess());
+    }
+
+    /** Возвращает личность из снимка: та же джинния, а не новая с чистым характером. */
+    public void restoreFromSnapshot(dev.romankrukovsky.kubanhorizons.genie.memory.GenieStateSnapshot snapshot,
+            net.minecraft.core.HolderLookup.Provider registries) {
+        snapshot.applyTo(personality, brain, wishborneState, registries);
+        ownerId = snapshot.ownerId();
     }
 
     @Override

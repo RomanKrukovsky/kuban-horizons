@@ -28,5 +28,10 @@ public final class TrueOmnipotenceEnding {
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.ending.wish1_complete"));
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.ending.no_interface_needed"));
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.ending.supreme_djinni"));
+
+        // Игрок сам стал джинном, и прежняя привязка мира больше не нужна.
+        // Это единственный игровой путь снять якорь единственности: пока он
+        // держится, второй джиннии в мире появиться не может.
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.release(level.getServer());
     }
 }

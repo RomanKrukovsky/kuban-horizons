@@ -27,7 +27,14 @@ public final class WishborneDefenseHandler {
     private WishborneDefenseHandler() {
     }
 
-    public static boolean handleHurt(KubanGenie genie, ServerLevel level, DamageSource source, float amount) {
+    /**
+     * Реагирует на попытку навредить джиннии и всегда отклоняет урон.
+     *
+     * <p>Величина урона не влияет ни на одну ветку: Wishborne-сущность не
+     * использует HP как состояние поражения (AD-010), поэтому важен только
+     * характер атаки, а не её сила.</p>
+     */
+    public static boolean handleHurt(KubanGenie genie, ServerLevel level, DamageSource source) {
         Entity attacker = source.getEntity();
         Entity directEntity = source.getDirectEntity();
 
@@ -96,12 +103,12 @@ public final class WishborneDefenseHandler {
             return false;
         }
 
-        // 5. Сильная атака или любая другая авантюра: активация Phantom Death («Нет, я не умерла»)
-        if (amount >= 5.0F || attacker != null) {
-            PhantomDeathController.triggerPhantomDeath(genie, level, attacker);
-            return false;
-        }
-
+        // 6. Любой другой урон: короткая реакция без исчезновения.
+        //
+        // Ложной смерти здесь нет намеренно. Она сжимала модель до нуля,
+        // убирала джиннию из мира на две секунды и телепортировала за спину
+        // после каждого случайного удара — спутница пропадала в самый нужный
+        // момент, а игрок получал вопрос «Ты закончил?» вместо помощи.
         genie.playHurt();
         level.sendParticles(ParticleTypes.PORTAL, genie.getX(), genie.getY() + 1.0D, genie.getZ(),
                 20, 0.4D, 0.8D, 0.4D, 0.05D);

@@ -116,9 +116,43 @@ public final class GenieCommands {
                                         .executes(context -> executeMove(context.getSource().getPlayerOrException())))))
                 .then(Commands.literal("status")
                         .executes(context -> runtimeStatus(context.getSource().getPlayerOrException())))
+                .then(Commands.literal("anchor")
+                        .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .then(Commands.literal("status")
+                                .executes(context -> anchorStatus(context.getSource().getPlayerOrException())))
+                        .then(Commands.literal("reset")
+                                .executes(context -> resetAnchor(context.getSource().getPlayerOrException()))))
                 .then(Commands.argument("message", StringArgumentType.greedyString())
                         .executes(context -> converse(context.getSource().getPlayerOrException(),
                                 StringArgumentType.getString(context, "message")))));
+    }
+
+    /** Показывает, к какой сущности привязана единственная джинния мира. */
+    private static int anchorStatus(ServerPlayer player) {
+        var server = player.level().getServer();
+        var anchored = GenieAnchor.anchoredId(server);
+        if (anchored == null) {
+            player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.anchor.absent"));
+            return 0;
+        }
+        String dimension = GenieAnchor.anchoredDimension(server)
+                .map(key -> key.identifier().toString())
+                .orElse("?");
+        player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.anchor.status",
+                anchored.toString(), dimension, GenieAnchor.anchoredPosition(server).toShortString()));
+        return 1;
+    }
+
+    /**
+     * Снимает привязку мира к джиннии.
+     *
+     * <p>Команда оператора: обычной игрой якорь не снимается, иначе
+     * единственность обходилась бы одним {@code /kill}.</p>
+     */
+    private static int resetAnchor(ServerPlayer player) {
+        GenieAnchor.release(player.level().getServer());
+        player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.anchor.reset"));
+        return 1;
     }
 
     private static int createSnapshot(ServerPlayer player, String name) {
@@ -481,7 +515,8 @@ public final class GenieCommands {
         GenieLanguageModel.reply(message, context).whenComplete((reply, error) ->
                 player.level().getServer().execute(() -> {
                     if (error != null) {
-                        KubanHorizons.LOGGER.warn("EuroModels genie request failed: {}", error.getMessage());
+                        KubanHorizons.LOGGER.warn("Genie language provider {} failed: {}",
+                                GenieLanguageModel.activeProviderName(), error.getMessage());
                         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.ai.failed"));
                         return;
                     }

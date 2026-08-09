@@ -39,6 +39,25 @@ base {
 // Minecraft 26.2 поставляется с Java 25 — моды должны собираться под Java 25 (см. AD-002)
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
+// Ключи диалогового разума джиннии.
+//
+// Читаются из гитигнорного local.properties и передаются в игру как
+// переменные окружения. Переменная окружения процесса имеет приоритет:
+// на сервере ключ задают через окружение, а local.properties нужен для
+// локального запуска, где экспортировать переменную перед каждым
+// ./gradlew runClient неудобно. Отсутствие файла или свойства ошибкой
+// не является — джинния просто отвечает, что дальний разум недоступен.
+var genieSecretKeys = ['EUROMODELS_API_KEY', 'OPENROUTER_API_KEY']
+var localProperties = new Properties()
+var localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { localProperties.load(it) }
+}
+var genieSecrets = genieSecretKeys.collectEntries { name ->
+    var value = System.getenv(name) ?: localProperties.getProperty(name)
+    value == null || value.isBlank() ? [:] : [(name): value]
+}
+
 neoForge {
     version = project.neo_version
 
@@ -77,6 +96,10 @@ neoForge {
         configureEach {
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             logLevel = org.slf4j.event.Level.INFO
+            // Ключи попадают в окружение всех запусков, включая datagen:
+            // отдельная логика «кому какой ключ» только создала бы
+            // конфигурацию, которая тихо расходится с реальностью.
+            environment.putAll genieSecrets
         }
     }
 

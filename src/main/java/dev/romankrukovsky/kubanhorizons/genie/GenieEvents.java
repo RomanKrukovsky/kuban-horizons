@@ -1,24 +1,41 @@
 package dev.romankrukovsky.kubanhorizons.genie;
 
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
-import dev.romankrukovsky.kubanhorizons.genie.defense.PhantomDeathController;
+import dev.romankrukovsky.kubanhorizons.entity.KubanGenie;
 import dev.romankrukovsky.kubanhorizons.genie.defense.WishborneDefenseHandler;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
-/** Подписка на серверные события для отсчёта иронической защиты и ложной смерти. */
+/** Подписка на серверные события джиннии: единственность, поводок, защита, превращение игрока. */
 @EventBusSubscriber(modid = KubanHorizons.MOD_ID)
 public final class GenieEvents {
     private GenieEvents() {
+    }
+
+    /**
+     * Не пускает в мир вторую джиннию.
+     *
+     * <p>Отмена входа означает, что сущность не добавляется в мир вообще: не
+     * тикает, не рендерится и не сохраняется. Поэтому {@code /summon} второй
+     * джиннии тихо ничего не даёт вместо создания второй личности.</p>
+     */
+    @SubscribeEvent
+    public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
+        if (event.getEntity() instanceof KubanGenie genie
+                && event.getLevel() instanceof ServerLevel level
+                && !GenieAnchor.admit(genie, level)) {
+            event.setCanceled(true);
+        }
     }
 
     @SubscribeEvent
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level) {
             WishborneDefenseHandler.tickServer(level);
-            PhantomDeathController.tickServer(level);
+            GenieLeash.tickServer(level);
             for (var player : level.players()) {
                 dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieTransformationController
                         .tickTransformation(level, player);
@@ -45,5 +62,4 @@ public final class GenieEvents {
             }
         }
     }
-
 }

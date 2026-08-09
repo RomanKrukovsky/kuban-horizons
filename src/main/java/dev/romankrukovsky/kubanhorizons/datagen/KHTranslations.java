@@ -276,14 +276,24 @@ final class KHTranslations {
                 "No genie bound to you is present in this dimension.",
                 "В этом измерении рядом нет связанной с вами джиннии.");
         add("message.kubanhorizons.genie.ai.unavailable",
-                "My distant mind is unavailable. The server needs EUROMODELS_API_KEY.",
-                "Мой дальний разум недоступен. Серверу нужна переменная EUROMODELS_API_KEY.");
+                "My distant mind is unavailable. The server has no language provider key configured.",
+                "Мой дальний разум недоступен. На сервере не задан ключ ни одного провайдера речи.");
         add("message.kubanhorizons.genie.ai.thinking",
                 "The genie considers more possibilities than she cares to name...",
                 "Джинния перебирает больше возможностей, чем считает нужным назвать...");
         add("message.kubanhorizons.genie.ai.failed",
                 "The distant mirror is silent. My local mind remains awake.",
                 "Дальнее зеркало молчит. Мой местный разум всё ещё бодрствует.");
+        // --- Единственность джиннии ---
+        add("message.kubanhorizons.genie.anchor.absent",
+                "No genie is bound to this world yet.",
+                "К этому миру ещё не привязана джинния.");
+        add("message.kubanhorizons.genie.anchor.status",
+                "This world's genie is %s, last seen in %s at %s.",
+                "Джинния этого мира — %s, последний раз в %s на %s.");
+        add("message.kubanhorizons.genie.anchor.reset",
+                "The world's binding to its genie has been released.",
+                "Привязка мира к джиннии снята.");
         // --- Предметы Джиннии ---
         add("item.kubanhorizons.wooden_spoon", "Wooden Spoon", "Деревянная ложка");
         add("item.kubanhorizons.sonic_boom_item", "Frozen Sonic Wave", "Застывший звуковой вал");
@@ -361,9 +371,6 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.irony.tnt",
                 "Explosions are so loud... My hair is ruined.",
                 "Взрывы такие громкие... Причёску слегка испортил.");
-        add("message.kubanhorizons.genie.phantom_death.finished",
-                "Finished yet?",
-                "Ты закончил?");
         add("message.kubanhorizons.genie.irony.kill",
                 "Entity cannot be permanently destroyed.",
                 "«Сущность не может быть уничтожена навсегда.»");

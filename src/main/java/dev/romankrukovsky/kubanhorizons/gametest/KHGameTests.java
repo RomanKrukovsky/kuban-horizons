@@ -153,7 +153,8 @@ public final class KHGameTests {
         register("genie_brain_remembers_actions", KHGameTests::testGenieBrainRemembersActions, 100);
         register("genie_predictive_planning", KHGameTests::testGeniePredictivePlanning, 100);
         register("genie_defense_irony", KHGameTests::testGenieDefenseIrony, 100);
-        register("genie_phantom_death", KHGameTests::testGeniePhantomDeath, 100);
+        register("genie_survives_hit_in_place", KHGameTests::testGenieSurvivesHitInPlace, 100);
+        register("genie_is_unique", KHGameTests::testGenieIsUnique, 100);
         register("genie_meta_rules", KHGameTests::testGenieMetaRules, 100);
         register("genie_weather_policy", KHGameTests::testGenieWeatherPolicy, 100);
         register("genie_clock_policy", KHGameTests::testGenieClockPolicy, 100);
@@ -211,6 +212,7 @@ public final class KHGameTests {
 
     /** Физический урон не является состоянием поражения для Wishborne-сущности. */
     private static void testGenieIsWishborne(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
         float before = genie.getHealth();
         boolean accepted = genie.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), 1000.0F);
@@ -222,6 +224,7 @@ public final class KHGameTests {
 
     /** Вежливая точная формулировка меняет отношения, а характер выводится из них. */
     private static void testGeniePersonalityChanges(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
         var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse(
                 "Я желаю сундук алмазов, безопасно размещённый передо мной");
@@ -294,6 +297,7 @@ public final class KHGameTests {
 
     /** Ироническая защита превращает мечи в ложки, а взрывы вызывают частицы без урона. */
     private static void testGenieDefenseIrony(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new ItemStack(Items.NETHERITE_SWORD));
@@ -304,14 +308,61 @@ public final class KHGameTests {
         helper.succeed();
     }
 
-    /** Ложная смерть временно скрывает джиннию и телепортирует за спину. */
-    private static void testGeniePhantomDeath(GameTestHelper helper) {
+    /**
+     * Обычный удар не уносит джиннию из мира.
+     *
+     * <p>Регрессия на удалённую ложную смерть: она делала спутницу невидимой
+     * и телепортировала за спину атакующего после любого удара, из-за чего
+     * джинния исчезала в момент, когда игрок на неё рассчитывал.</p>
+     */
+    private static void testGenieSurvivesHitInPlace(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
+        var before = genie.position();
 
-        dev.romankrukovsky.kubanhorizons.genie.defense.PhantomDeathController.triggerPhantomDeath(genie, helper.getLevel(), player);
-        helper.assertTrue(genie.isInvisible() && genie.isInvulnerable(),
-                "Ложная смерть должна сделать джиннию невидимой и неуязвимой");
+        genie.hurtServer(helper.getLevel(), helper.getLevel().damageSources().playerAttack(player), 10.0F);
+
+        helper.assertTrue(genie.isAlive(), "Джинния должна остаться живой после удара");
+        helper.assertTrue(!genie.isInvisible(), "Удар не должен делать джиннию невидимой");
+        helper.assertTrue(genie.position().distanceToSqr(before) < 1.0E-6D,
+                "Удар не должен телепортировать джиннию");
+        helper.succeed();
+    }
+
+    /**
+     * Джинния в мире одна, и второй появиться нельзя.
+     *
+     * <p>Вторая сущность не должна попадать в мир вообще: {@code /summon}
+     * тихо ничего не даёт, а не создаёт вторую личность с собственной
+     * памятью и характером.</p>
+     */
+    private static void testGenieIsUnique(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
+        var first = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+        var anchored = dev.romankrukovsky.kubanhorizons.genie.GenieAnchor
+                .anchoredId(helper.getLevel().getServer());
+        helper.assertTrue(first.getUUID().equals(anchored),
+                "Первая джинния должна стать джиннией мира");
+
+        var second = KHEntities.KUBAN_GENIE.get().create(helper.getLevel(),
+                net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        helper.assertTrue(second != null, "Сущность-кандидат должна создаваться");
+        var pos = helper.absolutePos(new BlockPos(3, 2, 3));
+        second.snapTo(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D, 0.0F, 0.0F);
+        boolean added = helper.getLevel().addFreshEntity(second);
+
+        helper.assertTrue(!added, "Вторая джинния не должна попадать в мир");
+        // Проверяется именно недобавление сущности, а не число джинний рядом:
+        // GameTest прогоняет все тесты в одном мире, и соседние структуры
+        // содержат своих джинний, что к контракту единственности не относится.
+        helper.assertTrue(helper.getLevel().getEntity(second.getUUID()) == null,
+                "Отклонённая джинния не должна существовать в мире");
+        helper.assertTrue(first.getUUID().equals(dev.romankrukovsky.kubanhorizons.genie.GenieAnchor
+                        .anchoredId(helper.getLevel().getServer())),
+                "Отклонённая джинния не должна перехватывать привязку мира");
+        helper.assertTrue(first.isAlive(), "Первая джинния должна остаться живой");
         helper.succeed();
     }
 
@@ -430,6 +481,7 @@ public final class KHGameTests {
 
     /** Полная физическая неуязвимость и перехват административного /kill. */
     private static void testGenieInviolabilityAndKillIntercept(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
 
@@ -440,6 +492,7 @@ public final class KHGameTests {
 
     /** Аура законов нейтрализует физические снаряды вокруг Джиннии. */
     private static void testGenieAuraOfLaws(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
         var arrow = net.minecraft.world.entity.EntityTypes.ARROW.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         if (arrow != null) {
@@ -467,6 +520,7 @@ public final class KHGameTests {
 
     /** Движок хвоста-индикатора маны и мультяшно-комедийных искажений. */
     private static void testGenieTailEngineAndCartoonAnatomy(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
         dev.romankrukovsky.kubanhorizons.genie.visual.GenieTailEngine.tickTail(genie, helper.getLevel());
         dev.romankrukovsky.kubanhorizons.genie.visual.CartoonAnatomyEngine.triggerFlatten(genie, helper.getLevel());
@@ -476,6 +530,7 @@ public final class KHGameTests {
 
     /** Печать побеждает аватар через якорение, не нанося фиктивный урон. */
     private static void testGenieMagicalDefeatState(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
         var state = genie.wishborneState();
         helper.assertTrue(state.canAct() && state.anchoring() == 0,
@@ -2631,6 +2686,7 @@ public final class KHGameTests {
 
     /** Обмен ролями освобождает NPC и записывает игроку полноценное состояние джинна. */
     private static void testGenieRoleSwap(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
         var player = helper.makeMockServerPlayerInLevel();
         genie.mobInteract(player, net.minecraft.world.InteractionHand.MAIN_HAND);
