@@ -3423,14 +3423,20 @@ public final class KHGameTests {
         }
         BlockPos birdPos = new BlockPos(1, 2, 1);
         var bird = helper.spawn(KHEntities.PHEASANT.get(), birdPos);
-        var locust = helper.spawn(KHEntities.LOCUST.get(), birdPos.offset(2, 0, 0));
+        // Саранча ставится вплотную: она летает случайным курсом и за 190
+        // тиков успевает улететь с тестовой площадки, из-за чего тест падал
+        // примерно раз из шести — на дрейфе, а не на охоте. Проверяется
+        // именно поедание, поэтому поиск цели упрощён намеренно.
+        var locust = helper.spawn(KHEntities.LOCUST.get(), birdPos.offset(1, 0, 0));
         helper.assertTrue(bird != null && locust != null, "Птица или саранча не создались");
 
-        helper.runAfterDelay(190, () -> {
+        // succeedWhen вместо фиксированной задержки: птица могла съесть добычу
+        // и на сороковом тике, и на сто восьмидесятом — важен исход, а не
+        // момент. Ожидание всё равно ограничено таймаутом теста.
+        helper.succeedWhen(() -> {
             helper.assertTrue(!locust.isAlive(),
                     "Птица не съела саранчу: птицы не работают как защита урожая");
             bird.discard();
-            helper.succeed();
         });
     }
     /**
