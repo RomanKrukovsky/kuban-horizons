@@ -1,6 +1,7 @@
 package dev.romankrukovsky.kubanhorizons.irrigation;
 
 import com.mojang.serialization.MapCodec;
+import dev.romankrukovsky.kubanhorizons.client.KHParticles;
 import dev.romankrukovsky.kubanhorizons.config.KHServerConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -76,6 +77,35 @@ public class IrrigationChannelBlock extends Block {
         return state.getValue(DISTANCE) > 0
                 ? Fluids.WATER.getSource(false)
                 : super.getFluidState(state);
+    }
+
+    /**
+     * Редкие блики воды над заполненным желобом.
+     *
+     * <p>Желоб с водой и сухой желоб отличались только цветом текстуры:
+     * работает ли сеть, приходилось угадывать. Частица делает состояние
+     * видимым в движении — там, где вода дошла, она поблёскивает.</p>
+     *
+     * <p>Проходит через {@link KHParticles}: настройка {@code
+     * particles.density} обязана действовать на все декоративные частицы
+     * мода, а не на одну листву. Метод клиентский, поэтому чтение
+     * клиентского конфига здесь законно.</p>
+     */
+    @Override
+    public void animateTick(BlockState state, net.minecraft.world.level.Level level, BlockPos pos,
+            RandomSource random) {
+        if (state.getValue(DISTANCE) <= 0) {
+            return;
+        }
+        // Редко: желоб — фон хозяйства, а не фонтан.
+        if (random.nextInt(24) != 0 || !KHParticles.allow(random)) {
+            return;
+        }
+        level.addParticle(net.minecraft.core.particles.ParticleTypes.SPLASH,
+                pos.getX() + 0.25D + random.nextDouble() * 0.5D,
+                pos.getY() + 0.6D,
+                pos.getZ() + 0.25D + random.nextDouble() * 0.5D,
+                0.0D, 0.0D, 0.0D);
     }
 
     @Override

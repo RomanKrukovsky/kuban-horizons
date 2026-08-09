@@ -65,6 +65,45 @@ public final class KHSounds {
     /** Магический щелчок Кубанской Джиннии при исполнении желаний. */
     public static final DeferredHolder<SoundEvent, SoundEvent> GENIE_SNAP = register("entity.genie.snap");
 
+    // --- Атмосфера биомов ---
+    // Четыре подписных биома мода генерировались с одними цветами в effects и
+    // на слух не отличались от ванильных равнин. Петля даёт биому голос,
+    // additions — редкое вкрапление, чтобы петля не превратилась в фон,
+    // который перестают замечать.
+    //
+    // Событию петли нужен фиксированный радиус: createVariableRangeEvent
+    // берёт радиус из громкости конкретного проигрывания, а атмосферная
+    // петля играется как relative-звук «вокруг игрока», без источника в
+    // мире, и переменный радиус для неё лишён смысла.
+
+    /** Степь: сухой ветер по ковылю (бесшовная петля). */
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_STEPPE_LOOP =
+            register("ambient.steppe.loop");
+    /** Степь: далёкий посвист ветра в бурьяне. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_STEPPE_ADDITIONS =
+            register("ambient.steppe.additions");
+
+    /** Пойма: шелест листвы и тихий низ текущей воды (бесшовная петля). */
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_FLOODPLAIN_LOOP =
+            register("ambient.floodplain.loop");
+    /** Пойма: плеск воды у берега. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_FLOODPLAIN_ADDITIONS =
+            register("ambient.floodplain.additions");
+
+    /** Плавни: свист тростниковых стеблей над стоячей водой (петля). */
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_PLAVNI_LOOP =
+            register("ambient.plavni.loop");
+    /** Плавни: хлопок крыльев в камыше. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_PLAVNI_ADDITIONS =
+            register("ambient.plavni.additions");
+
+    /** Лиман: низкий гул открытой воды (бесшовная петля). */
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_LIMAN_LOOP =
+            register("ambient.liman.loop");
+    /** Лиман: далёкий крик над отмелью. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> AMBIENT_LIMAN_ADDITIONS =
+            register("ambient.liman.additions");
+
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         return SOUNDS.register(name.replace('.', '_'),
                 () -> SoundEvent.createVariableRangeEvent(KHIds.of(name.replace('.', '_'))));

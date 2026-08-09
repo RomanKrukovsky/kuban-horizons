@@ -49,6 +49,22 @@ Minecraft принадлежит Mojang AB / Microsoft. Проект не рас
 | `assets/kubanhorizons/sounds/entity/manul/death.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/entity/genie/snap.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
 | `assets/kubanhorizons/sounds/weather/dry_wind.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/ambient/steppe/loop.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/ambient/steppe/additions.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/ambient/floodplain/loop.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/ambient/floodplain/additions.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/ambient/plavni/loop.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/ambient/plavni/additions.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/ambient/liman/loop.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+| `assets/kubanhorizons/sounds/ambient/liman/additions.ogg` | собственный синтез (tools/soundgen) | CC BY-SA 4.0 |
+
+Атмосфера четырёх биомов мода (степь, пойма, плавни, лиман) сгенерирована
+детерминированным скриптом `tools/soundgen/generate_ambient_sounds.py`
+(Python 3 + numpy, без сторонних сэмплов). Петли сшиты в бесшовный цикл
+кросс-фейдом «хвост в начало», а все модуляции взяты с целым числом
+периодов на длину файла — иначе на стыке был бы слышен щелчок. Тембры
+разведены по спектральному центроиду, чтобы четыре разных места не звучали
+одинаково.
 
 Голоса фауны давления, погодный суховей и щелчок джинна сгенерированы
 детерминированным скриптом `tools/soundgen/generate_fauna_sounds.py`

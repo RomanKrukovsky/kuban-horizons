@@ -70,8 +70,20 @@ public class FruitLeavesBlock extends LeavesBlock {
         return CODEC;
     }
 
+    /**
+     * Осыпание листвы с учётом настройки плотности частиц.
+     *
+     * <p>Проверка не в {@code animateTick}, а здесь: это единственное место,
+     * где мод сам решает выпустить частицу, и настройка {@code
+     * particles.density} обязана влиять именно на него. Метод вызывается
+     * только на клиенте (из ванильного {@code animateTick}), поэтому чтение
+     * клиентского конфига безопасно.</p>
+     */
     @Override
     protected void spawnFallingLeavesParticle(Level level, BlockPos pos, RandomSource random) {
+        if (!dev.romankrukovsky.kubanhorizons.client.KHParticles.allow(random)) {
+            return;
+        }
         ParticleUtils.spawnParticleBelow(level, pos, random, LEAF_PARTICLE);
     }
 

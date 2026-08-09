@@ -1,4 +1,52 @@
 {
+  "ambient_floodplain_additions": {
+    "sounds": [
+      "kubanhorizons:ambient/floodplain/additions"
+    ],
+    "subtitle": "subtitles.kubanhorizons.ambient.floodplain.additions"
+  },
+  "ambient_floodplain_loop": {
+    "sounds": [
+      "kubanhorizons:ambient/floodplain/loop"
+    ],
+    "subtitle": "subtitles.kubanhorizons.ambient.floodplain.loop"
+  },
+  "ambient_liman_additions": {
+    "sounds": [
+      "kubanhorizons:ambient/liman/additions"
+    ],
+    "subtitle": "subtitles.kubanhorizons.ambient.liman.additions"
+  },
+  "ambient_liman_loop": {
+    "sounds": [
+      "kubanhorizons:ambient/liman/loop"
+    ],
+    "subtitle": "subtitles.kubanhorizons.ambient.liman.loop"
+  },
+  "ambient_plavni_additions": {
+    "sounds": [
+      "kubanhorizons:ambient/plavni/additions"
+    ],
+    "subtitle": "subtitles.kubanhorizons.ambient.plavni.additions"
+  },
+  "ambient_plavni_loop": {
+    "sounds": [
+      "kubanhorizons:ambient/plavni/loop"
+    ],
+    "subtitle": "subtitles.kubanhorizons.ambient.plavni.loop"
+  },
+  "ambient_steppe_additions": {
+    "sounds": [
+      "kubanhorizons:ambient/steppe/additions"
+    ],
+    "subtitle": "subtitles.kubanhorizons.ambient.steppe.additions"
+  },
+  "ambient_steppe_loop": {
+    "sounds": [
+      "kubanhorizons:ambient/steppe/loop"
+    ],
+    "subtitle": "subtitles.kubanhorizons.ambient.steppe.loop"
+  },
   "block_oil_press_creak": {
     "sounds": [
       "kubanhorizons:block/oil_press/creak"

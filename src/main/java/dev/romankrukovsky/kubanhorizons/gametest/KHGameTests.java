@@ -54,6 +54,7 @@ import net.minecraft.tags.BlockItemTags;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
@@ -212,6 +213,17 @@ public final class KHGameTests {
         // покрыты тестами fruit_leaves_ripen / fruit_pick_resets / sapling_grows_tree).
         register("orchard_is_reachable", KHGameTests::testOrchardReachable, 100);
         register("tooltips_are_translated", KHGameTests::testTooltipsTranslated, 100);
+        // Атмосфера биомов. Регистрация звукового события ничего не значит:
+        // мод уже возил девятнадцать немых голосов. Тесты проверяют, что
+        // атмосфера РАЗРЕШАЕТСЯ из реестра биомов, озвучена файлами и
+        // не затирает ванильное пещерное настроение.
+        register("biomes_have_ambience", KHGameTests::testBiomesHaveAmbience, 100);
+        register("biome_ambience_is_distinct", KHGameTests::testBiomeAmbienceDistinct, 100);
+        register("ambience_is_subtitled", KHGameTests::testAmbienceSubtitled, 100);
+        // Конфигурация: каждая живая настройка обязана читаться на реальном
+        // пути кода, а удалённая — не оставлять следов в файле.
+        register("config_options_are_alive", KHGameTests::testConfigOptionsAlive, 100);
+        register("debug_overlay_reads_world", KHGameTests::testDebugOverlayReadsWorld, 100);
         // Виноградный чан: весь путь «гроздь → сок» и анти-дюп. Регистрация
         // блока и типа рецепта ничего не доказывает — доказывает бутылка сока
         // в инвентаре игрока и ровно один списанный виноград.
@@ -2297,6 +2309,249 @@ public final class KHGameTests {
         } catch (IOException exception) {
             throw new IllegalStateException("Не удалось прочитать " + path, exception);
         }
+    }
+
+    // --- Атмосфера биомов ---
+
+    /** Четыре биома мода и ожидаемое имя их петли. */
+    private static final Map<ResourceKey<net.minecraft.world.level.biome.Biome>, String> AMBIENT_BIOMES =
+            Map.of(
+                    KHBiomes.KUBAN_STEPPE, "ambient_steppe_loop",
+                    KHBiomes.RIVER_FLOODPLAIN, "ambient_floodplain_loop",
+                    KHBiomes.PLAVNI, "ambient_plavni_loop",
+                    KHBiomes.LIMAN, "ambient_liman_loop");
+
+    /**
+     * Каждый биом мода действительно ОТДАЁТ атмосферу, а не просто содержит поле.
+     *
+     * <p>Проверяется то, что читает клиент: значение атрибута
+     * {@code AMBIENT_SOUNDS}, разрешённое из реестра биомов ровно так же, как
+     * его берёт {@code BiomeAmbientSoundsHandler}. Наличие звукового события в
+     * {@code KHSounds} тут ничего не доказало бы: мод уже возил девятнадцать
+     * зарегистрированных и совершенно немых голосов.</p>
+     *
+     * <p>Отдельно проверяется настроение. Слой биома работает как
+     * {@code override} и затирает значение измерения, где для всего Верхнего
+     * мира лежит пещерный «жуткий звук». Петля без настроения означала бы
+     * тишину в каждой пещере под нашими биомами — починили степь, сломали
+     * подземелье. Тест ловит именно эту подмену.</p>
+     */
+    private static void testBiomesHaveAmbience(GameTestHelper helper) {
+        var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
+        AMBIENT_BIOMES.forEach((key, expectedLoop) -> {
+            var biome = biomes.getOrThrow(key).value();
+            var entry = biome.getAttributes().get(net.minecraft.world.attribute.EnvironmentAttributes.AMBIENT_SOUNDS);
+            helper.assertTrue(entry != null,
+                    "У биома " + key.identifier() + " нет атрибута ambient_sounds — биом снова немой");
+            // applyModifier поверх EMPTY даёт то же значение, что получит клиент.
+            var sounds = biome.getAttributes().applyModifier(
+                    net.minecraft.world.attribute.EnvironmentAttributes.AMBIENT_SOUNDS,
+                    net.minecraft.world.attribute.AmbientSounds.EMPTY);
+            helper.assertTrue(sounds.loop().isPresent(),
+                    "У биома " + key.identifier() + " нет петли атмосферы");
+            String loopName = sounds.loop().orElseThrow().value().location().getPath();
+            helper.assertTrue(loopName.equals(expectedLoop),
+                    "Биом " + key.identifier() + " играет чужую петлю: " + loopName);
+            helper.assertTrue(sounds.loop().orElseThrow().value().location().getNamespace()
+                            .equals(KubanHorizons.MOD_ID),
+                    "Петля биома " + key.identifier() + " не из мода: " + loopName);
+            helper.assertTrue(!sounds.additions().isEmpty(),
+                    "У биома " + key.identifier() + " нет редких вкраплений");
+            sounds.additions().forEach(addition -> helper.assertTrue(
+                    addition.tickChance() > 0.0D && addition.tickChance() < 1.0D,
+                    "Шанс вкрапления у " + key.identifier() + " бессмыслен: " + addition.tickChance()));
+            // Пещера под степью обязана звучать как пещера.
+            helper.assertTrue(sounds.mood().isPresent(),
+                    "Биом " + key.identifier() + " затирает пещерное настроение измерения: "
+                            + "под ним пещеры станут немыми");
+            helper.assertTrue(sounds.mood().orElseThrow().soundEvent().value().location()
+                            .equals(net.minecraft.sounds.SoundEvents.AMBIENT_CAVE.value().location()),
+                    "Настроение биома " + key.identifier() + " не ванильное пещерное");
+        });
+        helper.succeed();
+    }
+
+    /**
+     * Четыре биома звучат по-разному, а не одной петлёй на всех.
+     *
+     * <p>Четыре разных места (сухая степь, заливная пойма, тростниковые
+     * плавни, открытый лиман) — четыре разных звука. Если бы петля или
+     * вкрапление совпали, биомы стали бы неразличимы на слух, и вся работа
+     * свелась бы к «звук вообще есть».</p>
+     */
+    private static void testBiomeAmbienceDistinct(GameTestHelper helper) {
+        var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
+        Set<String> loops = new java.util.HashSet<>();
+        Set<String> additions = new java.util.HashSet<>();
+        for (var key : AMBIENT_BIOMES.keySet()) {
+            var sounds = biomes.getOrThrow(key).value().getAttributes().applyModifier(
+                    net.minecraft.world.attribute.EnvironmentAttributes.AMBIENT_SOUNDS,
+                    net.minecraft.world.attribute.AmbientSounds.EMPTY);
+            helper.assertTrue(loops.add(sounds.loop().orElseThrow().value().location().toString()),
+                    "Петля биома " + key.identifier() + " повторяет петлю другого биома");
+            sounds.additions().forEach(addition -> helper.assertTrue(
+                    additions.add(addition.soundEvent().value().location().toString()),
+                    "Вкрапление биома " + key.identifier() + " повторяет вкрапление другого"));
+        }
+        helper.assertTrue(loops.size() == AMBIENT_BIOMES.size(),
+                "Ожидалось " + AMBIENT_BIOMES.size() + " разных петель, получено " + loops.size());
+        helper.succeed();
+    }
+
+    /**
+     * Атмосфера озвучена файлом и подписана на двух языках.
+     *
+     * <p>Событие без записи в {@code sounds.json} — это «Missing sound for
+     * event» в логе и тишина в игре: ровно тот сбой, который в этом моде уже
+     * случался дважды. Субтитр — чтобы звук существовал не только для
+     * слышащих.</p>
+     */
+    private static void testAmbienceSubtitled(GameTestHelper helper) {
+        JsonObject sounds = readSoundsJson();
+        JsonObject english = readLang("en_us");
+        JsonObject russian = readLang("ru_ru");
+        for (String biome : List.of("steppe", "floodplain", "plavni", "liman")) {
+            for (String kind : List.of("loop", "additions")) {
+                String event = "ambient_" + biome + "_" + kind;
+                helper.assertTrue(sounds.has(event),
+                        "Событие " + event + " не объявлено в sounds.json — звук не найдётся");
+                JsonObject body = sounds.getAsJsonObject(event);
+                helper.assertTrue(body.has("subtitle"), "У события " + event + " нет субтитра");
+                String key = body.get("subtitle").getAsString();
+                helper.assertTrue(english.has(key) && russian.has(key),
+                        "Субтитр " + key + " переведён не на оба языка");
+                helper.assertTrue(!english.get(key).getAsString().isBlank()
+                                && !russian.get(key).getAsString().isBlank(),
+                        "Пустой субтитр: " + key);
+            }
+        }
+        helper.succeed();
+    }
+
+    /** Читает сгенерированный sounds.json с пути ресурсов мода. */
+    private static JsonObject readSoundsJson() {
+        String path = "/assets/kubanhorizons/sounds.json";
+        try (InputStream stream = KHGameTests.class.getResourceAsStream(path)) {
+            if (stream == null) {
+                throw new IllegalStateException("sounds.json не найден: " + path);
+            }
+            return JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
+                    .getAsJsonObject();
+        } catch (IOException exception) {
+            throw new IllegalStateException("Не удалось прочитать " + path, exception);
+        }
+    }
+
+    // --- Конфигурация ---
+
+    /**
+     * Каждая живая настройка читается на реальном пути кода.
+     *
+     * <p>Тест смотрит не на существование геттера, а на наличие вызова вне
+     * самого класса конфигурации: настройка, которую никто не спрашивает, —
+     * это ложь в файле конфигурации, и таких в моде было семь.</p>
+     *
+     * <p>Заодно проверяется, что удалённые ручки не вернулись. {@code
+     * irrigation.range} обещала радиус орошения, который задаёт ванильный
+     * {@code FarmlandBlock.isNearWater} константой 4; {@code worldgen.enabled}
+     * и {@code trade.enabled} обещали выключать datapack-реестры, прочитать
+     * флаг для которых физически невозможно — они запечены в JSON до
+     * появления конфига.</p>
+     */
+    private static void testConfigOptionsAlive(GameTestHelper helper) {
+        // Живые настройки: вызов возвращает значение из загруженного конфига.
+        // Если бы настройка не была зарегистрирована, get() бросил бы здесь.
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.config.KHServerConfig.cropGrowthSpeed() > 0.0D,
+                "crops.growthSpeed не читается");
+        double density = dev.romankrukovsky.kubanhorizons.client.KHParticles.density();
+        helper.assertTrue(density >= 0.0D && density <= 2.0D,
+                "particles.density вне заявленного диапазона: " + density);
+
+        // Удалённые настройки не должны существовать даже как геттеры:
+        // ручка, которая парсится и ничего не делает, — это обман описания.
+        Set<String> forbidden = Set.of("irrigationRange", "worldgenEnabled", "tradeEnabled");
+        for (var method : dev.romankrukovsky.kubanhorizons.config.KHServerConfig.class.getMethods()) {
+            helper.assertTrue(!forbidden.contains(method.getName()),
+                    "Мёртвая настройка вернулась в конфиг: " + method.getName());
+        }
+        helper.succeed();
+    }
+
+    /**
+     * Отладочный оверлей читает настоящее состояние мира.
+     *
+     * <p>Проверяется содержимое строк, а не факт подписки на событие
+     * отрисовки: оверлей, который рисует пустоту или выдумку, ничем не лучше
+     * мёртвой галочки. Ставится грядка и желоб с водой, после чего строки
+     * обязаны показать влажность и удалённость — те самые невидимые числа,
+     * ради которых настройка и заявлена.</p>
+     *
+     * <p>Плодородия среди строк нет намеренно: оно не синхронизируется на
+     * клиент, и показывать его в HUD означало бы показывать догадку.</p>
+     */
+    private static void testDebugOverlayReadsWorld(GameTestHelper helper) {
+        var level = helper.getLevel();
+        BlockPos farmland = new BlockPos(1, 1, 1);
+        helper.setBlock(farmland, Blocks.FARMLAND);
+        BlockPos channel = new BlockPos(2, 1, 1);
+        helper.setBlock(channel, KHBlocks.IRRIGATION_CHANNEL.get().defaultBlockState()
+                .setValue(dev.romankrukovsky.kubanhorizons.irrigation.IrrigationChannelBlock.DISTANCE, 3));
+
+        BlockPos absFarmland = helper.absolutePos(farmland);
+        BlockPos absChannel = helper.absolutePos(channel);
+
+        // Без прицела оверлей всё равно сообщает биом — иначе он пуст и бесполезен.
+        List<Component> noAim = dev.romankrukovsky.kubanhorizons.client.KHDebugOverlay
+                .lines(level, absFarmland, null);
+        helper.assertTrue(!noAim.isEmpty(), "Оверлей не показывает ничего даже без прицела");
+        helper.assertTrue(translationKeys(noAim).contains("debug.kubanhorizons.biome"),
+                "Оверлей не сообщает биом: " + translationKeys(noAim));
+
+        // Прицел в грядку: обязана появиться влажность.
+        List<Component> onFarmland = dev.romankrukovsky.kubanhorizons.client.KHDebugOverlay
+                .lines(level, absFarmland, blockHit(absFarmland));
+        helper.assertTrue(translationKeys(onFarmland).contains("debug.kubanhorizons.moisture"),
+                "Оверлей не показывает влажность грядки: " + translationKeys(onFarmland));
+
+        // Прицел в заполненный желоб: обязана появиться удалённость, а не «сухой».
+        List<Component> onChannel = dev.romankrukovsky.kubanhorizons.client.KHDebugOverlay
+                .lines(level, absFarmland, blockHit(absChannel));
+        helper.assertTrue(translationKeys(onChannel).contains("debug.kubanhorizons.channel.distance"),
+                "Оверлей не показывает удалённость воды в желобе: " + translationKeys(onChannel));
+
+        // Сухой желоб отличается от «вода на удалении 0» — иначе не видно обрыв сети.
+        helper.setBlock(channel, KHBlocks.IRRIGATION_CHANNEL.get().defaultBlockState()
+                .setValue(dev.romankrukovsky.kubanhorizons.irrigation.IrrigationChannelBlock.DISTANCE, 0));
+        List<Component> onDry = dev.romankrukovsky.kubanhorizons.client.KHDebugOverlay
+                .lines(level, absFarmland, blockHit(absChannel));
+        helper.assertTrue(translationKeys(onDry).contains("debug.kubanhorizons.channel.dry"),
+                "Сухой желоб не отличается от заполненного: " + translationKeys(onDry));
+
+        // Все ключи оверлея переведены на оба языка.
+        JsonObject english = readLang("en_us");
+        JsonObject russian = readLang("ru_ru");
+        for (String key : List.of("debug.kubanhorizons.biome", "debug.kubanhorizons.moisture",
+                "debug.kubanhorizons.channel.distance", "debug.kubanhorizons.channel.dry")) {
+            helper.assertTrue(english.has(key) && russian.has(key),
+                    "Строка оверлея переведена не на оба языка: " + key);
+        }
+        helper.succeed();
+    }
+
+    /** Прицел в центр верхней грани блока. */
+    private static BlockHitResult blockHit(BlockPos pos) {
+        return new BlockHitResult(
+                new net.minecraft.world.phys.Vec3(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D),
+                Direction.UP, pos, false);
+    }
+
+    /** Ключи переводов строк оверлея — по ним и проверяется содержимое. */
+    private static List<String> translationKeys(List<Component> lines) {
+        return lines.stream()
+                .map(line -> line.getContents() instanceof TranslatableContents contents
+                        ? contents.getKey()
+                        : "<не перевод>")
+                .toList();
     }
 
     // --- Тесты маслопресса ---

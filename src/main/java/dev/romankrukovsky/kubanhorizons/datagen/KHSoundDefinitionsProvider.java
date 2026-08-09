@@ -69,6 +69,43 @@ public final class KHSoundDefinitionsProvider extends SoundDefinitionsProvider {
         add(KHSounds.DRY_WIND.get(), definition()
                 .subtitle("subtitles.kubanhorizons.weather.dry_wind")
                 .with(sound(KHIds.of("weather/dry_wind"))));
+
+        // Атмосфера биомов. Без этих определений атрибут AMBIENT_SOUNDS
+        // ссылался бы на события без файлов, и четыре биома остались бы
+        // такими же немыми, только уже с записью в реестре.
+        ambience("steppe", KHSounds.AMBIENT_STEPPE_LOOP.get(),
+                KHSounds.AMBIENT_STEPPE_ADDITIONS.get());
+        ambience("floodplain", KHSounds.AMBIENT_FLOODPLAIN_LOOP.get(),
+                KHSounds.AMBIENT_FLOODPLAIN_ADDITIONS.get());
+        ambience("plavni", KHSounds.AMBIENT_PLAVNI_LOOP.get(),
+                KHSounds.AMBIENT_PLAVNI_ADDITIONS.get());
+        ambience("liman", KHSounds.AMBIENT_LIMAN_LOOP.get(),
+                KHSounds.AMBIENT_LIMAN_ADDITIONS.get());
+    }
+
+    /**
+     * Атмосфера одного биома: петля и редкое вкрапление.
+     *
+     * <p>Файлы лежат в {@code ambient/<биом>/{loop,additions}.ogg}.</p>
+     *
+     * <p>Петля намеренно не помечена {@code stream()}: потоковое чтение
+     * предназначено для звуков длиной от минуты (пластинки, музыка), а
+     * десятисекундная петля должна лежать в памяти целиком — иначе на
+     * стыке появится пауза подгрузки, и вся работа над бесшовностью
+     * шва пропадёт.</p>
+     *
+     * <p>Субтитр есть и у петли, и у вкрапления: игрок с включёнными
+     * субтитрами обязан видеть, что именно он слышит, — иначе звук
+     * существует только для слышащих.</p>
+     */
+    private void ambience(String biome, net.minecraft.sounds.SoundEvent loop,
+                          net.minecraft.sounds.SoundEvent additions) {
+        add(loop, definition()
+                .subtitle("subtitles.kubanhorizons.ambient." + biome + ".loop")
+                .with(sound(KHIds.of("ambient/" + biome + "/loop"))));
+        add(additions, definition()
+                .subtitle("subtitles.kubanhorizons.ambient." + biome + ".additions")
+                .with(sound(KHIds.of("ambient/" + biome + "/additions"))));
     }
 
     /** Определение одного голоса птицы: файл entity/<вид>/<событие>.ogg. */

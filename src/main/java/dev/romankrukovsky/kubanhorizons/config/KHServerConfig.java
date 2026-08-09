@@ -44,10 +44,14 @@ public final class KHServerConfig {
                     "Включает систему орошения.")
             .define("irrigation.enabled", true);
 
-    private static final ModConfigSpec.IntValue IRRIGATION_RANGE = BUILDER
-            .comment("Radius (in blocks) around a filled channel that counts as irrigated farmland.",
-                    "Радиус (в блоках) вокруг заполненного желоба, в котором грядки считаются орошаемыми.")
-            .defineInRange("irrigation.range", 4, 1, 8);
+    // Настройки irrigation.range здесь больше нет, и это не упущение.
+    // Она обещала «радиус вокруг заполненного желоба, в котором грядки
+    // считаются орошаемыми», но задать этот радиус мод не может: увлажнение
+    // делает ванильный FarmlandBlock.isNearWater, а радиус 4 записан прямо
+    // в его теле (private static, betweenClosed(pos.offset(-4,0,-4), ...)).
+    // Желоб лишь отдаёт FluidState воды — дальше решает ванильный код.
+    // Число в конфиге читалось бы игроком как настройка, ничего при этом не
+    // меняя: соврать в описании хуже, чем не дать ручку вовсе.
 
     // --- Переработка ---
 
@@ -113,19 +117,26 @@ public final class KHServerConfig {
                     "Включает половодье в пойме: заливает низкие грядки, обогащая луг.")
             .define("pressure.enableFlooding", true);
 
-    // --- Мир ---
+    // --- Мир и торговля ---
 
-    private static final ModConfigSpec.BooleanValue WORLDGEN_ENABLED = BUILDER
-            .comment("Master switch for Kuban Horizons world generation (biomes, structures).",
-                    "Главный выключатель генерации мира мода (биомы, структуры).")
-            .define("worldgen.enabled", true);
-
-    // --- Торговля ---
-
-    private static final ModConfigSpec.BooleanValue TRADE_ENABLED = BUILDER
-            .comment("Enable Kuban Horizons villager professions and trades.",
-                    "Включает региональные профессии и сделки поселенцев.")
-            .define("trade.enabled", true);
+    // Настроек worldgen.enabled и trade.enabled здесь больше нет.
+    //
+    // Обе обещали быть «главным выключателем», но выключать им нечего:
+    // и биомы с пресетом мира, и профессии со сделками задаются
+    // datapack-реестрами (Registries.BIOME, WORLD_PRESET, VILLAGER_TRADE,
+    // TRADE_SET) — их содержимое запечено в JSON на этапе датагена и
+    // читается при загрузке мира, ДО того как серверный конфиг вообще
+    // существует. Прочитать флаг в bootstrap-методе невозможно.
+    //
+    // Для генерации мира выключатель к тому же излишен: мир Kuban Horizons
+    // выбирается игроком как отдельный пресет в стандартном экране создания
+    // мира (см. KHWorldPresetTagsProvider), то есть он уже opt-in. Кто не
+    // хочет кубанских биомов — просто не выбирает этот пресет.
+    //
+    // Кому нужно отключить содержимое на самом деле, тот отключает его тем
+    // механизмом, которым такие вещи и отключаются, — датапаком. Галочка,
+    // которая переживает перезапуск и не делает ничего, вводит в заблуждение
+    // сильнее, чем её отсутствие.
 
     // --- Джинния: изменения мира ---
 
@@ -157,10 +168,6 @@ public final class KHServerConfig {
 
     public static boolean irrigationEnabled() {
         return IRRIGATION_ENABLED.get();
-    }
-
-    public static int irrigationRange() {
-        return IRRIGATION_RANGE.get();
     }
 
     public static boolean oilPressAuto() {
@@ -215,15 +222,6 @@ public final class KHServerConfig {
 
     public static boolean floodingEnabled() {
         return PRESSURE_ENABLED.get() && FLOODING_ENABLED.get();
-    }
-
-
-    public static boolean worldgenEnabled() {
-        return WORLDGEN_ENABLED.get();
-    }
-
-    public static boolean tradeEnabled() {
-        return TRADE_ENABLED.get();
     }
 
     /** Лимит объёма региона для операций джиннии (Закон сохранности). */
