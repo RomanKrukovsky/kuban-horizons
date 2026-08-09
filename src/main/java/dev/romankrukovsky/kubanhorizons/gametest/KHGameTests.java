@@ -150,6 +150,9 @@ public final class KHGameTests {
         register("carved_casing_facing_and_shape", KHGameTests::testCarvedCasingFacingAndShape, 100);
         register("roof_tile_slab_drops_two", KHGameTests::testRoofTileSlabDropsTwo, 100);
         register("ceramics_tools_drops_and_tags", KHGameTests::testCeramicsToolsDropsAndTags, 100);
+        register("genie_pull_window_shrinks", KHGameTests::testPullWindowShrinks, 100);
+        register("genie_leash_tension_by_distance", KHGameTests::testLeashTensionByDistance, 100);
+        register("genie_law_silence_frees", KHGameTests::testLawSilenceFrees, 100);
         register("genie_is_wishborne", KHGameTests::testGenieIsWishborne, 100);
         register("genie_personality_changes", KHGameTests::testGeniePersonalityChanges, 100);
         register("genie_brain_prioritizes_danger", KHGameTests::testGenieBrainPrioritizesDanger, 100);
@@ -243,6 +246,102 @@ public final class KHGameTests {
     }
 
     /** Физический урон не является состоянием поражения для Wishborne-сущности. */
+    /**
+     * Окно затягивания сокращается с искажением, монотонно и в объявленных границах.
+     *
+     * <p>Проверяется свойство, а не конкретные числа: важно, что второе жестокое
+     * желание никогда не удлиняет окно. Монотонность — то, на что игрок реально
+     * опирается, когда решает, позволить себе ещё одно желание или нет.</p>
+     */
+    private static void testPullWindowShrinks(GameTestHelper helper) {
+        long previous = Long.MAX_VALUE;
+        for (int corruption = 0; corruption <= 100; corruption += 10) {
+            long window = dev.romankrukovsky.kubanhorizons.genie.vessel.VesselPull.windowFor(corruption);
+            helper.assertTrue(window <= previous,
+                    "Окно должно сокращаться с искажением, но при " + corruption
+                            + " выросло с " + previous + " до " + window);
+            helper.assertTrue(window > 0L, "Окно обязано быть положительным при искажении " + corruption);
+            previous = window;
+        }
+        helper.assertTrue(
+                dev.romankrukovsky.kubanhorizons.genie.vessel.VesselPull.windowFor(100)
+                        < dev.romankrukovsky.kubanhorizons.genie.vessel.VesselPull.windowFor(0) / 2,
+                "Полное искажение должно сокращать окно более чем вдвое");
+        // Выход за границы не должен ломать расчёт: значения зажимаются.
+        helper.assertTrue(
+                dev.romankrukovsky.kubanhorizons.genie.vessel.VesselPull.windowFor(-50)
+                        == dev.romankrukovsky.kubanhorizons.genie.vessel.VesselPull.windowFor(0),
+                "Отрицательное искажение должно вести себя как нулевое");
+        helper.succeed();
+    }
+
+    /**
+     * Натяжение растёт с расстоянием, а ненайденный сосуд не тянет вовсе.
+     *
+     * <p>Последнее — не мелочь, а игровое обещание: спрятать сосуд далеко значит
+     * выиграть время, и если {@code null} давал бы максимум, пряталки работали бы
+     * наоборот.</p>
+     */
+    private static void testLeashTensionByDistance(GameTestHelper helper) {
+        var origin = new net.minecraft.world.phys.Vec3(0.0D, 64.0D, 0.0D);
+        var leash = dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.Tension.SLACK;
+        helper.assertTrue(
+                dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.tensionFor(null, origin) == leash,
+                "Ненайденный сосуд не должен натягивать хвост");
+
+        var previous = -1;
+        for (double distance : new double[] {2.0D, 20.0D, 40.0D, 90.0D}) {
+            var vessel = new dev.romankrukovsky.kubanhorizons.genie.vessel.VesselTracker.Located(
+                    origin.add(distance, 0.0D, 0.0D),
+                    dev.romankrukovsky.kubanhorizons.genie.vessel.VesselTracker.Holder.GROUND);
+            int ordinal = dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash
+                    .tensionFor(vessel, origin).ordinal();
+            helper.assertTrue(ordinal >= previous,
+                    "Натяжение не должно падать с ростом расстояния (на " + distance + " блоках)");
+            previous = ordinal;
+        }
+        var far = new dev.romankrukovsky.kubanhorizons.genie.vessel.VesselTracker.Located(
+                origin.add(90.0D, 0.0D, 0.0D),
+                dev.romankrukovsky.kubanhorizons.genie.vessel.VesselTracker.Holder.GROUND);
+        helper.assertTrue(
+                dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.tensionFor(far, origin)
+                        == dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.Tension.TAUT,
+                "Далёкий сосуд должен натягивать хвост до струны");
+        helper.succeed();
+    }
+
+    /**
+     * Тишина обесценивает выход, а желание снова делает его дорогим.
+     *
+     * <p>Это и есть закон сосуда целиком, и именно это свойство закрывает
+     * одиночную игру: там сосуд не трогает никто, поэтому цена доходит до нуля
+     * сама, без отдельной ветки кода.</p>
+     */
+    private static void testLawSilenceFrees(GameTestHelper helper) {
+        var attachment = new dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieAttachment();
+        long now = helper.getLevel().getGameTime();
+
+        // Желание только что: тишины нет.
+        attachment.setLastWishTick(now);
+        long fresh = dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLaw
+                .silenceTicks(helper.getLevel(), attachment);
+        helper.assertTrue(fresh == 0L, "Сразу после желания тишина должна быть нулевой, а не " + fresh);
+
+        // Желание сутки назад: тишина накопилась.
+        attachment.setLastWishTick(Math.max(1L, now - 24_000L));
+        long aged = dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLaw
+                .silenceTicks(helper.getLevel(), attachment);
+        helper.assertTrue(aged > fresh, "Тишина должна расти со временем: " + aged + " не больше " + fresh);
+
+        // Нулевой lastWishTick — сосуда не трогали ни разу, а не «трогали в начале мира».
+        attachment.setLastWishTick(0L);
+        long never = dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLaw
+                .silenceTicks(helper.getLevel(), attachment);
+        helper.assertTrue(never == helper.getLevel().getGameTime(),
+                "Нетронутый сосуд должен считать тишину от начала мира");
+        helper.succeed();
+    }
+
     private static void testGenieIsWishborne(GameTestHelper helper) {
         dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
