@@ -3472,9 +3472,12 @@ public final class KHGameTests {
                 new BlockPos(2, 2, 2));
         helper.assertTrue(manul != null, "Манул не создался");
 
-        helper.runAfterDelay(340, () -> {
-            // Диагностика в сообщении: без неё падение говорит «не заснул», но
-            // не говорит почему, и причину приходится угадывать.
+        // succeedWhen, а не фиксированные 340 тиков: зверь решает уснуть по
+        // своему расписанию, и жёсткое ожидание падало примерно раз из шести —
+        // на моменте засыпания, а не на самой механике. Диагностика в
+        // сообщении остаётся: если сон так и не наступит до таймаута теста,
+        // причину будет видно сразу.
+        helper.succeedWhen(() -> {
             helper.assertTrue(manul.isDozing(),
                     "Манул не заснул в укрытии днём. Состояние: день="
                             + helper.getLevel().isBrightOutside()
@@ -3484,7 +3487,6 @@ public final class KHGameTests {
                             + ", цель=" + manul.getTarget()
                             + ", навигация_идёт=" + !manul.getNavigation().isDone());
             manul.discard();
-            helper.succeed();
         });
     }
 }
