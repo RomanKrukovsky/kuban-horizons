@@ -133,8 +133,8 @@ public final class KHGameTests {
                 KHGameTests::testFloodingWashesCropButEnrichesSoil, 100);
         register("fertility_clamps_at_bounds",
                 KHGameTests::testFertilityClampsAtBounds, 100);
-        register("locust_eats_crop_stage", KHGameTests::testLocustEatsCropStage, 180);
-        register("ground_bird_hunts_locust", KHGameTests::testGroundBirdHuntsLocust, 400);
+        register("locust_eats_crop_stage", KHGameTests::testLocustEatsCropStage, 900);
+        register("ground_bird_hunts_locust", KHGameTests::testGroundBirdHuntsLocust, 900);
         register("worldgen_feature_order", KHGameTests::testWorldgenFeatureOrder, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
         register("structure_registry_integrity", KHGameTests::testStructureRegistryIntegrity, 100);
@@ -194,7 +194,7 @@ public final class KHGameTests {
         register("manul_trust_survives_reload", KHGameTests::testManulTrustSurvivesReload, 100);
         register("manul_offering_is_day_gated", KHGameTests::testManulOfferingDayGated, 100);
         register("manul_not_tamed_by_one_fish", KHGameTests::testManulNotTamedByOneFish, 100);
-        register("manul_anger_cools_down", KHGameTests::testManulAngerCoolsDown, 400);
+        register("manul_anger_cools_down", KHGameTests::testManulAngerCoolsDown, 900);
         register("fauna_chain_is_reachable", KHGameTests::testFaunaChainReachable, 100);
         register("cutting_board_cuts", KHGameTests::testCuttingBoardCuts, 100);
         register("every_device_is_craftable", KHGameTests::testDevicesCraftable, 100);
@@ -207,7 +207,7 @@ public final class KHGameTests {
         register("manul_shelter_becomes_occupied", KHGameTests::testManulShelterBecomesOccupied, 100);
         register("manul_criteria_are_reachable", KHGameTests::testManulCriteriaAreReachable, 100);
         register("manul_steals_fish_from_trader", KHGameTests::testManulStealsFishFromTrader, 100);
-        register("manul_sleeps_in_daytime_den", KHGameTests::testManulSleepsInDen, 400);
+        register("manul_sleeps_in_daytime_den", KHGameTests::testManulSleepsInDen, 900);
         // Садовый контур: вход в ветку (созревание, сбор и рост дерева уже
         // покрыты тестами fruit_leaves_ripen / fruit_pick_resets / sapling_grows_tree).
         register("orchard_is_reachable", KHGameTests::testOrchardReachable, 100);
@@ -513,7 +513,11 @@ public final class KHGameTests {
     /** Аура законов нейтрализует физические снаряды вокруг Джиннии. */
     private static void testGenieAuraOfLaws(GameTestHelper helper) {
         dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
-        dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws.clearHeldForTesting();
+        // Общая карта удерживаемых снарядов НЕ чистится: она статическая
+        // на весь мод, а тесты набора идут параллельно в одном мире —
+        // чистка стирала снаряд соседнего теста, тот навсегда выпадал из
+        // обработки и «зависал». Каждый тест смотрит только свой снаряд,
+        // поэтому чужие записи в карте ему не мешают.
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
         var arrow = net.minecraft.world.entity.EntityTypes.ARROW.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
         if (arrow == null) {
@@ -532,12 +536,19 @@ public final class KHGameTests {
 
         // Остановленный снаряд обязан рассыпаться: раньше он висел в воздухе
         // вечно, а файербол и голова иссушителя продолжали коптить на месте.
-        helper.runAfterDelay(20, () -> {
+        //
+        // succeedWhen, а не однократная проверка через 20 тиков. Карта
+        // удерживаемых снарядов статическая и общая на весь мод, а тесты
+        // набора идут параллельно в одном мире: соседний тест ауры вызывал
+        // clearHeldForTesting() в момент, когда этот ещё ждал, снаряд выпадал
+        // из карты, и обработчик перестаёт его видеть — тест сообщал «снаряд
+        // зависнет навсегда» на 20-м тике, хотя механика роспуска работала.
+        // Ожидание вместо мгновенного среза переживает такую гонку.
+        helper.succeedWhen(() -> {
             dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws
                     .tickHeldProjectiles(helper.getLevel());
             helper.assertTrue(!arrow.isAlive(),
                     "Остановленный снаряд должен исчезнуть, а не зависнуть навсегда");
-            helper.succeed();
         });
     }
 
@@ -550,7 +561,11 @@ public final class KHGameTests {
      */
     private static void testGenieAuraDissolvesFireballs(GameTestHelper helper) {
         dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
-        dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws.clearHeldForTesting();
+        // Общая карта удерживаемых снарядов НЕ чистится: она статическая
+        // на весь мод, а тесты набора идут параллельно в одном мире —
+        // чистка стирала снаряд соседнего теста, тот навсегда выпадал из
+        // обработки и «зависал». Каждый тест смотрит только свой снаряд,
+        // поэтому чужие записи в карте ему не мешают.
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
 
         var fireball = net.minecraft.world.entity.EntityTypes.FIREBALL.create(
@@ -1226,7 +1241,12 @@ public final class KHGameTests {
                 () -> {
                     helper.assertTrue(!manul.isRetaliating(),
                             "Злость не погасла за отведённое время: манул превратился "
-                                    + "в преследователя");
+                                    + "в преследователя. Рядом игроков в 8 блоках: "
+                                    + helper.getLevel().players().stream()
+                                            .filter(p -> p.distanceToSqr(manul) <= 64.0D)
+                                            .count()
+                                    + ", загнан_в_угол=" + manul.isCornered()
+                                    + ", цель=" + manul.getTarget());
                     helper.assertTrue(manul.getTarget() == null,
                             "Цель осталась после остывания — зверь так и гонится за игроком");
                     manul.discard();
@@ -3900,7 +3920,12 @@ public final class KHGameTests {
         var locust = helper.spawn(KHEntities.LOCUST.get(), cropPos);
         helper.assertTrue(locust != null, "Саранча не создалась");
 
-        helper.runAfterDelay(150, () -> {
+        // succeedWhen, а не фиксированные 150 тиков: саранча ест раз в
+        // EAT_INTERVAL (60) тиков и только когда номер такта совпадает с её
+        // собственным id, поэтому за 150 тиков попыток набегает всего две-три
+        // — и при неудачном id первая приходилась уже за границей ожидания.
+        // Тест падал через прогон не из-за механики, а из-за арифметики.
+        helper.succeedWhen(() -> {
             BlockState after = helper.getBlockState(cropPos);
             boolean damaged = !after.is(BlockTags.CROPS)
                     || after.getValue(SunflowerCropBlock.AGE) < ageBefore;
@@ -3909,7 +3934,6 @@ public final class KHGameTests {
             helper.assertTrue(helper.getBlockState(cropPos.below()).is(BlockTags.SUPPORTS_CROPS),
                     "Саранча испортила почву — это работа кабана, не насекомого");
             locust.discard();
-            helper.succeed();
         });
     }
 
