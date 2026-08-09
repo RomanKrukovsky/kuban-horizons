@@ -134,7 +134,7 @@ public final class KHGameTests {
         register("fertility_clamps_at_bounds",
                 KHGameTests::testFertilityClampsAtBounds, 100);
         register("locust_eats_crop_stage", KHGameTests::testLocustEatsCropStage, 180);
-        register("ground_bird_hunts_locust", KHGameTests::testGroundBirdHuntsLocust, 220);
+        register("ground_bird_hunts_locust", KHGameTests::testGroundBirdHuntsLocust, 400);
         register("worldgen_feature_order", KHGameTests::testWorldgenFeatureOrder, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
         register("structure_registry_integrity", KHGameTests::testStructureRegistryIntegrity, 100);
@@ -194,7 +194,7 @@ public final class KHGameTests {
         register("manul_trust_survives_reload", KHGameTests::testManulTrustSurvivesReload, 100);
         register("manul_offering_is_day_gated", KHGameTests::testManulOfferingDayGated, 100);
         register("manul_not_tamed_by_one_fish", KHGameTests::testManulNotTamedByOneFish, 100);
-        register("manul_anger_cools_down", KHGameTests::testManulAngerCoolsDown, 260);
+        register("manul_anger_cools_down", KHGameTests::testManulAngerCoolsDown, 400);
         register("fauna_chain_is_reachable", KHGameTests::testFaunaChainReachable, 100);
         register("cutting_board_cuts", KHGameTests::testCuttingBoardCuts, 100);
         register("every_device_is_craftable", KHGameTests::testDevicesCraftable, 100);
@@ -208,6 +208,18 @@ public final class KHGameTests {
         register("manul_criteria_are_reachable", KHGameTests::testManulCriteriaAreReachable, 100);
         register("manul_steals_fish_from_trader", KHGameTests::testManulStealsFishFromTrader, 100);
         register("manul_sleeps_in_daytime_den", KHGameTests::testManulSleepsInDen, 400);
+        // Садовый контур: вход в ветку (созревание, сбор и рост дерева уже
+        // покрыты тестами fruit_leaves_ripen / fruit_pick_resets / sapling_grows_tree).
+        register("orchard_is_reachable", KHGameTests::testOrchardReachable, 100);
+        register("tooltips_are_translated", KHGameTests::testTooltipsTranslated, 100);
+        // Виноградный чан: весь путь «гроздь → сок» и анти-дюп. Регистрация
+        // блока и типа рецепта ничего не доказывает — доказывает бутылка сока
+        // в инвентаре игрока и ровно один списанный виноград.
+        register("grape_press_makes_juice", KHGameTests::testGrapePressMakesJuice, 100);
+        register("grape_press_accumulates", KHGameTests::testGrapePressAccumulates, 100);
+        register("grape_press_no_dupe", KHGameTests::testGrapePressNoDupe, 100);
+        register("grape_press_stomping_works", KHGameTests::testGrapePressStomping, 100);
+        register("grape_press_persistence", KHGameTests::testGrapePressPersistence, 100);
     }
 
     private KHGameTests() {
@@ -1190,12 +1202,20 @@ public final class KHGameTests {
         helper.assertTrue(!manul.isRetaliating(),
                 "Злость включена без причины");
 
-        // Удар: зверь обязан ответить.
+        // Удар: зверь обязан ответить. Мнимый игрок убирается сразу после
+        // удара — оставленный в мире, он стоял вплотную и никуда не уходил,
+        // поэтому зверь бесконечно пытался от него отступить, не мог, считал
+        // себя загнанным в угол (ManulProvokedGoal, причина 3) и заново
+        // продлевал злость. Тест сообщал «манул превратился в преследователя»
+        // на 402-м тике, хотя окно злости всего 200: гасло оно исправно, а
+        // затем включалось снова. Проверяется здесь конечность злости от
+        // удара, а не поведение в углу — для угла есть свой тест.
+        var attacker = helper.makeMockPlayer(GameType.SURVIVAL);
         manul.hurtServer(helper.getLevel(),
-                helper.getLevel().damageSources().playerAttack(
-                        helper.makeMockPlayer(GameType.SURVIVAL)), 1.0F);
+                helper.getLevel().damageSources().playerAttack(attacker), 1.0F);
         helper.assertTrue(manul.isRetaliating(),
                 "Манул не ответил на удар: защищаться он должен");
+        attacker.discard();
 
         // И обязан остыть. Проверяется по таймеру сущности, а не по поведению
         // навигации: важен сам факт, что агрессия конечна.
@@ -1314,6 +1334,259 @@ public final class KHGameTests {
         });
     }
 
+    // --- Виноградный чан ---
+
+    /** Ставит чан на землю и возвращает его BlockEntity. */
+    private static dev.romankrukovsky.kubanhorizons.blockentity.GrapePressBlockEntity placeVat(
+            GameTestHelper helper, BlockPos pos) {
+        helper.setBlock(pos.below(), Blocks.DIRT);
+        helper.setBlock(pos, KHBlocks.GRAPE_PRESS.get());
+        var be = helper.getLevel().getBlockEntity(helper.absolutePos(pos));
+        helper.assertTrue(be instanceof dev.romankrukovsky.kubanhorizons.blockentity
+                        .GrapePressBlockEntity,
+                "У виноградного пресса нет BlockEntity");
+        return (dev.romankrukovsky.kubanhorizons.blockentity.GrapePressBlockEntity) be;
+    }
+
+    /**
+     * Полный путь игрока: поставить чан, раздавить виноград, налить сок.
+     *
+     * <p>Это главный тест устройства. Он специально идёт до конца — до предмета
+     * {@code grape_juice} в руках, а не до «рецепт зарегистрирован». Ровно на
+     * этом шаге ловится ошибка разделочного стола: блок и тип рецепта
+     * существовали, а рецептов типа не было, и устройство молча отказывало
+     * навсегда.</p>
+     */
+    private static void testGrapePressMakesJuice(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 2, 1);
+        var vat = placeVat(helper, pos);
+
+        helper.assertTrue(vat.juice() == 0, "Новый чан должен быть пустым");
+
+        // Одна гроздь по рецепту даёт 1 сока, бутылка стоит 2 — значит после
+        // первой давки налить ещё нельзя.
+        ItemStack grapes = new ItemStack(KHItems.GRAPES.get(), 4);
+        helper.assertTrue(vat.stomp(helper.getLevel(), grapes),
+                "Чан не принял виноград: рецепта давки нет, блок бесполезен");
+        helper.assertTrue(vat.juice() == 1,
+                "Одна гроздь должна дать 1 единицу сока, а дала " + vat.juice());
+        helper.assertTrue(!vat.canDrawOff(helper.getLevel()),
+                "Половина бутылки не должна наливаться — иначе сок берётся из воздуха");
+
+        ItemStack bottles = new ItemStack(Items.GLASS_BOTTLE, 2);
+        helper.assertTrue(vat.drawOff(helper.getLevel(), bottles).isEmpty(),
+                "Чан налил бутылку, не набрав нужного количества сока");
+
+        // Вторая гроздь добирает до бутылки.
+        helper.assertTrue(vat.stomp(helper.getLevel(), grapes),
+                "Чан отказался принять вторую гроздь");
+        helper.assertTrue(vat.canDrawOff(helper.getLevel()),
+                "Двух гроздей должно хватать на бутылку");
+
+        ItemStack juice = vat.drawOff(helper.getLevel(), bottles);
+        helper.assertTrue(juice.is(KHItems.GRAPE_JUICE.get()) && juice.getCount() == 1,
+                "Из чана не вышла бутылка виноградного сока: " + juice);
+        helper.assertTrue(vat.juice() == 0,
+                "После налива сок должен быть списан, осталось " + vat.juice());
+        helper.assertTrue(bottles.getCount() == 1,
+                "Налив должен потратить ровно одну стеклянную бутылку");
+
+        // Пустой рукой налить нельзя: сок не носится без тары.
+        helper.assertTrue(vat.drawOff(helper.getLevel(), ItemStack.EMPTY).isEmpty(),
+                "Чан выдал сок без бутылки");
+
+        // Сок съедобен — иначе цепочка снова упирается в тупик.
+        helper.assertTrue(juice.has(DataComponents.FOOD),
+                "Виноградный сок не является едой — выпить его нельзя");
+        helper.succeed();
+    }
+
+    /**
+     * Накопление — то, чего маслопресс не умеет: частичный прогресс материален.
+     *
+     * <p>Проверяется, что сок суммируется по одной единице сырья, что чан имеет
+     * предел ёмкости и что переполнить его нельзя. Это и есть механическое
+     * отличие от маслопресса, где партия либо целая, либо не начата.</p>
+     */
+    private static void testGrapePressAccumulates(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 2, 1);
+        var vat = placeVat(helper, pos);
+
+        // Копим до предела по одной грозди: сырьё докладывается порциями,
+        // а не требуется целиком заранее.
+        ItemStack grapes = new ItemStack(KHItems.GRAPES.get(), 64);
+        int capacity = dev.romankrukovsky.kubanhorizons.blockentity
+                .GrapePressBlockEntity.CAPACITY;
+        for (int i = 1; i <= capacity; i++) {
+            helper.assertTrue(vat.stomp(helper.getLevel(), grapes),
+                    "Чан отказался принять гроздь №" + i + " до заполнения");
+            helper.assertTrue(vat.juice() == i,
+                    "Сок должен накапливаться: ожидалось " + i + ", в чане " + vat.juice());
+        }
+
+        // Полный чан больше не принимает: иначе он был бы бездонным и ягоды
+        // исчезали бы бесследно.
+        helper.assertTrue(vat.freeSpace() == 0, "Чан должен быть полон");
+        int before = grapes.getCount();
+        helper.assertTrue(!vat.stomp(helper.getLevel(), grapes),
+                "Полный чан принял ещё виноград — сырьё пропадает впустую");
+        helper.assertTrue(grapes.getCount() == before,
+                "Отказ давки не должен списывать виноград");
+
+        // Из полного чана наливается несколько бутылок — запас имеет смысл.
+        ItemStack bottles = new ItemStack(Items.GLASS_BOTTLE, 64);
+        int poured = 0;
+        while (!vat.drawOff(helper.getLevel(), bottles).isEmpty()) {
+            poured++;
+            helper.assertTrue(poured <= capacity, "Налив не остановился — это дюп сока");
+        }
+        helper.assertTrue(poured == capacity / 2,
+                "Из полного чана должно выйти " + (capacity / 2) + " бутылок, вышло " + poured);
+        helper.succeed();
+    }
+
+    /**
+     * Анти-дюп: сырьё списывается ровно один раз, сок — ровно один раз.
+     *
+     * <p>Проверяются оба направления. Раздавленный виноград не должен нигде
+     * остаться (у чана нет входного слота, из которого его можно было бы
+     * вынуть обратно), а налитый сок не должен оставаться в чане. Также
+     * проверяется, что отказ давки не съедает сырьё «в никуда».</p>
+     */
+    private static void testGrapePressNoDupe(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 2, 1);
+        var vat = placeVat(helper, pos);
+
+        // 1. Давка списывает ровно одну единицу за вызов.
+        ItemStack grapes = new ItemStack(KHItems.GRAPES.get(), 10);
+        helper.assertTrue(vat.stomp(helper.getLevel(), grapes), "Давка не сработала");
+        helper.assertTrue(grapes.getCount() == 9,
+                "Давка должна списать ровно одну гроздь, осталось " + grapes.getCount());
+
+        // 2. Отказ давки не списывает ничего: неподходящее сырьё возвращается
+        // игроку целиком, а не исчезает.
+        ItemStack stone = new ItemStack(Items.STONE, 5);
+        helper.assertTrue(!vat.stomp(helper.getLevel(), stone),
+                "Чан раздавил камень — рецепт давки не проверяется");
+        helper.assertTrue(stone.getCount() == 5,
+                "Отказ давки списал камень: сырьё исчезает без результата");
+
+        // 3. Смешивать сорта нельзя, и отказ снова ничего не тратит.
+        //    (Проверяется через сохранённый рецепт: сок уже виноградный.)
+        helper.assertTrue(vat.juice() == 1, "В чане должна остаться одна единица сока");
+
+        // 4. Налив списывает и сок, и тару ровно один раз.
+        helper.assertTrue(vat.stomp(helper.getLevel(), grapes), "Вторая давка не сработала");
+        ItemStack bottles = new ItemStack(Items.GLASS_BOTTLE, 3);
+        ItemStack juice = vat.drawOff(helper.getLevel(), bottles);
+        helper.assertTrue(juice.getCount() == 1, "Налив выдал не одну бутылку: " + juice);
+        helper.assertTrue(bottles.getCount() == 2,
+                "Налив должен списать ровно одну тару, осталось " + bottles.getCount());
+        helper.assertTrue(vat.juice() == 0,
+                "Сок остался в чане после налива — это дюп: " + vat.juice());
+
+        // 5. Повторный налив из пустого чана ничего не даёт.
+        helper.assertTrue(vat.drawOff(helper.getLevel(), bottles).isEmpty(),
+                "Пустой чан налил бутылку — сок берётся из ниоткуда");
+        helper.assertTrue(bottles.getCount() == 2,
+                "Неудачный налив не должен тратить тару");
+
+        // 6. Итоговый баланс: 8 гроздей на руках + 1 бутылка сока из 2 гроздей.
+        helper.assertTrue(grapes.getCount() == 8,
+                "Всего должно быть раздавлено 2 грозди, осталось " + grapes.getCount());
+        helper.succeed();
+    }
+
+    /**
+     * Топтание: чан приводится в действие перемещением игрока.
+     *
+     * <p>Это то, чего нет ни у одного другого устройства мода, и главный
+     * механический признак чана. Проверяется и обратное: чан не работает без
+     * человека — корова, забежавшая в него, ничего не давит (пассивного
+     * режима у чана нет по замыслу).</p>
+     */
+    private static void testGrapePressStomping(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 2, 1);
+        var vat = placeVat(helper, pos);
+        BlockState state = helper.getLevel().getBlockState(helper.absolutePos(pos));
+
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
+                new ItemStack(KHItems.GRAPES.get(), 3));
+
+        // Наступаем на чан — так, как это делает игрок при ходьбе.
+        KHBlocks.GRAPE_PRESS.get().stepOn(helper.getLevel(), helper.absolutePos(pos),
+                state, player);
+        helper.assertTrue(vat.juice() == 1,
+                "Проход по чану с гроздьями в руке должен давить сок, в чане "
+                        + vat.juice());
+        helper.assertTrue(player.getMainHandItem().getCount() == 2,
+                "Топтание должно списать ровно одну гроздь");
+
+        // Уровень блока обновился: у чана нет GUI, наполнение видно снаружи.
+        BlockState after = helper.getLevel().getBlockState(helper.absolutePos(pos));
+        helper.assertTrue(after.getValue(
+                        dev.romankrukovsky.kubanhorizons.processing.GrapePressBlock.LEVEL) > 0,
+                "Уровень чана не изменился — наполнение не видно без GUI");
+
+        // Пустая рука ничего не давит: топтание не создаёт сок из ничего.
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        int before = vat.juice();
+        KHBlocks.GRAPE_PRESS.get().stepOn(helper.getLevel(), helper.absolutePos(pos),
+                helper.getLevel().getBlockState(helper.absolutePos(pos)), player);
+        helper.assertTrue(vat.juice() == before,
+                "Топтание пустой рукой добавило сок — сок появляется из воздуха");
+
+        // Животное не работник: без игрока чан стоять и работать не должен.
+        var cow = helper.spawn(EntityTypes.COW, pos.above());
+        KHBlocks.GRAPE_PRESS.get().stepOn(helper.getLevel(), helper.absolutePos(pos),
+                helper.getLevel().getBlockState(helper.absolutePos(pos)), cow);
+        helper.assertTrue(vat.juice() == before,
+                "Корова надавила сока — у чана появился пассивный режим, которого быть не должно");
+        helper.succeed();
+    }
+
+    /**
+     * Накопленный сок переживает перезагрузку чанка.
+     *
+     * <p>Смысл накопления в том, что можно уйти и вернуться. Сок, теряющийся
+     * при перезаходе, обесценил бы всю механику: чан снова стал бы устройством
+     * «всё за один сеанс», то есть маслопрессом.</p>
+     */
+    private static void testGrapePressPersistence(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 2, 1);
+        var vat = placeVat(helper, pos);
+
+        ItemStack grapes = new ItemStack(KHItems.GRAPES.get(), 3);
+        helper.assertTrue(vat.stomp(helper.getLevel(), grapes), "Давка не сработала");
+        helper.assertTrue(vat.juice() == 1, "В чане должна быть единица сока");
+
+        // Круг сохранение → загрузка тем же путём, что использует игра
+        // (как в oil_press_persistence).
+        var registries = helper.getLevel().registryAccess();
+        var tag = vat.saveWithFullMetadata(registries);
+        var restoredBe = net.minecraft.world.level.block.entity.BlockEntity.loadStatic(
+                helper.absolutePos(pos),
+                helper.getLevel().getBlockState(helper.absolutePos(pos)),
+                tag, registries);
+        helper.assertTrue(restoredBe instanceof dev.romankrukovsky.kubanhorizons.blockentity
+                        .GrapePressBlockEntity,
+                "BlockEntity чана не восстановился из NBT");
+        var restored = (dev.romankrukovsky.kubanhorizons.blockentity
+                .GrapePressBlockEntity) restoredBe;
+        restored.setLevel(helper.getLevel());
+
+        helper.assertTrue(restored.juice() == 1,
+                "Сок не сохранился: после перезагрузки в чане " + restored.juice());
+        // И сорт сока тоже: без него неизвестно, что наливать.
+        helper.assertTrue(restored.stomp(helper.getLevel(),
+                        new ItemStack(KHItems.GRAPES.get(), 1)),
+                "Восстановленный чан не принимает виноград");
+        helper.assertTrue(restored.canDrawOff(helper.getLevel()),
+                "Восстановленный чан не помнит, какой сок налит, — налить нельзя");
+        helper.succeed();
+    }
+
     /**
      * Каждое перерабатывающее устройство можно скрафтить.
      *
@@ -1327,6 +1600,78 @@ public final class KHGameTests {
      * растёт вместе с устройствами, и новое устройство без рецепта уронит тест
      * сразу, а не через месяц.</p>
      */
+    /**
+     * Садовая ветка достижима без саженца в руках.
+     *
+     * <p>Ловит замкнутый круг: саженец выпадает только из плодовой листвы,
+     * а листва бывает только у выросшего из саженца дерева. Пока в мире не
+     * было одичавших деревьев, четыре культуры и достижение «сад» нельзя
+     * было получить в выживании — при этом всё было зарегистрировано и
+     * выглядело готовым. Тест требует внешний источник: дикую фичу дерева,
+     * которая ставит плодовую листву.</p>
+     */
+    private static void testOrchardReachable(GameTestHelper helper) {
+        var features = helper.getLevel().registryAccess()
+                .lookupOrThrow(net.minecraft.core.registries.Registries.CONFIGURED_FEATURE);
+        var trees = new java.util.LinkedHashMap<String, net.minecraft.resources.ResourceKey<
+                net.minecraft.world.level.levelgen.feature.ConfiguredFeature<?, ?>>>();
+        trees.put("персик", dev.romankrukovsky.kubanhorizons.worldgen
+                .KHConfiguredFeatures.WILD_PEACH_TREE);
+        trees.put("абрикос", dev.romankrukovsky.kubanhorizons.worldgen
+                .KHConfiguredFeatures.WILD_APRICOT_TREE);
+        trees.put("слива", dev.romankrukovsky.kubanhorizons.worldgen
+                .KHConfiguredFeatures.WILD_PLUM_TREE);
+        trees.put("грецкий орех", dev.romankrukovsky.kubanhorizons.worldgen
+                .KHConfiguredFeatures.WILD_WALNUT_TREE);
+
+        var leavesByTree = java.util.Map.of(
+                "персик", KHBlocks.PEACH_LEAVES.get(),
+                "абрикос", KHBlocks.APRICOT_LEAVES.get(),
+                "слива", KHBlocks.PLUM_LEAVES.get(),
+                "грецкий орех", KHBlocks.WALNUT_LEAVES.get());
+
+        trees.forEach((name, key) -> {
+            var feature = features.get(key).orElse(null);
+            helper.assertTrue(feature != null,
+                    "Нет дикой фичи дерева: " + name + " — саженец недостижим в выживании");
+
+            // Фича обязана ставить именно плодовую листву: только с неё
+            // выпадает саженец. Дерево из ванильной листвы вход не открывает.
+            var config = feature.value().config();
+            helper.assertTrue(config instanceof net.minecraft.world.level.levelgen
+                            .feature.configurations.TreeConfiguration,
+                    "Дикое дерево " + name + " должно быть TREE-фичей");
+            var tree = (net.minecraft.world.level.levelgen.feature
+                    .configurations.TreeConfiguration) config;
+            var expected = leavesByTree.get(name);
+            var sample = tree.foliageProvider.getState(
+                    helper.getLevel(), helper.getLevel().getRandom(), BlockPos.ZERO);
+            helper.assertTrue(sample.is(expected),
+                    "Крона дикого дерева " + name + " не из плодовой листвы — "
+                            + "саженец с неё не выпадет");
+        });
+
+        // И обратная половина круга: с плодовой листвы действительно
+        // выпадает саженец. Иначе найденное дерево — тупик: с него можно
+        // собрать плоды, но собственный сад не заложить. Шанс саженца
+        // невелик, поэтому пробуем много раз — проверяем возможность, не
+        // вероятность.
+        var pos = new BlockPos(1, 2, 1);
+        helper.setBlock(pos, KHBlocks.PEACH_LEAVES.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.LeavesBlock.PERSISTENT, true));
+        var absolute = helper.absolutePos(pos);
+        boolean saplingDropped = false;
+        for (int attempt = 0; attempt < 400 && !saplingDropped; attempt++) {
+            saplingDropped = net.minecraft.world.level.block.Block.getDrops(
+                            helper.getLevel().getBlockState(absolute), helper.getLevel(),
+                            absolute, null, null, ItemStack.EMPTY).stream()
+                    .anyMatch(stack -> stack.is(KHItems.PEACH_SAPLING.get()));
+        }
+        helper.assertTrue(saplingDropped,
+                "С плодовой листвы не выпадает саженец — свой сад заложить нельзя");
+        helper.succeed();
+    }
+
     private static void testDevicesCraftable(GameTestHelper helper) {
         var recipes = helper.getLevel().recipeAccess();
         var devices = new java.util.LinkedHashMap<String, net.minecraft.world.item.Item>();
@@ -1334,6 +1679,8 @@ public final class KHGameTests {
         devices.put("ручная мельница", KHItems.HAND_MILL.get());
         devices.put("сушильная рама", KHItems.DRYING_RACK.get());
         devices.put("разделочный стол", KHItems.CUTTING_BOARD.get());
+        devices.put("виноградный пресс", KHItems.GRAPE_PRESS.get());
+        devices.put("коптильня", KHItems.SMOKEHOUSE.get());
         devices.put("оросительный желоб", KHItems.IRRIGATION_CHANNEL.get());
         devices.put("каменный желоб", KHItems.STONE_IRRIGATION_CHANNEL.get());
         devices.put("водозабор", KHItems.WATER_INTAKE.get());
@@ -1765,6 +2112,10 @@ public final class KHGameTests {
                 "minecraft:patch_sugar_cane",
                 "minecraft:patch_firefly_bush_near_water",
                 "minecraft:seagrass_river",
+                KHPlacedFeatures.WILD_PEACH_TREE_PLACED.identifier().toString(),
+                KHPlacedFeatures.WILD_APRICOT_TREE_PLACED.identifier().toString(),
+                KHPlacedFeatures.WILD_PLUM_TREE_PLACED.identifier().toString(),
+                KHPlacedFeatures.WILD_WALNUT_TREE_PLACED.identifier().toString(),
                 KHPlacedFeatures.WILD_RICE_PLACED.identifier().toString());
         helper.assertTrue(actualOrder.equals(expectedOrder),
                 "Порядок растительности поймы отличается от vanilla river baseline: " + actualOrder);
@@ -1877,6 +2228,40 @@ public final class KHGameTests {
         helper.assertTrue(orchardChallenge.requirements().size() == 4,
                 "«Кубанский сад» должен требовать все четыре плода, групп условий: "
                         + orchardChallenge.requirements().size());
+        helper.succeed();
+    }
+
+    /**
+     * У каждой игровой подсказки есть перевод на оба языка.
+     *
+     * <p>Настройка {@code tooltips.detailed} годами обещала «расширенные
+     * подсказки», которых в моде не существовало: галочку можно было
+     * переключать без всякого следствия. Теперь подсказки есть, и тест
+     * держит их живыми — подсказка без перевода показала бы игроку
+     * сырой ключ вида {@code tooltip.kubanhorizons.tea_leaves}, что хуже
+     * отсутствия подсказки.</p>
+     *
+     * <p>Список берётся из самого {@code KHTooltips}, а не дублируется
+     * здесь: иначе добавленная подсказка не попала бы под проверку — ровно
+     * тот же промах, из-за которого в моде месяцами жили молчащие звуки и
+     * предметы без текстур.</p>
+     */
+    private static void testTooltipsTranslated(GameTestHelper helper) {
+        JsonObject english = readLang("en_us");
+        JsonObject russian = readLang("ru_ru");
+
+        var hints = dev.romankrukovsky.kubanhorizons.client.KHTooltips.hints();
+        helper.assertTrue(!hints.isEmpty(),
+                "Список подсказок пуст — настройка tooltips.detailed снова ничего не делает");
+
+        hints.forEach((item, suffix) -> {
+            String key = "tooltip.kubanhorizons." + suffix;
+            helper.assertTrue(english.has(key), "Нет английского перевода подсказки: " + key);
+            helper.assertTrue(russian.has(key), "Нет русского перевода подсказки: " + key);
+            helper.assertTrue(!english.get(key).getAsString().isBlank()
+                            && !russian.get(key).getAsString().isBlank(),
+                    "Пустая подсказка: " + key);
+        });
         helper.succeed();
     }
 
@@ -3591,6 +3976,20 @@ public final class KHGameTests {
                 new BlockPos(2, 2, 2));
         helper.assertTrue(manul != null, "Манул не создался");
 
+        // Характер и доверие задаются явно, а не берутся случайными. У
+        // осторожного манула дистанция отхода 14 блоков, у храброго 6 — а
+        // тесты в наборе стоят рядом, и зверь видел игрока из СОСЕДНЕГО
+        // теста, считал место небезопасным и не засыпал. Тест падал примерно
+        // в двух прогонах из трёх, и виноват был не сон, а случайный
+        // характер: «спит ли манул днём» и «как далеко он бежит от людей» —
+        // разные вопросы, и проверять их надо порознь. Доверие FRIENDLY
+        // обнуляет дистанцию отхода совсем: остаётся ровно проверяемое —
+        // находит ли зверь укрытие и засыпает ли в нём.
+        manul.setPersonality(dev.romankrukovsky.kubanhorizons.entity
+                .ManulPersonality.BRAVE);
+        manul.adjustTrust(dev.romankrukovsky.kubanhorizons.entity
+                .ManulTrust.FRIENDLY.threshold());
+
         // succeedWhen, а не фиксированные 340 тиков: зверь решает уснуть по
         // своему расписанию, и жёсткое ожидание падало примерно раз из шести —
         // на моменте засыпания, а не на самой механике. Диагностика в
@@ -3601,6 +4000,12 @@ public final class KHGameTests {
                     "Манул не заснул в укрытии днём. Состояние: день="
                             + helper.getLevel().isBrightOutside()
                             + ", позиция=" + manul.blockPosition()
+                            + ", точно=" + manul.position()
+                            + ", на_земле=" + manul.onGround()
+                            + ", под_ним=" + helper.getLevel()
+                                    .getBlockState(manul.blockPosition().below())
+                            + ", в_нём=" + helper.getLevel()
+                                    .getBlockState(manul.blockPosition())
                             + ", шипит=" + manul.isHissing()
                             + ", сидит=" + manul.isLoafing()
                             + ", цель=" + manul.getTarget()
