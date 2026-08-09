@@ -151,6 +151,16 @@ public final class KHRecipeProvider extends RecipeProvider {
         cooking(SmokingRecipe::new, 100, "smoking");
         cooking(CampfireCookingRecipe::new, 600, "campfire_cooking");
 
+        // Готовка дичи и рыбы. Без этих рецептов сырое мясо было тупиком:
+        // готовые версии существовали в реестре, но не выпадали и не
+        // готовились ниоткуда — а на жареном мясе висит ещё и разведение
+        // кавказской овчарки, то есть без готовки был недоступен весь
+        // контр-приём против кабана и нутрии.
+        meat("cooked_pheasant", KHItems.RAW_PHEASANT.get(), KHItems.COOKED_PHEASANT.get());
+        meat("cooked_quail", KHItems.RAW_QUAIL.get(), KHItems.COOKED_QUAIL.get());
+        meat("cooked_boar", KHItems.RAW_BOAR.get(), KHItems.COOKED_BOAR.get());
+        meat("cooked_sturgeon", KHItems.RAW_STURGEON.get(), KHItems.COOKED_STURGEON.get());
+
         // Печёная кукуруза.
         cookedCorn(SmeltingRecipe::new, 200, "smelting");
         cookedCorn(SmokingRecipe::new, 100, "smoking");
@@ -426,6 +436,32 @@ public final class KHRecipeProvider extends RecipeProvider {
     }
 
     /** Жарка семечек одним из трёх способов приготовления. */
+    /**
+     * Готовка одного вида мяса всеми тремя способами.
+     *
+     * <p>Печь, коптильня и костёр разом: игрок ждёт от мяса ванильного
+     * поведения, и рецепт только для печи выглядел бы как недоделка, а не как
+     * замысел. Времена взяты ванильные (200/100/600), чтобы дичь не была
+     * выгоднее говядины.</p>
+     */
+    private void meat(String name, net.minecraft.world.level.ItemLike raw,
+            net.minecraft.world.level.ItemLike cooked) {
+        meatOne(name, raw, cooked, SmeltingRecipe::new, 200, "smelting");
+        meatOne(name, raw, cooked, SmokingRecipe::new, 100, "smoking");
+        meatOne(name, raw, cooked, CampfireCookingRecipe::new, 600, "campfire_cooking");
+    }
+
+    private <T extends AbstractCookingRecipe> void meatOne(String name,
+            net.minecraft.world.level.ItemLike raw, net.minecraft.world.level.ItemLike cooked,
+            AbstractCookingRecipe.Factory<T> factory, int cookingTime, String suffix) {
+        SimpleCookingRecipeBuilder.generic(
+                        Ingredient.of(raw), RecipeCategory.FOOD,
+                        CookingBookCategory.FOOD, cooked, 0.35F, cookingTime, factory)
+                .unlockedBy("has_" + name, this.has(raw))
+                .save(this.output, ResourceKey.create(Registries.RECIPE,
+                        KHIds.of(name + "_from_" + suffix)));
+    }
+
     private <T extends AbstractCookingRecipe> void cooking(
             AbstractCookingRecipe.Factory<T> factory, int cookingTime, String suffix) {
         SimpleCookingRecipeBuilder.generic(

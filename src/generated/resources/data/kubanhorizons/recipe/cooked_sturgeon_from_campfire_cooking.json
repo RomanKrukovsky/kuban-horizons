@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "cookingtime": 600,
+  "experience": 0.35,
+  "ingredient": "kubanhorizons:raw_sturgeon",
+  "result": {
+    "id": "kubanhorizons:cooked_sturgeon"
+  }
+}

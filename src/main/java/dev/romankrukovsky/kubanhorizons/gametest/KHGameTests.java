@@ -193,6 +193,7 @@ public final class KHGameTests {
         register("manul_offering_is_day_gated", KHGameTests::testManulOfferingDayGated, 100);
         register("manul_not_tamed_by_one_fish", KHGameTests::testManulNotTamedByOneFish, 100);
         register("manul_anger_cools_down", KHGameTests::testManulAngerCoolsDown, 260);
+        register("fauna_chain_is_reachable", KHGameTests::testFaunaChainReachable, 100);
         register("manul_personalities_differ", KHGameTests::testManulPersonalitiesDiffer, 100);
         register("manul_witness_lowers_trust", KHGameTests::testManulWitnessLowersTrust, 100);
         register("manul_loot_is_worthless", KHGameTests::testManulLootIsWorthless, 100);
@@ -1204,6 +1205,67 @@ public final class KHGameTests {
                     manul.discard();
                     helper.succeed();
                 });
+    }
+
+    /**
+     * Цепочка фауны замкнута: мясо готовится, овчарка достижима.
+     *
+     * <p>Проверяется не наличие предметов в реестре, а то, что до них есть
+     * путь. Именно этой проверки не хватало кавказской пчеле: она была
+     * зарегистрирована, нарисована и озвучена, а её бонус не работал, и никто
+     * этого не замечал, потому что все тесты смотрели на регистрацию.</p>
+     */
+    private static void testFaunaChainReachable(GameTestHelper helper) {
+        var recipes = helper.getLevel().recipeAccess();
+
+        // 1. Каждое готовое мясо получается хотя бы одним способом готовки.
+        record Meat(String name, net.minecraft.world.item.Item raw,
+                    net.minecraft.world.item.Item cooked) {
+        }
+        var meats = java.util.List.of(
+                new Meat("фазан", KHItems.RAW_PHEASANT.get(), KHItems.COOKED_PHEASANT.get()),
+                new Meat("перепел", KHItems.RAW_QUAIL.get(), KHItems.COOKED_QUAIL.get()),
+                new Meat("кабанина", KHItems.RAW_BOAR.get(), KHItems.COOKED_BOAR.get()),
+                new Meat("осётр", KHItems.RAW_STURGEON.get(), KHItems.COOKED_STURGEON.get()));
+        for (Meat meat : meats) {
+            // assemble() вместо result(): последний protected в SingleItemRecipe,
+            // а нам нужен именно публичный путь — тот же, которым игра выдаёт
+            // результат игроку.
+            boolean cookable = recipes.recipeMap().values().stream()
+                    .filter(holder -> holder.value()
+                            instanceof net.minecraft.world.item.crafting.AbstractCookingRecipe)
+                    .anyMatch(holder -> {
+                        var cooking = (net.minecraft.world.item.crafting.AbstractCookingRecipe)
+                                holder.value();
+                        if (!cooking.input().test(new ItemStack(meat.raw()))) {
+                            return false;
+                        }
+                        var input = new net.minecraft.world.item.crafting.SingleRecipeInput(
+                                new ItemStack(meat.raw()));
+                        return cooking.assemble(input)
+                                .is(meat.cooked());
+                    });
+            helper.assertTrue(cookable,
+                    "Нет рецепта готовки: " + meat.name() + " — сырое мясо стало тупиком");
+        }
+
+        // 2. Овчарка приручается и разводится тем, что реально достижимо.
+        var taming = net.minecraft.tags.ItemTags.create(KHIds.of("caucasian_shepherd_taming"));
+        var foods = net.minecraft.tags.ItemTags.create(KHIds.of("caucasian_shepherd_foods"));
+        for (var tag : java.util.List.of(taming, foods)) {
+            var members = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(tag);
+            helper.assertTrue(members.isPresent() && members.get().size() > 0,
+                    "Тег " + tag.location() + " пуст: овчарку нечем ни приручить, ни развести");
+        }
+
+        // 3. Щенка можно купить: без этого овчарки нет в выживании вовсе.
+        var trades = helper.getLevel().registryAccess()
+                .lookupOrThrow(net.minecraft.core.registries.Registries.VILLAGER_TRADE);
+        helper.assertTrue(
+                trades.get(dev.romankrukovsky.kubanhorizons.trade.KHTrades
+                        .OP2_EMERALD_TO_SHEPHERD_EGG).isPresent(),
+                "Нет сделки на щенка овчарки — защита хозяйства недостижима");
+        helper.succeed();
     }
 
     // --- Вспомогательные ---

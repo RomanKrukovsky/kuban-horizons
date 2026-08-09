@@ -34,6 +34,16 @@ public final class KHTrades {
             tradeKey("oil_presser/emerald_to_oil");
     public static final ResourceKey<VillagerTrade> OP2_OILCAKE_TO_EMERALD =
             tradeKey("oil_presser/oil_cake_to_emerald");
+    /**
+     * Щенок овчарки за эмеральды.
+     *
+     * <p>Единственный путь получить овчарку в выживании. Дикого спавна у неё
+     * нет и быть не должно: это не фауна, а хозяйственная собака, и брать её
+     * логично у людей. Без этой сделки контр-приём против кабана и нутрии был
+     * недостижим — давление на ферму оставалось безответным.</p>
+     */
+    public static final ResourceKey<VillagerTrade> OP2_EMERALD_TO_SHEPHERD_EGG =
+            tradeKey("oil_presser/emerald_to_shepherd_egg");
 
     private KHTrades() {
     }
@@ -66,6 +76,14 @@ public final class KHTrades {
                 new TradeCost(KHItems.OIL_CAKE.get(), 12),
                 new ItemStackTemplate(Items.EMERALD), 12, 3, 0.05F,
                 Optional.empty(), List.of()));
+
+        // Щенок дорог намеренно: он открывает всю защиту хозяйства, поэтому
+        // должен стоить как вложение, а не как перекус. maxUses = 2, чтобы
+        // пара для разведения была достижима, но не бесконечна.
+        context.register(OP2_EMERALD_TO_SHEPHERD_EGG, new VillagerTrade(
+                new TradeCost(Items.EMERALD, 22),
+                new ItemStackTemplate(KHItems.CAUCASIAN_SHEPHERD_SPAWN_EGG.get()), 2, 12, 0.05F,
+                Optional.empty(), List.of()));
     }
 
     public static void bootstrapTradeSets(BootstrapContext<TradeSet> context) {
@@ -79,7 +97,8 @@ public final class KHTrades {
         context.register(KHProfessions.OIL_PRESSER_TRADES_2, new TradeSet(
                 HolderSet.direct(
                         trades.getOrThrow(OP2_EMERALD_TO_OIL),
-                        trades.getOrThrow(OP2_OILCAKE_TO_EMERALD)),
+                        trades.getOrThrow(OP2_OILCAKE_TO_EMERALD),
+                        trades.getOrThrow(OP2_EMERALD_TO_SHEPHERD_EGG)),
                 ConstantValue.exactly(2.0F), false, Optional.empty()));
     }
 }

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_cooked_quail": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:raw_quail"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "kubanhorizons:cooked_quail_from_smoking"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_cooked_quail"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "kubanhorizons:cooked_quail_from_smoking"
+    ]
+  }
+}
