@@ -31,6 +31,10 @@ public final class KHPlacedFeatures {
     public static final ResourceKey<PlacedFeature> WILD_TOMATO_PLACED = createKey("wild_tomato");
     public static final ResourceKey<PlacedFeature> WILD_GRAPE_PLACED = createKey("wild_grape");
     public static final ResourceKey<PlacedFeature> WILD_RICE_PLACED = createKey("wild_rice");
+    public static final ResourceKey<PlacedFeature> WILD_PEACH_TREE_PLACED = createKey("wild_peach_tree");
+    public static final ResourceKey<PlacedFeature> WILD_APRICOT_TREE_PLACED = createKey("wild_apricot_tree");
+    public static final ResourceKey<PlacedFeature> WILD_PLUM_TREE_PLACED = createKey("wild_plum_tree");
+    public static final ResourceKey<PlacedFeature> WILD_WALNUT_TREE_PLACED = createKey("wild_walnut_tree");
 
     private KHPlacedFeatures() {
     }
@@ -71,6 +75,36 @@ public final class KHPlacedFeatures {
                         PlacementUtils.HEIGHTMAP_TOP_SOLID,
                         BiomeFilter.biome(),
                         inShallowWater)));
+
+        // Одичавшие плодовые деревья: по одному дереву на несколько чанков.
+        //
+        // Редкость 1/28 чанков и ровно одна попытка — дикий сад должен быть
+        // находкой, а не фоном: дерево даёт вход в целую ветку из четырёх
+        // культур, поэтому встречаться должно реже кустов (у чая 1/24 при 48
+        // попытках). Дереву нужна проверка почвы и свободное место сверху,
+        // иначе крона врастает в склон.
+        registerFruitTree(context, WILD_PEACH_TREE_PLACED,
+                features.getOrThrow(KHConfiguredFeatures.WILD_PEACH_TREE));
+        registerFruitTree(context, WILD_APRICOT_TREE_PLACED,
+                features.getOrThrow(KHConfiguredFeatures.WILD_APRICOT_TREE));
+        registerFruitTree(context, WILD_PLUM_TREE_PLACED,
+                features.getOrThrow(KHConfiguredFeatures.WILD_PLUM_TREE));
+        registerFruitTree(context, WILD_WALNUT_TREE_PLACED,
+                features.getOrThrow(KHConfiguredFeatures.WILD_WALNUT_TREE));
+    }
+
+    /** Размещение одичавшего плодового дерева на траве/земле. */
+    private static void registerFruitTree(BootstrapContext<PlacedFeature> context,
+            ResourceKey<PlacedFeature> key, Holder<ConfiguredFeature<?, ?>> feature) {
+        context.register(key, new PlacedFeature(feature, List.of(
+                RarityFilter.onAverageOnceEvery(28),
+                InSquarePlacement.spread(),
+                PlacementUtils.HEIGHTMAP_WORLD_SURFACE,
+                BiomeFilter.biome(),
+                BlockPredicateFilter.forPredicate(BlockPredicate.allOf(
+                        BlockPredicate.ONLY_IN_AIR_PREDICATE,
+                        BlockPredicate.matchesBlocks(Direction.DOWN.getUnitVec3i(),
+                                Blocks.GRASS_BLOCK, Blocks.DIRT, Blocks.COARSE_DIRT))))));
     }
 
     private static void register(BootstrapContext<PlacedFeature> context,

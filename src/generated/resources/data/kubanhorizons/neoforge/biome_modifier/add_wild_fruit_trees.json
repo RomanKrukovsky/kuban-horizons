@@ -1,0 +1,18 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": [
+    "kubanhorizons:kuban_steppe",
+    "kubanhorizons:river_floodplain",
+    "minecraft:plains",
+    "minecraft:sunflower_plains",
+    "minecraft:meadow",
+    "minecraft:forest"
+  ],
+  "features": [
+    "kubanhorizons:wild_peach_tree",
+    "kubanhorizons:wild_apricot_tree",
+    "kubanhorizons:wild_plum_tree",
+    "kubanhorizons:wild_walnut_tree"
+  ],
+  "step": "vegetal_decoration"
+}
