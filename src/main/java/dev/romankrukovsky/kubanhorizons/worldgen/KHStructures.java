@@ -61,6 +61,11 @@ public final class KHStructures {
                 new Structure.StructureSettings(HolderSet.direct(
                         biomes.getOrThrow(KHBiomes.PLAVNI))),
                 pools.getOrThrow(PLAVNI_REED_SHELTER_POOL)));
+
+        // Дворец джиннии живёт в своём пакете, но регистрируется здесь:
+        // RegistrySetBuilder принимает один bootstrap на реестр.
+        dev.romankrukovsky.kubanhorizons.worldgen.palace.KHPalaceWorldgen
+                .bootstrapStructure(context);
     }
 
     private static JigsawStructure landmark(Structure.StructureSettings settings,

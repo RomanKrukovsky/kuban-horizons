@@ -28,5 +28,8 @@ public final class KHStructureSets {
         context.register(PLAVNI_REED_SHELTERS, new StructureSet(
                 structures.getOrThrow(KHStructures.PLAVNI_REED_SHELTER),
                 new RandomSpreadStructurePlacement(44, 14, RandomSpreadType.TRIANGULAR, 17420352)));
+
+        dev.romankrukovsky.kubanhorizons.worldgen.palace.KHPalaceWorldgen
+                .bootstrapSet(context);
     }
 }

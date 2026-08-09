@@ -44,6 +44,7 @@ public final class KubanHorizons {
         KHAttachments.register(modEventBus);
         KHDataComponents.register(modEventBus);
         KHBiomeSources.register(modEventBus);
+        dev.romankrukovsky.kubanhorizons.worldgen.palace.KHPalaceStructures.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.registry.KHLootModifiers.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.trade.KHProfessions.register(modEventBus);
         // Триггеры достижений про манула: без регистрации критерии не
