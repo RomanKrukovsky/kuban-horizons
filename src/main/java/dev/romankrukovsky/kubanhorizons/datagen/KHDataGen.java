@@ -34,6 +34,13 @@ public final class KHDataGen {
                             dev.romankrukovsky.kubanhorizons.worldgen.KHBiomeModifiers::bootstrap)
                     .add(net.minecraft.core.registries.Registries.WORLD_PRESET,
                             dev.romankrukovsky.kubanhorizons.worldgen.KHWorldPresets::bootstrap)
+                    // Измерение лампы: тип и уровень. Регистрируются обычным
+                    // datapack-JSON, поэтому «Вечная Кубань» существует в любом
+                    // мире, а не только в opt-in пресете мода.
+                    .add(net.minecraft.core.registries.Registries.DIMENSION_TYPE,
+                            dev.romankrukovsky.kubanhorizons.worldgen.dimension.KHDimensions::bootstrapType)
+                    .add(net.minecraft.core.registries.Registries.LEVEL_STEM,
+                            dev.romankrukovsky.kubanhorizons.worldgen.dimension.KHDimensions::bootstrapStem)
                     .add(net.minecraft.core.registries.Registries.VILLAGER_TRADE,
                             dev.romankrukovsky.kubanhorizons.trade.KHTrades::bootstrapTrades)
                     .add(net.minecraft.core.registries.Registries.TRADE_SET,

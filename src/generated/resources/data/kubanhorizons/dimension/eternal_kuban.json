@@ -1,0 +1,11 @@
+{
+  "type": "kubanhorizons:eternal_kuban",
+  "generator": {
+    "type": "minecraft:noise",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "kubanhorizons:kuban_steppe"
+    },
+    "settings": "kubanhorizons:eternal_kuban"
+  }
+}

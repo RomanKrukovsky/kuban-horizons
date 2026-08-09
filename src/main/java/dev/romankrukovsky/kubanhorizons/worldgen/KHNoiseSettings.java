@@ -82,5 +82,9 @@ public final class KHNoiseSettings {
                 vanilla.aquifersEnabled(),
                 vanilla.oreVeinsEnabled(),
                 vanilla.useLegacyRandomSource()));
+
+        // Форма измерения лампы живёт в своём классе, но регистрируется здесь:
+        // RegistrySetBuilder принимает один bootstrap на реестр.
+        dev.romankrukovsky.kubanhorizons.worldgen.dimension.KHEternalKubanNoise.bootstrap(context);
     }
 }
