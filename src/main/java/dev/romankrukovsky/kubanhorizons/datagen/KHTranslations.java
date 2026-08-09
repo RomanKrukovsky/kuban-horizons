@@ -48,6 +48,8 @@ final class KHTranslations {
         add("block.kubanhorizons.drying_rack", "Drying Rack", "Сушильная рама");
         add("block.kubanhorizons.hand_mill", "Hand Mill", "Ручная мельница");
         add("block.kubanhorizons.cutting_board", "Cutting Board", "Разделочная доска");
+        add("block.kubanhorizons.smokehouse", "Smokehouse", "Коптильня");
+        add("block.kubanhorizons.grape_press", "Grape Press", "Виноградный пресс");
         add("block.kubanhorizons.peach_leaves", "Peach Leaves", "Персиковая листва");
         add("block.kubanhorizons.apricot_leaves", "Apricot Leaves", "Абрикосовая листва");
         add("block.kubanhorizons.plum_leaves", "Plum Leaves", "Сливовая листва");
@@ -106,6 +108,7 @@ final class KHTranslations {
         add("item.kubanhorizons.borscht", "Kuban Borscht", "Кубанский борщ");
         add("item.kubanhorizons.mamalyga", "Mamalyga", "Мамалыга");
         add("item.kubanhorizons.tea_cup", "Cup of Tea", "Чашка чая");
+        add("item.kubanhorizons.grape_juice", "Grape Juice", "Виноградный сок");
         add("item.kubanhorizons.honey_walnuts", "Honey with Walnuts", "Мёд с орехами");
         add("item.kubanhorizons.vegetable_spread", "Vegetable Spread", "Овощная закуска");
         add("item.kubanhorizons.peach_sapling", "Peach Sapling", "Саженец персика");
@@ -153,6 +156,8 @@ final class KHTranslations {
         add("item.kubanhorizons.cooked_sturgeon", "Cooked Sturgeon", "Запечённый осётр");
         add("item.kubanhorizons.nutria_pelt", "Nutria Pelt", "Шкура нутрии");
         add("item.kubanhorizons.sturgeon_bucket", "Bucket of Sturgeon", "Ведро с осётром");
+        add("item.kubanhorizons.smoked_fish", "Smoked Fish", "Копчёная рыба");
+        add("item.kubanhorizons.smoked_meat", "Smoked Meat", "Копчёное мясо");
 
         add("item.kubanhorizons.wild_boar_spawn_egg", "Wild Boar Spawn Egg",
                 "Яйцо появления дикого кабана");
@@ -214,6 +219,9 @@ final class KHTranslations {
         add("message.kubanhorizons.soil_probe.advice",
                 "Tip: compost the soil or rotate crops to restore fertility",
                 "Совет: внесите компост или смените культуру, чтобы восстановить плодородие");
+        add("message.kubanhorizons.grape_press.level",
+                "Juice in the vat: %s of %s",
+                "Сока в чане: %s из %s");
         add("message.kubanhorizons.genie.bound",
                 "The genie studies you in silence. The first bond has been made.",
                 "Джинния молча изучает вас. Первая связь установлена.");
@@ -740,6 +748,45 @@ final class KHTranslations {
         add("config.kubanhorizons.crops.growthSpeed", "Crop growth speed", "Скорость роста культур");
         add("config.kubanhorizons.fertility.enabled", "Soil fertility system", "Система плодородия почвы");
         add("config.kubanhorizons.irrigation.enabled", "Irrigation system", "Система орошения");
+
+        // --- Игровые подсказки на предметах (tooltips.detailed) ---
+        // Только там, где применение не следует из названия и модели.
+        add("tooltip.kubanhorizons.grape_cutting",
+                "Graft onto a trellis, not into farmland",
+                "Прививается в шпалеру, не в грядку");
+        add("tooltip.kubanhorizons.rice_seedlings",
+                "Plant in shallow water: a flooded paddy",
+                "Сажают в мелководье — затопленный чек");
+        add("tooltip.kubanhorizons.tea_sapling",
+                "A perennial bush: pick leaves by hand, it keeps growing",
+                "Многолетний куст: лист собирают рукой, куст остаётся");
+        add("tooltip.kubanhorizons.tea_leaves",
+                "Dry on a drying rack before brewing",
+                "Перед заваркой сушат на сушильной раме");
+        add("tooltip.kubanhorizons.sunflower_head",
+                "Thresh for seeds, or press for oil",
+                "Обмолачивают на семечки или отжимают на масло");
+        add("tooltip.kubanhorizons.oil_cake",
+                "Left over from pressing: livestock feed and compost",
+                "Остаётся после отжима: корм скоту и в компост");
+        add("tooltip.kubanhorizons.soil_probe",
+                "Right-click farmland to read its fertility and moisture",
+                "ПКМ по грядке — покажет плодородие и влажность");
+        add("tooltip.kubanhorizons.irrigation_channel",
+                "Carries water from an intake; wooden channels are gnawed by nutria",
+                "Ведёт воду от водозабора; деревянный портят нутрии");
+        add("tooltip.kubanhorizons.stone_irrigation_channel",
+                "Same as the wooden channel, but nutria cannot gnaw it",
+                "То же, что деревянный желоб, но нутрии его не прогрызут");
+        add("tooltip.kubanhorizons.water_intake",
+                "Place against water: the source for a channel network",
+                "Ставят к воде — источник для сети желобов");
+        add("tooltip.kubanhorizons.drying_rack",
+                "Dries tea leaves and fruit in the open air",
+                "Сушит чайный лист и фрукты на открытом воздухе");
+        add("tooltip.kubanhorizons.manul_shelter",
+                "A manul may settle here — if it trusts you and likes the spot",
+                "Здесь может поселиться манул — если доверяет и место по нему");
     }
 
     private KHTranslations() {
