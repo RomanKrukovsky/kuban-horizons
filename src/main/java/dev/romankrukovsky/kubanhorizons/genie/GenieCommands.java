@@ -116,6 +116,10 @@ public final class GenieCommands {
                                         .executes(context -> executeMove(context.getSource().getPlayerOrException())))))
                 .then(Commands.literal("status")
                         .executes(context -> runtimeStatus(context.getSource().getPlayerOrException())))
+                // forfeit, а не back: это не возвращение в лобби, а отказ от
+                // части пути. Бесплатный выход обнулил бы всю механику сосуда.
+                .then(Commands.literal("forfeit")
+                        .executes(context -> forfeitVessel(context.getSource().getPlayerOrException())))
                 .then(Commands.literal("anchor")
                         .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                         .then(Commands.literal("status")
@@ -271,6 +275,18 @@ public final class GenieCommands {
                     exception.getMessage()));
             return 0;
         }
+    }
+
+    /**
+     * Выход из сосуда своими силами, по закону сосуда.
+     *
+     * <p>Цена берётся из тишины: чем дольше сосуд никто не трогал, тем дешевле.
+     * Поэтому в одиночной игре команда со временем становится бесплатной сама,
+     * без отдельной ветки кода для сингла.</p>
+     */
+    private static int forfeitVessel(ServerPlayer player) {
+        return dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLaw.forfeit(
+                (net.minecraft.server.level.ServerLevel) player.level(), player) ? 1 : 0;
     }
 
     private static int runtimeStatus(ServerPlayer player) {

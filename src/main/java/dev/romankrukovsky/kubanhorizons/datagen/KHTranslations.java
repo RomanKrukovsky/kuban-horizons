@@ -487,6 +487,17 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.pull.hinted",
                 "\"Feel that? Something of yours has grown impatient.\"",
                 "«Чувствуешь? Кое-что твоё заждалось.»");
+        // Закон сосуда: цена выхода падает с тишиной, поэтому в сингле команда
+        // со временем становится бесплатной сама.
+        add("message.kubanhorizons.genie.law.not_confined",
+                "You are not inside a vessel.",
+                "Вы не внутри сосуда.");
+        add("message.kubanhorizons.genie.law.forfeited",
+                "You forced your way out. It cost you %s%% of your omnipotence.",
+                "Вы вышли сами. Это стоило %s%% всемогущества.");
+        add("message.kubanhorizons.genie.law.forfeited_free",
+                "The vessel had forgotten you. You walked out and it cost nothing.",
+                "Сосуд успел вас забыть. Вы просто вышли, и это ничего не стоило.");
         add("message.kubanhorizons.genie.vessel.new_rule_master",
                 "New rule discovered: Vessel owner has the right to state a wish.",
                 "Новое правило обнаружено: Владелец сосуда имеет право произнести желание.");
@@ -802,6 +813,17 @@ final class KHTranslations {
         add("config.kubanhorizons.crops.growthSpeed", "Crop growth speed", "Скорость роста культур");
         add("config.kubanhorizons.fertility.enabled", "Soil fertility system", "Система плодородия почвы");
         add("config.kubanhorizons.irrigation.enabled", "Irrigation system", "Система орошения");
+
+        // --- Отладочный оверлей (debug.overlay) ---
+        // Показываются только те числа, которые клиент действительно знает:
+        // плодородие на клиент не синхронизируется, и строки про него не
+        // существует намеренно — см. KHDebugOverlay.
+        add("debug.kubanhorizons.biome", "Biome: %s", "Биом: %s");
+        add("debug.kubanhorizons.moisture", "Farmland moisture: %s/%s",
+                "Влажность грядки: %s/%s");
+        add("debug.kubanhorizons.channel.distance", "Channel: water at distance %s",
+                "Жёлоб: вода на удалении %s");
+        add("debug.kubanhorizons.channel.dry", "Channel: dry", "Жёлоб: сухой");
 
         // --- Игровые подсказки на предметах (tooltips.detailed) ---
         // Только там, где применение не следует из названия и модели.

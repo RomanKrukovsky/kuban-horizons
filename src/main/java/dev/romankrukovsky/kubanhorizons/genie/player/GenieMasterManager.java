@@ -36,6 +36,9 @@ public final class GenieMasterManager {
         }
 
         attachment.setMasterUUID(master.getUUID());
+        // Потирание — уже пользование, а не только желание после него: иначе
+        // хозяин мог бы вызывать слугу и молчать, не платя за это тишиной.
+        dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLaw.markUsed(level, geniePlayer);
 
         geniePlayer.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.vessel.summon_countdown"));
 
@@ -80,5 +83,9 @@ public final class GenieMasterManager {
 
         // Прогресс Всемогущества увеличивается при каждой обработке желания
         PlayerGenieProgression.advanceProgress(geniePlayer, 5);
+        // Желание — это и есть пользование сосудом: тишина обнуляется, и выход
+        // своими силами снова становится дорогим. Отсюда гонка тактик — хозяину
+        // надо приказывать, чтобы не потерять слугу, слуге выгодно молчание.
+        dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLaw.markUsed(level, geniePlayer);
     }
 }
