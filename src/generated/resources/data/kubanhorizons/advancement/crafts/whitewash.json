@@ -1,0 +1,32 @@
+{
+  "parent": "kubanhorizons:crafts/adobe",
+  "criteria": {
+    "has_plaster": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:whitewashed_plaster"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.whitewash.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:whitewashed_plaster"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.whitewash.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_plaster"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

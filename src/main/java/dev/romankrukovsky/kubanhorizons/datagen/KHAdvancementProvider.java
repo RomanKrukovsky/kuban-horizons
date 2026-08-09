@@ -264,6 +264,126 @@ public final class KHAdvancementProvider extends AdvancementProvider {
                     .save(output, KHIds.of("orchard/kuban_orchard").toString());
 
             generateManul(output, root);
+            generateFishing(output, root);
+            generateCrafts(output, root);
+        }
+
+        /**
+         * Ветка рыболовства: от первой рыбы до копчёностей.
+         *
+         * <p>Сырьё, снасти и коптильня были в моде давно, а вести цепочку
+         * им было некуда: ветка стояла в спеке как план, хотя всё нужное
+         * лежало готовым. Достижение здесь не награда за труд, а указатель:
+         * без него игрок мог годами не узнать, что рыбу можно копить не
+         * только жаркой.</p>
+         *
+         * <p>Вход — сырой осётр, а не ведро: ведро требует ведра, а рыбу
+         * можно добыть удочкой сразу. Ветка ведёт к копчению, потому что
+         * это единственная переработка, дающая долгий запас — то есть
+         * настоящая причина ловить больше, чем съешь сегодня.</p>
+         */
+        private static void generateFishing(Consumer<AdvancementHolder> output,
+                                         AdvancementHolder root) {
+            AdvancementHolder firstCatch = Advancement.Builder.advancement()
+                    .parent(root)
+                    .display(KHItems.RAW_STURGEON.get(),
+                            title("first_sturgeon"), description("first_sturgeon"),
+                            null, AdvancementType.TASK, true, true, false)
+                    .addCriterion("has_raw_sturgeon",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(
+                                    KHItems.RAW_STURGEON.get()))
+                    .save(output, KHIds.of("fishing/first_sturgeon").toString());
+
+            // Жарка и копчение — две ветви от одной рыбы, а не цепочка:
+            // это разные решения игрока, и ни одно не предваряет другое.
+            Advancement.Builder.advancement()
+                    .parent(firstCatch)
+                    .display(KHItems.COOKED_STURGEON.get(),
+                            title("cooked_sturgeon"), description("cooked_sturgeon"),
+                            null, AdvancementType.TASK, true, true, false)
+                    .addCriterion("has_cooked_sturgeon",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(
+                                    KHItems.COOKED_STURGEON.get()))
+                    .save(output, KHIds.of("fishing/cooked_sturgeon").toString());
+
+            AdvancementHolder smoked = Advancement.Builder.advancement()
+                    .parent(firstCatch)
+                    .display(KHItems.SMOKED_FISH.get(),
+                            title("smoked_fish"), description("smoked_fish"),
+                            null, AdvancementType.GOAL, true, true, false)
+                    .addCriterion("has_smoked_fish",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(
+                                    KHItems.SMOKED_FISH.get()))
+                    .save(output, KHIds.of("fishing/smoked_fish").toString());
+
+            // Живая рыба в ведре — отдельная затея: её носят не ради еды,
+            // а чтобы завести своё, поэтому узел висит на копчении как
+            // признак хозяйского подхода к промыслу.
+            Advancement.Builder.advancement()
+                    .parent(smoked)
+                    .display(KHItems.STURGEON_BUCKET.get(),
+                            title("sturgeon_bucket"), description("sturgeon_bucket"),
+                            null, AdvancementType.CHALLENGE, true, true, false)
+                    .addCriterion("has_sturgeon_bucket",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(
+                                    KHItems.STURGEON_BUCKET.get()))
+                    .save(output, KHIds.of("fishing/sturgeon_bucket").toString());
+        }
+
+        /**
+         * Ветка ремесла: региональные строительные материалы.
+         *
+         * <p>Тридцать два предмета — саман, ракушечник, побелка, черепица,
+         * плетень, резные наличники — существовали без единого достижения.
+         * Игрок мог собрать всю усадьбу и не получить ни одного знака, что
+         * прошёл заметный путь.</p>
+         *
+         * <p>Вход через саман: это первый и самый дешёвый материал набора.
+         * Итог — челлендж на четыре материала сразу (OR здесь был бы
+         * бессмысленным: «дом из чего-нибудь одного» — не усадьба).</p>
+         */
+        private static void generateCrafts(Consumer<AdvancementHolder> output,
+                                         AdvancementHolder root) {
+            AdvancementHolder adobe = Advancement.Builder.advancement()
+                    .parent(root)
+                    .display(KHItems.ADOBE_BRICKS.get(),
+                            title("adobe"), description("adobe"),
+                            null, AdvancementType.TASK, true, true, false)
+                    .addCriterion("has_adobe",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(
+                                    KHItems.ADOBE_BRICKS.get()))
+                    .save(output, KHIds.of("crafts/adobe").toString());
+
+            AdvancementHolder whitewash = Advancement.Builder.advancement()
+                    .parent(adobe)
+                    .display(KHItems.WHITEWASHED_PLASTER.get(),
+                            title("whitewash"), description("whitewash"),
+                            null, AdvancementType.TASK, true, true, false)
+                    .addCriterion("has_plaster",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(
+                                    KHItems.WHITEWASHED_PLASTER.get()))
+                    .save(output, KHIds.of("crafts/whitewash").toString());
+
+            // Усадьба: все четыре материала разом. Strategy по умолчанию —
+            // AND, то есть нужны все критерии, и это здесь принципиально.
+            Advancement.Builder.advancement()
+                    .parent(whitewash)
+                    .display(KHItems.ROOF_TILES.get(),
+                            title("homestead"), description("homestead"),
+                            null, AdvancementType.CHALLENGE, true, true, false)
+                    .addCriterion("has_roof_tiles",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(
+                                    KHItems.ROOF_TILES.get()))
+                    .addCriterion("has_shell_rock",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(
+                                    KHItems.SHELL_ROCK.get()))
+                    .addCriterion("has_wattle",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(
+                                    KHItems.WATTLE.get()))
+                    .addCriterion("has_casing",
+                            InventoryChangeTrigger.TriggerInstance.hasItems(
+                                    KHItems.CARVED_WINDOW_CASING.get()))
+                    .save(output, KHIds.of("crafts/homestead").toString());
         }
 
         /**

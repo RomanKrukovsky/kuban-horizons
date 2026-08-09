@@ -1,0 +1,33 @@
+{
+  "parent": "kubanhorizons:fishing/first_sturgeon",
+  "criteria": {
+    "has_smoked_fish": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:smoked_fish"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.smoked_fish.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "kubanhorizons:smoked_fish"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.smoked_fish.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_smoked_fish"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

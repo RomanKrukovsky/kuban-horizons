@@ -1,0 +1,72 @@
+{
+  "parent": "kubanhorizons:crafts/whitewash",
+  "criteria": {
+    "has_casing": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:carved_window_casing"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_roof_tiles": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:roof_tiles"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_shell_rock": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:shell_rock"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_wattle": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:wattle"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.homestead.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "id": "kubanhorizons:roof_tiles"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.homestead.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_roof_tiles"
+    ],
+    [
+      "has_shell_rock"
+    ],
+    [
+      "has_wattle"
+    ],
+    [
+      "has_casing"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "kubanhorizons:fishing/first_sturgeon",
+  "criteria": {
+    "has_cooked_sturgeon": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:cooked_sturgeon"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.cooked_sturgeon.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:cooked_sturgeon"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.cooked_sturgeon.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_cooked_sturgeon"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

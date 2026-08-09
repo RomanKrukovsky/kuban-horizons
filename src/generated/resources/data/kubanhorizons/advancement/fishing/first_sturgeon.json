@@ -1,0 +1,32 @@
+{
+  "parent": "kubanhorizons:root",
+  "criteria": {
+    "has_raw_sturgeon": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:raw_sturgeon"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.first_sturgeon.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:raw_sturgeon"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.first_sturgeon.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_raw_sturgeon"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

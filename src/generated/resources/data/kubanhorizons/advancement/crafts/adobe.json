@@ -1,0 +1,32 @@
+{
+  "parent": "kubanhorizons:root",
+  "criteria": {
+    "has_adobe": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:adobe_bricks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.adobe.description"
+    },
+    "icon": {
+      "id": "kubanhorizons:adobe_bricks"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.adobe.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_adobe"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

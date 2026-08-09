@@ -1,0 +1,33 @@
+{
+  "parent": "kubanhorizons:fishing/smoked_fish",
+  "criteria": {
+    "has_sturgeon_bucket": {
+      "conditions": {
+        "items": [
+          {
+            "items": "kubanhorizons:sturgeon_bucket"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancement.kubanhorizons.sturgeon_bucket.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "id": "kubanhorizons:sturgeon_bucket"
+    },
+    "title": {
+      "translate": "advancement.kubanhorizons.sturgeon_bucket.title"
+    }
+  },
+  "requirements": [
+    [
+      "has_sturgeon_bucket"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
