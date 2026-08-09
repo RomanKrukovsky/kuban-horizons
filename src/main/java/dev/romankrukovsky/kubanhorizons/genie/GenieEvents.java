@@ -35,6 +35,9 @@ public final class GenieEvents {
     public static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level) {
             WishborneDefenseHandler.tickServer(level);
+            // Каждый тик, а не вместе с аурой: аура срабатывает раз в секунду,
+            // и остановленные снаряды рассыпались бы с заметной задержкой.
+            dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws.tickHeldProjectiles(level);
             GenieLeash.tickServer(level);
             for (var player : level.players()) {
                 dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieTransformationController

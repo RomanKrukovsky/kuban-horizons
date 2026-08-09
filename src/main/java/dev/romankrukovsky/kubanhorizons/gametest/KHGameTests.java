@@ -162,6 +162,7 @@ public final class KHGameTests {
         register("genie_world_memory", KHGameTests::testGenieWorldMemory, 100);
         register("genie_inviolability", KHGameTests::testGenieInviolabilityAndKillIntercept, 100);
         register("genie_aura_of_laws", KHGameTests::testGenieAuraOfLaws, 100);
+        register("genie_aura_dissolves_fireballs", KHGameTests::testGenieAuraDissolvesFireballs, 100);
         register("genie_literal_wish", KHGameTests::testLiteralWishEngine, 100);
         register("genie_visual_effects", KHGameTests::testGenieTailEngineAndCartoonAnatomy, 100);
         register("genie_magical_defeat_state", KHGameTests::testGenieMagicalDefeatState, 100);
@@ -493,20 +494,74 @@ public final class KHGameTests {
     /** Аура законов нейтрализует физические снаряды вокруг Джиннии. */
     private static void testGenieAuraOfLaws(GameTestHelper helper) {
         dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
+        dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws.clearHeldForTesting();
         var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
         var arrow = net.minecraft.world.entity.EntityTypes.ARROW.create(helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
-        if (arrow != null) {
-            arrow.snapTo(genie.getX() + 0.5D, genie.getY(), genie.getZ() + 0.5D, 0.0F, 0.0F);
-            arrow.setDeltaMovement(new net.minecraft.world.phys.Vec3(1.0D, 0.0D, 0.0D));
-            helper.getLevel().addFreshEntity(arrow);
-            dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws
-                    .tickAuraOfLaws(genie, helper.getLevel());
-            helper.assertTrue(arrow.getDeltaMovement().lengthSqr() < 0.001D,
-                    "Снаряд в ауре законов должен замереть");
+        if (arrow == null) {
             helper.succeed();
-        } else {
-            helper.succeed();
+            return;
         }
+        arrow.snapTo(genie.getX() + 0.5D, genie.getY(), genie.getZ() + 0.5D, 0.0F, 0.0F);
+        arrow.setDeltaMovement(new net.minecraft.world.phys.Vec3(1.0D, 0.0D, 0.0D));
+        helper.getLevel().addFreshEntity(arrow);
+
+        dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws
+                .tickAuraOfLaws(genie, helper.getLevel());
+        helper.assertTrue(arrow.getDeltaMovement().lengthSqr() < 0.001D,
+                "Снаряд в ауре законов должен замереть");
+        helper.assertTrue(arrow.isAlive(), "Снаряд должен сначала повисеть, а не исчезнуть мгновенно");
+
+        // Остановленный снаряд обязан рассыпаться: раньше он висел в воздухе
+        // вечно, а файербол и голова иссушителя продолжали коптить на месте.
+        helper.runAfterDelay(20, () -> {
+            dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws
+                    .tickHeldProjectiles(helper.getLevel());
+            helper.assertTrue(!arrow.isAlive(),
+                    "Остановленный снаряд должен исчезнуть, а не зависнуть навсегда");
+            helper.succeed();
+        });
+    }
+
+    /**
+     * Файербол гаста и голова иссушителя тоже рассыпаются.
+     *
+     * <p>Отдельно от стрелы: эти снаряды каждый тик рисуют шлейф огня и дыма,
+     * поэтому зависший навсегда файербол оставлял в воздухе вечно коптящую
+     * точку, а не просто безобидный предмет.</p>
+     */
+    private static void testGenieAuraDissolvesFireballs(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
+        dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws.clearHeldForTesting();
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+
+        var fireball = net.minecraft.world.entity.EntityTypes.FIREBALL.create(
+                helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        var skull = net.minecraft.world.entity.EntityTypes.WITHER_SKULL.create(
+                helper.getLevel(), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        if (fireball == null || skull == null) {
+            helper.succeed();
+            return;
+        }
+        for (var projectile : java.util.List.of(fireball, skull)) {
+            projectile.snapTo(genie.getX() + 2.0D, genie.getY() + 1.0D, genie.getZ(), 0.0F, 0.0F);
+            projectile.setDeltaMovement(new net.minecraft.world.phys.Vec3(-0.8D, 0.0D, 0.0D));
+            helper.getLevel().addFreshEntity(projectile);
+        }
+
+        dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws
+                .tickAuraOfLaws(genie, helper.getLevel());
+        helper.assertTrue(fireball.getDeltaMovement().lengthSqr() < 0.001D,
+                "Файербол должен замереть в ауре");
+        helper.assertTrue(skull.getDeltaMovement().lengthSqr() < 0.001D,
+                "Голова иссушителя должна замереть в ауре");
+
+        helper.runAfterDelay(20, () -> {
+            dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws
+                    .tickHeldProjectiles(helper.getLevel());
+            helper.assertTrue(!fireball.isAlive(), "Файербол должен рассыпаться, а не коптить в воздухе");
+            helper.assertTrue(!skull.isAlive(), "Голова иссушителя должна рассыпаться");
+            helper.succeed();
+        });
     }
 
     /** Режим «Исполнить буквально» воплощает точные формулировки. */
