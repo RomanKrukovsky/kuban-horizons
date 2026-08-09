@@ -455,6 +455,30 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.vessel.summon_countdown",
                 "SOMEONE IS SUMMONING YOU (3... 2... 1...)",
                 "КТО-ТО ВЫЗЫВАЕТ ВАС (3... 2... 1...)");
+        // Заключение в сосуд и выход. «Кто-то» вместо имени — сознательно:
+        // анонимность работает на напряжение, имя открывается на первом желании.
+        add("message.kubanhorizons.genie.vessel.confined",
+                "The vessel has taken you in. Outside, the world goes on without you.",
+                "Сосуд принял вас внутрь. Снаружи мир идёт дальше без вас.");
+        add("message.kubanhorizons.genie.vessel.released",
+                "You are outside again. The vessel remains yours — and findable.",
+                "Вы снова снаружи. Сосуд по-прежнему ваш — и его по-прежнему можно найти.");
+        add("message.kubanhorizons.genie.vessel.dimension_missing",
+                "The vessel has no inside: its dimension is not loaded.",
+                "У сосуда нет внутреннего пространства: его измерение не загружено.");
+        // Четыре стадии натяжения хвоста — интерфейс вместо полоски и цифр.
+        add("message.kubanhorizons.genie.leash.slack",
+                "Your tail hangs loose. The vessel is near.",
+                "Хвост висит свободно. Сосуд рядом.");
+        add("message.kubanhorizons.genie.leash.turned",
+                "The tip of your tail turns towards the vessel of its own accord.",
+                "Кончик хвоста сам разворачивается в сторону сосуда.");
+        add("message.kubanhorizons.genie.leash.stretched",
+                "Your tail stretches out. The slack is gone.",
+                "Хвост вытягивается. Провис исчез.");
+        add("message.kubanhorizons.genie.leash.taut",
+                "Your tail is drawn taut as a string. Moving is hard.",
+                "Хвост натянут как струна. Двигаться тяжело.");
         add("message.kubanhorizons.genie.vessel.new_rule_master",
                 "New rule discovered: Vessel owner has the right to state a wish.",
                 "Новое правило обнаружено: Владелец сосуда имеет право произнести желание.");

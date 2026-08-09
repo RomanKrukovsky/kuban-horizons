@@ -43,8 +43,47 @@ public final class GenieEvents {
                 dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieTransformationController
                         .tickTransformation(level, player);
             }
+            tickVesselLeash(level);
         }
     }
+
+    /**
+     * Натяжение хвоста к сосуду — раз в секунду, а не каждый тик.
+     *
+     * <p>Поиск сосуда обходит инвентари, предметы и контейнеры вокруг игрока,
+     * поэтому шестьдесят раз в секунду он был бы дороже всего остального в этом
+     * обработчике вместе. Стадия натяжения меняется медленно, и раз в секунду
+     * игрок не замечает разницы.</p>
+     *
+     * <p>Прошлая стадия хранится здесь, а не в attachment: это кадр показа, а не
+     * состояние персонажа — его не нужно ни сохранять в мир, ни синхронизировать.
+     * Игрок, вышедший и вернувшийся, просто получит сообщение о текущей стадии
+     * заново, что честнее, чем тишина.</p>
+     */
+    private static void tickVesselLeash(ServerLevel level) {
+        if (level.getGameTime()
+                % dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.CHECK_INTERVAL_TICKS != 0L) {
+            return;
+        }
+        for (var player : level.players()) {
+            var tension = dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.tick(level, player);
+            var previous = LAST_TENSION.get(player.getUUID());
+            if (previous != tension) {
+                LAST_TENSION.put(player.getUUID(), tension);
+                // Сообщение только при смене стадии: натяжение — состояние, а
+                // строка в чат каждую секунду превратила бы драму в спам.
+                if (tension != dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.Tension.SLACK
+                        || previous != null) {
+                    dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.announce(player, tension);
+                }
+            }
+        }
+    }
+
+    /** Последняя показанная стадия натяжения на игрока. */
+    private static final java.util.Map<java.util.UUID,
+            dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.Tension> LAST_TENSION =
+            new java.util.concurrent.ConcurrentHashMap<>();
 
     @SubscribeEvent
     public static void onLivingIncomingDamage(net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent event) {
