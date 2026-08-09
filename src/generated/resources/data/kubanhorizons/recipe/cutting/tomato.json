@@ -1,0 +1,13 @@
+{
+  "type": "kubanhorizons:cutting",
+  "ingredient": "kubanhorizons:tomato",
+  "results": [
+    {
+      "id": "kubanhorizons:vegetable_spread"
+    },
+    {
+      "id": "kubanhorizons:tomato_seeds"
+    }
+  ],
+  "tool": "minecraft:swords"
+}

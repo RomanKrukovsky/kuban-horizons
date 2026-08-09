@@ -194,6 +194,7 @@ public final class KHGameTests {
         register("manul_not_tamed_by_one_fish", KHGameTests::testManulNotTamedByOneFish, 100);
         register("manul_anger_cools_down", KHGameTests::testManulAngerCoolsDown, 260);
         register("fauna_chain_is_reachable", KHGameTests::testFaunaChainReachable, 100);
+        register("cutting_board_cuts", KHGameTests::testCuttingBoardCuts, 100);
         register("manul_personalities_differ", KHGameTests::testManulPersonalitiesDiffer, 100);
         register("manul_witness_lowers_trust", KHGameTests::testManulWitnessLowersTrust, 100);
         register("manul_loot_is_worthless", KHGameTests::testManulLootIsWorthless, 100);
@@ -1266,6 +1267,46 @@ public final class KHGameTests {
                         .OP2_EMERALD_TO_SHEPHERD_EGG).isPresent(),
                 "Нет сделки на щенка овчарки — защита хозяйства недостижима");
         helper.succeed();
+    }
+
+    /**
+     * Разделочный стол действительно режет.
+     *
+     * <p>Блок был мёртвым: зарегистрирован, крафтился, ставился — и отказывал
+     * на любой предмет, потому что рецептов его типа не существовало ни одного.
+     * Тест проверяет весь путь: продукт кладётся, нож режет, части выпадают.</p>
+     */
+    private static void testCuttingBoardCuts(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 2, 1);
+        helper.setBlock(pos.below(), Blocks.DIRT);
+        helper.setBlock(pos, KHBlocks.CUTTING_BOARD.get());
+
+        var be = helper.getLevel().getBlockEntity(helper.absolutePos(pos));
+        helper.assertTrue(be instanceof dev.romankrukovsky.kubanhorizons.blockentity
+                        .CuttingBoardBlockEntity,
+                "У разделочного стола нет BlockEntity");
+        var board = (dev.romankrukovsky.kubanhorizons.blockentity.CuttingBoardBlockEntity) be;
+
+        // Кладём то, для чего рецепт есть.
+        helper.assertTrue(board.place(helper.getLevel(), new ItemStack(KHItems.TOMATO.get())),
+                "Стол не принял томат: рецепта нарезки нет, блок бесполезен");
+
+        // Без инструмента резать нельзя — иначе стол не отличался бы от крафта.
+        helper.assertTrue(!board.cut(helper.getLevel(), ItemStack.EMPTY),
+                "Стол разрезал без ножа: требование инструмента не работает");
+
+        // Ножом — режет.
+        helper.assertTrue(board.cut(helper.getLevel(), new ItemStack(Items.IRON_SWORD)),
+                "Нож не разрезал томат");
+        helper.assertTrue(board.getHeldItem().isEmpty(),
+                "Продукт остался на столе после нарезки — это дюп");
+
+        // Оба результата выпали: смысл стола в том, что частей больше одной.
+        helper.runAfterDelay(5, () -> {
+            helper.assertItemEntityPresent(KHItems.VEGETABLE_SPREAD.get(), pos, 2.0);
+            helper.assertItemEntityPresent(KHItems.TOMATO_SEEDS.get(), pos, 2.0);
+            helper.succeed();
+        });
     }
 
     // --- Вспомогательные ---

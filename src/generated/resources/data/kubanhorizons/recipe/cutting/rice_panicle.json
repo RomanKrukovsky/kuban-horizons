@@ -1,0 +1,14 @@
+{
+  "type": "kubanhorizons:cutting",
+  "ingredient": "kubanhorizons:rice_panicle",
+  "results": [
+    {
+      "count": 2,
+      "id": "kubanhorizons:rice"
+    },
+    {
+      "id": "kubanhorizons:rice_seedlings"
+    }
+  ],
+  "tool": "minecraft:swords"
+}

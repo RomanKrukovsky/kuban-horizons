@@ -1,0 +1,10 @@
+{
+  "type": "kubanhorizons:cutting",
+  "ingredient": "kubanhorizons:walnut",
+  "results": [
+    {
+      "id": "kubanhorizons:honey_walnuts"
+    }
+  ],
+  "tool": "minecraft:swords"
+}

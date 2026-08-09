@@ -1,0 +1,11 @@
+{
+  "type": "kubanhorizons:cutting",
+  "ingredient": "kubanhorizons:raw_sturgeon",
+  "results": [
+    {
+      "count": 2,
+      "id": "kubanhorizons:raw_sturgeon"
+    }
+  ],
+  "tool": "minecraft:swords"
+}

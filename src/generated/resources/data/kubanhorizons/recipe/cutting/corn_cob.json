@@ -1,0 +1,11 @@
+{
+  "type": "kubanhorizons:cutting",
+  "ingredient": "kubanhorizons:corn_cob",
+  "results": [
+    {
+      "count": 3,
+      "id": "kubanhorizons:corn_kernels"
+    }
+  ],
+  "tool": "minecraft:swords"
+}

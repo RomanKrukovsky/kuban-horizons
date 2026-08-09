@@ -203,6 +203,31 @@ public final class KHRecipeProvider extends RecipeProvider {
         milling("cornmeal_from_corn", KHItems.CORN_KERNELS.get(), KHItems.CORNMEAL.get(), 3);
         milling("rice_from_panicle", KHItems.RICE_PANICLE.get(), KHItems.RICE.get(), 2);
 
+        // Рецепты нарезки. Без них разделочный стол был мёртвым блоком:
+        // зарегистрирован, крафтится, ставится — и на любой предмет отвечал
+        // отказом, потому что рецептов его типа не существовало.
+        // Смысл стола — вернуть больше, чем даёт голый крафт: нож разбирает
+        // продукт на части, а не превращает один предмет в другой.
+        cutting("sunflower_head", KHItems.SUNFLOWER_HEAD.get(),
+                java.util.List.of(cut(KHItems.SUNFLOWER_SEEDS.get(), 4)));
+        cutting("corn_cob", KHItems.CORN_COB.get(),
+                java.util.List.of(cut(KHItems.CORN_KERNELS.get(), 3)));
+        cutting("rice_panicle", KHItems.RICE_PANICLE.get(),
+                java.util.List.of(cut(KHItems.RICE.get(), 2),
+                        cut(KHItems.RICE_SEEDLINGS.get(), 1)));
+        // Овощная нарезка: два продукта в одном проходе — то, чего крафт не даёт.
+        cutting("tomato", KHItems.TOMATO.get(),
+                java.util.List.of(cut(KHItems.VEGETABLE_SPREAD.get(), 1),
+                        cut(KHItems.TOMATO_SEEDS.get(), 1)));
+        // Разделка дичи: нож на столе выгоднее, чем есть тушку целиком.
+        cutting("raw_boar", KHItems.RAW_BOAR.get(),
+                java.util.List.of(cut(KHItems.RAW_BOAR.get(), 2)));
+        cutting("raw_sturgeon", KHItems.RAW_STURGEON.get(),
+                java.util.List.of(cut(KHItems.RAW_STURGEON.get(), 2)));
+        // Орехи: скорлупа снимается ножом, а не зубами.
+        cutting("walnut", KHItems.WALNUT.get(),
+                java.util.List.of(cut(KHItems.HONEY_WALNUTS.get(), 1)));
+
         // Рецепты сушки.
         drying("dried_tea", KHItems.TEA_LEAVES.get(), KHItems.DRIED_TEA.get(), 1200);
         drying("dried_fruit_from_peach", KHItems.PEACH.get(), KHItems.DRIED_FRUIT.get(), 2400);
@@ -407,6 +432,30 @@ public final class KHRecipeProvider extends RecipeProvider {
                         result.asItem(), 0.3F, time, SmeltingRecipe::new)
                 .unlockedBy("has_input", this.has(input))
                 .save(this.output, ResourceKey.create(Registries.RECIPE, KHIds.of(name)));
+    }
+
+    /**
+     * Рецепт нарезки на разделочном столе.
+     *
+     * <p>Инструмент задаётся тегом, а не предметом: нож любого материала должен
+     * годиться, иначе стол требовал бы конкретный сорт железа.</p>
+     */
+    private void cutting(String name, net.minecraft.world.level.ItemLike input,
+            java.util.List<net.minecraft.world.item.ItemStackTemplate> results) {
+        this.output.accept(
+                ResourceKey.create(Registries.RECIPE, KHIds.of("cutting/" + name)),
+                new dev.romankrukovsky.kubanhorizons.processing.CuttingRecipe(
+                        new Recipe.CommonInfo(true), "",
+                        Ingredient.of(input),
+                        java.util.Optional.of(net.minecraft.tags.ItemTags.SWORDS),
+                        results),
+                null);
+    }
+
+    /** Один результат нарезки заданного количества. */
+    private static net.minecraft.world.item.ItemStackTemplate cut(
+            net.minecraft.world.level.ItemLike item, int count) {
+        return new net.minecraft.world.item.ItemStackTemplate(item.asItem(), count);
     }
 
     /** Рецепт помола на мельнице. */

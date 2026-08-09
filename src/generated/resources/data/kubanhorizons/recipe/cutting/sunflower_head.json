@@ -1,0 +1,11 @@
+{
+  "type": "kubanhorizons:cutting",
+  "ingredient": "kubanhorizons:sunflower_head",
+  "results": [
+    {
+      "count": 4,
+      "id": "kubanhorizons:sunflower_seeds"
+    }
+  ],
+  "tool": "minecraft:swords"
+}
