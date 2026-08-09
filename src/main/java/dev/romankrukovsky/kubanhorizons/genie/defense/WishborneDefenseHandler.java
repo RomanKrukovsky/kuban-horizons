@@ -53,8 +53,10 @@ public final class WishborneDefenseHandler {
         if (directEntity instanceof Projectile projectile) {
             level.sendParticles(ParticleTypes.PORTAL, projectile.getX(), projectile.getY(), projectile.getZ(),
                     25, 0.2D, 0.2D, 0.2D, 0.08D);
+            // getWeaponItem() объявлен @Nullable: у снарядов без исходного оружия
+            // (череп иссушителя, огненный шар, шальк) он возвращает null, а не пустой стек.
             ItemStack itemStack = projectile.getWeaponItem();
-            if (itemStack.isEmpty()) {
+            if (itemStack == null || itemStack.isEmpty()) {
                 itemStack = new ItemStack(Items.ARROW);
             }
             ItemEntity dropped = new ItemEntity(level, genie.getX(), genie.getY() + 1.0D, genie.getZ(), itemStack);
