@@ -98,12 +98,27 @@ public final class Manul extends TamableAnimal {
             SynchedEntityData.defineId(Manul.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> DATA_LOAFING =
             SynchedEntityData.defineId(Manul.class, EntityDataSerializers.BOOLEAN);
+    /** Спит ли зверь днём в укрытии; синхронизируется ради позы на клиенте. */
+    private static final EntityDataAccessor<Boolean> DATA_DOZING =
+            SynchedEntityData.defineId(Manul.class, EntityDataSerializers.BOOLEAN);
 
     private ManulPersonality personality = ManulPersonality.CAUTIOUS;
     private long lastOfferTick = Long.MIN_VALUE;
     private int hissTicks;
     private int freezeTicks;
     private int roamTicks;
+    /** Тиков активной злости; гаснет сама — манул огрызается и уходит. */
+    private int retaliationTicks;
+    /** Тиков подряд, что побег не удаётся: основа состояния «загнан в угол». */
+    private int blockedRetreatTicks;
+    /**
+     * Тиков запрета на новую провокацию после остывания.
+     *
+     * <p>Без него зверь попадал в цикл: загнан → бьёт → остыл → всё ещё
+     * загнан → бьёт снова. Тест это и поймал: злость формально гасла, но
+     * включалась в тот же тик, и снаружи манул выглядел вечно агрессивным.</p>
+     */
+    private int provokeCooldownTicks;
 
     public Manul(EntityType<? extends TamableAnimal> type, Level level) {
         super(type, level);
@@ -156,7 +171,8 @@ public final class Manul extends TamableAnimal {
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
-        // Загнанный в угол отвечает лапами — но только если его ударили.
+        // Отвечает лапами: от удара, при побудке вплотную и когда загнан в
+        // угол. Цель выбирается в targetSelector — здесь только сама драка.
         goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.4D, false));
         goalSelector.addGoal(2, new SitWhenOrderedToGoal(this));
         // Овчарка гонит дикого зверя, и манул это знает: от неё он уходит
@@ -168,20 +184,28 @@ public final class Manul extends TamableAnimal {
         // «замер — посмотрел — отошёл», которого у ванильной цели нет.
         goalSelector.addGoal(4, new ManulRetreatGoal(this));
         goalSelector.addGoal(5, new ManulOfferingGoal(this));
+        // Днём зверь уходит спать в укрытие: манул ночной, и бодрый полдень
+        // выдавал бы в нём перекрашенную кошку. Выше любопытства — сон
+        // сильнее интереса, — но ниже страха и подношений.
+        goalSelector.addGoal(6, new ManulSleepGoal(this));
         // Любопытство: подойти и разглядывать. Ниже отхода — страх сильнее
         // интереса, — но выше прогулки, иначе характер никогда бы не
         // проявился и curiosity() остался бы мёртвым числом.
-        goalSelector.addGoal(6, new ManulObserveGoal(this));
-        goalSelector.addGoal(7, new BreedGoal(this, 1.0D));
+        goalSelector.addGoal(7, new ManulObserveGoal(this));
+        goalSelector.addGoal(8, new BreedGoal(this, 1.0D));
         // Греется и сидит неподвижно: то, за что манула и запоминают.
-        goalSelector.addGoal(8, new ManulLoafGoal(this));
-        goalSelector.addGoal(9, new WaterAvoidingRandomStrollGoal(this, 0.8D));
-        goalSelector.addGoal(10, new LookAtPlayerGoal(this, Player.class, 10.0F));
-        goalSelector.addGoal(11, new RandomLookAroundGoal(this));
+        goalSelector.addGoal(9, new ManulLoafGoal(this));
+        goalSelector.addGoal(10, new WaterAvoidingRandomStrollGoal(this, 0.8D));
+        goalSelector.addGoal(11, new LookAtPlayerGoal(this, Player.class, 10.0F));
+        goalSelector.addGoal(12, new RandomLookAroundGoal(this));
 
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        // Своя агрессия по причине: побудка вплотную, загнанность в угол или
+        // уже испорченная репутация. Именно это отличает манула от зомби —
+        // он бросается не на игрока как такового, а на конкретный поступок.
+        targetSelector.addGoal(2, new ManulProvokedGoal(this));
         // Охота на мелкую живность: саранча — то, что реально есть в моде.
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Locust.class, true));
+        targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Locust.class, true));
     }
 
 
@@ -208,6 +232,7 @@ public final class Manul extends TamableAnimal {
         builder.define(DATA_HISSING, false);
         builder.define(DATA_FROZEN, false);
         builder.define(DATA_LOAFING, false);
+        builder.define(DATA_DOZING, false);
     }
 
     @Override
@@ -279,6 +304,20 @@ public final class Manul extends TamableAnimal {
     }
 
     /**
+     * Спит ли зверь днём в укрытии ({@link ManulSleepGoal}).
+     *
+     * <p>Синхронизируется на клиент по той же причине, что и сидячая поза:
+     * иначе спящий манул выглядел бы бодрствующим.</p>
+     */
+    public boolean isDozing() {
+        return entityData.get(DATA_DOZING);
+    }
+
+    void setSleeping(boolean sleeping) {
+        entityData.set(DATA_DOZING, sleeping);
+    }
+
+    /**
      * Изменяет доверие на дельту с ограничением шкалы.
      *
      * @return доверие после изменения
@@ -338,6 +377,19 @@ public final class Manul extends TamableAnimal {
         if (freezeTicks > 0 && --freezeTicks == 0) {
             entityData.set(DATA_FROZEN, false);
         }
+        // Злость гаснет сама. Это и отделяет манула от враждебного моба: он
+        // огрызнулся и пошёл своей дорогой, а не гонится через полкарты.
+        if (retaliationTicks > 0 && --retaliationTicks == 0) {
+            setTarget(null);
+            setLastHurtByMob(null);
+            blockedRetreatTicks = 0;
+            // Остыв, зверь получает право спокойно уйти: иначе он снова
+            // окажется «загнанным» в том же углу и бросится опять.
+            provokeCooldownTicks = PROVOKE_COOLDOWN_TICKS;
+        }
+        if (provokeCooldownTicks > 0) {
+            provokeCooldownTicks--;
+        }
         // Независимость: даже полностью доверяющий зверь уходит по своим делам.
         if (trust().atLeast(ManulTrust.FRIENDLY) && ++roamTicks > ROAM_INTERVAL_TICKS) {
             roamTicks = 0;
@@ -346,9 +398,96 @@ public final class Manul extends TamableAnimal {
         }
     }
 
+    /**
+     * Длительность ответной агрессии — около десяти секунд.
+     *
+     * <p>Ограничение и есть характер зверя. Без него ударенный манул гнался бы
+     * за игроком до потери из виду, то есть вёл себя как мстительный хищник,
+     * а по замыслу он огрызается и уходит.</p>
+     */
+    public static final int RETALIATION_TICKS = 200;
+
+    /** Пауза после остывания: столько тиков зверь не бросается снова. */
+    public static final int PROVOKE_COOLDOWN_TICKS = 200;
+
+    /** Тиков безуспешного побега, после которых зверь считается загнанным. */
+    private static final int CORNERED_TICKS = 30;
+
+    /**
+     * Удар запускает то же окно остывания, что и провокация.
+     *
+     * <p>Без этого {@code HurtByTargetGoal} держал бы цель бессрочно, и
+     * ударенный зверь преследовал бы игрока до потери из виду — ровно то
+     * поведение, от которого отделяет {@link #RETALIATION_TICKS}.</p>
+     */
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level,
+            DamageSource source, float amount) {
+        boolean hurt = super.hurtServer(level, source, amount);
+        if (hurt && source.getEntity() instanceof Player) {
+            startRetaliation();
+            hiss();
+            // Удар — это тоже поступок: доверие падает заметно сильнее, чем от
+            // вида чужой смерти, потому что бьют лично его.
+            adjustTrust(-6);
+        }
+        return hurt;
+    }
+
+    /** Можно ли сейчас спровоцировать зверя (после остывания — нельзя). */
+    public boolean canBeProvoked() {
+        return provokeCooldownTicks <= 0;
+    }
+
+    /** Идёт ли сейчас ответная агрессия. */
+    public boolean isRetaliating() {
+        return retaliationTicks > 0;
+    }
+
+    /** Запускает (или продлевает) окно ответной агрессии. */
+    public void startRetaliation() {
+        retaliationTicks = RETALIATION_TICKS;
+    }
+
+    /**
+     * Загнан ли зверь в угол: побег не удаётся дольше {@link #CORNERED_TICKS}.
+     *
+     * <p>Считается по факту неудачи, а не по геометрии вокруг: проверять стены
+     * лучами дорого и всё равно врёт на лестницах, заборах и в воде. Здесь
+     * ровно то, что важно игроку — зверь пытался уйти и не смог.</p>
+     */
+    public boolean isCornered() {
+        return blockedRetreatTicks >= CORNERED_TICKS;
+    }
+
+    /**
+     * Отмечает такт побега: удался он или нет.
+     *
+     * <p>Вызывается из {@link ManulRetreatGoal}: только цель отхода знает,
+     * действительно ли зверь сейчас пытается уйти.</p>
+     */
+    public void noteRetreatProgress(boolean moved) {
+        if (moved) {
+            blockedRetreatTicks = 0;
+        } else if (blockedRetreatTicks < CORNERED_TICKS) {
+            blockedRetreatTicks++;
+        }
+    }
+
+    /**
+     * Доверие именно к этому игроку.
+     *
+     * <p>Пока доверие в моде одно на особь, поэтому владелец получает текущее
+     * значение, а посторонний — тоже. Метод существует, чтобы провокация не
+     * зависела от этой детали: когда доверие станет персональным, менять
+     * придётся одно место, а не логику агрессии.</p>
+     */
+    public int trustToward(Player player) {
+        return trustPoints();
+    }
+
     /** Шипение: предупреждение, а не атака. */
-    public void hiss() {
-        if (hissTicks > 0) {
+    public void hiss() {        if (hissTicks > 0) {
             return;
         }
         hissTicks = HISS_TICKS;

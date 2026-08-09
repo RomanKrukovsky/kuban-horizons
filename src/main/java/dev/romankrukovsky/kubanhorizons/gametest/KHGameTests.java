@@ -192,6 +192,7 @@ public final class KHGameTests {
         register("manul_trust_survives_reload", KHGameTests::testManulTrustSurvivesReload, 100);
         register("manul_offering_is_day_gated", KHGameTests::testManulOfferingDayGated, 100);
         register("manul_not_tamed_by_one_fish", KHGameTests::testManulNotTamedByOneFish, 100);
+        register("manul_anger_cools_down", KHGameTests::testManulAngerCoolsDown, 260);
         register("manul_personalities_differ", KHGameTests::testManulPersonalitiesDiffer, 100);
         register("manul_witness_lowers_trust", KHGameTests::testManulWitnessLowersTrust, 100);
         register("manul_loot_is_worthless", KHGameTests::testManulLootIsWorthless, 100);
@@ -201,6 +202,7 @@ public final class KHGameTests {
         register("manul_shelter_becomes_occupied", KHGameTests::testManulShelterBecomesOccupied, 100);
         register("manul_criteria_are_reachable", KHGameTests::testManulCriteriaAreReachable, 100);
         register("manul_steals_fish_from_trader", KHGameTests::testManulStealsFishFromTrader, 100);
+        register("manul_sleeps_in_daytime_den", KHGameTests::testManulSleepsInDen, 400);
     }
 
     private KHGameTests() {
@@ -1158,6 +1160,50 @@ public final class KHGameTests {
         trader.discard();
         manul.discard();
         helper.succeed();
+    }
+
+    /**
+     * Злость манула гаснет сама: он огрызается и уходит.
+     *
+     * <p>Это граница между диким зверем и враждебным мобом. Без неё ударенный
+     * манул преследовал бы игрока до потери из виду, и мод получил бы мелкого
+     * агрессора вместо кошки, которая защищается.</p>
+     */
+    private static void testManulAngerCoolsDown(GameTestHelper helper) {
+        for (int dx = -2; dx <= 4; dx++) {
+            for (int dz = -2; dz <= 4; dz++) {
+                helper.setBlock(new BlockPos(1, 1, 1).offset(dx, 0, dz), Blocks.DIRT);
+            }
+        }
+        var manul = helper.spawn(KHEntities.MANUL.get(), new BlockPos(1, 2, 1));
+        helper.assertTrue(manul != null, "Манул не создался");
+
+        // Сам, без провокации, зверь на игрока не смотрит: это и отличает его
+        // от зомби, который ищет игрока по факту его существования.
+        helper.assertTrue(manul.getTarget() == null,
+                "Непровоцированный манул выбрал цель — он ведёт себя как враждебный моб");
+        helper.assertTrue(!manul.isRetaliating(),
+                "Злость включена без причины");
+
+        // Удар: зверь обязан ответить.
+        manul.hurtServer(helper.getLevel(),
+                helper.getLevel().damageSources().playerAttack(
+                        helper.makeMockPlayer(GameType.SURVIVAL)), 1.0F);
+        helper.assertTrue(manul.isRetaliating(),
+                "Манул не ответил на удар: защищаться он должен");
+
+        // И обязан остыть. Проверяется по таймеру сущности, а не по поведению
+        // навигации: важен сам факт, что агрессия конечна.
+        helper.runAfterDelay(dev.romankrukovsky.kubanhorizons.entity.Manul.RETALIATION_TICKS + 20,
+                () -> {
+                    helper.assertTrue(!manul.isRetaliating(),
+                            "Злость не погасла за отведённое время: манул превратился "
+                                    + "в преследователя");
+                    helper.assertTrue(manul.getTarget() == null,
+                            "Цель осталась после остывания — зверь так и гонится за игроком");
+                    manul.discard();
+                    helper.succeed();
+                });
     }
 
     // --- Вспомогательные ---
@@ -3281,6 +3327,54 @@ public final class KHGameTests {
             helper.assertTrue(!locust.isAlive(),
                     "Птица не съела саранчу: птицы не работают как защита урожая");
             bird.discard();
+            helper.succeed();
+        });
+    }
+    /**
+     * Днём манул уходит в укрытие и засыпает.
+     *
+     * <p>Проверяет то, чего в моде не было до появления {@link
+     * dev.romankrukovsky.kubanhorizons.entity.ManulSleepGoal}: модель умела
+     * рисовать сон клубком, но флаг сна никто не выставлял, и поза была
+     * недостижима. Тест смотрит на наблюдаемый исход — зверь спит, — а не на
+     * внутренности цели.</p>
+     */
+    private static void testManulSleepsInDen(GameTestHelper helper) {
+        // Нора целиком под крышей: пол, потолок и стены. Первая версия теста
+        // ставила лишь пятно крыши 3x3, и зверь успевал выйти из-под неё
+        // раньше, чем засыпал — тест падал через раз не из-за механики, а
+        // из-за того, что укрытием была не вся доступная площадка.
+        for (int dx = 0; dx <= 4; dx++) {
+            for (int dz = 0; dz <= 4; dz++) {
+                helper.setBlock(new BlockPos(dx, 1, dz), Blocks.STONE);
+                helper.setBlock(new BlockPos(dx, 4, dz), Blocks.STONE);
+            }
+        }
+        for (int d = 0; d <= 4; d++) {
+            for (int y = 2; y <= 3; y++) {
+                helper.setBlock(new BlockPos(d, y, 0), Blocks.STONE);
+                helper.setBlock(new BlockPos(d, y, 4), Blocks.STONE);
+                helper.setBlock(new BlockPos(0, y, d), Blocks.STONE);
+                helper.setBlock(new BlockPos(4, y, d), Blocks.STONE);
+            }
+        }
+        var manul = helper.spawn(
+                dev.romankrukovsky.kubanhorizons.registry.KHEntities.MANUL.get(),
+                new BlockPos(2, 2, 2));
+        helper.assertTrue(manul != null, "Манул не создался");
+
+        helper.runAfterDelay(340, () -> {
+            // Диагностика в сообщении: без неё падение говорит «не заснул», но
+            // не говорит почему, и причину приходится угадывать.
+            helper.assertTrue(manul.isDozing(),
+                    "Манул не заснул в укрытии днём. Состояние: день="
+                            + helper.getLevel().isBrightOutside()
+                            + ", позиция=" + manul.blockPosition()
+                            + ", шипит=" + manul.isHissing()
+                            + ", сидит=" + manul.isLoafing()
+                            + ", цель=" + manul.getTarget()
+                            + ", навигация_идёт=" + !manul.getNavigation().isDone());
+            manul.discard();
             helper.succeed();
         });
     }

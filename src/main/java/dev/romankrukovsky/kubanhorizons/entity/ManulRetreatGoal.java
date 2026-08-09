@@ -102,8 +102,16 @@ public final class ManulRetreatGoal extends Goal {
         Vec3 target = manul.position().add(away.normalize().scale(6.0D));
         // Резкое приближение — быстрый уход; иначе достойное отступление.
         double speed = Manul.isRushing(threat) ? 1.6D : 0.9D;
+        boolean started = true;
         if (manul.getNavigation().isDone()) {
-            manul.getNavigation().moveTo(target.x, target.y, target.z, speed);
+            started = manul.getNavigation().moveTo(target.x, target.y, target.z, speed);
         }
+        // Отмечаем, удаётся ли уходить. Побег считается провалившимся, если
+        // путь не строится или зверь стоит на месте, хотя пытается идти —
+        // это и есть «загнан в угол», и по накопленным тикам решается,
+        // перейти ли к драке (см. ManulProvokedGoal).
+        boolean moving = started
+                && manul.getDeltaMovement().horizontalDistanceSqr() > 0.0004D;
+        manul.noteRetreatProgress(moving);
     }
 }
