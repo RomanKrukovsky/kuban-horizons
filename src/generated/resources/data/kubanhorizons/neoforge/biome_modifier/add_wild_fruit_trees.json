@@ -3,6 +3,8 @@
   "biomes": [
     "kubanhorizons:kuban_steppe",
     "kubanhorizons:river_floodplain",
+    "kubanhorizons:foothill_forest",
+    "kubanhorizons:vineyard_hills",
     "minecraft:plains",
     "minecraft:sunflower_plains",
     "minecraft:meadow",

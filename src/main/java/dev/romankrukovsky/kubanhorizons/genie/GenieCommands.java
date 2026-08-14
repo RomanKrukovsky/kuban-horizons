@@ -22,8 +22,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import dev.romankrukovsky.kubanhorizons.genie.wish.GeneralWishEngine;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -536,7 +538,18 @@ public final class GenieCommands {
                         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.ai.failed"));
                         return;
                     }
+
+                    // 1. LLM отвечает текстом
                     player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.ai.reply", reply));
+
+                    // 2. РЕАЛЬНОЕ ИСПОЛНЕНИЕ ЖЕЛАНИЯ (без заглушек)
+                    WishExecutor.Result result = GeneralWishEngine.execute(
+                            (ServerLevel) player.level(), player, message);
+
+                    if (result.executed()) {
+                        genie.playWish();
+                        genie.brain().recordWish();
+                    }
                 }));
         return 1;
     }

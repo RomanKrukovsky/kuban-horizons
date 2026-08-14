@@ -20,7 +20,9 @@ public final class PolicyService {
     public static final String MOB_GRIEFING = "minecraft:mob_griefing";
     public static final String WEATHER = "minecraft:weather";
     public static final String OVERWORLD_CLOCK_RATE = "minecraft:overworld_clock_rate";
+    public static final String INSTANT_SMELT = "kubanhorizons:instant_smelt";
     private static final Duration PREVIEW_TTL = Duration.ofMinutes(2);
+    private static volatile boolean instantSmeltEnabled = false;
     private final PolicyManifestStore store;
     private final Set<UUID> issued = new HashSet<>();
 
@@ -28,9 +30,20 @@ public final class PolicyService {
         this.store = store;
     }
 
+    public static boolean isInstantSmeltEnabled() {
+        return instantSmeltEnabled;
+    }
+
     public PolicyPreview previewMobGriefing(UUID actor, MinecraftServer server, boolean target) {
         return new PolicyPreview(UUID.randomUUID(), actor, MOB_GRIEFING,
                 Boolean.toString(server.getGameRules().get(GameRules.MOB_GRIEFING)),
+                Boolean.toString(target),
+                Instant.now().plus(PREVIEW_TTL));
+    }
+
+    public PolicyPreview previewInstantSmelt(UUID actor, MinecraftServer server, boolean target) {
+        return new PolicyPreview(UUID.randomUUID(), actor, INSTANT_SMELT,
+                Boolean.toString(instantSmeltEnabled),
                 Boolean.toString(target),
                 Instant.now().plus(PREVIEW_TTL));
     }
@@ -143,6 +156,7 @@ public final class PolicyService {
                     server.overworld().getThunderLevel(1.0F));
             case OVERWORLD_CLOCK_RATE -> Float.toString(server.clockManager().getRate(
                     server.registryAccess().getOrThrow(WorldClocks.OVERWORLD)));
+            case INSTANT_SMELT -> "false";
             default -> throw new IllegalArgumentException("unknown policy " + ruleId);
         };
     }
@@ -163,6 +177,7 @@ public final class PolicyService {
             }
             case OVERWORLD_CLOCK_RATE -> server.clockManager().setRate(
                     server.registryAccess().getOrThrow(WorldClocks.OVERWORLD), Float.parseFloat(value));
+            case INSTANT_SMELT -> instantSmeltEnabled = Boolean.parseBoolean(value);
             default -> throw new IllegalArgumentException("unknown policy " + ruleId);
         }
     }

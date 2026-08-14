@@ -8,6 +8,7 @@ import dev.romankrukovsky.kubanhorizons.worldgen.dimension.KHDimensions;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -48,7 +49,7 @@ public final class VesselTravelService {
             return false;
         }
 
-        attachment.setBoundVesselEntry(player.position(), player.getYRot());
+        attachment.setBoundVesselPos(player.blockPosition());
         attachment.setBoundVesselDimension(player.level().dimension());
         ServerLevel from = (ServerLevel) player.level();
         MagicalSignature.cast(from, player.position());
@@ -70,7 +71,7 @@ public final class VesselTravelService {
                     "message.kubanhorizons.genie.law.use_forfeit"));
             return false;
         }
-        Optional<Vec3> entry = attachment.getBoundVesselEntry();
+        Optional<BlockPos> entry = attachment.getBoundVesselPos();
         ServerLevel target = attachment.getBoundVesselDimension()
                 .map(key -> player.level().getServer().getLevel(key))
                 .orElse(null);
@@ -78,9 +79,9 @@ public final class VesselTravelService {
             player.teleport(player.findRespawnPositionAndUseSpawnBlock(
                     false, TeleportTransition.DO_NOTHING));
         } else {
-            Vec3 destination = entry.get();
+            Vec3 destination = Vec3.atBottomCenterOf(entry.get());
             player.teleport(new TeleportTransition(target, destination, Vec3.ZERO,
-                    attachment.getBoundVesselYaw(), 0.0F, Set.<Relative>of(),
+                    player.getYRot(), 0.0F, Set.<Relative>of(),
                     TeleportTransition.DO_NOTHING));
             target.sendParticles(ParticleTypes.PORTAL, destination.x, destination.y + 1.0D,
                     destination.z, 60, 0.5D, 0.8D, 0.5D, 0.1D);

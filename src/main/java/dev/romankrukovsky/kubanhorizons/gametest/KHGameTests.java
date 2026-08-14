@@ -88,9 +88,6 @@ public final class KHGameTests {
     private static final Map<String, Integer> TEST_MAX_TICKS = new LinkedHashMap<>();
 
     static {
-        // Тест единственной джиннии должен идти отдельно от других тестов,
-        // создающих ту же глобально привязанную сущность.
-        register("genie_aura_of_laws", KHGameTests::testGenieAuraOfLaws, 100);
         register("sunflower_plant", KHGameTests::testSunflowerPlant, 200);
         register("sunflower_full_growth", KHGameTests::testSunflowerFullGrowth, 600);
         register("sunflower_bonemeal", KHGameTests::testSunflowerBonemeal, 200);

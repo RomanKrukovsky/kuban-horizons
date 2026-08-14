@@ -128,6 +128,10 @@ public final class GenieBrain {
         return projectilesIntercepted;
     }
 
+    public void setMode(GenieBehaviorMode mode) {
+        this.mode = mode != null ? mode : GenieBehaviorMode.FOLLOW;
+    }
+
     public int wishesObserved() {
         return wishesObserved;
     }

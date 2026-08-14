@@ -4,6 +4,7 @@
     "minecraft:forest",
     "minecraft:birch_forest",
     "minecraft:dark_forest",
+    "kubanhorizons:foothill_forest",
     "kubanhorizons:river_floodplain"
   ],
   "spawners": {

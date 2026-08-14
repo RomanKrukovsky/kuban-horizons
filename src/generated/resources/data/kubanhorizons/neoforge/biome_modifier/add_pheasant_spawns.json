@@ -2,6 +2,7 @@
   "type": "neoforge:add_spawns",
   "biomes": [
     "kubanhorizons:kuban_steppe",
+    "kubanhorizons:foothill_forest",
     "kubanhorizons:river_floodplain"
   ],
   "spawners": {

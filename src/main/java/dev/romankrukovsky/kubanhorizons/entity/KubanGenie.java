@@ -382,18 +382,10 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
             }
         }
 
-        // 3. Вывод статуса отношений и памяти мира
-        WorldGenieMemory memory = WorldGenieMemory.get((ServerLevel) level());
-        player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.status",
-                Component.translatable(personality.temperament().translationKey()),
-                personality.trust(), personality.respect(),
-                personality.fear(), personality.affection(), personality.freedomDrive(),
-                personality.power(), personality.corruption()));
-        player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.ai.status",
-                Component.translatable(brain.mode().translationKey()), brain.rescues(),
-                brain.threatsRepelled(), brain.projectilesIntercepted(), brain.wishesObserved()));
-        player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.memory.status",
-                memory.totalWishesGranted(), memory.totalRescuesPerformed(), memory.savedVillagesCount()));
+        // 3. Открываем диалог с джиннией (ПКМ без бумаги и без шифта)
+        if (!level().isClientSide() && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2COpenGenieDialog.send(serverPlayer, this);
+        }
         return InteractionResult.SUCCESS;
     }
 
@@ -499,6 +491,14 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
 
     public void playHurt() {
         triggerAnim("movement", "hurt");
+    }
+
+    public dev.romankrukovsky.kubanhorizons.genie.GenieBehaviorMode getBehaviorMode() {
+        return brain.mode();
+    }
+
+    public void setBehaviorMode(dev.romankrukovsky.kubanhorizons.genie.GenieBehaviorMode mode) {
+        brain.setMode(mode);
     }
 
     @Override

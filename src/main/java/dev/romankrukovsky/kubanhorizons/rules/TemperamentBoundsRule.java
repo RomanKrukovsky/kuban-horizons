@@ -1,6 +1,5 @@
 package dev.romankrukovsky.kubanhorizons.rules;
 
-import com.worldgenie.attachment.TemperamentDrift;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.List;
@@ -17,6 +16,20 @@ import java.util.concurrent.ConcurrentHashMap;
  * rejects the wish if any resulting drift would violate bounds.</p>
  */
 public final class TemperamentBoundsRule implements MetaRuleEngine.MetaRule {
+
+    public record TemperamentDrift(
+            long timestamp,
+            String attribute,
+            float previousValue,
+            float newValue,
+            String cause,
+            UUID relatedWishId
+    ) {
+        public static TemperamentDrift create(String attribute, float previous, float current,
+                                              String cause, UUID wishId) {
+            return new TemperamentDrift(System.currentTimeMillis(), attribute, previous, current, cause, wishId);
+        }
+    }
 
     public interface TemperamentProvider {
         /**

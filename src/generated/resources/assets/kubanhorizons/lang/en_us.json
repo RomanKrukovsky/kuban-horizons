@@ -234,13 +234,8 @@
   "item.kubanhorizons.wish_contract": "Wish Contract",
   "item.kubanhorizons.wooden_spoon": "Wooden Spoon",
   "itemGroup.kubanhorizons": "Kuban Horizons",
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
   "key.category.kubanhorizons.genie": "Kuban Genie",
   "key.kubanhorizons.open_genie_dialog": "Open genie dialogue",
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
   "manul.personality.brave": "Brave",
   "manul.personality.cautious": "Cautious",
   "manul.personality.curious": "Curious",
@@ -263,8 +258,6 @@
   "message.kubanhorizons.genie.anchor.reset": "The world's binding to its genie has been released.",
   "message.kubanhorizons.genie.anchor.status": "This world's genie is %s, last seen in %s at %s.",
   "message.kubanhorizons.genie.bound": "The genie studies you in silence. The first bond has been made.",
-<<<<<<< HEAD
-=======
   "message.kubanhorizons.genie.conditional.added": "The rule is alive and saved: %s",
   "message.kubanhorizons.genie.conditional.limit": "You may keep no more than 16 conditional rules.",
   "message.kubanhorizons.genie.conditional.list": "Saved conditional rules: %s",
@@ -272,7 +265,6 @@
   "message.kubanhorizons.genie.conditional.removed": "The conditional rule has been removed.",
   "message.kubanhorizons.genie.conditional.rule.night.soul_light": "When night falls → kindle soul lights near the owner",
   "message.kubanhorizons.genie.conditional.rule.raining.grow_steppe": "When it rains → strengthen plant growth in the Kuban lands",
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
   "message.kubanhorizons.genie.contract_issued": "A formal Magical Contract with fine print and loopholes has been issued!",
   "message.kubanhorizons.genie.death_choice": "Genie offers a choice: Instant Revive, Soul Preservation, or 5-Minute Rollback?",
   "message.kubanhorizons.genie.dream.vision": "In your sleep, you see visions of forgotten ancient temples and sister genies...",
@@ -286,36 +278,26 @@
   "message.kubanhorizons.genie.irony.sonic": "Sound can be quite tangible if you catch it properly.",
   "message.kubanhorizons.genie.irony.spoon": "Did you really think a piece of metal would hurt me? Hold this wooden spoon instead.",
   "message.kubanhorizons.genie.irony.tnt": "Explosions are so loud... My hair is ruined.",
-<<<<<<< HEAD
-  "message.kubanhorizons.genie.lamp.no_genie_online": "The lamp glows softly, but its bound genie is currently dormant.",
-=======
   "message.kubanhorizons.genie.lamp.bound": "The lamp now remembers %s — and its true owner.",
   "message.kubanhorizons.genie.lamp.no_genie_online": "The lamp glows softly, but its bound genie is currently dormant.",
   "message.kubanhorizons.genie.lamp.not_owner": "The lamp is silent. Stealing a vessel does not transfer its bond.",
   "message.kubanhorizons.genie.lamp.required": "Bind a genie lamp first. A palace without a vessel has no door.",
   "message.kubanhorizons.genie.lamp.summoned": "The lamp answers. Your genie is beside you.",
   "message.kubanhorizons.genie.lamp.unavailable": "The bond is real, but the genie cannot answer it now.",
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
   "message.kubanhorizons.genie.lamp.unbound": "This lamp is not bound to a Genie identity.",
   "message.kubanhorizons.genie.law.forfeited": "You forced your way out. It cost you %s%% of your omnipotence.",
   "message.kubanhorizons.genie.law.forfeited_free": "The vessel had forgotten you. You walked out and it cost nothing.",
   "message.kubanhorizons.genie.law.not_confined": "You are not inside a vessel.",
-<<<<<<< HEAD
-=======
   "message.kubanhorizons.genie.law.use_forfeit": "The vessel will not simply release you. Use /genie forfeit.",
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
   "message.kubanhorizons.genie.leash.slack": "Your tail hangs loose. The vessel is near.",
   "message.kubanhorizons.genie.leash.stretched": "Your tail stretches out. The slack is gone.",
   "message.kubanhorizons.genie.leash.taut": "Your tail is drawn taut as a string. Moving is hard.",
   "message.kubanhorizons.genie.leash.turned": "The tip of your tail turns towards the vessel of its own accord.",
   "message.kubanhorizons.genie.living_painting": "You step through the canvas into a living painted dimension!",
-<<<<<<< HEAD
-=======
   "message.kubanhorizons.genie.magic_realm.left": "The portal returns you to the exact place you entered from.",
   "message.kubanhorizons.genie.magic_realm.missing": "The magical realm is unavailable in this world.",
   "message.kubanhorizons.genie.magic_realm.no_sleep": "Dreams cannot nest inside a painted reality.",
   "message.kubanhorizons.genie.magic_realm.recursive": "Pocket worlds cannot be opened from inside another pocket world.",
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
   "message.kubanhorizons.genie.memory.first_discovery": "First bond forged in the wild land.",
   "message.kubanhorizons.genie.memory.item_read": "Memory of %s: enchantments: %s, damage: %s.",
   "message.kubanhorizons.genie.memory.rescue": "Owner saved from lethal threat.",
@@ -323,11 +305,7 @@
   "message.kubanhorizons.genie.memory.village": "Village economy transformed by magic.",
   "message.kubanhorizons.genie.miniature.blocked": "The miniature needs an empty region of the same size.",
   "message.kubanhorizons.genie.miniature.compressed": "The selected region now exists inside the miniature world.",
-<<<<<<< HEAD
-  "message.kubanhorizons.genie.mirror_world": "The mirror surface ripples as you step into the parallel mirror timeline...",
-=======
   "message.kubanhorizons.genie.mirror_world": "The mirror surface ripples as you step into the mirror world.",
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
   "message.kubanhorizons.genie.mob_wish.cow": "The cow smiles as gentle snowflakes begin to fall...",
   "message.kubanhorizons.genie.mob_wish.creeper": "The creeper sparkles with harmless fireworks instead of exploding.",
   "message.kubanhorizons.genie.mob_wish.golem": "The iron golem receives a flower and understands its protective purpose.",
@@ -379,11 +357,8 @@
   "message.kubanhorizons.genie.vessel.loophole_found": "Loophole found for wish: %s",
   "message.kubanhorizons.genie.vessel.master_acquired": "Genie %s has emerged before you!",
   "message.kubanhorizons.genie.vessel.new_rule_master": "New rule discovered: Vessel owner has the right to state a wish.",
-<<<<<<< HEAD
-=======
   "message.kubanhorizons.genie.vessel.palace_entered": "The lamp opens inward. You enter the Eternal Kuban palace.",
   "message.kubanhorizons.genie.vessel.palace_left": "The lamp returns you to the exact place you entered from.",
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
   "message.kubanhorizons.genie.vessel.refused": "Wish refused: %s",
   "message.kubanhorizons.genie.vessel.released": "You are outside again. The vessel remains yours — and findable.",
   "message.kubanhorizons.genie.vessel.summon_countdown": "SOMEONE IS SUMMONING YOU (3... 2... 1...)",
@@ -409,10 +384,7 @@
   "message.kubanhorizons.genie.wish.mirror_warning": "Genie: To be like me?.. You do not know what you ask.",
   "message.kubanhorizons.genie.wish.no_space": "Reality found no safe place for the chest. Precision: %s.",
   "message.kubanhorizons.genie.wish.omnipotence_warning": "Genie: Omnipotent?.. That is a very careless word.",
-<<<<<<< HEAD
-=======
   "message.kubanhorizons.genie.wish.policy_confirmation_required": "A global rule must be previewed and confirmed in the genie dialogue.",
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
   "message.kubanhorizons.genie.wish.power_transfer_warning": "Genie: My power comes with a heavy vessel.",
   "message.kubanhorizons.genie.wish.safe": "A precise wish leaves little room for mischief. Precision: %s.",
   "message.kubanhorizons.genie.wish.self_fulfillment_warning": "Genie: To grant your own wishes?.. A recursive loop of power.",
@@ -427,10 +399,6 @@
   "message.kubanhorizons.manul.legend.2": "Villager: They say a manul on the roof means the house will stand a hundred years.",
   "message.kubanhorizons.manul.legend.3": "Villager: Meeting a manul is good luck. Just don't reach out to pet it.",
   "message.kubanhorizons.manul.legend.4": "Villager: My grandfather never chased one off the hay. He said the steppe would take offence.",
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
   "message.kubanhorizons.soil_probe.advice": "Tip: compost the soil or rotate crops to restore fertility",
   "message.kubanhorizons.soil_probe.normal": "normal",
   "message.kubanhorizons.soil_probe.not_farmland": "Till the soil first to probe it",

@@ -29,7 +29,7 @@ public final class NoDirectHarmRule implements MetaRuleEngine.MetaRule {
     public NoDirectHarmRule() {
         this(entity ->
                 entity instanceof dev.romankrukovsky.kubanhorizons.entity.KubanGenie genie
-                        && genie.getOwnerUUID() != null);
+                        && genie.getOwner() != null);
     }
 
     @Override
@@ -50,7 +50,7 @@ public final class NoDirectHarmRule implements MetaRuleEngine.MetaRule {
         DamageSource source = damageEvent.getSource();
         if (source.getEntity() instanceof ServerPlayer attacker) {
             if (target instanceof dev.romankrukovsky.kubanhorizons.entity.KubanGenie genie) {
-                if (attacker.getUUID().equals(genie.getOwnerUUID())) {
+                if (genie.isOwnedBy(attacker)) {
                     // Direct self-harm via owned genie — veto
                     return false;
                 }

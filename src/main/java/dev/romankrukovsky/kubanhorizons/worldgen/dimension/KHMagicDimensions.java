@@ -44,7 +44,7 @@ public final class KHMagicDimensions {
     }
 
     public static boolean isPocketDimension(ResourceKey<Level> dimension) {
-        return dimension.equals(PAINTING_WORLD) || dimension.equals(MIRROR_WORLD) || dimension.equals(KHDimensions.POCKET);
+        return dimension.equals(PAINTING_WORLD) || dimension.equals(MIRROR_WORLD) || dimension.equals(KHDimensions.ETERNAL_KUBAN);
     }
 
     public static void bootstrapType(BootstrapContext<DimensionType> context) {

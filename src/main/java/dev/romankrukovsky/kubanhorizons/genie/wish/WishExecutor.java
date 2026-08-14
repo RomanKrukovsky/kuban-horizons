@@ -19,8 +19,9 @@ public final class WishExecutor {
     }
 
     public static Result execute(ServerLevel level, Player player, WishIntent intent) {
-        if (!intent.understood()) {
-            return new Result(false, "message.kubanhorizons.genie.wish.unknown");
+        // LLM_DELEGATED wishes are handled directly without recording to memory
+        if (intent.target() == WishIntent.Target.LLM_DELEGATED) {
+            return LLMWishExecutor.execute(level, player, intent.detailParam());
         }
 
         Result result = switch (intent.category()) {
@@ -30,8 +31,8 @@ public final class WishExecutor {
             case CIVILIZATION -> executeCivilizationWish(level, player, intent);
             case DISTORTED_HIGHER_WISH -> (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)
                     ? DistortedWishEngine.execute(level, serverPlayer, intent)
-                    : new Result(false, "message.kubanhorizons.genie.wish.unknown");
-            default -> new Result(false, "message.kubanhorizons.genie.wish.unknown");
+                    : LLMWishExecutor.execute(level, player, intent.detailParam());
+            default -> GeneralWishEngine.execute(level, player, intent.detailParam().isBlank() ? "general wish" : intent.detailParam());
         };
         if (result.executed()) {
             WorldGenieMemory.get(level).recordWish(player.blockPosition(), intent.target().name(),

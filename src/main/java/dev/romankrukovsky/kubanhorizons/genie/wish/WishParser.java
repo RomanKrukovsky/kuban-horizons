@@ -91,7 +91,15 @@ public final class WishParser {
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);
 
-        int precision = target == WishIntent.Target.UNKNOWN ? 0 : 20;
+        // If no specific target was matched, delegate to LLMWishExecutor
+        // This ensures WishParser NEVER returns an UNKNOWN target
+        if (target == WishIntent.Target.UNKNOWN) {
+            target = WishIntent.Target.LLM_DELEGATED;
+            category = WishIntent.Category.UNKNOWN;
+            detailParam = text; // Pass original text for LLM interpretation
+        }
+
+        int precision = target == WishIntent.Target.LLM_DELEGATED ? 10 : 20;
         precision += switch (amount) {
             case CHEST -> 25;
             case STACK -> 20;

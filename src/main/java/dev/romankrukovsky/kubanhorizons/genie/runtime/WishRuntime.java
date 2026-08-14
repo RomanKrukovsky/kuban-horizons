@@ -296,17 +296,29 @@ public final class WishRuntime {
 
     public StructureMovePreview previewSelectedStructureMove(ServerPlayer player,
                                                              BlockPos offset) throws IOException {
+        return previewSelectedStructureMove(player, offset, net.minecraft.world.level.block.Rotation.NONE);
+    }
+
+    public StructureMovePreview previewSelectedStructureMove(ServerPlayer player,
+                                                             BlockPos offset,
+                                                             net.minecraft.world.level.block.Rotation rotation) throws IOException {
         RegionSelection source = selections.requireCompleted(player.getUUID());
-        StructureMovePreview preview = previewStructureMove(player, source, offset);
+        StructureMovePreview preview = previewStructureMove(player, source, offset, rotation);
         selections.clear(player.getUUID());
         return preview;
     }
 
     private StructureMovePreview previewStructureMove(ServerPlayer player, RegionSelection source,
                                                       BlockPos offset) throws IOException {
+        return previewStructureMove(player, source, offset, net.minecraft.world.level.block.Rotation.NONE);
+    }
+
+    private StructureMovePreview previewStructureMove(ServerPlayer player, RegionSelection source,
+                                                      BlockPos offset,
+                                                      net.minecraft.world.level.block.Rotation rotation) throws IOException {
         requireServerThread();
         var plan = dev.romankrukovsky.kubanhorizons.genie.dimension.FlyingStructureEngine
-                .buildMovePlan(player.level(), source, offset, player.getUUID());
+                .buildMovePlan(player.level(), source, offset, rotation, player.getUUID());
         ensureReady(plan.current().selection());
         int changed = 0;
         for (int index = 0; index < plan.current().blocks().size(); index++) {
@@ -500,6 +512,15 @@ public final class WishRuntime {
     public PolicyPreview previewMobGriefing(UUID actor, boolean target) {
         requireServerThread();
         return policyService.previewMobGriefing(actor, server, target);
+    }
+
+    public PolicyPreview previewInstantSmelt(UUID actor, boolean target) {
+        requireServerThread();
+        return policyService.previewInstantSmelt(actor, server, target);
+    }
+
+    public boolean isInstantSmeltEnabled() {
+        return PolicyService.isInstantSmeltEnabled();
     }
 
     public PolicyPreview previewWeather(UUID actor, float rain, float thunder) {

@@ -2,6 +2,8 @@
   "type": "neoforge:add_spawns",
   "biomes": [
     "kubanhorizons:kuban_steppe",
+    "kubanhorizons:vineyard_hills",
+    "kubanhorizons:mountain_forest",
     "minecraft:savanna",
     "minecraft:savanna_plateau",
     "minecraft:badlands",

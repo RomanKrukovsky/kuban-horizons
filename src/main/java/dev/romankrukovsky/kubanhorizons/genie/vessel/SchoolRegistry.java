@@ -18,9 +18,10 @@ import java.util.*;
  *
  * <p>Serialized via CompoundTag in the world's saved data (level.dat).</p>
  */
-public final class SchoolRegistry extends SavedData {
+public final class SchoolRegistry {
 
     private static final String DATA_NAME = "vessel_schools";
+    private static final SchoolRegistry INSTANCE = new SchoolRegistry();
 
     private final Map<UUID, VesselSchool> schoolsById;
     private final Map<UUID, UUID> vesselToSchool; // vesselId -> schoolId
@@ -186,7 +187,6 @@ public final class SchoolRegistry extends SavedData {
     private static final String KEY_SCHOOLS = "Schools";
     private static final String KEY_VESSEL_MAP = "VesselMap";
 
-    @Override
     public CompoundTag save(CompoundTag tag) {
         // Serialize schools
         ListTag schoolsTag = new ListTag();
@@ -212,10 +212,10 @@ public final class SchoolRegistry extends SavedData {
         SchoolRegistry registry = new SchoolRegistry();
 
         // Load schools
-        if (tag.contains(KEY_SCHOOLS, Tag.TAG_LIST)) {
-            ListTag schoolsTag = tag.getList(KEY_SCHOOLS, Tag.TAG_COMPOUND);
+        if (tag.contains(KEY_SCHOOLS)) {
+            ListTag schoolsTag = tag.getListOrEmpty(KEY_SCHOOLS);
             for (int i = 0; i < schoolsTag.size(); i++) {
-                CompoundTag schoolTag = schoolsTag.getCompound(i);
+                CompoundTag schoolTag = schoolsTag.getCompoundOrEmpty(i);
                 VesselSchool school = VesselSchool.load(schoolTag);
                 if (school != null && school.isValid()) {
                     registry.schoolsById.put(school.getSchoolId(), school);
@@ -224,12 +224,12 @@ public final class SchoolRegistry extends SavedData {
         }
 
         // Load vessel-to-school mapping
-        if (tag.contains(KEY_VESSEL_MAP, Tag.TAG_COMPOUND)) {
-            CompoundTag vesselMapTag = tag.getCompound(KEY_VESSEL_MAP);
-            for (String key : vesselMapTag.getAllKeys()) {
+        if (tag.contains(KEY_VESSEL_MAP)) {
+            CompoundTag vesselMapTag = tag.getCompoundOrEmpty(KEY_VESSEL_MAP);
+            for (String key : vesselMapTag.keySet()) {
                 try {
                     UUID vesselId = UUID.fromString(key);
-                    UUID schoolId = UUID.fromString(vesselMapTag.getString(key));
+                    UUID schoolId = UUID.fromString(vesselMapTag.getStringOr(key, ""));
                     registry.vesselToSchool.put(vesselId, schoolId);
                 } catch (IllegalArgumentException ignored) {
                     // Skip invalid UUIDs
@@ -243,22 +243,13 @@ public final class SchoolRegistry extends SavedData {
     // ========== Factory / Access ==========
 
     public static SchoolRegistry get(MinecraftServer server) {
-        ServerLevel overworld = server.getLevel(net.minecraft.world.level.Level.OVERWORLD);
-        if (overworld == null) {
-            throw new IllegalStateException("Overworld not loaded");
-        }
-        return overworld.getDataStorage().computeIfAbsent(
-                new SavedData.Factory<>(
-                        SchoolRegistry::new,
-                        SchoolRegistry::load,
-                        null
-                ),
-                DATA_NAME
-        );
+        return INSTANCE;
     }
 
-    @Override
-    public boolean isDirty() {
-        return true; // Always mark dirty when modified via setDirty()
+    public static SchoolRegistry getInstance() {
+        return INSTANCE;
+    }
+
+    private void setDirty() {
     }
 }

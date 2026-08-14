@@ -21,6 +21,7 @@ public final class MetaRuleEngine {
                             50, 1.0D, 1.0D, 1.0D, 0.1D);
                     return new WishExecutor.Result(true, "message.kubanhorizons.genie.wish.meta_no_creeper_damage");
                 }
+                return new WishExecutor.Result(false, "message.kubanhorizons.genie.wish.failed");
             }
             case META_LONGER_NIGHT -> {
                 if (level.getServer() != null) {
@@ -32,6 +33,7 @@ public final class MetaRuleEngine {
                             60, 1.5D, 1.5D, 1.5D, 0.2D);
                     return new WishExecutor.Result(true, "message.kubanhorizons.genie.wish.meta_longer_night");
                 }
+                return new WishExecutor.Result(false, "message.kubanhorizons.genie.wish.failed");
             }
             case META_INSTANT_SMELT -> {
                 level.sendParticles(ParticleTypes.FLAME, player.getX(), player.getY() + 1.0D, player.getZ(),
@@ -39,8 +41,9 @@ public final class MetaRuleEngine {
                 return new WishExecutor.Result(true, "message.kubanhorizons.genie.wish.meta_instant_smelt");
             }
             default -> {
+                // Delegate unhandled meta-rule targets to LLM for graceful handling
+                return LLMWishExecutor.execute(level, player, intent.detailParam());
             }
         }
-        return new WishExecutor.Result(false, "message.kubanhorizons.genie.wish.unknown");
     }
 }

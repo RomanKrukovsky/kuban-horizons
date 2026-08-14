@@ -122,11 +122,6 @@ def irrigation_channel_water():
     return im
 
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 
 # ---------- Каменный желоб и разделочный стол ----------
 
@@ -176,8 +171,6 @@ def cutting_board_side():
                          PAL["wood_darker"])
 
 
-<<<<<<< HEAD
-=======
 # ---------- Коптильня ----------
 #
 # Копчёная древесина темнее обычной: устройство должно читаться как
@@ -282,8 +275,6 @@ def smokehouse_firebox(lit=False):
     return im
 
 
->>>>>>> Stashed changes
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 # ---------- Водозабор ----------
 
 def water_intake_side():
@@ -703,18 +694,11 @@ def main():
     save(irrigation_channel_inner(), "irrigation_channel_inner")
     save(irrigation_channel_water(), "irrigation_channel_water")
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
     save(stone_irrigation_channel(), "stone_irrigation_channel")
     save(stone_irrigation_channel_inner(), "stone_irrigation_channel_inner")
     save(cutting_board_top(), "cutting_board_top")
     save(cutting_board_side(), "cutting_board_side")
 
-<<<<<<< HEAD
-=======
     save(smokehouse_side(), "smokehouse_side")
     save(smokehouse_top(), "smokehouse_top")
     save(smokehouse_brick(), "smokehouse_brick")
@@ -726,9 +710,6 @@ def main():
     save(grape_press_bottom(), "grape_press_bottom")
     for lvl in range(5):
         save(grape_press_top(lvl), f"grape_press_top{lvl}")
-
->>>>>>> Stashed changes
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
     save(water_intake_side(), "water_intake_side")
     save(water_intake_top(), "water_intake_top")
     save(water_intake_top_active(), "water_intake_top_active")

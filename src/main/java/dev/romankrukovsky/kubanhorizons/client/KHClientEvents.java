@@ -1,7 +1,7 @@
 package dev.romankrukovsky.kubanhorizons.client;
 
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
-import dev.romankrukovsky.kubanhorizons.client.gui.OilPressScreen;
+import dev.romankrukovsky.kubanhorizons.client.screen.OilPressScreen;
 import dev.romankrukovsky.kubanhorizons.client.render.GroundBirdModel;
 import dev.romankrukovsky.kubanhorizons.client.render.GroundBirdRenderer;
 import dev.romankrukovsky.kubanhorizons.client.render.GullModel;
@@ -36,35 +36,38 @@ import org.lwjgl.glfw.GLFW;
 /**
  * Клиентские события мода (экраны, слои моделей, рендереры сущностей).
  */
-@EventBusSubscriber(modid = KubanHorizons.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = KubanHorizons.MOD_ID, value = Dist.CLIENT)
 public final class KHClientEvents {
     public static final ModelLayerLocation PHEASANT_LAYER =
-            new ModelLayerLocation(KHIds.of(pheasant), main);
+            new ModelLayerLocation(KHIds.of("pheasant"), "main");
     public static final ModelLayerLocation QUAIL_LAYER =
-            new ModelLayerLocation(KHIds.of(quail), main);
+            new ModelLayerLocation(KHIds.of("quail"), "main");
     public static final ModelLayerLocation WILD_BOAR_LAYER =
-            new ModelLayerLocation(KHIds.of(wild_boar), main);
+            new ModelLayerLocation(KHIds.of("wild_boar"), "main");
     public static final ModelLayerLocation CAUCASIAN_SHEPHERD_LAYER =
-            new ModelLayerLocation(KHIds.of(caucasian_shepherd), main);
+            new ModelLayerLocation(KHIds.of("caucasian_shepherd"), "main");
     public static final ModelLayerLocation NUTRIA_LAYER =
-            new ModelLayerLocation(KHIds.of(nutria), main);
+            new ModelLayerLocation(KHIds.of("nutria"), "main");
     public static final ModelLayerLocation LOCUST_LAYER =
-            new ModelLayerLocation(KHIds.of(locust), main);
+            new ModelLayerLocation(KHIds.of("locust"), "main");
     public static final ModelLayerLocation GULL_LAYER =
-            new ModelLayerLocation(KHIds.of(gull), main);
+            new ModelLayerLocation(KHIds.of("gull"), "main");
     public static final ModelLayerLocation HERON_LAYER =
-            new ModelLayerLocation(KHIds.of(heron), main);
+            new ModelLayerLocation(KHIds.of("heron"), "main");
     public static final ModelLayerLocation MANUL_LAYER =
-            new ModelLayerLocation(KHIds.of(manul), main);
+            new ModelLayerLocation(KHIds.of("manul"), "main");
     public static final ModelLayerLocation STURGEON_LAYER =
-            new ModelLayerLocation(KHIds.of(sturgeon), main);
+            new ModelLayerLocation(KHIds.of("sturgeon"), "main");
     public static final ModelLayerLocation GENIE_TAIL_LAYER =
-            new ModelLayerLocation(KHIds.of(player_genie_tail), main);
+            new ModelLayerLocation(KHIds.of("player_genie_tail"), "main");
+
+    public static final KeyMapping.Category CATEGORY =
+            KeyMapping.Category.register(KHIds.of("main"));
 
     public static final KeyMapping OPEN_GENIE_DIALOG = new KeyMapping(
             "key.kubanhorizons.open_genie_dialog",
             GLFW.GLFW_KEY_J,
-            "key.categories.kubanhorizons");
+            CATEGORY);
 
     private KHClientEvents() {
     }

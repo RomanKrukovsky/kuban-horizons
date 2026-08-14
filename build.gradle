@@ -21,6 +21,10 @@ sourceSets.main.resources {
     exclude(".cache/**")
 }
 
+tasks.withType(ProcessResources).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 repositories {
     mavenCentral()
     maven {

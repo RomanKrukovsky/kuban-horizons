@@ -27,14 +27,54 @@ public final class FlyingStructureEngine {
 
     public static MovePlan buildMovePlan(ServerLevel level, RegionSelection source,
                                          BlockPos offset, UUID ownerId) throws IOException {
+        return buildMovePlan(level, source, offset, net.minecraft.world.level.block.Rotation.NONE, ownerId);
+    }
+
+    public static MovePlan buildMovePlan(ServerLevel level, RegionSelection source,
+                                         BlockPos offset, net.minecraft.world.level.block.Rotation rotation,
+                                         UUID ownerId) throws IOException {
         if (!source.dimension().equals(level.dimension().identifier().toString())) {
             throw new IllegalArgumentException("source belongs to another dimension");
         }
         if (offset.equals(BlockPos.ZERO)) {
             throw new IllegalArgumentException("move offset must not be zero");
         }
+        net.minecraft.world.level.block.Rotation rot = rotation != null
+                ? rotation : net.minecraft.world.level.block.Rotation.NONE;
+
+        BlockPos destBase = source.min().offset(offset);
+        int minDestX = Integer.MAX_VALUE, minDestY = Integer.MAX_VALUE, minDestZ = Integer.MAX_VALUE;
+        int maxDestX = Integer.MIN_VALUE, maxDestY = Integer.MIN_VALUE, maxDestZ = Integer.MIN_VALUE;
+
+        for (BlockPos srcPos : source.positions()) {
+            int relX = srcPos.getX() - source.min().getX();
+            int relY = srcPos.getY() - source.min().getY();
+            int relZ = srcPos.getZ() - source.min().getZ();
+            int rotX = switch (rot) {
+                case CLOCKWISE_90 -> -relZ;
+                case CLOCKWISE_180 -> -relX;
+                case COUNTERCLOCKWISE_90 -> relZ;
+                default -> relX;
+            };
+            int rotZ = switch (rot) {
+                case CLOCKWISE_90 -> relX;
+                case CLOCKWISE_180 -> -relZ;
+                case COUNTERCLOCKWISE_90 -> -relX;
+                default -> relZ;
+            };
+            int curX = destBase.getX() + rotX;
+            int curY = destBase.getY() + relY;
+            int curZ = destBase.getZ() + rotZ;
+            minDestX = Math.min(minDestX, curX);
+            minDestY = Math.min(minDestY, curY);
+            minDestZ = Math.min(minDestZ, curZ);
+            maxDestX = Math.max(maxDestX, curX);
+            maxDestY = Math.max(maxDestY, curY);
+            maxDestZ = Math.max(maxDestZ, curZ);
+        }
+
         RegionSelection destination = new RegionSelection(level.dimension().identifier().toString(),
-                source.min().offset(offset), source.max().offset(offset));
+                new BlockPos(minDestX, minDestY, minDestZ), new BlockPos(maxDestX, maxDestY, maxDestZ));
         if (overlaps(source, destination)) {
             throw new IllegalArgumentException("overlapping moves are not supported yet");
         }
@@ -73,20 +113,38 @@ public final class FlyingStructureEngine {
             targetBlocks.set(index, new RegionSnapshot.BlockRecord(sourceX,
                     sourceY, sourceZ, air, null));
         }
-        int xOffset = destination.min().getX() - closure.min().getX();
-        int yOffset = destination.min().getY() - closure.min().getY();
-        int zOffset = destination.min().getZ() - closure.min().getZ();
         for (RegionSnapshot.BlockRecord record : sourceState.blocks()) {
-            int index = index(closure, xOffset + record.relativeX(),
-                    yOffset + record.relativeY(), zOffset + record.relativeZ());
+            int relX = record.relativeX();
+            int relY = record.relativeY();
+            int relZ = record.relativeZ();
+            int rotX = switch (rot) {
+                case CLOCKWISE_90 -> -relZ;
+                case CLOCKWISE_180 -> -relX;
+                case COUNTERCLOCKWISE_90 -> relZ;
+                default -> relX;
+            };
+            int rotZ = switch (rot) {
+                case CLOCKWISE_90 -> relX;
+                case CLOCKWISE_180 -> -relZ;
+                case COUNTERCLOCKWISE_90 -> -relX;
+                default -> relZ;
+            };
+            int targetAbsX = destBase.getX() + rotX;
+            int targetAbsY = destBase.getY() + relY;
+            int targetAbsZ = destBase.getZ() + rotZ;
+            int targetRelX = targetAbsX - closure.min().getX();
+            int targetRelY = targetAbsY - closure.min().getY();
+            int targetRelZ = targetAbsZ - closure.min().getZ();
+
+            int index = index(closure, targetRelX, targetRelY, targetRelZ);
             var blockEntity = record.blockEntity();
             if (blockEntity != null) {
-                blockEntity.putInt("x", destination.min().getX() + record.relativeX());
-                blockEntity.putInt("y", destination.min().getY() + record.relativeY());
-                blockEntity.putInt("z", destination.min().getZ() + record.relativeZ());
+                blockEntity.putInt("x", targetAbsX);
+                blockEntity.putInt("y", targetAbsY);
+                blockEntity.putInt("z", targetAbsZ);
             }
-            targetBlocks.set(index, new RegionSnapshot.BlockRecord(xOffset + record.relativeX(),
-                    yOffset + record.relativeY(), zOffset + record.relativeZ(), record.blockState(), blockEntity));
+            targetBlocks.set(index, new RegionSnapshot.BlockRecord(targetRelX,
+                    targetRelY, targetRelZ, record.blockState(), blockEntity));
         }
         var targetBlockTicks = new ArrayList<RegionSnapshot.TickRecord>();
         for (RegionSnapshot.TickRecord tick : current.blockTicks()) {
@@ -94,21 +152,11 @@ public final class FlyingStructureEngine {
                 targetBlockTicks.add(tick);
             }
         }
-        for (RegionSnapshot.TickRecord tick : sourceState.blockTicks()) {
-            targetBlockTicks.add(new RegionSnapshot.TickRecord(xOffset + tick.relativeX(),
-                    yOffset + tick.relativeY(), zOffset + tick.relativeZ(), tick.typeId(),
-                    tick.delay(), tick.priority()));
-        }
         var targetFluidTicks = new ArrayList<RegionSnapshot.TickRecord>();
         for (RegionSnapshot.TickRecord tick : current.fluidTicks()) {
             if (!containsRelative(source, closure, tick.relativeX(), tick.relativeY(), tick.relativeZ())) {
                 targetFluidTicks.add(tick);
             }
-        }
-        for (RegionSnapshot.TickRecord tick : sourceState.fluidTicks()) {
-            targetFluidTicks.add(new RegionSnapshot.TickRecord(xOffset + tick.relativeX(),
-                    yOffset + tick.relativeY(), zOffset + tick.relativeZ(), tick.typeId(),
-                    tick.delay(), tick.priority()));
         }
         SnapshotService.SnapshotState target = new SnapshotService.SnapshotState(
                 targetBlocks, targetBlockTicks, targetFluidTicks, java.util.List.of(), current.biomes());

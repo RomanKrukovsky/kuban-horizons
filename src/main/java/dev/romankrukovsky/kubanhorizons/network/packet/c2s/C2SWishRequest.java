@@ -38,7 +38,7 @@ public record C2SWishRequest(int genieId, String wishText) implements CustomPack
                 if (!dev.romankrukovsky.kubanhorizons.rules.MetaRuleEngine.get()
                         .evaluateWish(sp, packet.genieId(), packet.wishText())) {
                     S2CGenieResponse.send(sp, packet.genieId(),
-                            "Meta-rule violation: wish rejected.",
+                            net.minecraft.network.chat.Component.literal("Meta-rule violation: wish rejected."),
                             0, false);
                     return;
                 }

@@ -34,6 +34,7 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         MIRROR_TRANSFORMATION,
         POWER_TRANSFER,
         ABS_INTANGIBILITY,
+        LLM_DELEGATED,
         UNKNOWN
     }
 
@@ -53,7 +54,7 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
     }
 
     public boolean understood() {
-        return target != Target.UNKNOWN;
+        return target != Target.UNKNOWN && target != Target.LLM_DELEGATED;
     }
 
     public boolean isPreciseAndSafe() {

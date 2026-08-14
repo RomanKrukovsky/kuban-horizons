@@ -13,7 +13,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
  * sensible defaults. Replace the default stores with your persistent
  * implementations as needed.</p>
  */
-@EventBusSubscriber(modid = KubanHorizons.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = KubanHorizons.MOD_ID)
 public final class MetaRuleBootstrap {
 
     private MetaRuleBootstrap() {

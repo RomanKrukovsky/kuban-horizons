@@ -258,29 +258,35 @@ public final class VesselSchool {
      */
     public static @Nullable VesselSchool load(CompoundTag tag) {
         try {
-            UUID schoolId = UUID.fromString(tag.getString(KEY_SCHOOL_ID));
-            UUID leaderId = UUID.fromString(tag.getString(KEY_LEADER_ID));
-            SharedRule sharedRule = SharedRule.valueOf(tag.getString(KEY_SHARED_RULE));
+            String schoolIdStr = tag.getStringOr(KEY_SCHOOL_ID, "");
+            String leaderIdStr = tag.getStringOr(KEY_LEADER_ID, "");
+            String sharedRuleStr = tag.getStringOr(KEY_SHARED_RULE, "");
+            if (schoolIdStr.isEmpty() || leaderIdStr.isEmpty() || sharedRuleStr.isEmpty()) return null;
+            UUID schoolId = UUID.fromString(schoolIdStr);
+            UUID leaderId = UUID.fromString(leaderIdStr);
+            SharedRule sharedRule = SharedRule.valueOf(sharedRuleStr);
 
             VesselSchool school = new VesselSchool(schoolId, leaderId, sharedRule);
 
             // Load members
-            if (tag.contains(KEY_MEMBERS, Tag.TAG_LIST)) {
-                ListTag membersTag = tag.getList(KEY_MEMBERS, Tag.TAG_COMPOUND);
+            if (tag.contains(KEY_MEMBERS)) {
+                ListTag membersTag = tag.getListOrEmpty(KEY_MEMBERS);
                 for (int i = 0; i < membersTag.size(); i++) {
-                    CompoundTag memberTag = membersTag.getCompound(i);
-                    UUID memberId = UUID.fromString(memberTag.getString("UUID"));
-                    school.memberIds.add(memberId);
+                    CompoundTag memberTag = membersTag.getCompoundOrEmpty(i);
+                    String u = memberTag.getStringOr("UUID", "");
+                    if (!u.isEmpty()) {
+                        school.memberIds.add(UUID.fromString(u));
+                    }
                 }
             }
 
             // Load modifiers
-            if (tag.contains(KEY_MODIFIERS, Tag.TAG_COMPOUND)) {
-                CompoundTag modifiersTag = tag.getCompound(KEY_MODIFIERS);
-                for (String key : modifiersTag.getAllKeys()) {
+            if (tag.contains(KEY_MODIFIERS)) {
+                CompoundTag modifiersTag = tag.getCompoundOrEmpty(KEY_MODIFIERS);
+                for (String key : modifiersTag.keySet()) {
                     try {
                         SchoolEvent event = SchoolEvent.valueOf(key);
-                        BehaviorModifier modifier = BehaviorModifier.valueOf(modifiersTag.getString(key));
+                        BehaviorModifier modifier = BehaviorModifier.valueOf(modifiersTag.getStringOr(key, ""));
                         school.activeModifiers.put(event, modifier);
                     } catch (IllegalArgumentException ignored) {
                         // Skip invalid enum values

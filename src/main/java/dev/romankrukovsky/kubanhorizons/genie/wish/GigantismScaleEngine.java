@@ -8,6 +8,7 @@ import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Blocks;
 
 /** Движок исполнения желаний гигантизма (курицы высотой 30 блоков, гигантские животные). */
 public final class GigantismScaleEngine {
@@ -31,10 +32,26 @@ public final class GigantismScaleEngine {
                             targetPos.getZ() + 0.5D, 3, 0.0D, 0.0D, 0.0D, 0.0D);
                     return new WishExecutor.Result(true, "message.kubanhorizons.genie.wish.big_chicken");
                 }
+                return new WishExecutor.Result(false, "message.kubanhorizons.genie.wish.failed");
+            }
+            case BIG_PIE -> {
+                // Materialize a giant pie (cake) at target position
+                level.setBlockAndUpdate(targetPos, Blocks.CAKE.defaultBlockState());
+                level.sendParticles(ParticleTypes.HAPPY_VILLAGER, targetPos.getX() + 0.5D, targetPos.getY() + 1.0D,
+                        targetPos.getZ() + 0.5D, 30, 0.8D, 0.8D, 0.8D, 0.1D);
+                return new WishExecutor.Result(true, "message.kubanhorizons.genie.wish.big_pie");
+            }
+            case BIG_BED -> {
+                // Place a giant bed (redstone block) - simple 1-block representation for now
+                level.setBlockAndUpdate(targetPos, Blocks.REDSTONE_BLOCK.defaultBlockState());
+                level.sendParticles(ParticleTypes.ENCHANT, targetPos.getX() + 0.5D, targetPos.getY() + 1.0D,
+                        targetPos.getZ() + 0.5D, 25, 0.6D, 0.6D, 0.6D, 0.1D);
+                return new WishExecutor.Result(true, "message.kubanhorizons.genie.wish.big_bed");
             }
             default -> {
+                // Delegate unhandled gigantism targets to LLM for graceful handling
+                return LLMWishExecutor.execute(level, player, intent.detailParam());
             }
         }
-        return new WishExecutor.Result(false, "message.kubanhorizons.genie.wish.unknown");
     }
 }

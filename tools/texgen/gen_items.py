@@ -385,11 +385,6 @@ def tea_cup_item():
     return im
 
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 def raw_bird_item(c_main, c_hi, c_dark, bone=True):
     """Сырая тушка птицы: округлое тело, кость слева, свет сверху-слева.
 
@@ -447,8 +442,6 @@ def slab_meat_item(c_main, c_hi, c_dark, marbled=False):
     return im
 
 
-<<<<<<< HEAD
-=======
 def smoked_glaze(im, c_glaze):
     """Копчёный лоск: редкие светлые точки по верхней кромке силуэта.
 
@@ -487,7 +480,6 @@ def smoked_meat_item():
     return smoked_glaze(im, (192, 130, 78, 255))
 
 
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 def fish_item(c_back, c_belly, c_dark, cooked=False):
     """Рыба в профиль: вытянутое тело, рострум и раздвоенный хвост.
 
@@ -721,10 +713,6 @@ def sonic_boom_item():
     return im
 
 
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 def main():
     save(homemade_bread_item(), "homemade_bread")
     save(bowl_dish((176, 44, 52, 255), (204, 74, 70, 255),
@@ -774,11 +762,6 @@ def main():
     save(fruit_item(PAL["plum"], PAL["plum_hi"], (80, 42, 96, 255)), "plum")
     save(walnut_item(), "walnut")
 
-<<<<<<< HEAD
-=======
-<<<<<<< Updated upstream
-=======
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
     # Фауна: фазан и перепел. Сырое мясо холоднее и краснее, готовое — темнее
     # и теплее; перепел мельче фазана, поэтому его тушка на пиксель компактнее.
     save(raw_bird_item((196, 106, 104, 255), (222, 142, 138, 255),
@@ -806,12 +789,9 @@ def main():
     save(fish_item((166, 126, 78, 255), (216, 190, 146, 255),
                    (122, 88, 50, 255), cooked=True), "cooked_sturgeon")
     save(bucket_with_fish_item((104, 108, 96, 255)), "sturgeon_bucket")
-<<<<<<< HEAD
-=======
     # Копчёности: следующая ступень после жарки, тон темнее и с лоском.
     save(smoked_fish_item(), "smoked_fish")
     save(smoked_meat_item(), "smoked_meat")
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
     # Шкурка нутрии — товарный продукт плавней.
     save(pelt_item((118, 88, 58, 255), (146, 112, 76, 255),
                    (86, 64, 42, 255)), "nutria_pelt")
@@ -835,6 +815,7 @@ def main():
          "heron_spawn_egg")
     save(spawn_egg_item((104, 108, 96, 255), (208, 202, 180, 255)),
          "sturgeon_spawn_egg")
+    save(bottle((212, 172, 60, 255), (255, 220, 100, 255)), "genie_lamp")
     save(bottle((212, 172, 60, 255), (255, 220, 100, 255)), "player_genie_lamp")
 
     # Предметы системы желаний: ложка подмены, зеркало-«смартфон»,
@@ -843,11 +824,6 @@ def main():
     save(magic_mirror_item(), "magic_mirror")
     save(miniature_world_item(), "miniature_world")
     save(sonic_boom_item(), "sonic_boom_item")
-
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 
 if __name__ == "__main__":
     main()
