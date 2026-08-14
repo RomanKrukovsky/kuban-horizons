@@ -2,6 +2,12 @@
   "values": [
     "kubanhorizons:kuban_steppe",
     "kubanhorizons:liman",
-    "kubanhorizons:river_floodplain"
+    "kubanhorizons:river_floodplain",
+    "kubanhorizons:foothill_forest",
+    "kubanhorizons:mountain_forest",
+    "kubanhorizons:azov_coast",
+    "kubanhorizons:black_sea_coast",
+    "kubanhorizons:vineyard_hills",
+    "kubanhorizons:tea_slopes"
   ]
 }

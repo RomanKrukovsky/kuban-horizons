@@ -23,6 +23,17 @@ public final class SoilFertility {
     public static final int BASE_FARMLAND = 40;
     /** Максимум шкалы. */
     public static final int MAX = 100;
+    /**
+     * Порог «богатой» почвы: с него культуры, умеющие благодарить за землю,
+     * дают прибавку к урожаю (TECH_SPEC.md §3 — «при 80+ шанс бонусного
+     * дропа»).
+     *
+     * <p>80 выбрано выше базы чернозёма минус один сбор: свежий чернозём (85)
+     * порог проходит, но уже первый повторный сбор той же культуры сбивает
+     * его ниже. Богатый урожай — состояние ухоженной земли, а не постоянное
+     * свойство блока.</p>
+     */
+    public static final int RICH_THRESHOLD = 80;
     /** Штраф за повторный сбор той же культуры. */
     private static final int DEPLETION_SAME_CROP = 12;
     /** Штраф за сбор с ротацией культур (меньше). */
@@ -35,26 +46,44 @@ public final class SoilFertility {
     private SoilFertility() {
     }
 
+    /**
+     * Базовое плодородие грядки по её ярусу почвы.
+     *
+     * <p>Единая точка: все операции ниже спрашивают базу здесь, а не берут
+     * константу обычной грядки. Иначе новый ярус читался бы в одном месте и
+     * молча игнорировался в остальных — плодородие «возвращалось» бы к 40
+     * при первом же сборе на чернозёме.</p>
+     */
+    public static int baseFertility(ServerLevel level, BlockPos farmlandPos) {
+        return SoilTier.at(level, farmlandPos).baseFertility();
+    }
+
     /** Текущее плодородие грядки (с учётом ленивого восстановления). */
     public static int fertility(ServerLevel level, BlockPos farmlandPos) {
+        int base = baseFertility(level, farmlandPos);
         if (!KHServerConfig.fertilityEnabled()) {
-            return BASE_FARMLAND;
+            return base;
         }
         LevelChunk chunk = level.getChunkAt(farmlandPos);
         ChunkFertilityData data = chunk.getExistingDataOrNull(KHAttachments.CHUNK_FERTILITY.get());
         if (data == null) {
-            return BASE_FARMLAND;
+            return base;
         }
         ChunkFertilityData.Entry entry = data.get(farmlandPos);
         if (entry == null) {
-            return BASE_FARMLAND;
+            return base;
         }
-        return recoveredFertility(entry, level.getGameTime());
+        return recoveredFertility(entry, level.getGameTime(), base);
     }
 
     /**
-     * Множитель скорости роста по плодородию: 0.6 при нуле, 1.0 при базе,
-     * 1.6 при максимуме.
+     * Множитель скорости роста по плодородию: 0.6 при нуле, 1.0 при базе
+     * обычной грядки, 1.6 при максимуме.
+     *
+     * <p>Точка перелома осталась на {@link #BASE_FARMLAND}, а не на базе
+     * яруса: иначе чернозём с его 85 давал бы ровно 1.0, и весь ярус не
+     * значил бы ничего. Шкала одна на все ярусы, ярус лишь определяет, где
+     * на ней грядка стоит по умолчанию.</p>
      */
     public static float growthMultiplier(ServerLevel level, BlockPos farmlandPos) {
         if (!KHServerConfig.fertilityEnabled()) {
@@ -66,6 +95,18 @@ public final class SoilFertility {
         }
         return Mth.lerp((fertility - BASE_FARMLAND) / (float) (MAX - BASE_FARMLAND), 1.0F, 1.6F);
     }
+
+    /**
+     * Богата ли земля настолько, чтобы дать прибавку к урожаю.
+     *
+     * <p>Свойство почвы, а не культуры: культуры лишь решают, пользуются они
+     * этим или нет. Так «награда за хорошую землю» остаётся общим правилом
+     * мира и честно исчезает вместе с истощением.</p>
+     */
+    public static boolean isRichHarvest(ServerLevel level, BlockPos farmlandPos) {
+        return fertility(level, farmlandPos) >= RICH_THRESHOLD;
+    }
+
 
     /**
      * Регистрирует сбор урожая: истощает грядку с учётом севооборота.
@@ -80,8 +121,9 @@ public final class SoilFertility {
         ChunkFertilityData data = chunk.getData(KHAttachments.CHUNK_FERTILITY.get());
         long now = level.getGameTime();
 
+        int base = baseFertility(level, farmlandPos);
         ChunkFertilityData.Entry old = data.get(farmlandPos);
-        int current = old != null ? recoveredFertility(old, now) : BASE_FARMLAND;
+        int current = old != null ? recoveredFertility(old, now, base) : base;
         byte crop = CropKind.ofBlock(cropBlock).code();
         boolean sameCrop = old != null && old.lastCrop() == crop && crop != ChunkFertilityData.NO_CROP;
 
@@ -99,28 +141,92 @@ public final class SoilFertility {
         if (!KHServerConfig.fertilityEnabled()) {
             return;
         }
+<<<<<<< Updated upstream
+=======
+        adjust(level, farmlandPos,
+                (int) Math.round(COMPOST_BONUS * KHServerConfig.fertilityRecoveryRate()));
+    }
+
+    /**
+     * Вытаптывание грядки животным: резкая потеря плодородия без смены
+     * культуры-истории. Сила масштабируется конфигом давления.
+     *
+     * @return плодородие после вытаптывания
+     */
+    public static int onTrample(ServerLevel level, BlockPos farmlandPos) {
+        if (!KHServerConfig.fertilityEnabled()) {
+            return baseFertility(level, farmlandPos);
+        }
+        int loss = (int) Math.round(TRAMPLE_LOSS * KHServerConfig.pressureSeverity());
+        return adjust(level, farmlandPos, -loss);
+    }
+
+    /**
+     * Обогащение почвы после схода половодья: заливной луг становится
+     * плодороднее, чем был. Прибавка не зависит от давности события.
+     *
+     * @return плодородие после обогащения
+     */
+    public static int onFloodDeposit(ServerLevel level, BlockPos farmlandPos) {
+        if (!KHServerConfig.fertilityEnabled()) {
+            return baseFertility(level, farmlandPos);
+        }
+        int bonus = (int) Math.round(FLOOD_SILT_BONUS * KHServerConfig.fertilityRecoveryRate());
+        return adjust(level, farmlandPos, bonus);
+    }
+
+    /**
+     * Общий путь изменения плодородия на дельту с сохранением истории культуры.
+     * Все внешние операции проходят здесь, поэтому ленивое восстановление и
+     * запись в чанк реализованы один раз.
+     */
+    private static int adjust(ServerLevel level, BlockPos farmlandPos, int delta) {
+>>>>>>> Stashed changes
         LevelChunk chunk = level.getChunkAt(farmlandPos);
         ChunkFertilityData data = chunk.getData(KHAttachments.CHUNK_FERTILITY.get());
         long now = level.getGameTime();
 
+        int base = baseFertility(level, farmlandPos);
         ChunkFertilityData.Entry old = data.get(farmlandPos);
+<<<<<<< Updated upstream
         int current = old != null ? recoveredFertility(old, now) : BASE_FARMLAND;
         int bonus = (int) Math.round(COMPOST_BONUS * KHServerConfig.fertilityRecoveryRate());
         int updated = Mth.clamp(current + bonus, 0, MAX);
+=======
+        int current = old != null ? recoveredFertility(old, now, base) : base;
+        int updated = Mth.clamp(current + delta, 0, MAX);
+>>>>>>> Stashed changes
         byte crop = old != null ? old.lastCrop() : ChunkFertilityData.NO_CROP;
 
         data.put(farmlandPos, new ChunkFertilityData.Entry(updated, crop, now));
         chunk.markUnsaved();
     }
 
-    /** Ленивое восстановление: +1 за каждые RECOVERY_TICKS_PER_POINT тиков. */
-    private static int recoveredFertility(ChunkFertilityData.Entry entry, long now) {
+    /**
+     * Ленивое восстановление: +1 за каждые RECOVERY_TICKS_PER_POINT тиков
+     * простоя, но <b>не выше базы своего яруса</b>.
+     *
+     * <p>Потолок по ярусу — то, что вообще делает ярусы осмысленными. Если бы
+     * пар восстанавливал до максимума шкалы, любая грядка мира приходила бы к
+     * 100 сама собой, и чернозём означал бы лишь «дойти до сотни быстрее».
+     * Поэтому земля сама возвращается только к своей норме (40 / 60 / 85), а
+     * всё, что выше нормы, остаётся результатом вложений — компоста и
+     * речного ила. Разница между ярусами сохраняется навсегда.</p>
+     *
+     * <p>При этом уже вложенное не отбирается: если значение выше базы, оно
+     * берётся как есть, а не срезается до нормы. Компост на обычной грядке не
+     * должен исчезать только потому, что грядка «обычная».</p>
+     */
+    private static int recoveredFertility(ChunkFertilityData.Entry entry, long now, int base) {
         long elapsed = Math.max(0, now - entry.lastUpdate());
         double rate = KHServerConfig.fertilityRecoveryRate();
         if (rate <= 0) {
             return entry.fertility();
         }
         int recovered = (int) (elapsed / (long) (RECOVERY_TICKS_PER_POINT / rate));
-        return Mth.clamp(entry.fertility() + recovered, 0, MAX);
+        // Потолок восстановления — максимум из нормы яруса и уже достигнутого
+        // значения: пар подтягивает к норме, но не сбрасывает вложенное.
+        int ceiling = Math.max(base, entry.fertility());
+        return Mth.clamp(entry.fertility() + recovered, 0, Math.min(MAX, ceiling));
     }
 }

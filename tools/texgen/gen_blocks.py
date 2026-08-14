@@ -122,6 +122,162 @@ def irrigation_channel_water():
     return im
 
 
+<<<<<<< Updated upstream
+=======
+
+# ---------- Каменный желоб и разделочный стол ----------
+
+def stone_irrigation_channel():
+    """Каменный желоб: тёсаный камень, суше и холоднее деревянного.
+
+    Отличается от ракушечника отсутствием каверн: это обработанный камень,
+    а не природный известняк, и апгрейд сети должен читаться как рукотворный.
+    """
+    im = img()
+    rect(im, 0, 0, 15, 15, PAL["stone"])
+    checker_noise(im, 0, 0, 15, 15, PAL["stone"], PAL["stone_dark"], 4)
+    # Тёска: горизонтальные борозды инструмента.
+    for y in (3, 8, 12):
+        hline(im, y, 1, 14, PAL["stone_dark"])
+    hline(im, 0, 0, 15, PAL["stone_hi"])
+    vline(im, 0, 0, 15, PAL["stone_hi"])
+    hline(im, 15, 0, 15, PAL["stone_dark"])
+    vline(im, 15, 0, 15, PAL["stone_dark"])
+    return im
+
+
+def stone_irrigation_channel_inner():
+    """Внутренняя поверхность: темнее и с потёками, как у деревянного."""
+    im = img()
+    rect(im, 0, 0, 15, 15, PAL["stone_dark"])
+    checker_noise(im, 0, 0, 15, 15, PAL["stone_dark"], PAL["stone"], 5)
+    for x in (3, 8, 12):
+        vline(im, x, 2, 13, PAL["chernozem_dark"])
+    return im
+
+
+def cutting_board_top():
+    """Столешница: доска со следами ножа вдоль волокна."""
+    im = plank_texture(PAL["wood_hi"], PAL["paper"], PAL["wood"], PAL["wood_dark"])
+    # Порезы — подпись именно разделочного стола, а не просто доски.
+    for x, y0, y1 in ((4, 2, 9), (7, 5, 13), (11, 3, 11), (13, 7, 14)):
+        vline(im, x, y0, y1, PAL["wood_dark"])
+    for y, x0, x1 in ((6, 2, 6), (11, 8, 14)):
+        hline(im, y, x0, x1, PAL["wood_dark"])
+    return im
+
+
+def cutting_board_side():
+    """Бок: чистая доска, торец волокна."""
+    return plank_texture(PAL["wood"], PAL["wood_hi"], PAL["wood_dark"],
+                         PAL["wood_darker"])
+
+
+# ---------- Коптильня ----------
+#
+# Копчёная древесина темнее обычной: устройство должно читаться как
+# «прокопчённое», а не как свежий сруб рамы. Оттенки взяты от wood_dark
+# в сторону чернозёма — палитра региона (ART_BIBLE §2), не произвольный
+# коричневый. Всего в текстуре 5–6 тонов, потолок §2 не тронут.
+
+SMOKE_WOOD = (104, 78, 50, 255)
+SMOKE_WOOD_HI = (126, 96, 62, 255)
+SMOKE_WOOD_DARK = (78, 58, 38, 255)
+SMOKE_WOOD_DARKER = (56, 42, 28, 255)
+SMOKE_SOOT = (46, 38, 32, 255)
+
+# Топка: кирпич региона (черепичный тон §2) и жар в устье.
+FIRE_BRICK = (150, 74, 44, 255)
+FIRE_BRICK_HI = (176, 96, 60, 255)
+FIRE_BRICK_DARK = (108, 52, 32, 255)
+EMBER = (238, 148, 44, 255)
+EMBER_HI = (252, 202, 96, 255)
+EMBER_DARK = (186, 92, 28, 255)
+
+
+def smokehouse_side():
+    """Бок сруба: прокопчённая доска с потёками сажи сверху.
+
+    Сажа идёт от верха вниз — дым поднимается, и след остаётся под крышей.
+    Это отличает бок коптильни от бока разделочного стола, хотя оба дощатые.
+    """
+    im = plank_texture(SMOKE_WOOD, SMOKE_WOOD_HI, SMOKE_WOOD_DARK,
+                       SMOKE_WOOD_DARKER)
+    # Потёки сажи: короткие вертикальные мазки от верхней кромки.
+    for x, depth in ((2, 4), (5, 2), (8, 5), (11, 3), (14, 4)):
+        vline(im, x, 0, depth, SMOKE_SOOT)
+    hline(im, 0, 0, 15, SMOKE_SOOT)
+    return im
+
+
+def smokehouse_top():
+    """Крыша камеры: доски поперёк с закопчённой серединой у трубы."""
+    im = plank_texture(SMOKE_WOOD_HI, SMOKE_WOOD, SMOKE_WOOD_DARK,
+                       SMOKE_WOOD_DARKER)
+    # Кольцо сажи вокруг основания трубы (труба 4×4 по центру).
+    for x in range(5, 11):
+        px(im, x, 5, SMOKE_SOOT)
+        px(im, x, 10, SMOKE_SOOT)
+    for y in range(5, 11):
+        px(im, 5, y, SMOKE_SOOT)
+        px(im, 10, y, SMOKE_SOOT)
+    return im
+
+
+def smokehouse_brick():
+    """Кирпичная кладка топки: смещённые ряды, свет сверху-слева."""
+    im = img()
+    rect(im, 0, 0, 15, 15, FIRE_BRICK)
+    # Горизонтальные швы.
+    for y in (3, 7, 11, 15):
+        hline(im, y, 0, 15, FIRE_BRICK_DARK)
+    # Вертикальные швы со сдвигом через ряд — иначе читается как сетка.
+    for row, y0 in enumerate((0, 4, 8, 12)):
+        offset = 0 if row % 2 == 0 else 4
+        for x in range(offset, 16, 8):
+            vline(im, x, y0, y0 + 2, FIRE_BRICK_DARK)
+    # Блик по верхней кромке каждого ряда (свет сверху).
+    for y0 in (0, 4, 8, 12):
+        hline(im, y0, 0, 15, FIRE_BRICK_HI)
+    return im
+
+
+def smokehouse_firebox(lit=False):
+    """Устье топки: заслонка в кирпичной рамке.
+
+    Холодная — чёрный провал с сажей; горячая — угли и пламя. Форма устья
+    одна и та же, поэтому состояние различается не только цветом (ART_BIBLE
+    §5: различимо не только цветом — светятся именно угли внутри рамки).
+    """
+    im = smokehouse_brick()
+    # Устье 8×6 по центру-низу.
+    x0, y0, x1, y1 = 4, 7, 11, 13
+    rect(im, x0, y0, x1, y1, SMOKE_SOOT)
+    # Рамка устья — кирпич темнее, обводка своим тоном (§3).
+    hline(im, y0 - 1, x0 - 1, x1 + 1, FIRE_BRICK_DARK)
+    hline(im, y1 + 1, x0 - 1, x1 + 1, FIRE_BRICK_DARK)
+    vline(im, x0 - 1, y0 - 1, y1 + 1, FIRE_BRICK_DARK)
+    vline(im, x1 + 1, y0 - 1, y1 + 1, FIRE_BRICK_DARK)
+    if lit:
+        # Поленья углями: два ряда жара, ярче снизу — там горит.
+        for x in range(x0 + 1, x1):
+            px(im, x, y1 - 1, EMBER_DARK)
+            px(im, x, y1, EMBER)
+        for x in range(x0 + 2, x1 - 1, 2):
+            px(im, x, y1 - 2, EMBER_HI)
+        # Язычки пламени вверх, силуэт важнее детали (§3).
+        px(im, x0 + 3, y0 + 1, EMBER)
+        px(im, x0 + 4, y0, EMBER_HI)
+        px(im, x1 - 2, y0 + 1, EMBER_DARK)
+    else:
+        # Холодная топка: остывшие дрова тёмным по тёмному, силуэт поленьев.
+        for x in range(x0 + 1, x1, 3):
+            px(im, x, y1 - 1, SMOKE_WOOD_DARKER)
+            px(im, x + 1, y1, SMOKE_WOOD_DARK)
+    return im
+
+
+>>>>>>> Stashed changes
 # ---------- Водозабор ----------
 
 def water_intake_side():
@@ -279,6 +435,98 @@ def hand_mill_top():
     # Отверстие в центре
     rect(im, 6, 6, 9, 9, PAL["chernozem_dark"])
     hline(im, 0, 0, 15, PAL["stone_hi"])
+    return im
+
+
+# ---------- Виноградный пресс (давильный чан) ----------
+#
+# Силуэт чана должен читаться иначе, чем станина маслопресса: у пресса
+# вертикальные стойки и железный обруч по горизонтали, у чана — клёпки
+# бочарной клепки и два широких обруча, то есть рисунок «бочка», а не
+# «рама». Тон древесины взят светлее маслопресса (свежая клепка), чтобы
+# два деревянных устройства не путались в инвентаре.
+#
+# Сок — виноград тёмный #4a2a52 из палитры региона (ART_BIBLE §2) плюс
+# два производных оттенка на блик и тень. Всего в текстуре 7–8 тонов,
+# потолок §2 не тронут.
+
+VAT_WOOD = (158, 124, 78, 255)
+VAT_WOOD_HI = (184, 150, 100, 255)
+VAT_WOOD_DARK = (120, 92, 58, 255)
+VAT_HOOP = (128, 126, 118, 255)
+VAT_HOOP_DARK = (94, 92, 86, 255)
+
+JUICE = PAL["grape_dark"]
+JUICE_HI = (96, 58, 106, 255)
+JUICE_DARK = (52, 28, 58, 255)
+
+
+def grape_press_side():
+    """Бок чана: бочарная клепка с двумя обручами.
+
+    Вертикальные швы между клёпками — главное отличие от маслопресса, у
+    которого бок читается горизонтальной доской с одной парой обручей.
+    """
+    im = img()
+    rect(im, 0, 0, 15, 15, VAT_WOOD)
+    # Клёпки: вертикальные полосы со светлой левой и тёмной правой кромкой
+    # (свет сверху-слева, ART_BIBLE §3).
+    for x in range(0, 16, 4):
+        vline(im, x, 0, 15, VAT_WOOD_HI)
+        vline(im, x + 3, 0, 15, VAT_WOOD_DARK)
+    # Два обруча: широкие, у верха и у низа — «бочка», а не «рама».
+    for y in (2, 12):
+        hline(im, y, 0, 15, VAT_HOOP)
+        hline(im, y + 1, 0, 15, VAT_HOOP_DARK)
+    return im
+
+
+def grape_press_top(level=0):
+    """Вид сверху: обод чана и зеркало сока.
+
+    Уровень 0 — сухое дно (видна клепка), 1..4 — сок поднимается. Именно
+    эта текстура делает наполнение видимым без GUI.
+    """
+    im = img()
+    # Обод по периметру
+    rect(im, 0, 0, 15, 15, VAT_WOOD)
+    for i in range(16):
+        px(im, i, 0, VAT_WOOD_HI)
+        px(im, 0, i, VAT_WOOD_HI)
+        px(im, i, 15, VAT_WOOD_DARK)
+        px(im, 15, i, VAT_WOOD_DARK)
+    hline(im, 1, 1, 14, VAT_HOOP)
+    vline(im, 1, 1, 14, VAT_HOOP)
+    hline(im, 14, 1, 14, VAT_HOOP_DARK)
+    vline(im, 14, 1, 14, VAT_HOOP_DARK)
+    # Дно: доски настила
+    rect(im, 2, 2, 13, 13, VAT_WOOD_DARK)
+    for y in range(3, 13, 3):
+        hline(im, y, 2, 13, VAT_WOOD)
+    if level <= 0:
+        return im
+    # Зеркало сока: площадь растёт с уровнем, поэтому «мало сока» и «полный
+    # чан» отличаются на глаз, а не только числом в подсказке.
+    inset = {1: 4, 2: 3, 3: 2, 4: 2}[level]
+    rect(im, inset, inset, 15 - inset, 15 - inset, JUICE)
+    # Блик сверху-слева и тень снизу-справа — по ART_BIBLE §3.
+    hline(im, inset, inset, 15 - inset, JUICE_HI)
+    vline(im, inset, inset, 15 - inset, JUICE_HI)
+    hline(im, 15 - inset, inset, 15 - inset, JUICE_DARK)
+    vline(im, 15 - inset, inset, 15 - inset, JUICE_DARK)
+    if level == 4:
+        # Полный чан: пена/ягодная кожица пятнами, осмысленное «зерно» §2.
+        for x, y in ((5, 6), (9, 5), (7, 9), (11, 10), (6, 11)):
+            px(im, x, y, JUICE_HI)
+    return im
+
+
+def grape_press_bottom():
+    """Дно чана: тёмная клепка без обручей."""
+    im = img()
+    rect(im, 0, 0, 15, 15, VAT_WOOD_DARK)
+    for x in range(0, 16, 4):
+        vline(im, x, 0, 15, VAT_WOOD)
     return im
 
 
@@ -449,6 +697,26 @@ def main():
     save(irrigation_channel_inner(), "irrigation_channel_inner")
     save(irrigation_channel_water(), "irrigation_channel_water")
 
+<<<<<<< Updated upstream
+=======
+    save(stone_irrigation_channel(), "stone_irrigation_channel")
+    save(stone_irrigation_channel_inner(), "stone_irrigation_channel_inner")
+    save(cutting_board_top(), "cutting_board_top")
+    save(cutting_board_side(), "cutting_board_side")
+
+    save(smokehouse_side(), "smokehouse_side")
+    save(smokehouse_top(), "smokehouse_top")
+    save(smokehouse_brick(), "smokehouse_brick")
+    save(smokehouse_firebox(lit=False), "smokehouse_firebox")
+    save(smokehouse_firebox(lit=True), "smokehouse_firebox_lit")
+
+    # Виноградный чан: бок, дно и пять состояний зеркала сока (0..4).
+    save(grape_press_side(), "grape_press_side")
+    save(grape_press_bottom(), "grape_press_bottom")
+    for lvl in range(5):
+        save(grape_press_top(lvl), f"grape_press_top{lvl}")
+
+>>>>>>> Stashed changes
     save(water_intake_side(), "water_intake_side")
     save(water_intake_top(), "water_intake_top")
     save(water_intake_top_active(), "water_intake_top_active")

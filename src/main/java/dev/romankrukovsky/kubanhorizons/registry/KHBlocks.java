@@ -118,11 +118,57 @@ public final class KHBlocks {
                             .sound(SoundType.WOOD)
                             .noOcclusion());
 
+<<<<<<< Updated upstream
+=======
+    /** Разделочный стол — нарезка продуктов ножом, без GUI. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.processing.CuttingBoardBlock> CUTTING_BOARD =
+            BLOCKS.registerBlock("cutting_board",
+                    dev.romankrukovsky.kubanhorizons.processing.CuttingBoardBlock::new,
+                    p -> p.mapColor(MapColor.WOOD)
+                            .strength(1.5F)
+                            .sound(SoundType.WOOD)
+                            .noOcclusion());
+
+    /**
+     * Коптильня — рыба и мясо в копчёности (GAME_DESIGN.md §7).
+     *
+     * <p>Светится, пока топится: {@code lightLevel} читает состояние
+     * {@code LIT}, поэтому работающая коптильня заметна в темноте, а
+     * остывшая — нет. Свет слабый (7), это топка, а не факел.</p>
+     */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.processing.SmokehouseBlock> SMOKEHOUSE =
+            BLOCKS.registerBlock("smokehouse",
+                    dev.romankrukovsky.kubanhorizons.processing.SmokehouseBlock::new,
+                    p -> p.mapColor(MapColor.WOOD)
+                            .strength(2.0F)
+                            .sound(SoundType.WOOD)
+                            .lightLevel(state -> state.getValue(
+                                    dev.romankrukovsky.kubanhorizons.processing.SmokehouseBlock.LIT) ? 7 : 0)
+                            .noOcclusion());
+
+>>>>>>> Stashed changes
     /** Маслопресс — первое перерабатывающее устройство мода. */
     public static final DeferredBlock<OilPressBlock> OIL_PRESS =
             BLOCKS.registerBlock("oil_press", OilPressBlock::new,
                     p -> p.mapColor(MapColor.WOOD)
                             .strength(2.5F)
+                            .sound(SoundType.WOOD)
+                            .noOcclusion());
+
+    /**
+     * Виноградный пресс — давильный чан (GAME_DESIGN.md §7).
+     *
+     * <p>Коллизия у чана обычная и намеренно <b>не</b> отключена: механика
+     * топтания опирается на то, что игрок стоит именно на этом блоке. С
+     * {@code noCollision()} игрок проваливался бы сквозь чан и «наступал» бы на
+     * блок под ним — давка не срабатывала бы никогда. Низкий силуэт задаётся
+     * формой блока, а не отсутствием коллизии.</p>
+     */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.processing.GrapePressBlock> GRAPE_PRESS =
+            BLOCKS.registerBlock("grape_press",
+                    dev.romankrukovsky.kubanhorizons.processing.GrapePressBlock::new,
+                    p -> p.mapColor(MapColor.WOOD)
+                            .strength(2.0F)
                             .sound(SoundType.WOOD)
                             .noOcclusion());
 
@@ -313,6 +359,70 @@ public final class KHBlocks {
                             net.minecraft.sounds.SoundEvents.FENCE_GATE_CLOSE),
                     solidOn(wattleProperties()));
 
+<<<<<<< Updated upstream
+=======
+    /**
+     * Укрытие для манула — дрова, сено и камень у сарая.
+     *
+     * <p>Смешанный материал, поэтому и звук смешанный: сено глушит шаги
+     * ({@link SoundType#GRASS}), а прочность взята по дровам, не по камню —
+     * укрытие должно разбираться топором за пару секунд, иначе игрок не
+     * станет переставлять его, подбирая место для манула.</p>
+     *
+     * <p>{@code noOcclusion} обязателен: у блока есть лаз, и без него
+     * освещение соседних блоков считалось бы как за глухим кубом.</p>
+     */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.block.ManulShelterBlock> MANUL_SHELTER =
+            BLOCKS.registerBlock("manul_shelter",
+                    dev.romankrukovsky.kubanhorizons.block.ManulShelterBlock::new,
+                    p -> p.mapColor(MapColor.WOOD)
+                            .strength(2.0F)
+                            .sound(SoundType.GRASS)
+                            .ignitedByLava()
+                            .noOcclusion());
+
+    // --- Почвенный ярус: чернозём (GAME_DESIGN.md §4, TECH_SPEC.md §3) ---
+
+    /**
+     * Чернозём — высший ярус почвы, находится в степи и переносится руками.
+     *
+     * <p>Свойства сняты с ванильной земли, кроме двух вещей. Во-первых,
+     * {@code strength(0.6F)} вместо 0.5: чернозём плотнее рыхлой земли, и
+     * лишняя десятая секунды на блок ощутимо превращает вывоз грядки 9×9 в
+     * работу, а не в мгновение — поиск должен иметь цену.</p>
+     *
+     * <p>Во-вторых, {@link SoundType#GRAVEL} вместо ванильного глухого звука
+     * земли: комковатая тучная почва звучит суше и «зернистее», и это
+     * единственный звуковой признак, по которому ярус слышен на слух.</p>
+     */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.soil.ChernozemBlock> CHERNOZEM =
+            BLOCKS.registerBlock("chernozem",
+                    dev.romankrukovsky.kubanhorizons.soil.ChernozemBlock::new,
+                    p -> p.mapColor(MapColor.TERRACOTTA_BROWN)
+                            .instrument(net.minecraft.world.level.block.state.properties.NoteBlockInstrument.BASEDRUM)
+                            .strength(0.6F)
+                            .sound(SoundType.GRAVEL));
+
+    /**
+     * Вспаханный чернозём — грядка высшего яруса.
+     *
+     * <p>Свойства ровно ванильной грядки ({@code Blocks.FARMLAND}):
+     * {@code randomTicks} обязателен — на них держится и подсыхание, и
+     * возврат в чернозём; {@code isViewBlocking}/{@code isSuffocating}
+     * повторяют ваниль, потому что грядка на пиксель ниже полного куба, и без
+     * этих флагов освещение и удушение считались бы неверно.</p>
+     */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.soil.ChernozemFarmlandBlock> CHERNOZEM_FARMLAND =
+            BLOCKS.registerBlock("chernozem_farmland",
+                    dev.romankrukovsky.kubanhorizons.soil.ChernozemFarmlandBlock::new,
+                    p -> p.mapColor(MapColor.DIRT)
+                            .randomTicks()
+                            .strength(0.6F)
+                            .sound(SoundType.GRAVEL)
+                            .isViewBlocking((state, level, pos) -> true)
+                            .isSuffocating((state, level, pos) -> true));
+
+>>>>>>> Stashed changes
     /** Свойства самана — по образцу ванильного грязевого кирпича. */
     private static java.util.function.UnaryOperator<BlockBehaviour.Properties> adobeProperties() {
         return p -> p.mapColor(MapColor.TERRACOTTA_YELLOW)

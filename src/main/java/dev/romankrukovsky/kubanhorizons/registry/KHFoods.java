@@ -92,6 +92,46 @@ public final class KHFoods {
             .saturationModifier(0.3F)
             .build();
 
+<<<<<<< Updated upstream
+=======
+    /** Сырое мясо фазана. */
+    public static final FoodProperties RAW_PHEASANT = new FoodProperties.Builder()
+            .nutrition(3).saturationModifier(0.3F).build();
+    /** Запечённое мясо фазана. */
+    public static final FoodProperties COOKED_PHEASANT = new FoodProperties.Builder()
+            .nutrition(7).saturationModifier(0.75F).build();
+    /** Сырое мясо перепела. */
+    public static final FoodProperties RAW_QUAIL = new FoodProperties.Builder()
+            .nutrition(2).saturationModifier(0.25F).build();
+    /** Запечённое мясо перепела. */
+    public static final FoodProperties COOKED_QUAIL = new FoodProperties.Builder()
+            .nutrition(5).saturationModifier(0.65F).build();
+    /** Сырая кабанина: жёсткое дикое мясо. */
+    public static final FoodProperties RAW_BOAR = new FoodProperties.Builder()
+            .nutrition(3).saturationModifier(0.3F).build();
+    /** Жареная кабанина: сытная дичь, награда за защиту поля. */
+    public static final FoodProperties COOKED_BOAR = new FoodProperties.Builder()
+            .nutrition(8).saturationModifier(0.8F).build();
+    /** Сырой осётр: крупная рыба. */
+    public static final FoodProperties RAW_STURGEON = new FoodProperties.Builder()
+            .nutrition(3).saturationModifier(0.3F).build();
+    /**
+     * Копчёная рыба: сытнее запечённой и не портится по смыслу.
+     *
+     * <p>Выше жарки намеренно: копчение требует дров и вчетверо больше времени,
+     * и без прибавки коптильня была бы медленной печью.</p>
+     */
+    public static final FoodProperties SMOKED_FISH = new FoodProperties.Builder()
+            .nutrition(9).saturationModifier(1.0F).build();
+    /** Копчёное мясо: то же для дичи. */
+    public static final FoodProperties SMOKED_MEAT = new FoodProperties.Builder()
+            .nutrition(9).saturationModifier(1.0F).build();
+
+    /** Запечённый осётр: лучшая рыба региона. */
+    public static final FoodProperties COOKED_STURGEON = new FoodProperties.Builder()
+            .nutrition(8).saturationModifier(0.85F).build();
+
+>>>>>>> Stashed changes
     // --- Кухня ---
 
     /** Домашний хлеб: сытнее ванильного. */
@@ -133,6 +173,42 @@ public final class KHFoods {
             .hasConsumeParticles(false)
             .onConsume(new ApplyStatusEffectsConsumeEffect(
                     new MobEffectInstance(MobEffects.SPEED, 1200, 0)))
+            .build();
+
+    /**
+     * Виноградный сок: полуфабрикат-напиток, не «супереда».
+     *
+     * <p>Питание 3 при насыщении 0.3 — ровно как у самой грозди
+     * ({@link #GRAPES}): давка не должна быть способом получить из еды больше
+     * калорий, чем в ней было, иначе чан стал бы генератором питания, а не
+     * переработкой. Ценность сока не в питании, а в том, что он не портит
+     * баланс, пьётся мгновенно-длительным действием и служит основой кухни
+     * (GAME_DESIGN.md §11: полуфабрикаты слабы).</p>
+     *
+     * <p>{@code alwaysEdible()} — потому что это питьё: жажду утоляют и на
+     * полный желудок, как ванильное молоко или зелье.</p>
+     */
+    public static final FoodProperties GRAPE_JUICE = new FoodProperties.Builder()
+            .nutrition(3)
+            .saturationModifier(0.3F)
+            .alwaysEdible()
+            .build();
+
+    /**
+     * Сок пьётся, а не съедается.
+     *
+     * <p>Эффект намеренно скромный и <b>не</b> алкогольный: короткое
+     * восстановление энергии (спешка I на 20 секунд) — «освежился в поле».
+     * Никакого опьянения и никаких штрафов: сок безалкогольный по спецификации
+     * (GAME_DESIGN.md §7), и ветка брожения к нему не относится.</p>
+     */
+    public static final Consumable GRAPE_JUICE_CONSUMABLE = Consumable.builder()
+            .consumeSeconds(1.6F)
+            .animation(ItemUseAnimation.DRINK)
+            .sound(SoundEvents.GENERIC_DRINK)
+            .hasConsumeParticles(false)
+            .onConsume(new ApplyStatusEffectsConsumeEffect(
+                    new MobEffectInstance(MobEffects.HASTE, 400, 0)))
             .build();
 
     /** Мёд с орехами: десерт с поглощением. */

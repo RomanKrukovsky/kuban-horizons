@@ -1,0 +1,333 @@
+{
+  "format_version": "1.8.0",
+  "animations": {
+    "animation.manul.idle": {
+      "loop": true,
+      "animation_length": 3,
+      "bones": {
+        "body": {
+          "position": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            "1.5": [
+              0,
+              0.25,
+              0
+            ],
+            "3.0": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "tail_2": {
+          "rotation": {
+            "0.0": [
+              0,
+              -4,
+              0
+            ],
+            "1.5": [
+              0,
+              4,
+              0
+            ],
+            "3.0": [
+              0,
+              -4,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.manul.walk": {
+      "loop": true,
+      "animation_length": 1,
+      "bones": {
+        "front_left_leg": {
+          "rotation": {
+            "0.0": [
+              20,
+              0,
+              0
+            ],
+            ".5": [
+              -20,
+              0,
+              0
+            ],
+            "1.0": [
+              20,
+              0,
+              0
+            ]
+          }
+        },
+        "front_right_leg": {
+          "rotation": {
+            "0.0": [
+              -20,
+              0,
+              0
+            ],
+            ".5": [
+              20,
+              0,
+              0
+            ],
+            "1.0": [
+              -20,
+              0,
+              0
+            ]
+          }
+        },
+        "rear_left_leg": {
+          "rotation": {
+            "0.0": [
+              -16,
+              0,
+              0
+            ],
+            ".5": [
+              16,
+              0,
+              0
+            ],
+            "1.0": [
+              -16,
+              0,
+              0
+            ]
+          }
+        },
+        "rear_right_leg": {
+          "rotation": {
+            "0.0": [
+              16,
+              0,
+              0
+            ],
+            ".5": [
+              -16,
+              0,
+              0
+            ],
+            "1.0": [
+              16,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    "animation.manul.sit": {
+      "loop": true,
+      "animation_length": 3,
+      "bones": {
+        "body": {
+          "position": [
+            0,
+            -1.8,
+            1.5
+          ],
+          "rotation": [
+            6,
+            0,
+            0
+          ]
+        },
+        "rear_left_leg": {
+          "rotation": [
+            28,
+            0,
+            0
+          ]
+        },
+        "rear_right_leg": {
+          "rotation": [
+            28,
+            0,
+            0
+          ]
+        },
+        "tail_1": {
+          "rotation": [
+            0,
+            20,
+            0
+          ]
+        }
+      }
+    },
+    "animation.manul.sleep": {
+      "loop": true,
+      "animation_length": 4,
+      "bones": {
+        "body": {
+          "position": [
+            0,
+            -3.2,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            4
+          ]
+        },
+        "head": {
+          "position": [
+            0,
+            -2.0,
+            -1.0
+          ],
+          "rotation": [
+            12,
+            18,
+            5
+          ]
+        },
+        "tail_1": {
+          "rotation": [
+            0,
+            36,
+            12
+          ]
+        }
+      }
+    },
+    "animation.manul.hiss": {
+      "loop": true,
+      "animation_length": 0.65,
+      "bones": {
+        "jaw": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            ".2": [
+              -38,
+              0,
+              0
+            ],
+            ".5": [
+              -34,
+              0,
+              0
+            ],
+            ".65": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "head": {
+          "position": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            ".2": [
+              0,
+              0.5,
+              -1
+            ],
+            ".65": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "left_ear": {
+          "rotation": [
+            0,
+            0,
+            -22
+          ]
+        },
+        "right_ear": {
+          "rotation": [
+            0,
+            0,
+            22
+          ]
+        }
+      }
+    },
+    "animation.manul.attack": {
+      "loop": false,
+      "animation_length": 0.65,
+      "bones": {
+        "jaw": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            ".22": [
+              -38,
+              0,
+              0
+            ],
+            ".65": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "front_right_leg": {
+          "rotation": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            ".22": [
+              -62,
+              0,
+              0
+            ],
+            ".65": [
+              0,
+              0,
+              0
+            ]
+          }
+        },
+        "head": {
+          "position": {
+            "0.0": [
+              0,
+              0,
+              0
+            ],
+            ".22": [
+              0,
+              1.2,
+              -2
+            ],
+            ".65": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    }
+  }
+}

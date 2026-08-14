@@ -202,6 +202,48 @@ public final class KHItems {
     public static final DeferredItem<BlockItem> HAND_MILL =
             ITEMS.registerSimpleBlockItem("hand_mill", KHBlocks.HAND_MILL);
 
+<<<<<<< Updated upstream
+=======
+    public static final DeferredItem<BlockItem> CUTTING_BOARD =
+            ITEMS.registerSimpleBlockItem("cutting_board", KHBlocks.CUTTING_BOARD);
+
+    /** Коптильня (предмет). */
+    public static final DeferredItem<BlockItem> SMOKEHOUSE =
+            ITEMS.registerSimpleBlockItem("smokehouse", KHBlocks.SMOKEHOUSE);
+
+    /** Виноградный пресс — давильный чан (предмет). */
+    public static final DeferredItem<BlockItem> GRAPE_PRESS =
+            ITEMS.registerSimpleBlockItem("grape_press", KHBlocks.GRAPE_PRESS);
+
+    /** Укрытие для манула (предмет). */
+    public static final DeferredItem<BlockItem> MANUL_SHELTER =
+            ITEMS.registerSimpleBlockItem("manul_shelter", KHBlocks.MANUL_SHELTER);
+
+    /**
+     * Чернозём (предмет).
+     *
+     * <p>Есть только предмет нетронутого чернозёма; у вспаханной грядки
+     * своего предмета нет намеренно — она и в ванили не носится, а
+     * выпадает исходной почвой. Пахать нужно на месте.</p>
+     */
+    public static final DeferredItem<BlockItem> CHERNOZEM =
+            ITEMS.registerSimpleBlockItem("chernozem", KHBlocks.CHERNOZEM);
+
+    /**
+     * Ведро с осетром: ванильный способ переноса рыбы.
+     *
+     * <p>Без него осётр не ловится ведром, и игрок, привыкший к ванильной рыбе,
+     * получает пустое ведро — молчаливый сбой вместо ожидаемого действия.</p>
+     */
+    public static final DeferredItem<net.minecraft.world.item.MobBucketItem> STURGEON_BUCKET =
+            ITEMS.registerItem("sturgeon_bucket",
+                    p -> new net.minecraft.world.item.MobBucketItem(
+                            KHEntities.STURGEON.get(),
+                            net.minecraft.world.level.material.Fluids.WATER,
+                            net.minecraft.sounds.SoundEvents.BUCKET_EMPTY_FISH, p),
+                    p -> p.stacksTo(1));
+
+>>>>>>> Stashed changes
     // --- Строительные материалы (предметы) ---
 
     /** Саманный кирпич (предмет). */
@@ -314,6 +356,20 @@ public final class KHItems {
                             .food(KHFoods.TEA_DRINK, KHFoods.TEA_DRINK_CONSUMABLE)
                             .usingConvertsTo(Items.GLASS_BOTTLE));
 
+    /**
+     * Бутылка виноградного сока — продукт давильного чана.
+     *
+     * <p>Тара возвращается ({@code usingConvertsTo}), как у чая: стекло в моде
+     * не расходуемо, иначе цепочка сока требовала бы бесконечного песка.
+     * Стек 16 — как у прочих напитков: сок это жидкость в таре, а не
+     * сухой припас.</p>
+     */
+    public static final DeferredItem<Item> GRAPE_JUICE =
+            ITEMS.registerSimpleItem("grape_juice",
+                    p -> p.stacksTo(16)
+                            .food(KHFoods.GRAPE_JUICE, KHFoods.GRAPE_JUICE_CONSUMABLE)
+                            .usingConvertsTo(Items.GLASS_BOTTLE));
+
     /** Мёд с орехами. */
     public static final DeferredItem<Item> HONEY_WALNUTS =
             ITEMS.registerSimpleItem("honey_walnuts",
@@ -339,6 +395,114 @@ public final class KHItems {
             ITEMS.registerSimpleItem("dried_fruit",
                     p -> p.food(KHFoods.DRIED_FRUIT));
 
+<<<<<<< Updated upstream
+=======
+    // --- Региональная фауна ---
+
+    public static final DeferredItem<SpawnEggItem> PHEASANT_SPAWN_EGG =
+            ITEMS.registerItem("pheasant_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.PHEASANT.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> QUAIL_SPAWN_EGG =
+            ITEMS.registerItem("quail_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.QUAIL.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<Item> RAW_PHEASANT =
+            ITEMS.registerSimpleItem("raw_pheasant", p -> p.food(KHFoods.RAW_PHEASANT));
+    public static final DeferredItem<Item> COOKED_PHEASANT =
+            ITEMS.registerSimpleItem("cooked_pheasant", p -> p.food(KHFoods.COOKED_PHEASANT));
+    public static final DeferredItem<Item> RAW_QUAIL =
+            ITEMS.registerSimpleItem("raw_quail", p -> p.food(KHFoods.RAW_QUAIL));
+    public static final DeferredItem<Item> COOKED_QUAIL =
+            ITEMS.registerSimpleItem("cooked_quail", p -> p.food(KHFoods.COOKED_QUAIL));
+
+    public static final DeferredItem<SpawnEggItem> WILD_BOAR_SPAWN_EGG =
+            ITEMS.registerItem("wild_boar_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.WILD_BOAR.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> NUTRIA_SPAWN_EGG =
+            ITEMS.registerItem("nutria_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.NUTRIA.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> CAUCASIAN_SHEPHERD_SPAWN_EGG =
+            ITEMS.registerItem("caucasian_shepherd_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.CAUCASIAN_SHEPHERD.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> LOCUST_SPAWN_EGG =
+            ITEMS.registerItem("locust_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.LOCUST.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> MANUL_SPAWN_EGG =
+            ITEMS.registerItem("manul_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.MANUL.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> STURGEON_SPAWN_EGG =
+            ITEMS.registerItem("sturgeon_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.STURGEON.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> GULL_SPAWN_EGG =
+            ITEMS.registerItem("gull_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.GULL.get(), new net.minecraft.nbt.CompoundTag())));
+    public static final DeferredItem<SpawnEggItem> HERON_SPAWN_EGG =
+            ITEMS.registerItem("heron_spawn_egg", SpawnEggItem::new,
+                    p -> p.component(DataComponents.ENTITY_DATA,
+                            TypedEntityData.of(KHEntities.HERON.get(), new net.minecraft.nbt.CompoundTag())));
+
+    /** Сырая кабанина — трофей защищённого поля. */
+    public static final DeferredItem<Item> RAW_BOAR =
+            ITEMS.registerSimpleItem("raw_boar", p -> p.food(KHFoods.RAW_BOAR));
+    public static final DeferredItem<Item> COOKED_BOAR =
+            ITEMS.registerSimpleItem("cooked_boar", p -> p.food(KHFoods.COOKED_BOAR));
+    public static final DeferredItem<Item> RAW_STURGEON =
+            ITEMS.registerSimpleItem("raw_sturgeon", p -> p.food(KHFoods.RAW_STURGEON));
+    public static final DeferredItem<Item> COOKED_STURGEON =
+            ITEMS.registerSimpleItem("cooked_sturgeon", p -> p.food(KHFoods.COOKED_STURGEON));
+
+    /** Копчёная рыба — продукт коптильни. */
+    public static final DeferredItem<Item> SMOKED_FISH =
+            ITEMS.registerSimpleItem("smoked_fish", p -> p.food(KHFoods.SMOKED_FISH));
+    /** Копчёное мясо — продукт коптильни. */
+    public static final DeferredItem<Item> SMOKED_MEAT =
+            ITEMS.registerSimpleItem("smoked_meat", p -> p.food(KHFoods.SMOKED_MEAT));
+
+    /** Шкура нутрии: ремесленное сырьё, а не еда. */
+    public static final DeferredItem<Item> NUTRIA_PELT =
+            ITEMS.registerSimpleItem("nutria_pelt");
+
+    /** Деревянная ложка — иронический предмет подмены при атаке мечом. */
+    public static final DeferredItem<Item> WOODEN_SPOON =
+            ITEMS.registerSimpleItem("wooden_spoon");
+
+    /** Застывший звуковой вал — материализованная звуковая волна Вардена. */
+    public static final DeferredItem<Item> SONIC_BOOM_ITEM =
+            ITEMS.registerSimpleItem("sonic_boom_item");
+
+    /** Магическое зеркало — смартфон Джиннии. */
+    public static final DeferredItem<Item> MAGIC_MIRROR =
+            ITEMS.registerItem("magic_mirror",
+                    dev.romankrukovsky.kubanhorizons.genie.item.MagicMirrorItem::new,
+                    p -> p.stacksTo(1));
+
+    /** Сжатый карманный мир — 100x100 область мира на ладони. */
+    public static final DeferredItem<Item> MINIATURE_WORLD =
+            ITEMS.registerItem("miniature_world",
+                    dev.romankrukovsky.kubanhorizons.genie.item.MiniatureWorldItem::new,
+                    p -> p.stacksTo(1));
+
+    /** Лампа единственной NPC-джиннии: привязка, призыв и вход во дворец. */
+    public static final DeferredItem<Item> GENIE_LAMP =
+            ITEMS.registerItem("genie_lamp",
+                    dev.romankrukovsky.kubanhorizons.genie.vessel.GenieLampItem::new,
+                    p -> p.stacksTo(1));
+
+    /** Лампа превращённого игрока-Джиннии (сосуд существования). */
+    public static final DeferredItem<Item> PLAYER_GENIE_LAMP =
+            ITEMS.registerItem("player_genie_lamp",
+                    p -> new dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieLampItem(p),
+                    p -> p.stacksTo(1));
+
+>>>>>>> Stashed changes
     private KHItems() {
     }
 

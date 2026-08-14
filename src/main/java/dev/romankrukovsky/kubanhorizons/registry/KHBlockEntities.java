@@ -29,6 +29,24 @@ public final class KHBlockEntities {
                     () -> new BlockEntityType<>(dev.romankrukovsky.kubanhorizons.blockentity.DryingRackBlockEntity::new,
                             KHBlocks.DRYING_RACK.get()));
 
+<<<<<<< Updated upstream
+=======
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<dev.romankrukovsky.kubanhorizons.blockentity.CuttingBoardBlockEntity>> CUTTING_BOARD =
+            BLOCK_ENTITIES.register("cutting_board",
+                    () -> new BlockEntityType<>(dev.romankrukovsky.kubanhorizons.blockentity.CuttingBoardBlockEntity::new,
+                            KHBlocks.CUTTING_BOARD.get()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<dev.romankrukovsky.kubanhorizons.blockentity.SmokehouseBlockEntity>> SMOKEHOUSE =
+            BLOCK_ENTITIES.register("smokehouse",
+                    () -> new BlockEntityType<>(dev.romankrukovsky.kubanhorizons.blockentity.SmokehouseBlockEntity::new,
+                            KHBlocks.SMOKEHOUSE.get()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<dev.romankrukovsky.kubanhorizons.blockentity.GrapePressBlockEntity>> GRAPE_PRESS =
+            BLOCK_ENTITIES.register("grape_press",
+                    () -> new BlockEntityType<>(dev.romankrukovsky.kubanhorizons.blockentity.GrapePressBlockEntity::new,
+                            KHBlocks.GRAPE_PRESS.get()));
+
+>>>>>>> Stashed changes
     private KHBlockEntities() {
     }
 

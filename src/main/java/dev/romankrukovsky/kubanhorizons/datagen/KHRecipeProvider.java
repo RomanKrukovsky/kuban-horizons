@@ -82,6 +82,31 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_copper", this.has(Items.COPPER_INGOT))
                 .save(this.output);
 
+<<<<<<< Updated upstream
+=======
+        // Магическое зеркало — двухточечный инструмент безопасных снимков области.
+        this.shaped(RecipeCategory.TOOLS, KHItems.MAGIC_MIRROR.get())
+                .pattern("AGA")
+                .pattern("GPG")
+                .pattern("AGA")
+                .define('A', Items.AMETHYST_SHARD)
+                .define('G', Items.GOLD_INGOT)
+                .define('P', Items.ENDER_PEARL)
+                .unlockedBy("has_amethyst", this.has(Items.AMETHYST_SHARD))
+                .save(this.output);
+
+        // Пустая лампа получает связь только при взаимодействии со своей джиннией.
+        this.shaped(RecipeCategory.TOOLS, KHItems.GENIE_LAMP.get())
+                .pattern(" G ")
+                .pattern("GAG")
+                .pattern(" E ")
+                .define('G', Items.GOLD_INGOT)
+                .define('A', Items.AMETHYST_SHARD)
+                .define('E', Items.ENDER_PEARL)
+                .unlockedBy("has_amethyst", this.has(Items.AMETHYST_SHARD))
+                .save(this.output);
+
+>>>>>>> Stashed changes
         // Початок → зёрна (2 шт.).
         this.shapeless(RecipeCategory.MISC, KHItems.CORN_KERNELS.get(), 2)
                 .requires(KHItems.CORN_COB.get())
@@ -155,6 +180,20 @@ public final class KHRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_stone", this.has(Items.STONE))
                 .save(this.output);
 
+        // Виноградный чан: бочарная клепка — доски по кругу, дно из бревна.
+        // Рисунок «кольцо досок вокруг пустоты» читается как открытая ёмкость,
+        // а не как станина маслопресса (у того винт сверху и сплошной корпус).
+        // Цена ниже маслопресса намеренно: чан не имеет привода, он работает
+        // ногами игрока, и требовать за него железо было бы нечестно.
+        this.shaped(RecipeCategory.DECORATIONS, KHItems.GRAPE_PRESS.get())
+                .pattern("P P")
+                .pattern("P P")
+                .pattern("PLP")
+                .define('P', net.minecraft.tags.ItemTags.PLANKS)
+                .define('L', net.minecraft.tags.ItemTags.LOGS)
+                .unlockedBy("has_grapes", this.has(KHItems.GRAPES.get()))
+                .save(this.output);
+
         // Рецепты помола.
         milling("flour_from_wheat", Items.WHEAT, KHItems.FLOUR.get(), 3);
         milling("cornmeal_from_corn", KHItems.CORN_KERNELS.get(), KHItems.CORNMEAL.get(), 3);
@@ -167,6 +206,30 @@ public final class KHRecipeProvider extends RecipeProvider {
         drying("dried_fruit_from_plum", KHItems.PLUM.get(), KHItems.DRIED_FRUIT.get(), 2400);
         drying("dried_fruit_from_grapes", KHItems.GRAPES.get(), KHItems.DRIED_FRUIT.get(), 2400);
 
+<<<<<<< Updated upstream
+=======
+        // Рецепты копчения. Рыба коптится быстрее мяса — тонкая тушка
+        // прокапчивается насквозь раньше, чем кабаний окорок.
+        smoking("smoked_fish_from_sturgeon",
+                KHItems.RAW_STURGEON.get(), KHItems.SMOKED_FISH.get(), 1200);
+        smoking("smoked_meat_from_boar",
+                KHItems.RAW_BOAR.get(), KHItems.SMOKED_MEAT.get(), 2400);
+        smoking("smoked_meat_from_pheasant",
+                KHItems.RAW_PHEASANT.get(), KHItems.SMOKED_MEAT.get(), 1800);
+        smoking("smoked_meat_from_quail",
+                KHItems.RAW_QUAIL.get(), KHItems.SMOKED_MEAT.get(), 1800);
+
+        // Рецепты давки сока. Без этого рецепта виноградный чан был бы мёртвым
+        // блоком — ровно та ошибка, что случилась с разделочным столом: он
+        // был полностью зарегистрирован и на любой предмет отвечал отказом,
+        // потому что рецептов его типа не существовало.
+        //
+        // Две грозди на бутылку: сок ценнее ягоды по применению (питьё,
+        // основа кухни), но не должен быть выгоднее её по калориям, иначе
+        // давка стала бы источником питания из ничего.
+        pressing("grape_juice", KHItems.GRAPES.get(), 1, KHItems.GRAPE_JUICE.get(), 2);
+
+>>>>>>> Stashed changes
         // --- Кухня ---
 
         // Домашний хлеб: 3 муки (в печи).
@@ -392,6 +455,51 @@ public final class KHRecipeProvider extends RecipeProvider {
                 null);
     }
 
+<<<<<<< Updated upstream
+=======
+    /**
+     * Рецепт копчения в коптильне.
+     *
+     * <p>Времена заметно больше, чем у печи (200 тиков): копчение — не способ
+     * пожарить побыстрее, а отдельная, более дорогая ветка, за которую игрок
+     * получает продукт с бо́льшим насыщением. Плюс расход дров в самой
+     * коптильне, которого печь для этого продукта не требует.</p>
+     */
+    private void smoking(String name, net.minecraft.world.level.ItemLike input,
+            net.minecraft.world.level.ItemLike result, int ticks) {
+        this.output.accept(
+                ResourceKey.create(Registries.RECIPE, KHIds.of("smoking_process/" + name)),
+                new dev.romankrukovsky.kubanhorizons.processing.SmokingProcessRecipe(
+                        new Recipe.CommonInfo(true), "",
+                        Ingredient.of(input),
+                        new ItemStackTemplate(result.asItem()),
+                        ticks),
+                null);
+    }
+
+    /**
+     * Рецепт давки сока в виноградном чане.
+     *
+     * <p>Параметров два, и оба про накопление, а не про партию:
+     * {@code juicePerItem} — сколько сока даёт одна ягодная единица,
+     * {@code juicePerBottle} — сколько сока стоит бутылка. Длительности здесь
+     * нет намеренно: чан не ведёт цикл, он суммирует раздавленное, и «время
+     * работы» у него равно времени, которое игрок готов топтать.</p>
+     */
+    private void pressing(String name, net.minecraft.world.level.ItemLike input,
+            int juicePerItem, net.minecraft.world.level.ItemLike result, int juicePerBottle) {
+        this.output.accept(
+                ResourceKey.create(Registries.RECIPE, KHIds.of("pressing/" + name)),
+                new dev.romankrukovsky.kubanhorizons.processing.PressingRecipe(
+                        new Recipe.CommonInfo(true), "",
+                        Ingredient.of(input),
+                        juicePerItem,
+                        new ItemStackTemplate(result.asItem()),
+                        juicePerBottle),
+                null);
+    }
+
+>>>>>>> Stashed changes
     /** Жарка семечек одним из трёх способов приготовления. */
     private <T extends AbstractCookingRecipe> void cooking(
             AbstractCookingRecipe.Factory<T> factory, int cookingTime, String suffix) {

@@ -50,6 +50,9 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.WALNUT_SAPLING.get());
                         output.accept(KHItems.WALNUT.get());
                         output.accept(KHItems.SOIL_PROBE.get());
+                        // Чернозём рядом со щупом: щуп показывает плодородие,
+                        // чернозём — то, чем его поднимают. Один сюжет.
+                        output.accept(KHItems.CHERNOZEM.get());
                         output.accept(KHItems.OIL_PRESS.get());
                         output.accept(KHItems.IRRIGATION_CHANNEL.get());
                         output.accept(KHItems.WATER_INTAKE.get());
@@ -57,14 +60,49 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.DRIED_TEA.get());
                         output.accept(KHItems.DRIED_FRUIT.get());
                         output.accept(KHItems.HAND_MILL.get());
+<<<<<<< Updated upstream
+=======
+                        output.accept(KHItems.CUTTING_BOARD.get());
+                        output.accept(KHItems.SMOKEHOUSE.get());
+                        output.accept(KHItems.GRAPE_PRESS.get());
+                        output.accept(KHItems.MANUL_SHELTER.get());
+>>>>>>> Stashed changes
                         output.accept(KHItems.FLOUR.get());
                         output.accept(KHItems.CORNMEAL.get());
                         output.accept(KHItems.HOMEMADE_BREAD.get());
                         output.accept(KHItems.BORSCHT.get());
                         output.accept(KHItems.MAMALYGA.get());
                         output.accept(KHItems.TEA_CUP.get());
+                        output.accept(KHItems.GRAPE_JUICE.get());
                         output.accept(KHItems.HONEY_WALNUTS.get());
                         output.accept(KHItems.VEGETABLE_SPREAD.get());
+<<<<<<< Updated upstream
+=======
+                        output.accept(KHItems.PHEASANT_SPAWN_EGG.get());
+                        output.accept(KHItems.QUAIL_SPAWN_EGG.get());
+                        output.accept(KHItems.WILD_BOAR_SPAWN_EGG.get());
+                        output.accept(KHItems.NUTRIA_SPAWN_EGG.get());
+                        output.accept(KHItems.LOCUST_SPAWN_EGG.get());
+                        output.accept(KHItems.CAUCASIAN_SHEPHERD_SPAWN_EGG.get());
+                        output.accept(KHItems.MANUL_SPAWN_EGG.get());
+                        output.accept(KHItems.STURGEON_SPAWN_EGG.get());
+                        output.accept(KHItems.GULL_SPAWN_EGG.get());
+                        output.accept(KHItems.HERON_SPAWN_EGG.get());
+                        output.accept(KHItems.RAW_PHEASANT.get());
+                        output.accept(KHItems.COOKED_PHEASANT.get());
+                        output.accept(KHItems.RAW_QUAIL.get());
+                        output.accept(KHItems.COOKED_QUAIL.get());
+                        output.accept(KHItems.RAW_BOAR.get());
+                        output.accept(KHItems.COOKED_BOAR.get());
+                        output.accept(KHItems.RAW_STURGEON.get());
+                        output.accept(KHItems.COOKED_STURGEON.get());
+                        output.accept(KHItems.STURGEON_BUCKET.get());
+                        // Копчёности идут после жареного: это следующая
+                        // ступень переработки того же сырья.
+                        output.accept(KHItems.SMOKED_FISH.get());
+                        output.accept(KHItems.SMOKED_MEAT.get());
+                        output.accept(KHItems.NUTRIA_PELT.get());
+>>>>>>> Stashed changes
                         output.accept(KHItems.ADOBE_BRICKS.get());
                         output.accept(KHItems.ADOBE_BRICK_STAIRS.get());
                         output.accept(KHItems.ADOBE_BRICK_SLAB.get());
@@ -83,6 +121,15 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.CARVED_WINDOW_CASING.get());
                         output.accept(KHItems.WATTLE.get());
                         output.accept(KHItems.WATTLE_GATE.get());
+<<<<<<< Updated upstream
+=======
+                        output.accept(KHItems.WOODEN_SPOON.get());
+                        output.accept(KHItems.SONIC_BOOM_ITEM.get());
+                        output.accept(KHItems.MAGIC_MIRROR.get());
+                        output.accept(KHItems.MINIATURE_WORLD.get());
+                        output.accept(KHItems.GENIE_LAMP.get());
+                        output.accept(KHItems.PLAYER_GENIE_LAMP.get());
+>>>>>>> Stashed changes
                     })
                     .build());
 

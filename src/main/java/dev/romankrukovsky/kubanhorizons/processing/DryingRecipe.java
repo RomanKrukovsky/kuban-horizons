@@ -44,13 +44,23 @@ public record DryingRecipe(
             com.mojang.serialization.Codec.intRange(1, 72000).optionalFieldOf("dry_ticks", 1200).forGetter(DryingRecipe::dryTicks)
     ).apply(i, DryingRecipe::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, DryingRecipe> STREAM_CODEC = StreamCodec.composite(
-            Recipe.CommonInfo.STREAM_CODEC, DryingRecipe::commonInfo,
-            ByteBufCodecs.STRING_UTF8, DryingRecipe::group,
-            Ingredient.CONTENTS_STREAM_CODEC, DryingRecipe::input,
-            ItemStackTemplate.STREAM_CODEC, DryingRecipe::result,
-            ByteBufCodecs.VAR_INT, DryingRecipe::dryTicks,
-            DryingRecipe::new);
+    public static final StreamCodec<RegistryFriendlyByteBuf, DryingRecipe> STREAM_CODEC =
+            StreamCodec.of(
+                    (buffer, recipe) -> {
+                        Recipe.CommonInfo.STREAM_CODEC.encode(buffer, recipe.commonInfo());
+                        buffer.writeUtf(recipe.group());
+                        Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.input());
+                        ItemStackTemplate.STREAM_CODEC.encode(buffer, recipe.result());
+                        buffer.writeVarInt(recipe.dryTicks());
+                    },
+                    buffer -> new DryingRecipe(
+                            Recipe.CommonInfo.STREAM_CODEC.decode(buffer),
+                            buffer.readUtf(),
+                            Ingredient.CONTENTS_STREAM_CODEC.decode(buffer),
+                            ItemStackTemplate.STREAM_CODEC.decode(buffer),
+                            buffer.readVarInt()
+                    )
+            );
 
     @Override
     public boolean matches(SingleRecipeInput input, Level level) {

@@ -3,6 +3,9 @@
     "kubanhorizons:kuban_steppe",
     "kubanhorizons:plavni",
     "kubanhorizons:liman",
-    "kubanhorizons:river_floodplain"
+    "kubanhorizons:river_floodplain",
+    "kubanhorizons:foothill_forest",
+    "kubanhorizons:mountain_forest",
+    "kubanhorizons:black_sea_coast"
   ]
 }

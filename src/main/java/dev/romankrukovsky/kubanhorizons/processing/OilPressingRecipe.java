@@ -54,15 +54,27 @@ public record OilPressingRecipe(
             com.mojang.serialization.Codec.intRange(1, 72000).optionalFieldOf("work_ticks", 300).forGetter(OilPressingRecipe::workTicks)
     ).apply(i, OilPressingRecipe::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, OilPressingRecipe> STREAM_CODEC = StreamCodec.composite(
-            Recipe.CommonInfo.STREAM_CODEC, OilPressingRecipe::commonInfo,
-            ByteBufCodecs.STRING_UTF8, OilPressingRecipe::group,
-            Ingredient.CONTENTS_STREAM_CODEC, OilPressingRecipe::input,
-            ByteBufCodecs.VAR_INT, OilPressingRecipe::inputCount,
-            ItemStackTemplate.STREAM_CODEC, OilPressingRecipe::result,
-            ItemStackTemplate.STREAM_CODEC, OilPressingRecipe::byproduct,
-            ByteBufCodecs.VAR_INT, OilPressingRecipe::workTicks,
-            OilPressingRecipe::new);
+    public static final StreamCodec<RegistryFriendlyByteBuf, OilPressingRecipe> STREAM_CODEC =
+            StreamCodec.of(
+                    (buffer, recipe) -> {
+                        Recipe.CommonInfo.STREAM_CODEC.encode(buffer, recipe.commonInfo());
+                        buffer.writeUtf(recipe.group());
+                        Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.input());
+                        buffer.writeVarInt(recipe.inputCount());
+                        ItemStackTemplate.STREAM_CODEC.encode(buffer, recipe.result());
+                        ItemStackTemplate.STREAM_CODEC.encode(buffer, recipe.byproduct());
+                        buffer.writeVarInt(recipe.workTicks());
+                    },
+                    buffer -> new OilPressingRecipe(
+                            Recipe.CommonInfo.STREAM_CODEC.decode(buffer),
+                            buffer.readUtf(),
+                            Ingredient.CONTENTS_STREAM_CODEC.decode(buffer),
+                            buffer.readVarInt(),
+                            ItemStackTemplate.STREAM_CODEC.decode(buffer),
+                            ItemStackTemplate.STREAM_CODEC.decode(buffer),
+                            buffer.readVarInt()
+                    )
+            );
 
     @Override
     public boolean matches(OilPressInput input, Level level) {

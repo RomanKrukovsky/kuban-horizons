@@ -1,0 +1,16 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "minecraft:beach",
+    "minecraft:stony_shore",
+    "kubanhorizons:azov_coast",
+    "kubanhorizons:black_sea_coast",
+    "kubanhorizons:liman"
+  ],
+  "spawners": {
+    "type": "kubanhorizons:gull",
+    "maxCount": 4,
+    "minCount": 2,
+    "weight": 10
+  }
+}

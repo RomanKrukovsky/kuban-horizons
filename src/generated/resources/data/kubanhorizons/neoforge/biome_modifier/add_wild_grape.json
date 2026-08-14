@@ -4,6 +4,7 @@
     "minecraft:savanna",
     "minecraft:savanna_plateau",
     "minecraft:wooded_badlands",
+    "kubanhorizons:vineyard_hills",
     "kubanhorizons:kuban_steppe"
   ],
   "features": "kubanhorizons:wild_grape",

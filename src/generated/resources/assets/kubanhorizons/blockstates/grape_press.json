@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "level=0": {
+      "model": "kubanhorizons:block/grape_press"
+    },
+    "level=1": {
+      "model": "kubanhorizons:block/grape_press_level1"
+    },
+    "level=2": {
+      "model": "kubanhorizons:block/grape_press_level2"
+    },
+    "level=3": {
+      "model": "kubanhorizons:block/grape_press_level3"
+    },
+    "level=4": {
+      "model": "kubanhorizons:block/grape_press_level4"
+    }
+  }
+}

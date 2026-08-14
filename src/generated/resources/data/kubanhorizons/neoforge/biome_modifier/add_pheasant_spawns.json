@@ -1,0 +1,14 @@
+{
+  "type": "neoforge:add_spawns",
+  "biomes": [
+    "kubanhorizons:kuban_steppe",
+    "kubanhorizons:foothill_forest",
+    "kubanhorizons:river_floodplain"
+  ],
+  "spawners": {
+    "type": "kubanhorizons:pheasant",
+    "maxCount": 3,
+    "minCount": 1,
+    "weight": 8
+  }
+}

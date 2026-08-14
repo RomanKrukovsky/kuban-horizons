@@ -1,0 +1,8 @@
+{
+  "type": "kubanhorizons:smoking_process",
+  "ingredient": "kubanhorizons:raw_pheasant",
+  "result": {
+    "id": "kubanhorizons:smoked_meat"
+  },
+  "smoke_ticks": 1800
+}

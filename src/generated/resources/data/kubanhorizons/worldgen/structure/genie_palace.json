@@ -1,0 +1,6 @@
+{
+  "type": "kubanhorizons:genie_palace",
+  "biomes": "kubanhorizons:kuban_steppe",
+  "spawn_overrides": {},
+  "step": "surface_structures"
+}

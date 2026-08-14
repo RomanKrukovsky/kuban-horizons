@@ -1,0 +1,7 @@
+{
+  "type": "kubanhorizons:pressing",
+  "ingredient": "kubanhorizons:grapes",
+  "result": {
+    "id": "kubanhorizons:grape_juice"
+  }
+}
