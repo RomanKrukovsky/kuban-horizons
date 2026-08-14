@@ -44,13 +44,23 @@ public record MillingRecipe(
             com.mojang.serialization.Codec.intRange(1, 64).optionalFieldOf("turns", 3).forGetter(MillingRecipe::turns)
     ).apply(i, MillingRecipe::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, MillingRecipe> STREAM_CODEC = StreamCodec.composite(
-            Recipe.CommonInfo.STREAM_CODEC, MillingRecipe::commonInfo,
-            ByteBufCodecs.STRING_UTF8, MillingRecipe::group,
-            Ingredient.CONTENTS_STREAM_CODEC, MillingRecipe::input,
-            ItemStackTemplate.STREAM_CODEC, MillingRecipe::result,
-            ByteBufCodecs.VAR_INT, MillingRecipe::turns,
-            MillingRecipe::new);
+    public static final StreamCodec<RegistryFriendlyByteBuf, MillingRecipe> STREAM_CODEC =
+            StreamCodec.of(
+                    (buffer, recipe) -> {
+                        Recipe.CommonInfo.STREAM_CODEC.encode(buffer, recipe.commonInfo());
+                        buffer.writeUtf(recipe.group());
+                        Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, recipe.input());
+                        ItemStackTemplate.STREAM_CODEC.encode(buffer, recipe.result());
+                        buffer.writeVarInt(recipe.turns());
+                    },
+                    buffer -> new MillingRecipe(
+                            Recipe.CommonInfo.STREAM_CODEC.decode(buffer),
+                            buffer.readUtf(),
+                            Ingredient.CONTENTS_STREAM_CODEC.decode(buffer),
+                            ItemStackTemplate.STREAM_CODEC.decode(buffer),
+                            buffer.readVarInt()
+                    )
+            );
 
     @Override
     public boolean matches(SingleRecipeInput input, Level level) {

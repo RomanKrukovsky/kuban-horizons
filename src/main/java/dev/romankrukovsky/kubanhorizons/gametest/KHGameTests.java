@@ -88,6 +88,9 @@ public final class KHGameTests {
     private static final Map<String, Integer> TEST_MAX_TICKS = new LinkedHashMap<>();
 
     static {
+        // Тест единственной джиннии должен идти отдельно от других тестов,
+        // создающих ту же глобально привязанную сущность.
+        register("genie_aura_of_laws", KHGameTests::testGenieAuraOfLaws, 100);
         register("sunflower_plant", KHGameTests::testSunflowerPlant, 200);
         register("sunflower_full_growth", KHGameTests::testSunflowerFullGrowth, 600);
         register("sunflower_bonemeal", KHGameTests::testSunflowerBonemeal, 200);
@@ -138,6 +141,15 @@ public final class KHGameTests {
         register("ground_bird_hunts_locust", KHGameTests::testGroundBirdHuntsLocust, 900);
         register("worldgen_feature_order", KHGameTests::testWorldgenFeatureOrder, 100);
         register("river_floodplain_biome", KHGameTests::testRiverFloodplainBiome, 100);
+        // Маршрутизация биомов: биом, который источник никогда не вернёт,
+        // недостижим в игре, сколько бы его ни регистрировали.
+        register("biome_routing_covers_climate_regions",
+                KHGameTests::testBiomeRoutingCoversClimateRegions, 100);
+        register("biome_source_declares_everything_it_returns",
+                KHGameTests::testBiomeSourceDeclaresEverythingItReturns, 100);
+        register("world_actually_has_multiple_biomes",
+                KHGameTests::testWorldActuallyHasMultipleBiomes, 200);
+        register("new_biomes_are_distinct", KHGameTests::testNewBiomesAreDistinct, 100);
         register("structure_registry_integrity", KHGameTests::testStructureRegistryIntegrity, 100);
         register("structure_templates_load", KHGameTests::testStructureTemplatesLoad, 100);
         register("advancement_tree_complete", KHGameTests::testAdvancementTree, 100);
@@ -157,6 +169,12 @@ public final class KHGameTests {
         register("genie_personality_changes", KHGameTests::testGeniePersonalityChanges, 100);
         register("genie_brain_prioritizes_danger", KHGameTests::testGenieBrainPrioritizesDanger, 100);
         register("genie_brain_remembers_actions", KHGameTests::testGenieBrainRemembersActions, 100);
+        register("genie_dialog_server_actions", KHGameTests::testGenieDialogServerActions, 100);
+        register("genie_lamp_binds_and_summons", KHGameTests::testGenieLampBindsAndSummons, 100);
+        register("genie_conditional_rules_persist", KHGameTests::testConditionalRulesPersist, 100);
+        register("genie_conditional_wish_runtime", KHGameTests::testConditionalWishRuntime, 100);
+        register("genie_living_painting_enters_other_level",
+                KHGameTests::testGenieLivingPaintingEntersOtherLevel, 100);
         register("genie_predictive_planning", KHGameTests::testGeniePredictivePlanning, 100);
         register("genie_defense_irony", KHGameTests::testGenieDefenseIrony, 100);
         register("genie_survives_hit_in_place", KHGameTests::testGenieSurvivesHitInPlace, 100);
@@ -182,7 +200,10 @@ public final class KHGameTests {
         register("genie_runtime_miniaturize_confirmation", KHGameTests::testRuntimeMiniaturizeConfirmation, 100);
         register("genie_snapshot_management", KHGameTests::testSnapshotManagement, 100);
         register("genie_runtime_pocket_scene", KHGameTests::testRuntimePocketScene, 100);
+        register("genie_dialog_pocket_scene_cycle", KHGameTests::testDialogPocketSceneCycle, 100);
         register("genie_runtime_structure_move", KHGameTests::testRuntimeStructureMove, 100);
+        register("genie_runtime_structure_rotate", KHGameTests::testRuntimeStructureRotate, 100);
+        register("genie_runtime_structure_moves_entities", KHGameTests::testRuntimeStructureMovesEntities, 100);
         register("genie_runtime_magic_drawing", KHGameTests::testRuntimeMagicDrawing, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
@@ -235,6 +256,9 @@ public final class KHGameTests {
         register("grape_press_no_dupe", KHGameTests::testGrapePressNoDupe, 100);
         register("grape_press_stomping_works", KHGameTests::testGrapePressStomping, 100);
         register("grape_press_persistence", KHGameTests::testGrapePressPersistence, 100);
+        // Глобальная policy не должна выполняться параллельно с тестом диалога,
+        // который намеренно включает и отменяет то же правило.
+        register("genie_instant_smelt_policy", KHGameTests::testGenieInstantSmeltPolicy, 100);
     }
 
     private KHGameTests() {
@@ -245,7 +269,6 @@ public final class KHGameTests {
         TEST_MAX_TICKS.put(name, maxTicks);
     }
 
-    /** Физический урон не является состоянием поражения для Wishborne-сущности. */
     /**
      * Окно затягивания сокращается с искажением, монотонно и в объявленных границах.
      *
@@ -405,6 +428,129 @@ public final class KHGameTests {
         helper.assertTrue(brain.decide(peaceful)
                         == dev.romankrukovsky.kubanhorizons.genie.GenieDecision.OBSERVE,
                 "Без прогнозируемой угрозы джинния не должна тратить магию");
+        helper.succeed();
+    }
+
+    /** Лампа сохраняет владельца, не передаёт связь вору и возвращает джиннию. */
+    private static void testGenieLampBindsAndSummons(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
+        var owner = helper.makeMockServerPlayerInLevel();
+        var stranger = helper.makeMockServerPlayerInLevel();
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(1, 2, 1));
+        ItemStack lamp = new ItemStack(KHItems.GENIE_LAMP.get());
+        owner.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, lamp);
+
+        genie.mobInteract(owner, net.minecraft.world.InteractionHand.MAIN_HAND);
+        var binding = dev.romankrukovsky.kubanhorizons.genie.vessel.GenieLampItem.binding(lamp);
+        helper.assertTrue(binding != null
+                        && binding.genieId().equals(genie.getUUID())
+                        && binding.ownerId().equals(owner.getUUID()),
+                "Лампа не сохранила UUID джиннии и настоящего владельца");
+        helper.assertTrue(!dev.romankrukovsky.kubanhorizons.genie.vessel.GenieLampItem
+                        .bind(lamp, stranger, genie),
+                "Чужой игрок смог перепривязать украденную лампу");
+
+        genie.snapTo(owner.getX() + 20.0D, owner.getY(), owner.getZ(), 0.0F, 0.0F);
+        // Сам объект передаётся явно: GameTest запускает тесты параллельно в одном
+        // мире, поэтому его общий якорь намеренно не используется в этой проверке.
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.vessel.GenieLampItem
+                        .summonResolved(owner, binding, genie)
+                        && genie.distanceToSqr(owner) < 16.0D,
+                "Привязанная лампа не вернула джиннию к владельцу");
+        helper.assertTrue(!dev.romankrukovsky.kubanhorizons.genie.vessel.GenieLampItem
+                        .summonResolved(stranger, binding, genie),
+                "Вор смог призвать джиннию чужой лампой");
+        owner.discard();
+        stranger.discard();
+        helper.succeed();
+    }
+
+    /** Условное желание сохраняется, не дублируется и удаляется владельцем. */
+    private static void testConditionalRulesPersist(GameTestHelper helper) {
+        UUID ownerId = UUID.randomUUID();
+        var condition = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                .Condition.RAINING;
+        var action = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                .Action.GROW_STEPPE;
+        var first = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                .addRule(helper.getLevel(), ownerId, condition, action);
+        var second = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                .addRule(helper.getLevel(), ownerId, condition, action);
+        var rules = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                .rules(helper.getLevel(), ownerId);
+        helper.assertTrue(first.ruleId().equals(second.ruleId()) && rules.size() == 1,
+                "Повторная формулировка создала дубликат условного правила");
+        helper.assertTrue(rules.getFirst().enabled()
+                        && rules.getFirst().condition().equals("RAINING")
+                        && rules.getFirst().action().equals("GROW_STEPPE"),
+                "Сохранённое правило потеряло условие, действие или флаг включения");
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                        .removeRule(helper.getLevel(), ownerId, condition, action)
+                        && dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                        .rules(helper.getLevel(), ownerId).isEmpty(),
+                "Владелец не смог удалить условное правило");
+        helper.succeed();
+    }
+
+    /** Conditional wish runtime: preview → confirm → execute → undo with digest and before-image. */
+    private static void testConditionalWishRuntime(GameTestHelper helper) {
+        UUID ownerId = UUID.randomUUID();
+        UUID actorId = UUID.randomUUID();
+        var condition = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine.Condition.DAY;
+        var action = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine.Action.GROW_CROPS;
+
+        // Preview
+        var preview = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                .previewRule(actorId, ownerId, condition, action);
+        helper.assertTrue(preview != null && preview.digest() != null, "Preview must produce digest");
+
+        // Confirm
+        var confirmed = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                .confirmRule(actorId, preview);
+        helper.assertTrue(confirmed != null, "Confirmation must succeed");
+
+        // Execute
+        boolean executed = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                .executeConfirmed(helper.getLevel(), actorId, confirmed);
+        helper.assertTrue(executed, "Execution must succeed on first run");
+
+        // Verify rule exists
+        var rules = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                .rules(helper.getLevel(), ownerId);
+        helper.assertTrue(rules.stream().anyMatch(r -> r.condition().equals("DAY") && r.action().equals("GROW_CROPS")),
+                "Rule must be persisted after executeConfirmed");
+
+        // Undo
+        boolean undone = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine
+                .undoRule(helper.getLevel(), ownerId, condition, action);
+        helper.assertTrue(undone, "Undo must succeed");
+
+        helper.succeed();
+    }
+
+    /** Живая картина обязана перенести игрока в другой ServerLevel, а не показать реплику. */
+    private static void testGenieLivingPaintingEntersOtherLevel(GameTestHelper helper) {
+        ServerLevel original = helper.getLevel();
+        var player = helper.makeMockServerPlayerInLevel();
+        var origin = helper.absoluteVec(new net.minecraft.world.phys.Vec3(1.5D, 2.0D, 1.5D));
+        player.setPos(origin);
+
+        boolean entered = dev.romankrukovsky.kubanhorizons.genie.dimension.LivingPaintingEngine
+                .enterDimension(original, player.blockPosition(), player,
+                        net.minecraft.world.level.Level.NETHER,
+                        new net.minecraft.world.phys.Vec3(0.5D, 80.0D, 0.5D));
+
+        helper.assertTrue(entered, "Переход через живую картину был отклонён");
+        helper.assertTrue(player.level() != original,
+                "Живая картина оставила игрока в исходном ServerLevel");
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.dimension.LivingPaintingEngine
+                        .leave(player),
+                "Обратный переход из живой картины был отклонён");
+        helper.assertTrue(player.level() == original,
+                "Живая картина не вернула игрока в исходный ServerLevel");
+        helper.assertTrue(player.position().distanceToSqr(origin) < 0.0001D,
+                "Живая картина не вернула игрока в точные исходные координаты");
+        player.discard();
         helper.succeed();
     }
 
@@ -586,6 +732,115 @@ public final class KHGameTests {
         } catch (IOException | RuntimeException exception) {
             helper.fail("Clock policy failed: " + exception.getMessage());
         }
+    }
+
+    /** Мгновенная переплавка реально работает и полностью отключается через policy undo. */
+    private static void testGenieInstantSmeltPolicy(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) runtime.recover();
+        BlockPos furnacePos = helper.absolutePos(new BlockPos(2, 2, 2));
+        helper.getLevel().setBlock(furnacePos, Blocks.FURNACE.defaultBlockState(), 3);
+        var furnace = (net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity)
+                helper.getLevel().getBlockEntity(furnacePos);
+        helper.assertTrue(furnace != null, "Печь должна создать block entity");
+
+        final dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionReport report;
+        try {
+            var preview = runtime.previewInstantSmelt(player.getUUID(), true);
+            helper.assertTrue(!runtime.isInstantSmeltEnabled(),
+                    "Preview не должен включать мгновенную переплавку");
+            report = runtime.executePolicy(player.getUUID(),
+                    runtime.confirmPolicy(player.getUUID(), preview));
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED,
+                    "Instant-smelt policy не была применена");
+
+            furnace.setItem(0, new ItemStack(Items.RAW_IRON));
+            furnace.setItem(1, new ItemStack(Items.COAL));
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Instant-smelt policy failed: " + exception.getMessage());
+            return;
+        }
+
+        helper.startSequence()
+                // Новая block entity попадает в список тикеров не в тот же
+                // момент, когда ставится блок. Ждём реального результата, а
+                // не угадываем, понадобится регистрации один тик или два.
+                .thenWaitUntil(() -> helper.assertTrue(furnace.getItem(2).is(Items.IRON_INGOT),
+                        "Включённое правило не переплавило железо мгновенно"))
+                .thenExecute(() -> {
+                    try {
+                        runtime.undoPolicy(player.getUUID(), report.transactionId());
+                    } catch (IOException exception) {
+                        throw new IllegalStateException(exception);
+                    }
+                    furnace.setItem(0, new ItemStack(Items.RAW_IRON));
+                    furnace.setItem(1, new ItemStack(Items.COAL));
+                    furnace.setItem(2, ItemStack.EMPTY);
+                })
+                .thenExecuteAfter(2, () -> helper.assertTrue(
+                        furnace.getItem(2).isEmpty() && furnace.getItem(0).is(Items.RAW_IRON),
+                        "После undo печь должна снова работать с обычной скоростью"))
+                .thenExecute(player::discard)
+                .thenSucceed();
+    }
+
+    /** Экран не может командовать чужой джиннией и меняет режим только связанной сущности. */
+    private static void testGenieDialogServerActions(GameTestHelper helper) {
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
+        var owner = helper.makeMockServerPlayerInLevel();
+        BlockPos ownerPos = helper.absolutePos(new BlockPos(4, 2, 4));
+        owner.snapTo(ownerPos.getX() + 0.5D, ownerPos.getY(), ownerPos.getZ() + 0.5D,
+                0.0F, 0.0F);
+        var genie = KHEntities.KUBAN_GENIE.get().create(helper.getLevel(),
+                net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        helper.assertTrue(genie != null, "Джинния должна создаваться");
+        genie.snapTo(owner.getX() + 1.0D, owner.getY(), owner.getZ() + 1.0D, 0.0F, 0.0F);
+        helper.assertTrue(helper.getLevel().addFreshEntity(genie),
+                "Джинния должна добавляться в тестовый мир");
+        genie.mobInteract(owner, net.minecraft.world.InteractionHand.MAIN_HAND);
+
+        boolean changed = dev.romankrukovsky.kubanhorizons.genie.GenieConversationService
+                .changeMode(owner, genie.getId(),
+                        dev.romankrukovsky.kubanhorizons.genie.GenieBehaviorMode.GUARD);
+        helper.assertTrue(changed && genie.brain().mode()
+                        == dev.romankrukovsky.kubanhorizons.genie.GenieBehaviorMode.GUARD,
+                "Команда владельца не включила режим охраны");
+
+        var stranger = helper.makeMockServerPlayerInLevel();
+        stranger.snapTo(ownerPos.getX() + 2.5D, ownerPos.getY(), ownerPos.getZ() + 0.5D,
+                0.0F, 0.0F);
+        boolean stolen = dev.romankrukovsky.kubanhorizons.genie.GenieConversationService
+                .changeMode(stranger, genie.getId(),
+                        dev.romankrukovsky.kubanhorizons.genie.GenieBehaviorMode.STAY);
+        helper.assertTrue(!stolen && genie.brain().mode()
+                        == dev.romankrukovsky.kubanhorizons.genie.GenieBehaviorMode.GUARD,
+                "Чужой игрок смог изменить приказ джиннии");
+
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) {
+            runtime.recover();
+        }
+        var preview = dev.romankrukovsky.kubanhorizons.genie.GenieConversationService.submitWish(
+                owner, genie.getId(), "Хочу, чтобы железо плавилось мгновенно");
+        helper.assertTrue(preview.confirmationRequired() && !runtime.isInstantSmeltEnabled(),
+                "Диалог должен сначала показать правило, не применяя его");
+        var applied = dev.romankrukovsky.kubanhorizons.genie.GenieConversationService
+                .confirmPolicy(owner, genie.getId());
+        helper.assertTrue(!applied.confirmationRequired() && runtime.isInstantSmeltEnabled(),
+                "Подтверждение из диалога не включило правило");
+        var undone = dev.romankrukovsky.kubanhorizons.genie.GenieConversationService
+                .undoLastPolicy(owner, genie.getId());
+        helper.assertTrue(!undone.confirmationRequired() && !runtime.isInstantSmeltEnabled(),
+                "Диалог не отменил последнее глобальное правило");
+        owner.discard();
+        stranger.discard();
+        genie.discard();
+        dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
+        helper.succeed();
     }
 
     /** Движок гигантизма создаёт сущности гигантских масштабов. */
@@ -1965,9 +2220,273 @@ public final class KHGameTests {
         helper.succeed();
     }
 
-    /** Пресет содержит три измерения, а Overworld публикует только четыре кубанских биома. */
-    private static void testKubanSteppeWorldPreset(GameTestHelper helper) {
+    // --- Маршрутизация биомов ---
+
+    /**
+     * Все биомы, которые генератор мода может вернуть игроку.
+     *
+     * <p>Один список на все проверки маршрутизации, тегов и крепостей: две
+     * копии разошлись бы при первом же добавлении биома, и половина
+     * проверок молча перестала бы охватывать новый биом.</p>
+     */
+    private static final List<ResourceKey<net.minecraft.world.level.biome.Biome>> ALL_KUBAN_BIOMES = List.of(
+            KHBiomes.KUBAN_STEPPE, KHBiomes.PLAVNI, KHBiomes.LIMAN, KHBiomes.RIVER_FLOODPLAIN,
+            KHBiomes.FOOTHILL_FOREST, KHBiomes.MOUNTAIN_FOREST, KHBiomes.AZOV_COAST,
+            KHBiomes.BLACK_SEA_COAST, KHBiomes.VINEYARD_HILLS, KHBiomes.TEA_SLOPES);
+
+    /**
+     * Какой кубанский биом обязан прийти на замену каждому климатическому
+     * региону ванили.
+     *
+     * <p>Это карта географии края, записанная проверяемо: море → берег →
+     * равнина → предгорья → горы. Перечислены ИМЕННО те ванильные биомы,
+     * которые несут смысловую подмену; регионы, законно уходящие в степь
+     * (равнина, пустыня, badlands, снежная равнина), проверяются отдельно
+     * ниже — вместе с тем, что они уходят туда осознанно.</p>
+     */
+    private static final Map<ResourceKey<net.minecraft.world.level.biome.Biome>,
+            ResourceKey<net.minecraft.world.level.biome.Biome>> BIOME_ROUTING = Map.ofEntries(
+            // Влажные низины — свои с самого начала.
+            Map.entry(net.minecraft.world.level.biome.Biomes.SWAMP, KHBiomes.PLAVNI),
+            Map.entry(net.minecraft.world.level.biome.Biomes.MANGROVE_SWAMP, KHBiomes.LIMAN),
+            Map.entry(net.minecraft.world.level.biome.Biomes.RIVER, KHBiomes.RIVER_FLOODPLAIN),
+            Map.entry(net.minecraft.world.level.biome.Biomes.FROZEN_RIVER, KHBiomes.RIVER_FLOODPLAIN),
+            // Лесной пояс предгорий.
+            Map.entry(net.minecraft.world.level.biome.Biomes.FOREST, KHBiomes.FOOTHILL_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.BIRCH_FOREST, KHBiomes.FOOTHILL_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.OLD_GROWTH_BIRCH_FOREST, KHBiomes.FOOTHILL_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.FLOWER_FOREST, KHBiomes.FOOTHILL_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.DARK_FOREST, KHBiomes.FOOTHILL_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.PALE_GARDEN, KHBiomes.FOOTHILL_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.WINDSWEPT_FOREST, KHBiomes.FOOTHILL_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.TAIGA, KHBiomes.FOOTHILL_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.SNOWY_TAIGA, KHBiomes.FOOTHILL_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.OLD_GROWTH_PINE_TAIGA, KHBiomes.FOOTHILL_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.OLD_GROWTH_SPRUCE_TAIGA, KHBiomes.FOOTHILL_FOREST),
+            // Горный пояс.
+            Map.entry(net.minecraft.world.level.biome.Biomes.WINDSWEPT_HILLS, KHBiomes.MOUNTAIN_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.WINDSWEPT_GRAVELLY_HILLS, KHBiomes.MOUNTAIN_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.MEADOW, KHBiomes.MOUNTAIN_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.CHERRY_GROVE, KHBiomes.MOUNTAIN_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.GROVE, KHBiomes.MOUNTAIN_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.SNOWY_SLOPES, KHBiomes.MOUNTAIN_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.STONY_PEAKS, KHBiomes.MOUNTAIN_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.JAGGED_PEAKS, KHBiomes.MOUNTAIN_FOREST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.FROZEN_PEAKS, KHBiomes.MOUNTAIN_FOREST),
+            // Берега двух морей.
+            Map.entry(net.minecraft.world.level.biome.Biomes.BEACH, KHBiomes.AZOV_COAST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.SNOWY_BEACH, KHBiomes.AZOV_COAST),
+            Map.entry(net.minecraft.world.level.biome.Biomes.STONY_SHORE, KHBiomes.BLACK_SEA_COAST),
+            // Виноградный пояс.
+            Map.entry(net.minecraft.world.level.biome.Biomes.SAVANNA, KHBiomes.VINEYARD_HILLS),
+            Map.entry(net.minecraft.world.level.biome.Biomes.SAVANNA_PLATEAU, KHBiomes.VINEYARD_HILLS),
+            Map.entry(net.minecraft.world.level.biome.Biomes.WINDSWEPT_SAVANNA, KHBiomes.VINEYARD_HILLS),
+            // Чайный пояс.
+            Map.entry(net.minecraft.world.level.biome.Biomes.JUNGLE, KHBiomes.TEA_SLOPES),
+            Map.entry(net.minecraft.world.level.biome.Biomes.SPARSE_JUNGLE, KHBiomes.TEA_SLOPES),
+            Map.entry(net.minecraft.world.level.biome.Biomes.BAMBOO_JUNGLE, KHBiomes.TEA_SLOPES),
+            // Сухая открытая равнина — законно степь.
+            Map.entry(net.minecraft.world.level.biome.Biomes.PLAINS, KHBiomes.KUBAN_STEPPE),
+            Map.entry(net.minecraft.world.level.biome.Biomes.SUNFLOWER_PLAINS, KHBiomes.KUBAN_STEPPE),
+            Map.entry(net.minecraft.world.level.biome.Biomes.DESERT, KHBiomes.KUBAN_STEPPE),
+            Map.entry(net.minecraft.world.level.biome.Biomes.BADLANDS, KHBiomes.KUBAN_STEPPE),
+            Map.entry(net.minecraft.world.level.biome.Biomes.WOODED_BADLANDS, KHBiomes.KUBAN_STEPPE),
+            Map.entry(net.minecraft.world.level.biome.Biomes.ERODED_BADLANDS, KHBiomes.KUBAN_STEPPE),
+            Map.entry(net.minecraft.world.level.biome.Biomes.SNOWY_PLAINS, KHBiomes.KUBAN_STEPPE),
+            Map.entry(net.minecraft.world.level.biome.Biomes.ICE_SPIKES, KHBiomes.KUBAN_STEPPE));
+
+    /** Достаёт источник биомов пресета мода. */
+    private static KubanBiomeSource kubanSource(GameTestHelper helper) {
+        var source = helper.getLevel().registryAccess()
+                .lookupOrThrow(Registries.WORLD_PRESET)
+                .getOrThrow(KHWorldPresets.KUBAN_HORIZONS).value()
+                .overworld().orElseThrow().generator().getBiomeSource();
+        if (!(source instanceof KubanBiomeSource kuban)) {
+            throw new AssertionError("Overworld пресета больше не использует KubanBiomeSource: "
+                    + source.getClass().getName());
+        }
+        return kuban;
+    }
+
+    /**
+     * Каждый климатический регион ванили приводит к своему кубанскому биому.
+     *
+     * <p>Проверяется ПУТЬ, а не наличие. Биом можно зарегистрировать,
+     * перевести, снабдить цветами и тегами — и не встретить в игре ни разу,
+     * если источник его не возвращает. В этом моде так уже было со всем
+     * подряд: с устройством без рецепта, с саженцами в замкнутом круге, с
+     * восемью существами без спавна. Зарегистрированный биом, который
+     * генератор никогда не отдаёт, — та же болезнь, и здесь она
+     * закрывается прогоном самой маршрутизации.</p>
+     *
+     * <p>Тест гоняет {@link KubanBiomeSource#remap} по всем ванильным
+     * биомам Верхнего мира: и по тем, что обязаны стать новыми поясами, и
+     * по тем, что законно уходят в степь. Если чью-то ветку убрать, регион
+     * провалится в степь — и тест назовёт и регион, и то, что пришло
+     * вместо ожидаемого.</p>
+     */
+    private static void testBiomeRoutingCoversClimateRegions(GameTestHelper helper) {
+        var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
+        KubanBiomeSource source = kubanSource(helper);
+
+        BIOME_ROUTING.forEach((vanilla, expected) -> {
+            Holder<net.minecraft.world.level.biome.Biome> actual =
+                    source.remap(biomes.getOrThrow(vanilla));
+            helper.assertTrue(actual.is(expected),
+                    "Климатический регион " + vanilla.identifier() + " должен становиться "
+                            + expected.identifier() + ", а стал "
+                            + actual.unwrapKey().map(key -> key.identifier().toString())
+                                    .orElse("<неизвестным биомом>"));
+        });
+
+        // Обратная сторона: каждый новый пояс обязан быть КОНЕЧНОЙ точкой
+        // хотя бы одного региона. Биом, в который не ведёт ни один
+        // климатический регион, недостижим — сколько бы правил его ни
+        // упоминало.
+        for (ResourceKey<net.minecraft.world.level.biome.Biome> kuban : ALL_KUBAN_BIOMES) {
+            boolean reachable = BIOME_ROUTING.values().stream().anyMatch(target -> target == kuban);
+            helper.assertTrue(reachable, "Биом " + kuban.identifier()
+                    + " не является результатом ни одного климатического региона — "
+                    + "он зарегистрирован, но недостижим в мире");
+        }
+        helper.succeed();
+    }
+
+    /**
+     * Источник объявляет всё, что может вернуть.
+     *
+     * <p>Биом, который {@code remap} отдаёт, но которого нет в
+     * {@code collectPossibleBiomes()}, — реальный баг: ванильные системы
+     * (сортировка features, поиск структур, спавн) читают именно
+     * объявленный список, и биом-безбилетник ломает их молча.</p>
+     *
+     * <p>Проверка идёт перебором ВСЕХ ванильных биомов Верхнего мира,
+     * включая океаны и пещеры, а не только тех, что перечислены в карте
+     * маршрутизации: так тест поймает и биом, добавленный в {@code remap}
+     * без объявления.</p>
+     */
+    private static void testBiomeSourceDeclaresEverythingItReturns(GameTestHelper helper) {
+        var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
+        KubanBiomeSource source = kubanSource(helper);
+        Set<ResourceKey<net.minecraft.world.level.biome.Biome>> declared =
+                source.possibleBiomes().stream()
+                        .map(holder -> holder.unwrapKey().orElseThrow())
+                        .collect(java.util.stream.Collectors.toSet());
+
+        int checked = 0;
+        for (var entry : biomes.listElements().toList()) {
+            ResourceKey<net.minecraft.world.level.biome.Biome> key = entry.unwrapKey().orElseThrow();
+            // Только ванильные биомы Верхнего мира: Нижний мир и Край идут
+            // через свои источники и через remap не проходят.
+            if (!key.identifier().getNamespace().equals("minecraft")
+                    || !biomes.getOrThrow(net.minecraft.tags.BiomeTags.IS_OVERWORLD)
+                            .contains(biomes.getOrThrow(key))) {
+                continue;
+            }
+            checked++;
+            ResourceKey<net.minecraft.world.level.biome.Biome> result =
+                    source.remap(entry).unwrapKey().orElseThrow();
+            helper.assertTrue(declared.contains(result),
+                    "remap(" + key.identifier() + ") вернул " + result.identifier()
+                            + ", которого нет в collectPossibleBiomes()");
+        }
+        helper.assertTrue(checked > 40,
+                "Проверено слишком мало ванильных биомов Верхнего мира (" + checked
+                        + ") — тест перестал что-либо охватывать");
+        helper.succeed();
+    }
+
+    /**
+     * В настоящем мире действительно встречается несколько биомов.
+     *
+     * <p>Две проверки выше гоняют маршрутизацию напрямую. Эта — сам мир:
+     * настоящий {@link net.minecraft.world.level.levelgen.RandomState} по
+     * шумовым настройкам мода, настоящий климатический сэмплер и обход
+     * большой площади с шагом в четверть чанка, как это делает генерация
+     * биомов.</p>
+     *
+     * <p>Смысл именно в этом: до появления второго пояса такой обход
+     * вернул бы почти одну степь, потому что весь рельеф — лес, гора,
+     * пляж — подписывался ею. Порог в четыре биома и требование, чтобы ни
+     * один биом не занимал больше девяти десятых площади, ловят возврат к
+     * «мир из одного биома», даже если маршрутизация формально на месте.</p>
+     */
+    private static void testWorldActuallyHasMultipleBiomes(GameTestHelper helper) {
         var registries = helper.getLevel().registryAccess();
+        KubanBiomeSource source = kubanSource(helper);
+        var randomState = net.minecraft.world.level.levelgen.RandomState.create(
+                registries.lookupOrThrow(Registries.NOISE_SETTINGS)
+                        .getOrThrow(KHNoiseSettings.OVERWORLD).value(),
+                registries.lookupOrThrow(Registries.NOISE),
+                helper.getLevel().getSeed());
+        var sampler = randomState.sampler();
+
+        Map<String, Integer> seen = new LinkedHashMap<>();
+        int samples = 0;
+        // Шаг 4 — это ровно решётка биомов (четверть чанка), в которой
+        // работает fillBiomesFromNoise. Диапазон широкий, чтобы попасть в
+        // разные климатические зоны, а не в один биом у нуля координат.
+        for (int x = -2048; x <= 2048; x += 64) {
+            for (int z = -2048; z <= 2048; z += 64) {
+                var biome = source.getNoiseBiome(x >> 2, 16, z >> 2, sampler);
+                String name = biome.unwrapKey().orElseThrow().identifier().toString();
+                seen.merge(name, 1, Integer::sum);
+                samples++;
+            }
+        }
+
+        helper.assertTrue(seen.size() >= 4,
+                "Мир состоит из слишком малого числа биомов: " + seen);
+        int max = seen.values().stream().mapToInt(Integer::intValue).max().orElse(0);
+        helper.assertTrue(max < samples * 9 / 10,
+                "Один биом занимает почти весь мир — вернулась монотонность: " + seen);
+        // Каждый встреченный биом обязан быть кубанским: ванильный ID,
+        // просочившийся наружу, означает дыру в подмене.
+        seen.keySet().forEach(name -> helper.assertTrue(name.startsWith(KubanHorizons.MOD_ID + ":"),
+                "В мир просочился ванильный биом: " + name));
+        helper.succeed();
+    }
+
+    /**
+     * У каждого биома есть своё лицо: подпись, цвета и поверхность.
+     *
+     * <p>Биом, не отличимый от соседнего, — это тот самый «ванильный
+     * пересказ ванильного биома», из-за которого мир и казался однообразным. Проверяется то,
+     * что видит игрок: перевод названия на двух языках, собственный цвет
+     * травы или листвы и участие в правилах поверхности.</p>
+     */
+    private static void testNewBiomesAreDistinct(GameTestHelper helper) {
+        var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
+        JsonObject english = readLang("en_us");
+        JsonObject russian = readLang("ru_ru");
+        Set<String> palettes = new java.util.HashSet<>();
+
+        for (ResourceKey<net.minecraft.world.level.biome.Biome> key : ALL_KUBAN_BIOMES) {
+            String translation = "biome." + KubanHorizons.MOD_ID + "." + key.identifier().getPath();
+            helper.assertTrue(english.has(translation) && russian.has(translation),
+                    "Биом " + key.identifier() + " не переведён на оба языка: " + translation);
+            helper.assertTrue(!english.get(translation).getAsString().isBlank()
+                            && !russian.get(translation).getAsString().isBlank(),
+                    "Пустое название биома: " + translation);
+
+            var effects = biomes.getOrThrow(key).value().getSpecialEffects();
+            // Подпись в F3 отличать биомы не должна — их должно быть видно.
+            // Цвет травы или листвы задаёт лицо биома сильнее всего.
+            boolean coloured = effects.grassColorOverride().isPresent()
+                    || effects.foliageColorOverride().isPresent();
+            helper.assertTrue(coloured, "У биома " + key.identifier()
+                    + " нет ни своего цвета травы, ни цвета листвы — на глаз он остался ванильным");
+            String palette = effects.waterColor()
+                    + "/" + effects.grassColorOverride().orElse(-1)
+                    + "/" + effects.foliageColorOverride().orElse(-1);
+            helper.assertTrue(palettes.add(palette), "Биом " + key.identifier()
+                    + " повторяет палитру другого биома целиком: " + palette);
+        }
+        helper.succeed();
+    }
+
+    /** Пресет содержит три измерения, а Overworld публикует только кубанские биомы. */
+    private static void testKubanSteppeWorldPreset(GameTestHelper helper) {        var registries = helper.getLevel().registryAccess();
         var preset = registries.lookupOrThrow(Registries.WORLD_PRESET)
                 .getOrThrow(KHWorldPresets.KUBAN_HORIZONS)
                 .value();
@@ -1987,10 +2506,8 @@ public final class KHGameTests {
                 .map(Holder::unwrapKey)
                 .map(key -> key.orElseThrow(() -> new AssertionError("Незарегистрированный биом в KubanBiomeSource")))
                 .collect(java.util.stream.Collectors.toSet());
-        Set<ResourceKey<net.minecraft.world.level.biome.Biome>> expectedBiomes = Set.of(
-                KHBiomes.KUBAN_STEPPE, KHBiomes.PLAVNI, KHBiomes.LIMAN, KHBiomes.RIVER_FLOODPLAIN);
-        helper.assertTrue(actualBiomes.equals(expectedBiomes),
-                "KubanBiomeSource должен публиковать только четыре кубанских биома: " + actualBiomes);
+        helper.assertTrue(actualBiomes.equals(Set.copyOf(ALL_KUBAN_BIOMES)),
+                "KubanBiomeSource должен публиковать ровно кубанские биомы: " + actualBiomes);
 
         helper.assertTrue(dimensions.get(net.minecraft.world.level.dimension.LevelStem.NETHER).generator().getBiomeSource()
                         instanceof net.minecraft.world.level.biome.MultiNoiseBiomeSource,
@@ -2009,8 +2526,7 @@ public final class KHGameTests {
     private static void testKubanStrongholdBiomes(GameTestHelper helper) {
         var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
         var strongholdBiomes = biomes.getOrThrow(net.minecraft.tags.BiomeTags.HAS_STRONGHOLD);
-        for (ResourceKey<net.minecraft.world.level.biome.Biome> key : List.of(
-                KHBiomes.KUBAN_STEPPE, KHBiomes.PLAVNI, KHBiomes.LIMAN, KHBiomes.RIVER_FLOODPLAIN)) {
+        for (ResourceKey<net.minecraft.world.level.biome.Biome> key : ALL_KUBAN_BIOMES) {
             helper.assertTrue(strongholdBiomes.contains(biomes.getOrThrow(key)),
                     "Достижимый кубанский биом отсутствует в #has_structure/stronghold: " + key.identifier());
         }
@@ -2325,6 +2841,12 @@ public final class KHGameTests {
                 "vineyard/grape_cutting", "vineyard/grape_trellis", "vineyard/grapes",
                 "tea/tea_sapling", "tea/tea_leaves", "tea/dried_tea",
                 "orchard/sapling", "orchard/first_fruit", "orchard/dried_fruit",
+                // Рыболовство и ремесло: содержимое для обеих ветвей лежало
+                // готовым — осётр с копчением и 32 строительных предмета, — а
+                // достижений не было ни одного, и цепочку некуда было вести.
+                "fishing/first_sturgeon", "fishing/cooked_sturgeon",
+                "fishing/smoked_fish", "fishing/sturgeon_bucket",
+                "crafts/adobe", "crafts/whitewash", "crafts/homestead",
                 "orchard/kuban_orchard",
                 // Ветка манула: узлы должны висеть на корне мода, иначе
                 // достижения не появятся в дереве.
@@ -2359,6 +2881,15 @@ public final class KHGameTests {
         helper.assertTrue(orchardChallenge.requirements().size() == 4,
                 "«Кубанский сад» должен требовать все четыре плода, групп условий: "
                         + orchardChallenge.requirements().size());
+
+        // «Кубанская усадьба» — тоже челлендж на все материалы разом.
+        // Одна группа условий означала бы OR: «дом из чего-нибудь одного»,
+        // что усадьбой не является. Стратегия задаётся по умолчанию, поэтому
+        // ошибиться легко и заметить трудно — отсюда проверка.
+        Advancement homestead = tree.get(KHIds.of("crafts/homestead")).advancement();
+        helper.assertTrue(homestead.requirements().size() == 4,
+                "«Кубанская усадьба» должна требовать все четыре материала, групп условий: "
+                        + homestead.requirements().size());
         helper.succeed();
     }
 
@@ -3886,6 +4417,42 @@ public final class KHGameTests {
         }
     }
 
+<<<<<<< HEAD
+=======
+    /** Диалоговая карманная сцена не меняет мир до подтверждения и сама возвращает его по таймеру. */
+    private static void testDialogPocketSceneCycle(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        BlockPos origin = helper.absolutePos(new BlockPos(4, 2, 4));
+        player.snapTo(origin.getX() + 0.5D, origin.getY(), origin.getZ() + 0.5D,
+                0.0F, 0.0F);
+        helper.getLevel().setBlock(origin, Blocks.DIAMOND_BLOCK.defaultBlockState(), 3);
+        var preview = dev.romankrukovsky.kubanhorizons.genie.dimension.PocketSceneService
+                .preview(player, 5);
+        helper.assertTrue(preview.success(),
+                "Предпросмотр карманной сцены отклонён: " + preview.message().getString());
+        helper.assertTrue(helper.getLevel().getBlockState(origin).is(Blocks.DIAMOND_BLOCK),
+                "Предпросмотр карманной сцены изменил мир: "
+                        + helper.getLevel().getBlockState(origin));
+        var applied = dev.romankrukovsky.kubanhorizons.genie.dimension.PocketSceneService
+                .confirm(player);
+        helper.assertTrue(applied.success()
+                        && helper.getLevel().getBlockState(origin).is(Blocks.SANDSTONE),
+                "Подтверждённая карманная сцена не создалась");
+
+        helper.startSequence()
+                .thenExecuteAfter(6, () ->
+                        dev.romankrukovsky.kubanhorizons.genie.dimension.PocketSceneService
+                                .tick(helper.getLevel()))
+                .thenExecute(() -> helper.assertTrue(
+                        helper.getLevel().getBlockState(origin).is(Blocks.DIAMOND_BLOCK)
+                                && !dev.romankrukovsky.kubanhorizons.genie.dimension.PocketSceneService
+                                .isActive(helper.getLevel(), player.getUUID()),
+                        "Карманная сцена не вернула исходный мир по таймеру"))
+                .thenExecute(player::discard)
+                .thenSucceed();
+    }
+
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
     /** Небольшой дом переносится через preview/confirmation/transaction и возвращается undo. */
     private static void testRuntimeStructureMove(GameTestHelper helper) {
         var player = helper.makeMockServerPlayerInLevel();
@@ -3927,6 +4494,93 @@ public final class KHGameTests {
         }
     }
 
+<<<<<<< HEAD
+=======
+    /** Асимметричный blueprint поворачивается вместе с состояниями блоков. */
+    private static void testRuntimeStructureRotate(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        BlockPos origin = helper.absolutePos(new BlockPos(3, 2, 3));
+        helper.getLevel().setBlock(origin, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+        helper.getLevel().setBlock(origin.east(), Blocks.EMERALD_BLOCK.defaultBlockState(), 3);
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) runtime.recover();
+        runtime.setSelection(player.getUUID(),
+                new dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection(
+                        helper.getLevel().dimension().identifier().toString(), origin, origin.east()));
+        BlockPos offset = new BlockPos(6, 0, 0);
+        BlockPos destination = origin.offset(offset);
+        try {
+            var preview = runtime.previewSelectedStructureMove(player, offset,
+                    net.minecraft.world.level.block.Rotation.CLOCKWISE_90);
+            var report = runtime.executeStructureMove(player,
+                    runtime.confirmStructureMove(player.getUUID(), preview));
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED,
+                    "Поворот blueprint не завершился: " + report);
+            helper.assertTrue(helper.getLevel().getBlockState(origin).isAir()
+                            && helper.getLevel().getBlockState(origin.east()).isAir()
+                            && helper.getLevel().getBlockState(destination).is(Blocks.GOLD_BLOCK)
+                            && helper.getLevel().getBlockState(destination.south()).is(Blocks.EMERALD_BLOCK),
+                    "Blueprint не повернулся по часовой стрелке вокруг своего угла");
+            var undo = runtime.undo(helper.getLevel(), player.getUUID(), report.transactionId());
+            helper.assertTrue(undo.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && helper.getLevel().getBlockState(origin).is(Blocks.GOLD_BLOCK)
+                            && helper.getLevel().getBlockState(origin.east()).is(Blocks.EMERALD_BLOCK),
+                    "Undo не вернул повёрнутый blueprint");
+            runtime.retireUndo(player.getUUID(), undo.transactionId());
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Runtime structure rotation failed: " + exception.getMessage());
+        }
+    }
+
+    /** Обычная сущность внутри дома перемещается вместе с ним и возвращается через undo. */
+    private static void testRuntimeStructureMovesEntities(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        ServerLevel level = helper.getLevel();
+        BlockPos origin = helper.absolutePos(new BlockPos(3, 2, 3));
+        level.setBlock(origin, Blocks.OAK_PLANKS.defaultBlockState(), 3);
+        var sheep = EntityTypes.SHEEP.create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        helper.assertTrue(sheep != null, "Овца для переноса не создалась");
+        sheep.snapTo(origin.getX() + 0.5D, origin.getY() + 1.0D,
+                origin.getZ() + 0.5D, 0.0F, 0.0F);
+        UUID sheepId = sheep.getUUID();
+        level.addFreshEntity(sheep);
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(level.getServer());
+        if (!runtime.ready()) runtime.recover();
+        runtime.setSelection(player.getUUID(),
+                new dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection(
+                        level.dimension().identifier().toString(), origin, origin.offset(0, 2, 0)));
+        BlockPos offset = new BlockPos(6, 0, 0);
+        try {
+            var preview = runtime.previewSelectedStructureMove(player, offset);
+            var report = runtime.executeStructureMove(player,
+                    runtime.confirmStructureMove(player.getUUID(), preview));
+            var moved = level.getEntity(sheepId);
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && moved != null
+                            && moved.blockPosition().closerThan(origin.offset(offset), 2.0D),
+                    "Сущность не переместилась вместе со структурой: " + report);
+            var undo = runtime.undo(level, player.getUUID(), report.transactionId());
+            var restored = level.getEntity(sheepId);
+            helper.assertTrue(undo.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && restored != null && restored.blockPosition().closerThan(origin, 2.0D),
+                    "Undo не вернул сущность в исходную структуру");
+            runtime.retireUndo(player.getUUID(), undo.transactionId());
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Runtime entity move failed: " + exception.getMessage());
+        }
+    }
+
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
     /** Рисунок-линия проходит preview/confirmation/transaction и retained undo. */
     private static void testRuntimeMagicDrawing(GameTestHelper helper) {
         var player = helper.makeMockServerPlayerInLevel();
@@ -4391,4 +5045,8 @@ public final class KHGameTests {
             manul.discard();
         });
     }
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 }

@@ -35,10 +35,10 @@
   ],
   "downfall": 0.9,
   "effects": {
-    "dry_foliage_color": "#7b5334",
-    "foliage_color": "#6a7039",
-    "grass_color_modifier": "swamp",
-    "water_color": "#617b64"
+    "dry_foliage_color": "#7a7942",
+    "foliage_color": "#3f6b33",
+    "grass_color": "#4f7a3d",
+    "water_color": "#476f63"
   },
   "features": [
     [],

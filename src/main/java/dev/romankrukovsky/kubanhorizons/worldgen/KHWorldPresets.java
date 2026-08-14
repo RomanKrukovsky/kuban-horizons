@@ -39,13 +39,21 @@ public final class KHWorldPresets {
         Holder<Biome> plavni = biomes.getOrThrow(KHBiomes.PLAVNI);
         Holder<Biome> liman = biomes.getOrThrow(KHBiomes.LIMAN);
         Holder<Biome> floodplain = biomes.getOrThrow(KHBiomes.RIVER_FLOODPLAIN);
+        Holder<Biome> foothillForest = biomes.getOrThrow(KHBiomes.FOOTHILL_FOREST);
+        Holder<Biome> mountainForest = biomes.getOrThrow(KHBiomes.MOUNTAIN_FOREST);
+        Holder<Biome> azovCoast = biomes.getOrThrow(KHBiomes.AZOV_COAST);
+        Holder<Biome> blackSeaCoast = biomes.getOrThrow(KHBiomes.BLACK_SEA_COAST);
+        Holder<Biome> vineyardHills = biomes.getOrThrow(KHBiomes.VINEYARD_HILLS);
+        Holder<Biome> teaSlopes = biomes.getOrThrow(KHBiomes.TEA_SLOPES);
 
         LevelStem overworld = new LevelStem(
                 dimensionTypes.getOrThrow(BuiltinDimensionTypes.OVERWORLD),
                 new NoiseBasedChunkGenerator(
                         new KubanBiomeSource(
                                 parameterLists.getOrThrow(MultiNoiseBiomeSourceParameterLists.OVERWORLD),
-                                steppe, plavni, liman, floodplain),
+                                steppe, plavni, liman, floodplain,
+                                foothillForest, mountainForest, azovCoast, blackSeaCoast,
+                                vineyardHills, teaSlopes),
                         noiseSettings.getOrThrow(KHNoiseSettings.OVERWORLD)));
         LevelStem nether = new LevelStem(
                 dimensionTypes.getOrThrow(BuiltinDimensionTypes.NETHER),

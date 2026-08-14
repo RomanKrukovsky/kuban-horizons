@@ -50,6 +50,9 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.WALNUT_SAPLING.get());
                         output.accept(KHItems.WALNUT.get());
                         output.accept(KHItems.SOIL_PROBE.get());
+                        // Чернозём рядом со щупом: щуп показывает плодородие,
+                        // чернозём — то, чем его поднимают. Один сюжет.
+                        output.accept(KHItems.CHERNOZEM.get());
                         output.accept(KHItems.OIL_PRESS.get());
                         output.accept(KHItems.IRRIGATION_CHANNEL.get());
                         output.accept(KHItems.STONE_IRRIGATION_CHANNEL.get());
@@ -59,6 +62,8 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.DRIED_FRUIT.get());
                         output.accept(KHItems.HAND_MILL.get());
                         output.accept(KHItems.CUTTING_BOARD.get());
+                        output.accept(KHItems.SMOKEHOUSE.get());
+                        output.accept(KHItems.GRAPE_PRESS.get());
                         output.accept(KHItems.MANUL_SHELTER.get());
                         output.accept(KHItems.FLOUR.get());
                         output.accept(KHItems.CORNMEAL.get());
@@ -66,6 +71,7 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.BORSCHT.get());
                         output.accept(KHItems.MAMALYGA.get());
                         output.accept(KHItems.TEA_CUP.get());
+                        output.accept(KHItems.GRAPE_JUICE.get());
                         output.accept(KHItems.HONEY_WALNUTS.get());
                         output.accept(KHItems.VEGETABLE_SPREAD.get());
                         output.accept(KHItems.PHEASANT_SPAWN_EGG.get());
@@ -87,6 +93,10 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.RAW_STURGEON.get());
                         output.accept(KHItems.COOKED_STURGEON.get());
                         output.accept(KHItems.STURGEON_BUCKET.get());
+                        // Копчёности идут после жареного: это следующая
+                        // ступень переработки того же сырья.
+                        output.accept(KHItems.SMOKED_FISH.get());
+                        output.accept(KHItems.SMOKED_MEAT.get());
                         output.accept(KHItems.NUTRIA_PELT.get());
                         output.accept(KHItems.ADOBE_BRICKS.get());
                         output.accept(KHItems.ADOBE_BRICK_STAIRS.get());
@@ -110,6 +120,7 @@ public final class KHCreativeTabs {
                         output.accept(KHItems.SONIC_BOOM_ITEM.get());
                         output.accept(KHItems.MAGIC_MIRROR.get());
                         output.accept(KHItems.MINIATURE_WORLD.get());
+                        output.accept(KHItems.GENIE_LAMP.get());
                         output.accept(KHItems.PLAYER_GENIE_LAMP.get());
                     })
                     .build());

@@ -19,6 +19,28 @@ public final class KHBlockTagsProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
+        // --- Почвенный ярус: чернозём ---
+        // Лопата: чернозём — почва, и копаться он обязан как почва. Без тега
+        // блок ломался бы рукой ровно с той же скоростью, и лопата в этой
+        // механике не значила бы ничего.
+        tag(BlockTags.MINEABLE_WITH_SHOVEL)
+                .add(KHBlocks.CHERNOZEM.getKey())
+                .add(KHBlocks.CHERNOZEM_FARMLAND.getKey());
+        // SUPPORTS_CROPS — ключевой тег: именно его проверяют культуры мода
+        // (DoubleCropBlock, TomatoBushBlock, RiceCropBlock) и ванильные
+        // растения. Без него на чернозёмной грядке нельзя посадить вообще
+        // ничего, и весь ярус остался бы декорацией.
+        tag(BlockTags.SUPPORTS_CROPS).add(KHBlocks.CHERNOZEM_FARMLAND.getKey());
+        // GROWS_CROPS читает ванильная формула скорости роста (CropGrowth):
+        // без тега соседние блоки грядки не давали бы бонуса к скорости.
+        tag(BlockTags.GROWS_CROPS).add(KHBlocks.CHERNOZEM_FARMLAND.getKey());
+        // DIRT: чернозём — земля. Тег даёт совместимость со всем, что ищет
+        // почву (кости-удобрения, размещение растений, ванильные проверки).
+        tag(BlockTags.DIRT).add(KHBlocks.CHERNOZEM.getKey());
+        // ENDERMAN_HOLDABLE намеренно НЕ добавляем: чернозём — дефицитный
+        // ресурс, который игрок привёз издалека, и эндермен, уносящий блок с
+        // грядки, работал бы против самой механики поиска.
+
         // Маслопресс и желоб рубятся топором.
         tag(BlockTags.MINEABLE_WITH_AXE).add(KHBlocks.OIL_PRESS.getKey());
         tag(BlockTags.MINEABLE_WITH_AXE).add(KHBlocks.IRRIGATION_CHANNEL.getKey());

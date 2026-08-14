@@ -213,9 +213,27 @@ public final class KHItems {
     public static final DeferredItem<BlockItem> CUTTING_BOARD =
             ITEMS.registerSimpleBlockItem("cutting_board", KHBlocks.CUTTING_BOARD);
 
+    /** Коптильня (предмет). */
+    public static final DeferredItem<BlockItem> SMOKEHOUSE =
+            ITEMS.registerSimpleBlockItem("smokehouse", KHBlocks.SMOKEHOUSE);
+
+    /** Виноградный пресс — давильный чан (предмет). */
+    public static final DeferredItem<BlockItem> GRAPE_PRESS =
+            ITEMS.registerSimpleBlockItem("grape_press", KHBlocks.GRAPE_PRESS);
+
     /** Укрытие для манула (предмет). */
     public static final DeferredItem<BlockItem> MANUL_SHELTER =
             ITEMS.registerSimpleBlockItem("manul_shelter", KHBlocks.MANUL_SHELTER);
+
+    /**
+     * Чернозём (предмет).
+     *
+     * <p>Есть только предмет нетронутого чернозёма; у вспаханной грядки
+     * своего предмета нет намеренно — она и в ванили не носится, а
+     * выпадает исходной почвой. Пахать нужно на месте.</p>
+     */
+    public static final DeferredItem<BlockItem> CHERNOZEM =
+            ITEMS.registerSimpleBlockItem("chernozem", KHBlocks.CHERNOZEM);
 
     /**
      * Ведро с осетром: ванильный способ переноса рыбы.
@@ -230,7 +248,6 @@ public final class KHItems {
                             net.minecraft.world.level.material.Fluids.WATER,
                             net.minecraft.sounds.SoundEvents.BUCKET_EMPTY_FISH, p),
                     p -> p.stacksTo(1));
-
     // --- Строительные материалы (предметы) ---
 
     /** Саманный кирпич (предмет). */
@@ -343,6 +360,20 @@ public final class KHItems {
                             .food(KHFoods.TEA_DRINK, KHFoods.TEA_DRINK_CONSUMABLE)
                             .usingConvertsTo(Items.GLASS_BOTTLE));
 
+    /**
+     * Бутылка виноградного сока — продукт давильного чана.
+     *
+     * <p>Тара возвращается ({@code usingConvertsTo}), как у чая: стекло в моде
+     * не расходуемо, иначе цепочка сока требовала бы бесконечного песка.
+     * Стек 16 — как у прочих напитков: сок это жидкость в таре, а не
+     * сухой припас.</p>
+     */
+    public static final DeferredItem<Item> GRAPE_JUICE =
+            ITEMS.registerSimpleItem("grape_juice",
+                    p -> p.stacksTo(16)
+                            .food(KHFoods.GRAPE_JUICE, KHFoods.GRAPE_JUICE_CONSUMABLE)
+                            .usingConvertsTo(Items.GLASS_BOTTLE));
+
     /** Мёд с орехами. */
     public static final DeferredItem<Item> HONEY_WALNUTS =
             ITEMS.registerSimpleItem("honey_walnuts",
@@ -430,6 +461,13 @@ public final class KHItems {
     public static final DeferredItem<Item> COOKED_STURGEON =
             ITEMS.registerSimpleItem("cooked_sturgeon", p -> p.food(KHFoods.COOKED_STURGEON));
 
+    /** Копчёная рыба — продукт коптильни. */
+    public static final DeferredItem<Item> SMOKED_FISH =
+            ITEMS.registerSimpleItem("smoked_fish", p -> p.food(KHFoods.SMOKED_FISH));
+    /** Копчёное мясо — продукт коптильни. */
+    public static final DeferredItem<Item> SMOKED_MEAT =
+            ITEMS.registerSimpleItem("smoked_meat", p -> p.food(KHFoods.SMOKED_MEAT));
+
     /** Шкура нутрии: ремесленное сырьё, а не еда. */
     public static final DeferredItem<Item> NUTRIA_PELT =
             ITEMS.registerSimpleItem("nutria_pelt");
@@ -452,6 +490,12 @@ public final class KHItems {
     public static final DeferredItem<Item> MINIATURE_WORLD =
             ITEMS.registerItem("miniature_world",
                     dev.romankrukovsky.kubanhorizons.genie.item.MiniatureWorldItem::new,
+                    p -> p.stacksTo(1));
+
+    /** Лампа единственной NPC-джиннии: привязка, призыв и вход во дворец. */
+    public static final DeferredItem<Item> GENIE_LAMP =
+            ITEMS.registerItem("genie_lamp",
+                    dev.romankrukovsky.kubanhorizons.genie.vessel.GenieLampItem::new,
                     p -> p.stacksTo(1));
 
     /** Лампа превращённого игрока-Джиннии (сосуд существования). */

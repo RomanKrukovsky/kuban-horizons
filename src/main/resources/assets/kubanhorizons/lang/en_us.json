@@ -1,0 +1,52 @@
+{
+  "entity.kubanhorizons.kuban_genie": "Kuban Genie",
+  "item.kubanhorizons.genie_lamp": "Genie Lamp",
+  "item.kubanhorizons.genie_spawn_egg": "Kuban Genie Spawn Egg",
+
+  "message.kubanhorizons.genie.bound": "The genie is now bound to you.",
+  "message.kubanhorizons.genie.not_owner": "This genie does not obey you.",
+  "message.kubanhorizons.genie.ai.mode": "Behavior mode: %s",
+  "message.kubanhorizons.genie.status": "Genie status — Temperament: %s",
+  "message.kubanhorizons.genie.ai.status": "AI mode: %s | Rescues: %s",
+  "message.kubanhorizons.genie.memory.status": "Memory entries: %s",
+
+  "message.kubanhorizons.genie.anchor.absent": "No anchor found in this dimension.",
+  "message.kubanhorizons.genie.anchor.status": "Anchor at %s (%s, %s, %s)",
+  "message.kubanhorizons.genie.anchor.reset": "Anchor reset.",
+
+  "message.kubanhorizons.genie.runtime.snapshot_created": "Pocket snapshot created.",
+  "message.kubanhorizons.genie.runtime.failed": "Operation failed: %s",
+  "message.kubanhorizons.genie.runtime.preview": "Pocket preview ready.",
+  "message.kubanhorizons.genie.runtime.no_preview": "No preview available.",
+  "message.kubanhorizons.genie.runtime.confirmed": "Pocket confirmed.",
+
+  "screen.kubanhorizons.genie.dialog.title": "Genie Dialog",
+  "screen.kubanhorizons.genie.owner_death.title": "Owner Death — Choose Fate",
+  "screen.kubanhorizons.genie.owner_death.subtitle": "The genie offers you a choice:",
+
+  "choice.kubanhorizons.genie.owner_death.resurrect": "Resurrect Owner",
+  "choice.kubanhorizons.genie.owner_death.save_soul": "Save Soul (60s)",
+  "choice.kubanhorizons.genie.owner_death.rollback": "Rollback Last Wish",
+  "choice.kubanhorizons.genie.owner_death.respawn_free": "Free the Genie",
+
+  "message.kubanhorizons.genie.owner_death.resurrected": "You have been resurrected by your genie.",
+  "message.kubanhorizons.genie.owner_death.soul_saved": "Your soul has been preserved for 60 seconds.",
+  "message.kubanhorizons.genie.owner_death.rollback": "Last wish has been rolled back.",
+  "message.kubanhorizons.genie.owner_death.free": "The genie is now free. You are no longer bound.",
+
+  "container.kubanhorizons.oil_press": "Oil Press",
+  "container.kubanhorizons.grape_press": "Grape Press",
+
+  "entity.minecraft.villager.kubanhorizons.winemaker": "Winemaker",
+  "entity.minecraft.villager.kubanhorizons.oil_maker": "Oil Maker",
+
+  "biome.kubanhorizons.kuban_steppe": "Kuban Steppe",
+  "biome.kubanhorizons.kuban_forest": "Kuban Forest",
+  "biome.kubanhorizons.kuban_river": "Kuban River",
+  "biome.kubanhorizons.kuban_hills": "Kuban Hills",
+
+  "dimension.kubanhorizons.eternal_kuban": "Eternal Kuban",
+  "dimension.kubanhorizons.pocket": "Pocket Dimension",
+
+  "itemGroup.kubanhorizons": "Kuban Horizons"
+}

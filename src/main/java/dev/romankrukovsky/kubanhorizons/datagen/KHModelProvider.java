@@ -42,6 +42,7 @@ public final class KHModelProvider extends ModelProvider {
 
     @Override
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
+        registerSoil(blockModels);
         registerSunflowerCrop(blockModels);
         registerDoubleCrop(blockModels, KHBlocks.CORN_CROP.get(), CornCropBlock.MAX_AGE, 2);
         registerTeaBush(blockModels);
@@ -92,8 +93,11 @@ public final class KHModelProvider extends ModelProvider {
                         .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
         blockModels.registerSimpleItemModel(cuttingBoard.asItem(), KHIds.of("block/cutting_board"));
 
-        registerManulShelter(blockModels);
+        registerSmokehouse(blockModels);
 
+        registerGrapePress(blockModels);
+
+        registerManulShelter(blockModels);
         registerBuildingFamilies(blockModels);
 
         // Резной наличник: ручная тонкая модель + горизонтальные повороты.
@@ -132,6 +136,7 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.BORSCHT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.MAMALYGA.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.TEA_CUP.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.GRAPE_JUICE.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.HONEY_WALNUTS.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.VEGETABLE_SPREAD.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.PEACH.get(), ModelTemplates.FLAT_ITEM);
@@ -158,10 +163,13 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.COOKED_STURGEON.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.NUTRIA_PELT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.STURGEON_BUCKET.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.SMOKED_FISH.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.SMOKED_MEAT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.WOODEN_SPOON.get(), ModelTemplates.FLAT_HANDHELD_ITEM);
         itemModels.generateFlatItem(KHItems.SONIC_BOOM_ITEM.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.MAGIC_MIRROR.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.MINIATURE_WORLD.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.GENIE_LAMP.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.PLAYER_GENIE_LAMP.get(), ModelTemplates.FLAT_ITEM);
     }
 
@@ -225,6 +233,53 @@ public final class KHModelProvider extends ModelProvider {
     }
 
     /**
+     * Коптильня: холодная и топящаяся модели с горизонтальными поворотами.
+     *
+     * <p>Состояние {@code LIT} меняет модель, а не только освещение: игрок
+     * должен видеть по блоку, горят ли дрова, — у устройства нет GUI, и внешний
+     * вид остаётся единственным индикатором снабжения. Модели ручные (AD-005,
+     * как у укрытия и желоба): сруб с топкой и заслонкой шаблонами не
+     * описывается.</p>
+     */
+    private void registerSmokehouse(BlockModelGenerators blockModels) {
+        Block smokehouse = KHBlocks.SMOKEHOUSE.get();
+        Identifier cold = KHIds.of("block/smokehouse");
+        Identifier lit = KHIds.of("block/smokehouse_lit");
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(smokehouse)
+                .with(PropertyDispatch.initial(
+                                dev.romankrukovsky.kubanhorizons.processing.SmokehouseBlock.LIT)
+                        .generate(isLit -> plainVariant(isLit ? lit : cold)))
+                .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        // В инвентаре коптильня холодная: предмет ещё не топится.
+        blockModels.registerSimpleItemModel(smokehouse.asItem(), cold);
+    }
+
+    /**
+     * Виноградный чан: пять моделей по уровню налитого сока.
+     *
+     * <p>Уровень — не декор, а единственный интерфейс устройства: у чана нет
+     * GUI, поэтому наполнение обязано читаться по блоку. Модели ручные
+     * (AD-005, как у коптильни и желоба): полая ёмкость с поднимающимся
+     * зеркалом жидкости шаблонами не описывается. Поворотов нет — чан
+     * симметричен, у него нет «лица».</p>
+     */
+    private void registerGrapePress(BlockModelGenerators blockModels) {
+        Block press = KHBlocks.GRAPE_PRESS.get();
+        Identifier empty = KHIds.of("block/grape_press");
+        Identifier[] filled = {
+                empty,
+                KHIds.of("block/grape_press_level1"),
+                KHIds.of("block/grape_press_level2"),
+                KHIds.of("block/grape_press_level3"),
+                KHIds.of("block/grape_press_level4"),
+        };
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(press)
+                .with(PropertyDispatch.initial(
+                                dev.romankrukovsky.kubanhorizons.processing.GrapePressBlock.LEVEL)
+                        .generate(level -> plainVariant(filled[level]))));
+        // В инвентаре чан пустой: сок наливают в мире, а не в предмете.
+        blockModels.registerSimpleItemModel(press.asItem(), empty);
+    }
      * Блоки орошения: модели написаны вручную (нестандартная геометрия
      * желоба — допустимое исключение AD-005), blockstates и item-модели
      * генерируются здесь.
@@ -285,6 +340,43 @@ public final class KHModelProvider extends ModelProvider {
                 .with(PropertyDispatch.initial(DoubleCropBlock.AGE, BlockStateProperties.DOUBLE_BLOCK_HALF)
                         .generate((age, half) -> plainVariant(
                                 half == DoubleBlockHalf.UPPER ? top[age] : bottom[age]))));
+    }
+
+    /**
+     * Почвенный ярус: чернозём (обычный куб) и вспаханный чернозём.
+     *
+     * <p>Грядка описывается ванильным шаблоном {@code template_farmland} по
+     * схеме {@code BlockModelGenerators.createFarmland}: две модели — сухая и
+     * влажная — и переключение по {@code MOISTURE} на пороге 7. Иначе
+     * влажность была бы видна только в щупе, а на самой грядке нет: игрок
+     * читает полив по цвету борозд.</p>
+     *
+     * <p>Боковые грани грядки берут текстуру нетронутого чернозёма (слот
+     * {@code dirt} шаблона) — в разрезе видна та же почва, что лежит рядом,
+     * а не борозды сбоку.</p>
+     */
+    private void registerSoil(BlockModelGenerators blockModels) {
+        blockModels.createTrivialCube(KHBlocks.CHERNOZEM.get());
+
+        Block farmland = KHBlocks.CHERNOZEM_FARMLAND.get();
+        var side = TextureMapping.getBlockTexture(KHBlocks.CHERNOZEM.get());
+        TextureMapping dry = new TextureMapping()
+                .put(net.minecraft.client.data.models.model.TextureSlot.DIRT, side)
+                .put(net.minecraft.client.data.models.model.TextureSlot.TOP,
+                        TextureMapping.getBlockTexture(farmland));
+        TextureMapping moist = new TextureMapping()
+                .put(net.minecraft.client.data.models.model.TextureSlot.DIRT, side)
+                .put(net.minecraft.client.data.models.model.TextureSlot.TOP,
+                        TextureMapping.getBlockTexture(farmland, "_moist"));
+        var dryModel = plainVariant(
+                ModelTemplates.FARMLAND.create(farmland, dry, blockModels.modelOutput));
+        var moistModel = plainVariant(ModelTemplates.FARMLAND.create(
+                net.minecraft.client.data.models.model.ModelLocationUtils
+                        .getModelLocation(farmland, "_moist"),
+                moist, blockModels.modelOutput));
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(farmland)
+                .with(BlockModelGenerators.createEmptyOrFullDispatch(
+                        BlockStateProperties.MOISTURE, 7, moistModel, dryModel)));
     }
 
     private void registerSunflowerCrop(BlockModelGenerators blockModels) {

@@ -1,0 +1,188 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "kubanhorizons:block/grape_press_side",
+    "side": "kubanhorizons:block/grape_press_side",
+    "bottom": "kubanhorizons:block/grape_press_bottom",
+    "inside": "kubanhorizons:block/grape_press_top2",
+    "juice": "kubanhorizons:block/grape_press_top2"
+  },
+  "elements": [
+    {
+      "__comment": "Дно чана",
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        2,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#bottom",
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#inside"
+        },
+        "north": {
+          "texture": "#side"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "__comment": "Северная стенка",
+      "from": [
+        0,
+        2,
+        0
+      ],
+      "to": [
+        16,
+        9,
+        2
+      ],
+      "faces": {
+        "up": {
+          "texture": "#side"
+        },
+        "north": {
+          "texture": "#side",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "__comment": "Южная стенка",
+      "from": [
+        0,
+        2,
+        14
+      ],
+      "to": [
+        16,
+        9,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#side"
+        },
+        "north": {
+          "texture": "#side"
+        },
+        "south": {
+          "texture": "#side",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "__comment": "Западная стенка",
+      "from": [
+        0,
+        2,
+        2
+      ],
+      "to": [
+        2,
+        9,
+        14
+      ],
+      "faces": {
+        "up": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side",
+          "cullface": "west"
+        },
+        "east": {
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "__comment": "Восточная стенка",
+      "from": [
+        14,
+        2,
+        2
+      ],
+      "to": [
+        16,
+        9,
+        14
+      ],
+      "faces": {
+        "up": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side",
+          "cullface": "east"
+        }
+      }
+    },
+    {
+      "__comment": "Зеркало сока: отдельный элемент, его высота и есть индикатор",
+      "from": [
+        2,
+        2,
+        2
+      ],
+      "to": [
+        14,
+        5.0,
+        14
+      ],
+      "faces": {
+        "up": {
+          "texture": "#juice"
+        },
+        "north": {
+          "texture": "#juice"
+        },
+        "south": {
+          "texture": "#juice"
+        },
+        "west": {
+          "texture": "#juice"
+        },
+        "east": {
+          "texture": "#juice"
+        }
+      }
+    }
+  ]
+}

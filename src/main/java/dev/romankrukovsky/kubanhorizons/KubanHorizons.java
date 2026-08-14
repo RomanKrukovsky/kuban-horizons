@@ -51,6 +51,7 @@ public final class KubanHorizons {
         // существуют, и достижения не могут сработать в принципе.
         dev.romankrukovsky.kubanhorizons.entity.ManulCriteria.register(modEventBus);
         dev.romankrukovsky.kubanhorizons.gametest.KHGameTests.register(modEventBus);
+        dev.romankrukovsky.kubanhorizons.network.KHNetwork.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.SERVER, KHServerConfig.SPEC);
     }

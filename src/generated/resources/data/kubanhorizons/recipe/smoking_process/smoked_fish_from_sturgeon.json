@@ -1,0 +1,8 @@
+{
+  "type": "kubanhorizons:smoking_process",
+  "ingredient": "kubanhorizons:raw_sturgeon",
+  "result": {
+    "id": "kubanhorizons:smoked_fish"
+  },
+  "smoke_ticks": 1200
+}

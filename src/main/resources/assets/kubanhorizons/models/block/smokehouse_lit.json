@@ -1,0 +1,113 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "kubanhorizons:block/smokehouse_side",
+    "side": "kubanhorizons:block/smokehouse_side",
+    "top": "kubanhorizons:block/smokehouse_top",
+    "brick": "kubanhorizons:block/smokehouse_brick",
+    "firebox": "kubanhorizons:block/smokehouse_firebox",
+    "firebox_lit": "kubanhorizons:block/smokehouse_firebox_lit"
+  },
+  "elements": [
+    {
+      "__comment": "Кирпичное основание — топка",
+      "from": [
+        1,
+        0,
+        1
+      ],
+      "to": [
+        15,
+        6,
+        15
+      ],
+      "faces": {
+        "down": {
+          "texture": "#brick",
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#brick"
+        },
+        "north": {
+          "texture": "#firebox_lit"
+        },
+        "south": {
+          "texture": "#brick"
+        },
+        "west": {
+          "texture": "#brick"
+        },
+        "east": {
+          "texture": "#brick"
+        }
+      }
+    },
+    {
+      "__comment": "Дощатая камера копчения",
+      "from": [
+        2,
+        6,
+        2
+      ],
+      "to": [
+        14,
+        14,
+        14
+      ],
+      "faces": {
+        "down": {
+          "texture": "#top"
+        },
+        "up": {
+          "texture": "#top"
+        },
+        "north": {
+          "texture": "#side"
+        },
+        "south": {
+          "texture": "#side"
+        },
+        "west": {
+          "texture": "#side"
+        },
+        "east": {
+          "texture": "#side"
+        }
+      }
+    },
+    {
+      "__comment": "Труба",
+      "from": [
+        6,
+        14,
+        6
+      ],
+      "to": [
+        10,
+        16,
+        10
+      ],
+      "faces": {
+        "down": {
+          "texture": "#brick"
+        },
+        "up": {
+          "texture": "#brick"
+        },
+        "north": {
+          "texture": "#brick"
+        },
+        "south": {
+          "texture": "#brick"
+        },
+        "west": {
+          "texture": "#brick"
+        },
+        "east": {
+          "texture": "#brick"
+        }
+      }
+    }
+  ]
+}

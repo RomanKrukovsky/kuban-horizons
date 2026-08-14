@@ -1,71 +1,87 @@
 package dev.romankrukovsky.kubanhorizons.client;
 
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
+import dev.romankrukovsky.kubanhorizons.client.gui.OilPressScreen;
 import dev.romankrukovsky.kubanhorizons.client.render.GroundBirdModel;
 import dev.romankrukovsky.kubanhorizons.client.render.GroundBirdRenderer;
 import dev.romankrukovsky.kubanhorizons.client.render.GullModel;
 import dev.romankrukovsky.kubanhorizons.client.render.HeronModel;
-import dev.romankrukovsky.kubanhorizons.client.render.ManulModel;
-import dev.romankrukovsky.kubanhorizons.client.render.ManulRenderer;
 import dev.romankrukovsky.kubanhorizons.client.render.InsectModel;
 import dev.romankrukovsky.kubanhorizons.client.render.InsectRenderer;
+import dev.romankrukovsky.kubanhorizons.client.render.KubanGenieRenderer;
+import dev.romankrukovsky.kubanhorizons.client.render.KubanQuadrupedModel;
+import dev.romankrukovsky.kubanhorizons.client.render.KubanQuadrupedRenderer;
+import dev.romankrukovsky.kubanhorizons.client.render.MagicDoppelgangerRenderer;
+import dev.romankrukovsky.kubanhorizons.client.render.ManulModel;
+import dev.romankrukovsky.kubanhorizons.client.render.ManulRenderer;
+import dev.romankrukovsky.kubanhorizons.client.render.NutriaModel;
+import dev.romankrukovsky.kubanhorizons.client.render.NutriaRenderer;
 import dev.romankrukovsky.kubanhorizons.client.render.SturgeonModel;
 import dev.romankrukovsky.kubanhorizons.client.render.SturgeonRenderer;
 import dev.romankrukovsky.kubanhorizons.client.render.WaterBirdRenderer;
-import dev.romankrukovsky.kubanhorizons.client.render.KubanQuadrupedModel;
-import dev.romankrukovsky.kubanhorizons.client.render.KubanQuadrupedRenderer;
-import dev.romankrukovsky.kubanhorizons.client.render.NutriaModel;
-import dev.romankrukovsky.kubanhorizons.client.render.NutriaRenderer;
-import dev.romankrukovsky.kubanhorizons.client.render.KubanGenieRenderer;
-import dev.romankrukovsky.kubanhorizons.client.render.MagicDoppelgangerRenderer;
-import dev.romankrukovsky.kubanhorizons.client.screen.OilPressScreen;
 import dev.romankrukovsky.kubanhorizons.registry.KHEntities;
 import dev.romankrukovsky.kubanhorizons.registry.KHMenus;
 import dev.romankrukovsky.kubanhorizons.util.KHIds;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import org.lwjgl.glfw.GLFW;
 
 /**
- * Клиентские подписчики мод-шины: регистрация экранов и рендереров.
+ * Клиентские события мода (экраны, слои моделей, рендереры сущностей).
  */
-@EventBusSubscriber(modid = KubanHorizons.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = KubanHorizons.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class KHClientEvents {
-    /** Слои моделей птиц: у фазана длинный хвост, у перепела короткий. */
     public static final ModelLayerLocation PHEASANT_LAYER =
-            new ModelLayerLocation(KHIds.of("pheasant"), "main");
+            new ModelLayerLocation(KHIds.of(pheasant), main);
     public static final ModelLayerLocation QUAIL_LAYER =
-            new ModelLayerLocation(KHIds.of("quail"), "main");
-    /** Четвероногие: кабан приземистее, овчарка выше и лохматее. */
+            new ModelLayerLocation(KHIds.of(quail), main);
     public static final ModelLayerLocation WILD_BOAR_LAYER =
-            new ModelLayerLocation(KHIds.of("wild_boar"), "main");
+            new ModelLayerLocation(KHIds.of(wild_boar), main);
     public static final ModelLayerLocation CAUCASIAN_SHEPHERD_LAYER =
-            new ModelLayerLocation(KHIds.of("caucasian_shepherd"), "main");
-    /** Нутрия: своя сетка — горбатая спина и голый хвост. */
+            new ModelLayerLocation(KHIds.of(caucasian_shepherd), main);
     public static final ModelLayerLocation NUTRIA_LAYER =
-            new ModelLayerLocation(KHIds.of("nutria"), "main");
-    /** Насекомые: одна сетка, разные пропорции брюшка и ног. */
+            new ModelLayerLocation(KHIds.of(nutria), main);
     public static final ModelLayerLocation LOCUST_LAYER =
-            new ModelLayerLocation(KHIds.of("locust"), "main");
-    /** Водные птицы: чайка летает, цапля стоит на ходулях. */
+            new ModelLayerLocation(KHIds.of(locust), main);
     public static final ModelLayerLocation GULL_LAYER =
-            new ModelLayerLocation(KHIds.of("gull"), "main");
+            new ModelLayerLocation(KHIds.of(gull), main);
     public static final ModelLayerLocation HERON_LAYER =
-            new ModelLayerLocation(KHIds.of("heron"), "main");
-    /** Манул: талисман мода, ванильная сетка четвероногого. */
+            new ModelLayerLocation(KHIds.of(heron), main);
     public static final ModelLayerLocation MANUL_LAYER =
-            new ModelLayerLocation(KHIds.of("manul"), "main");
-    /** Осётр: два сегмента тела для волнообразного хода. */
+            new ModelLayerLocation(KHIds.of(manul), main);
     public static final ModelLayerLocation STURGEON_LAYER =
-            new ModelLayerLocation(KHIds.of("sturgeon"), "main");
-    /** Хвост игрока-джиннии: слой поверх ванильной модели игрока. */
+            new ModelLayerLocation(KHIds.of(sturgeon), main);
     public static final ModelLayerLocation GENIE_TAIL_LAYER =
-            new ModelLayerLocation(KHIds.of("genie_tail"), "main");
+            new ModelLayerLocation(KHIds.of(player_genie_tail), main);
+
+    public static final KeyMapping OPEN_GENIE_DIALOG = new KeyMapping(
+            "key.kubanhorizons.open_genie_dialog",
+            GLFW.GLFW_KEY_J,
+            "key.categories.kubanhorizons");
 
     private KHClientEvents() {
+    }
+
+    @SubscribeEvent
+    static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+        event.register(OPEN_GENIE_DIALOG);
+    }
+
+    @SubscribeEvent
+    static void onClientTick(ClientTickEvent.Post event) {
+        var minecraft = net.minecraft.client.Minecraft.getInstance();
+        while (OPEN_GENIE_DIALOG.consumeClick()) {
+            if (minecraft.player != null && minecraft.gui.screen() == null) {
+                dev.romankrukovsky.kubanhorizons.network.packet.c2s.C2SOpenGenieDialog.send();
+            }
+        }
     }
 
     @SubscribeEvent

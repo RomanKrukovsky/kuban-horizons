@@ -6,11 +6,17 @@
         "type": "minecraft:noise",
         "biome_source": {
           "type": "kubanhorizons:kuban",
+          "azov_coast": "kubanhorizons:azov_coast",
+          "black_sea_coast": "kubanhorizons:black_sea_coast",
           "floodplain": "kubanhorizons:river_floodplain",
+          "foothill_forest": "kubanhorizons:foothill_forest",
           "liman": "kubanhorizons:liman",
+          "mountain_forest": "kubanhorizons:mountain_forest",
           "plavni": "kubanhorizons:plavni",
           "preset": "minecraft:overworld",
-          "steppe": "kubanhorizons:kuban_steppe"
+          "steppe": "kubanhorizons:kuban_steppe",
+          "tea_slopes": "kubanhorizons:tea_slopes",
+          "vineyard_hills": "kubanhorizons:vineyard_hills"
         },
         "settings": "kubanhorizons:overworld"
       }

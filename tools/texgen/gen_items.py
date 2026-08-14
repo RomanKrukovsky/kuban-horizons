@@ -385,6 +385,11 @@ def tea_cup_item():
     return im
 
 
+<<<<<<< HEAD
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 def raw_bird_item(c_main, c_hi, c_dark, bone=True):
     """Сырая тушка птицы: округлое тело, кость слева, свет сверху-слева.
 
@@ -442,6 +447,47 @@ def slab_meat_item(c_main, c_hi, c_dark, marbled=False):
     return im
 
 
+<<<<<<< HEAD
+=======
+def smoked_glaze(im, c_glaze):
+    """Копчёный лоск: редкие светлые точки по верхней кромке силуэта.
+
+    Копчёность отличается от жареного не только тоном, но и блеском корочки.
+    Точки ставятся только там, где уже есть пиксель, — глазурь не выходит за
+    силуэт (ART_BIBLE §3: контраст силуэта важнее внутренней детализации).
+    """
+    for x, y in ((5, 6), (8, 5), (10, 7), (6, 8), (9, 9)):
+        if im.getpixel((x, y))[3] != 0:
+            px(im, x, y, c_glaze)
+    return im
+
+
+def smoked_fish_item():
+    """Копчёный осётр: тёмно-янтарная тушка с лоском.
+
+    Форма та же, что у сырого и жареного осетра (тот же зверь), но тон
+    заметно темнее жареного — копчение идёт дольше и даёт корочку. Гребень
+    жучков сохранён (cooked=False): при копчении тушку не чистят так, как
+    перед жаркой, и это отличает иконку от cooked_sturgeon.
+    """
+    im = fish_item((132, 84, 44, 255), (186, 138, 84, 255),
+                   (92, 56, 30, 255))
+    return smoked_glaze(im, (214, 168, 106, 255))
+
+
+def smoked_meat_item():
+    """Копчёное мясо: ломоть глубокого коричневого тона с корочкой.
+
+    Без прожилок сала (marbled=False): при копчении жир вытапливается, и
+    светлых прожилок сырого мяса не остаётся — так копчёность не путается
+    с raw_boar в инвентаре.
+    """
+    im = slab_meat_item((116, 68, 40, 255), (158, 100, 60, 255),
+                        (80, 46, 26, 255))
+    return smoked_glaze(im, (192, 130, 78, 255))
+
+
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 def fish_item(c_back, c_belly, c_dark, cooked=False):
     """Рыба в профиль: вытянутое тело, рострум и раздвоенный хвост.
 
@@ -675,6 +721,10 @@ def sonic_boom_item():
     return im
 
 
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 def main():
     save(homemade_bread_item(), "homemade_bread")
     save(bowl_dish((176, 44, 52, 255), (204, 74, 70, 255),
@@ -692,6 +742,11 @@ def main():
     save(sunflower_seeds(), "sunflower_seeds")
     save(sunflower_head(), "sunflower_head")
     save(bottle(PAL["oil"], PAL["oil_hi"]), "sunflower_oil")
+    # Виноградный сок: та же тара, что у масла (обе бутылки — продукт
+    # переработки и возвращают стекло), но заливка — виноград тёмный
+    # #4a2a52 из палитры региона (ART_BIBLE §2). Силуэт общий намеренно:
+    # игрок должен читать «бутылка продукта», а сорт различать цветом.
+    save(bottle(PAL["grape_dark"], PAL["grape_hi"]), "grape_juice")
     save(roasted_seeds(), "roasted_sunflower_seeds")
     save(oil_cake(), "oil_cake")
     save(soil_probe(), "soil_probe")
@@ -719,6 +774,11 @@ def main():
     save(fruit_item(PAL["plum"], PAL["plum_hi"], (80, 42, 96, 255)), "plum")
     save(walnut_item(), "walnut")
 
+<<<<<<< HEAD
+=======
+<<<<<<< Updated upstream
+=======
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
     # Фауна: фазан и перепел. Сырое мясо холоднее и краснее, готовое — темнее
     # и теплее; перепел мельче фазана, поэтому его тушка на пиксель компактнее.
     save(raw_bird_item((196, 106, 104, 255), (222, 142, 138, 255),
@@ -746,6 +806,12 @@ def main():
     save(fish_item((166, 126, 78, 255), (216, 190, 146, 255),
                    (122, 88, 50, 255), cooked=True), "cooked_sturgeon")
     save(bucket_with_fish_item((104, 108, 96, 255)), "sturgeon_bucket")
+<<<<<<< HEAD
+=======
+    # Копчёности: следующая ступень после жарки, тон темнее и с лоском.
+    save(smoked_fish_item(), "smoked_fish")
+    save(smoked_meat_item(), "smoked_meat")
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
     # Шкурка нутрии — товарный продукт плавней.
     save(pelt_item((118, 88, 58, 255), (146, 112, 76, 255),
                    (86, 64, 42, 255)), "nutria_pelt")
@@ -778,6 +844,10 @@ def main():
     save(miniature_world_item(), "miniature_world")
     save(sonic_boom_item(), "sonic_boom_item")
 
+<<<<<<< HEAD
+=======
+>>>>>>> Stashed changes
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,6 @@
 {
   "attributes": {
+<<<<<<< HEAD
     "minecraft:audio/ambient_sounds": {
       "additions": {
         "sound": "kubanhorizons:ambient_floodplain_additions",
@@ -13,6 +14,9 @@
         "tick_delay": 6000
       }
     },
+=======
+<<<<<<< Updated upstream
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
     "minecraft:audio/background_music": {
       "creative": {
         "max_delay": 24000,
@@ -31,6 +35,21 @@
       }
     },
     "minecraft:visual/sky_color": "#79a6ff"
+=======
+    "minecraft:audio/ambient_sounds": {
+      "additions": {
+        "sound": "kubanhorizons:ambient_floodplain_additions",
+        "tick_chance": 0.009
+      },
+      "loop": "kubanhorizons:ambient_floodplain_loop",
+      "mood": {
+        "block_search_extent": 8,
+        "offset": 2.0,
+        "sound": "minecraft:ambient.cave",
+        "tick_delay": 6000
+      }
+    }
+>>>>>>> Stashed changes
   },
   "carvers": [
     "minecraft:cave",
@@ -39,6 +58,9 @@
   ],
   "downfall": 0.8,
   "effects": {
+    "dry_foliage_color": "#a39a5d",
+    "foliage_color": "#568a45",
+    "grass_color": "#79a85a",
     "water_color": "#3f76e4"
   },
   "features": [

@@ -29,6 +29,12 @@ final class KHTranslations {
         add("biome.kubanhorizons.plavni", "Kuban Wetlands", "Плавни");
         add("biome.kubanhorizons.liman", "Liman", "Лиман");
         add("biome.kubanhorizons.river_floodplain", "River Floodplain", "Пойма реки");
+        add("biome.kubanhorizons.foothill_forest", "Foothill Forest", "Предгорный лес");
+        add("biome.kubanhorizons.mountain_forest", "Mountain Forest", "Горный лес");
+        add("biome.kubanhorizons.azov_coast", "Azov Coast", "Азовское побережье");
+        add("biome.kubanhorizons.black_sea_coast", "Black Sea Coast", "Черноморское побережье");
+        add("biome.kubanhorizons.vineyard_hills", "Vineyard Hills", "Виноградные холмы");
+        add("biome.kubanhorizons.tea_slopes", "Tea Slopes", "Чайные склоны");
         add("generator.kubanhorizons.kuban_horizons", "Kuban Horizons", "Кубанские горизонты");
         add("structure.kubanhorizons.floodplain_fishing_camp",
                 "Floodplain Fishing Camp", "Рыбацкий стан в пойме");
@@ -253,6 +259,62 @@ final class KHTranslations {
         add("genie.kubanhorizons.mode.stay", "stay", "оставаться на месте");
         add("genie.kubanhorizons.mode.guard", "guard", "охранять");
         add("genie.kubanhorizons.mode.scout", "scout", "исследовать окрестности");
+        add("key.category.kubanhorizons.genie", "Kuban Genie", "Кубанская джинния");
+        add("key.kubanhorizons.open_genie_dialog", "Open genie dialogue", "Открыть диалог с джиннией");
+        add("screen.kubanhorizons.genie.title", "Dialogue with %s", "Разговор с %s");
+        add("screen.kubanhorizons.genie.greeting", "What shall reality become?",
+                "Какой должна стать реальность?");
+        add("screen.kubanhorizons.genie.input", "State your wish", "Сформулируйте желание");
+        add("screen.kubanhorizons.genie.send", "Send", "Сказать");
+        add("screen.kubanhorizons.genie.orders", "Companion orders", "Приказы спутнице");
+        add("screen.kubanhorizons.genie.mode", "Current order: %s", "Текущий приказ: %s");
+        add("screen.kubanhorizons.genie.hint", "Enter — send, right click — quick orders",
+                "Enter — сказать, ПКМ — быстрые приказы");
+        add("screen.kubanhorizons.genie.waiting", "The genie considers your wording...",
+                "Джинния обдумывает формулировку...");
+        add("screen.kubanhorizons.genie.invalid_wish", "The wish is empty or too long.",
+                "Желание пустое или слишком длинное.");
+        add("screen.kubanhorizons.genie.confirm", "Confirm change", "Подтвердить изменение");
+        add("screen.kubanhorizons.genie.cancel", "Reject", "Отказаться");
+        add("screen.kubanhorizons.genie.policy_preview",
+                "Global rule %s: %s → %s. Confirm this change?",
+                "Глобальное правило %s: %s → %s. Подтвердить изменение?");
+        add("screen.kubanhorizons.genie.policy_applied",
+                "The rule is active. Undo transaction: %s.",
+                "Правило действует. Транзакция отмены: %s.");
+        add("screen.kubanhorizons.genie.policy_cancelled", "The rule was left unchanged.",
+                "Правило осталось без изменений.");
+        add("screen.kubanhorizons.genie.no_policy_preview",
+                "That preview is no longer available.", "Это предложение уже недоступно.");
+        add("screen.kubanhorizons.genie.no_policy_to_undo",
+                "There is no recent rule to undo.", "Нет недавнего правила для отмены.");
+        add("screen.kubanhorizons.genie.policy_undone",
+                "The last global rule was undone.", "Последнее глобальное правило отменено.");
+        add("screen.kubanhorizons.pocket.title", "Pocket scene preview",
+                "Предпросмотр карманной сцены");
+        add("screen.kubanhorizons.pocket.confirm", "Create scene", "Создать сцену");
+        add("screen.kubanhorizons.pocket.cancel", "Leave the world unchanged",
+                "Не менять мир");
+        add("screen.kubanhorizons.pocket.blocks", "Blocks changed: %s",
+                "Изменится блоков: %s");
+        add("screen.kubanhorizons.pocket.duration", "Duration: %s seconds",
+                "Длительность: %s секунд");
+        add("screen.kubanhorizons.pocket.risk", "Risk: %s", "Риск: %s");
+        add("screen.kubanhorizons.pocket.applied",
+                "The scene is active for %s seconds, then the world will return.",
+                "Сцена действует %s секунд, затем мир вернётся.");
+        add("screen.kubanhorizons.pocket.restored", "The pocket scene dissolved; the world returned.",
+                "Карманная сцена растворилась; мир вернулся.");
+        add("screen.kubanhorizons.pocket.cancelled", "The world was left unchanged.",
+                "Мир остался без изменений.");
+        add("screen.kubanhorizons.pocket.preview_expired", "The scene preview is no longer available.",
+                "Предпросмотр сцены уже недоступен.");
+        add("screen.kubanhorizons.pocket.already_active", "Your previous pocket scene is still active.",
+                "Ваша предыдущая карманная сцена ещё действует.");
+        add("message.kubanhorizons.genie.law.use_forfeit",
+                "The vessel will not simply release you. Use /genie forfeit.",
+                "Сосуд не отпустит просто так. Используйте /genie forfeit.");
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
         add("message.kubanhorizons.genie.ai.mode", "New order: %s.", "Новый приказ: %s.");
         add("message.kubanhorizons.genie.ai.status",
                 "Mind: %s | rescues %s, threats repelled %s, projectiles stopped %s, wishes remembered %s. Sneak-use with an empty hand to change my order.",
@@ -350,8 +412,20 @@ final class KHTranslations {
                 "You step through the canvas into a living painted dimension!",
                 "Вы шагаете через холст прямо в живое нарисованное измерение!");
         add("message.kubanhorizons.genie.mirror_world",
-                "The mirror surface ripples as you step into the parallel mirror timeline...",
-                "Поверхность зеркала идет волнами, открывая проход в параллельный таймлайн...");
+                "The mirror surface ripples as you step into the mirror world.",
+                "Поверхность зеркала идёт волнами, открывая проход в зазеркалье.");
+        add("message.kubanhorizons.genie.magic_realm.left",
+                "The portal returns you to the exact place you entered from.",
+                "Портал возвращает вас точно к месту входа.");
+        add("message.kubanhorizons.genie.magic_realm.recursive",
+                "Pocket worlds cannot be opened from inside another pocket world.",
+                "Нельзя открыть карманный мир изнутри другого карманного мира.");
+        add("message.kubanhorizons.genie.magic_realm.missing",
+                "The magical realm is unavailable in this world.",
+                "Магический мир недоступен в этом сохранении.");
+        add("message.kubanhorizons.genie.magic_realm.no_sleep",
+                "Dreams cannot nest inside a painted reality.",
+                "Сны нельзя вкладывать внутрь нарисованной реальности.");
         add("message.kubanhorizons.genie.festival_start",
                 "Annual Genie Festival has begun in the village with music, decorations and fireworks!",
                 "В деревне начался Ежегодный праздник Джиннии с музыкой и салютами!");
@@ -392,7 +466,45 @@ final class KHTranslations {
                 "Genie (literal): Wish granted word for word.",
                 "Джинния (буквально): «Желание исполнено буква в букву.»");
         // --- Искажённые желания и превращение в джиннию ---
+        add("item.kubanhorizons.genie_lamp", "Genie's Lamp", "Лампа джиннии");
         add("item.kubanhorizons.player_genie_lamp", "%s's Genie Lamp", "Лампа джиннии %s");
+        add("message.kubanhorizons.genie.lamp.bound",
+                "The lamp now remembers %s — and its true owner.",
+                "Лампа запомнила %s — и своего настоящего владельца.");
+        add("message.kubanhorizons.genie.lamp.not_owner",
+                "The lamp is silent. Stealing a vessel does not transfer its bond.",
+                "Лампа молчит. Кража сосуда не передаёт связь.");
+        add("message.kubanhorizons.genie.lamp.unavailable",
+                "The bond is real, but the genie cannot answer it now.",
+                "Связь существует, но джинния сейчас не может ответить.");
+        add("message.kubanhorizons.genie.lamp.summoned",
+                "The lamp answers. Your genie is beside you.",
+                "Лампа откликнулась. Джинния снова рядом.");
+        add("message.kubanhorizons.genie.lamp.required",
+                "Bind a genie lamp first. A palace without a vessel has no door.",
+                "Сначала привяжите лампу. У дворца без сосуда нет двери.");
+        add("message.kubanhorizons.genie.conditional.added",
+                "The rule is alive and saved: %s",
+                "Правило действует и сохранено: %s");
+        add("message.kubanhorizons.genie.conditional.removed",
+                "The conditional rule has been removed.",
+                "Условное правило удалено.");
+        add("message.kubanhorizons.genie.conditional.not_found",
+                "There is no matching rule to remove.",
+                "Подходящего правила для удаления нет.");
+        add("message.kubanhorizons.genie.conditional.limit",
+                "You may keep no more than 16 conditional rules.",
+                "Можно хранить не больше 16 условных правил.");
+        add("message.kubanhorizons.genie.conditional.list",
+                "Saved conditional rules: %s",
+                "Сохранённые условные правила: %s");
+        add("message.kubanhorizons.genie.conditional.rule.raining.grow_steppe",
+                "When it rains → strengthen plant growth in the Kuban lands",
+                "Когда идёт дождь → усиливать рост растений на кубанской земле");
+        add("message.kubanhorizons.genie.conditional.rule.night.soul_light",
+                "When night falls → kindle soul lights near the owner",
+                "Когда наступает ночь → зажигать огни душ рядом с хозяином");
+>>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
         add("message.kubanhorizons.genie.wish.omnipotence_warning",
                 "Genie: Omnipotent?.. That is a very careless word.",
                 "Джинния: «Всемогущим?.. Это очень неосторожное слово.»");
@@ -463,6 +575,12 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.vessel.released",
                 "You are outside again. The vessel remains yours — and findable.",
                 "Вы снова снаружи. Сосуд по-прежнему ваш — и его по-прежнему можно найти.");
+        add("message.kubanhorizons.genie.vessel.palace_entered",
+                "The lamp opens inward. You enter the Eternal Kuban palace.",
+                "Лампа открылась внутрь. Вы вошли во дворец Вечной Кубани.");
+        add("message.kubanhorizons.genie.vessel.palace_left",
+                "The lamp returns you to the exact place you entered from.",
+                "Лампа вернула вас точно туда, откуда вы вошли.");
         add("message.kubanhorizons.genie.vessel.dimension_missing",
                 "The vessel has no inside: its dimension is not loaded.",
                 "У сосуда нет внутреннего пространства: его измерение не загружено.");
@@ -555,6 +673,9 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.wish.meta_instant_smelt",
                 "The fires of reality flare to instant heat.",
                 "Пламя реальности вспыхивает мгновенным жаром.");
+        add("message.kubanhorizons.genie.wish.policy_confirmation_required",
+                "A global rule must be previewed and confirmed in the genie dialogue.",
+                "Глобальное правило нужно сначала просмотреть и подтвердить в диалоге с джиннией.");
         add("message.kubanhorizons.genie.wish.village_wealth",
                 "A chest of emeralds arrives for the settlement.",
                 "Сундук изумрудов прибывает на благо поселения.");
@@ -772,6 +893,36 @@ final class KHTranslations {
                 "Gather peach, apricot, plum and walnut",
                 "Соберите персик, абрикос, сливу и грецкий орех");
 
+        // --- Достижения: рыболовство ---
+        add("advancement.kubanhorizons.first_sturgeon.title", "Kuban Sturgeon", "Кубанский осётр");
+        add("advancement.kubanhorizons.first_sturgeon.description",
+                "Catch a sturgeon in the floodplain or a liman",
+                "Поймайте осетра в пойме или лимане");
+        add("advancement.kubanhorizons.cooked_sturgeon.title", "Fish on the Fire", "Рыба на огне");
+        add("advancement.kubanhorizons.cooked_sturgeon.description",
+                "Cook a sturgeon", "Пожарьте осетра");
+        add("advancement.kubanhorizons.smoked_fish.title", "Smokehouse Keeps", "Коптильня хранит");
+        add("advancement.kubanhorizons.smoked_fish.description",
+                "Smoke fish in a smokehouse — it keeps far longer than fried",
+                "Закопти рыбу в коптильне: так она хранится дольше жареной");
+        add("advancement.kubanhorizons.sturgeon_bucket.title", "Live Fish", "Живая рыба");
+        add("advancement.kubanhorizons.sturgeon_bucket.description",
+                "Carry a living sturgeon in a bucket",
+                "Перенесите живого осетра в ведре");
+
+        // --- Достижения: ремесло ---
+        add("advancement.kubanhorizons.adobe.title", "Clay and Straw", "Глина и солома");
+        add("advancement.kubanhorizons.adobe.description",
+                "Make adobe bricks — the cheapest wall in the steppe",
+                "Сделайте саманный кирпич — самую дешёвую стену в степи");
+        add("advancement.kubanhorizons.whitewash.title", "White Hut", "Белая хата");
+        add("advancement.kubanhorizons.whitewash.description",
+                "Whitewash a wall with plaster", "Побелите стену штукатуркой");
+        add("advancement.kubanhorizons.homestead.title", "Kuban Homestead", "Кубанская усадьба");
+        add("advancement.kubanhorizons.homestead.description",
+                "Gather roof tiles, shell rock, wattle and a carved window casing",
+                "Соберите черепицу, ракушечник, плетень и резной наличник");
+
         // --- Достижения: манул ---
         add("advancement.kubanhorizons.manul_observed.title", "Don't Touch the Cat", "Не трогай кота");
         add("advancement.kubanhorizons.manul_observed.description",
@@ -808,7 +959,6 @@ final class KHTranslations {
         add("message.kubanhorizons.manul.legend.4",
                 "Villager: My grandfather never chased one off the hay. He said the steppe would take offence.",
                 "Житель: «Дед мой манула с сена никогда не гонял. Говорил — степь обидится».");
-
         // --- Конфигурация (переводы ключей) ---
         add("config.kubanhorizons.crops.growthSpeed", "Crop growth speed", "Скорость роста культур");
         add("config.kubanhorizons.fertility.enabled", "Soil fertility system", "Система плодородия почвы");

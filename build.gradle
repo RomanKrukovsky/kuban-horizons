@@ -60,6 +60,7 @@ var genieSecrets = genieSecretKeys.collectEntries { name ->
 
 neoForge {
     version = project.neo_version
+    accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         client {
@@ -78,6 +79,11 @@ neoForge {
             server()
             programArgument '--nogui'
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+            // Отдельный smoke-мир без изменения server.properties:
+            // ./gradlew runServer -PkhServerWorld="имя-каталога"
+            if (project.hasProperty('khServerWorld')) {
+                programArguments.addAll '--world', project.khServerWorld
+            }
         }
 
         // Запускает GameTestServer, прогоняет все зарегистрированные gametests и завершает работу

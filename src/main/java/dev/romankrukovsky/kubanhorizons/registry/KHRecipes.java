@@ -50,6 +50,21 @@ public final class KHRecipes {
     public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> DRYING_CATEGORY =
             BOOK_CATEGORIES.register("drying", RecipeBookCategory::new);
 
+    /** Тип рецепта «копчение». */
+    public static final DeferredHolder<RecipeType<?>, RecipeType<dev.romankrukovsky.kubanhorizons.processing.SmokingProcessRecipe>> SMOKING_TYPE =
+            TYPES.register("smoking_process", () -> RecipeType.simple(KHIds.of("smoking_process")));
+
+    /** Сериализатор рецепта «копчение». */
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<dev.romankrukovsky.kubanhorizons.processing.SmokingProcessRecipe>> SMOKING_SERIALIZER =
+            SERIALIZERS.register("smoking_process",
+                    () -> new RecipeSerializer<>(
+                            dev.romankrukovsky.kubanhorizons.processing.SmokingProcessRecipe.MAP_CODEC,
+                            dev.romankrukovsky.kubanhorizons.processing.SmokingProcessRecipe.STREAM_CODEC));
+
+    /** Категория книги рецептов «копчение». */
+    public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> SMOKING_CATEGORY =
+            BOOK_CATEGORIES.register("smoking_process", RecipeBookCategory::new);
+
     /** Тип рецепта «помол». */
     public static final DeferredHolder<RecipeType<?>, RecipeType<dev.romankrukovsky.kubanhorizons.processing.MillingRecipe>> MILLING_TYPE =
             TYPES.register("milling", () -> RecipeType.simple(KHIds.of("milling")));
@@ -79,6 +94,28 @@ public final class KHRecipes {
     /** Категория книги рецептов «нарезка». */
     public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> CUTTING_CATEGORY =
             BOOK_CATEGORIES.register("cutting", RecipeBookCategory::new);
+
+    /**
+     * Тип рецепта «давка сока» (виноградный чан).
+     *
+     * <p>Отдельный тип, а не {@code oil_pressing}: у давки другой состав полей
+     * (выход сока на единицу и стоимость бутылки вместо жмыха и длительности
+     * цикла), а общий тип заставил бы маслопресс принимать виноград, а чан —
+     * семечки. Подробнее — javadoc {@code PressingRecipe}.</p>
+     */
+    public static final DeferredHolder<RecipeType<?>, RecipeType<dev.romankrukovsky.kubanhorizons.processing.PressingRecipe>> PRESSING_TYPE =
+            TYPES.register("pressing", () -> RecipeType.simple(KHIds.of("pressing")));
+
+    /** Сериализатор рецепта «давка сока». */
+    public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<dev.romankrukovsky.kubanhorizons.processing.PressingRecipe>> PRESSING_SERIALIZER =
+            SERIALIZERS.register("pressing",
+                    () -> new RecipeSerializer<>(
+                            dev.romankrukovsky.kubanhorizons.processing.PressingRecipe.MAP_CODEC,
+                            dev.romankrukovsky.kubanhorizons.processing.PressingRecipe.STREAM_CODEC));
+
+    /** Категория книги рецептов «давка сока». */
+    public static final DeferredHolder<RecipeBookCategory, RecipeBookCategory> PRESSING_CATEGORY =
+            BOOK_CATEGORIES.register("pressing", RecipeBookCategory::new);
 
     private KHRecipes() {
     }

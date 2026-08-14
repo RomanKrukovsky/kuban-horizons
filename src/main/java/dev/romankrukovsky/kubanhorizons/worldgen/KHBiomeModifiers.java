@@ -24,6 +24,18 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
  * томаты — равнины и саванны; одичавший виноград — саванны и лесистые
  * холмы (сухие «южные» склоны); дикий рис — мелководье поймы реки;
  * одичавшие плодовые деревья — степь, пойма и равнины.</p>
+ *
+ * <p><b>Про ванильные биомы в списках ниже.</b> Генератор мода
+ * ({@link KubanBiomeSource}) подменяет ванильные биомы кубанскими, поэтому
+ * ни один {@code Biomes.*} в мире мода не появляется. Записи с ванильными
+ * биомами оставлены сознательно — они работают в обычном мире и в чужих
+ * пресетах, где мод стоит рядом с ванильной генерацией, — но полагаться
+ * на них внутри «Кубанских горизонтов» нельзя. Именно поэтому у каждой
+ * культуры и каждого зверя рядом с ванильным биомом обязан стоять
+ * кубанский: иначе контент зарегистрирован, а в игре его нет. Так уже
+ * было с чаем (жил на болоте вместо склонов), лозой (только степь),
+ * кабаном (только пойма), чайкой (только лиман) и манулом (один биом из
+ * девяти).</p>
  */
 public final class KHBiomeModifiers {
     public static final ResourceKey<BiomeModifier> ADD_WILD_TEA =
@@ -69,6 +81,12 @@ public final class KHBiomeModifiers {
                         biomes.getOrThrow(Biomes.JUNGLE),
                         biomes.getOrThrow(Biomes.SPARSE_JUNGLE),
                         biomes.getOrThrow(Biomes.BAMBOO_JUNGLE),
+                        // Чайные склоны — то самое место, ради которого
+                        // дикий чай и задумывался. До появления этого биома
+                        // джунглевые записи выше были мертвы: генератор мода
+                        // ванильные джунгли не порождает, и чай встречался
+                        // только на болоте, в плавнях и лимане.
+                        biomes.getOrThrow(KHBiomes.TEA_SLOPES),
                         biomes.getOrThrow(KHBiomes.PLAVNI),
                         biomes.getOrThrow(KHBiomes.LIMAN)),
                 HolderSet.direct(features.getOrThrow(KHPlacedFeatures.WILD_TEA_PLACED)),
@@ -88,6 +106,11 @@ public final class KHBiomeModifiers {
                         biomes.getOrThrow(Biomes.SAVANNA),
                         biomes.getOrThrow(Biomes.SAVANNA_PLATEAU),
                         biomes.getOrThrow(Biomes.WOODED_BADLANDS),
+                        // Виноградные холмы: сухие южные склоны Тамани, для
+                        // которых саванна выше и была подобрана. В мире мода
+                        // ванильной саванны нет, поэтому одичавшая лоза
+                        // росла только в степи.
+                        biomes.getOrThrow(KHBiomes.VINEYARD_HILLS),
                         biomes.getOrThrow(KHBiomes.KUBAN_STEPPE)),
                 HolderSet.direct(features.getOrThrow(KHPlacedFeatures.WILD_GRAPE_PLACED)),
                 GenerationStep.Decoration.VEGETAL_DECORATION));
@@ -108,10 +131,17 @@ public final class KHBiomeModifiers {
         // Биомы: кубанская степь и пойма (свои, обжитые человеком места),
         // равнины и лесостепь как их ванильные аналоги. Ни джунглей, ни
         // болот: сад — след хозяйства, а не дикой природы.
+        //
+        // Предгорный лес и виноградные холмы — тоже обжитые места: старые
+        // сады на склонах и у лесной кромки. Ванильные PLAINS/MEADOW/FOREST
+        // ниже в этом мире недостижимы, поэтому без своих биомов сад
+        // встречался лишь в двух местах из шести заявленных.
         context.register(ADD_WILD_FRUIT_TREES, new BiomeModifiers.AddFeaturesBiomeModifier(
                 HolderSet.direct(
                         biomes.getOrThrow(KHBiomes.KUBAN_STEPPE),
                         biomes.getOrThrow(KHBiomes.RIVER_FLOODPLAIN),
+                        biomes.getOrThrow(KHBiomes.FOOTHILL_FOREST),
+                        biomes.getOrThrow(KHBiomes.VINEYARD_HILLS),
                         biomes.getOrThrow(Biomes.PLAINS),
                         biomes.getOrThrow(Biomes.SUNFLOWER_PLAINS),
                         biomes.getOrThrow(Biomes.MEADOW),
@@ -126,6 +156,9 @@ public final class KHBiomeModifiers {
         context.register(ADD_PHEASANT_SPAWNS, BiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(
                 HolderSet.direct(
                         biomes.getOrThrow(KHBiomes.KUBAN_STEPPE),
+                        // Фазан — птица лесостепной кромки, а не чистого поля:
+                        // кормится в поле, прячется в подлеске.
+                        biomes.getOrThrow(KHBiomes.FOOTHILL_FOREST),
                         biomes.getOrThrow(KHBiomes.RIVER_FLOODPLAIN)),
                 new Weighted<>(new MobSpawnSettings.SpawnerData(KHEntities.PHEASANT.get(), 1, 3), 8)));
 
@@ -141,11 +174,15 @@ public final class KHBiomeModifiers {
 
         // Кабан: лес и пойма, откуда он и выходит на поля. В степи не живёт —
         // ему нужно укрытие, иначе он караулил бы грядки круглосуточно.
+        // Предгорный лес добавлен потому, что ванильные леса ниже в этом
+        // мире не порождаются: кабан жил только в пойме, и «зверь выходит
+        // из леса на поле» не работало за отсутствием леса.
         context.register(ADD_WILD_BOAR_SPAWNS, BiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(
                 HolderSet.direct(
                         biomes.getOrThrow(Biomes.FOREST),
                         biomes.getOrThrow(Biomes.BIRCH_FOREST),
                         biomes.getOrThrow(Biomes.DARK_FOREST),
+                        biomes.getOrThrow(KHBiomes.FOOTHILL_FOREST),
                         biomes.getOrThrow(KHBiomes.RIVER_FLOODPLAIN)),
                 new Weighted<>(new MobSpawnSettings.SpawnerData(
                         KHEntities.WILD_BOAR.get(), 1, 2), 4)));
@@ -158,11 +195,15 @@ public final class KHBiomeModifiers {
                 new Weighted<>(new MobSpawnSettings.SpawnerData(
                         KHEntities.NUTRIA.get(), 2, 4), 8)));
 
-        // Чайка: побережья и лиманы — примета берега.
+        // Чайка: побережья и лиманы — примета берега. Оба кубанских берега
+        // добавлены по той же причине: ванильные BEACH и STONY_SHORE в этом
+        // мире не появляются, и чайка держалась только над лиманом.
         context.register(ADD_GULL_SPAWNS, BiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(
                 HolderSet.direct(
                         biomes.getOrThrow(Biomes.BEACH),
                         biomes.getOrThrow(Biomes.STONY_SHORE),
+                        biomes.getOrThrow(KHBiomes.AZOV_COAST),
+                        biomes.getOrThrow(KHBiomes.BLACK_SEA_COAST),
                         biomes.getOrThrow(KHBiomes.LIMAN)),
                 new Weighted<>(new MobSpawnSettings.SpawnerData(
                         KHEntities.GULL.get(), 2, 4), 10)));
@@ -196,9 +237,17 @@ public final class KHBiomeModifiers {
         // как каменистые балки и осыпи; windswept-склоны как горные луга.
         // Пойма и плавни намеренно исключены — манул сухолюб, и в сырых
         // биомах он выглядел бы приезжим.
+        //
+        // Виноградные холмы и горный лес добавлены не для расширения ареала,
+        // а чтобы он вообще заработал: из девяти перечисленных ниже биомов
+        // генератор мода порождал ровно один — степь. Талисман края жил в
+        // одном биоме вместо девяти, и «сухие склоны, каменистые балки и
+        // горные пастбища» из задания существовали только в комментарии.
         context.register(ADD_MANUL_SPAWNS, BiomeModifiers.AddSpawnsBiomeModifier.singleSpawn(
                 HolderSet.direct(
                         biomes.getOrThrow(KHBiomes.KUBAN_STEPPE),
+                        biomes.getOrThrow(KHBiomes.VINEYARD_HILLS),
+                        biomes.getOrThrow(KHBiomes.MOUNTAIN_FOREST),
                         biomes.getOrThrow(Biomes.SAVANNA),
                         biomes.getOrThrow(Biomes.SAVANNA_PLATEAU),
                         biomes.getOrThrow(Biomes.BADLANDS),
