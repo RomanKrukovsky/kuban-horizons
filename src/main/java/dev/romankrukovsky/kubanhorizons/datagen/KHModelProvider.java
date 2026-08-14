@@ -280,6 +280,8 @@ public final class KHModelProvider extends ModelProvider {
         // В инвентаре чан пустой: сок наливают в мире, а не в предмете.
         blockModels.registerSimpleItemModel(press.asItem(), empty);
     }
+
+    /**
      * Блоки орошения: модели написаны вручную (нестандартная геометрия
      * желоба — допустимое исключение AD-005), blockstates и item-модели
      * генерируются здесь.

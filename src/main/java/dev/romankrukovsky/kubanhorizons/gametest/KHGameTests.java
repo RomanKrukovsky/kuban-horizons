@@ -4417,8 +4417,6 @@ public final class KHGameTests {
         }
     }
 
-<<<<<<< HEAD
-=======
     /** Диалоговая карманная сцена не меняет мир до подтверждения и сама возвращает его по таймеру. */
     private static void testDialogPocketSceneCycle(GameTestHelper helper) {
         var player = helper.makeMockServerPlayerInLevel();
@@ -4452,7 +4450,6 @@ public final class KHGameTests {
                 .thenSucceed();
     }
 
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
     /** Небольшой дом переносится через preview/confirmation/transaction и возвращается undo. */
     private static void testRuntimeStructureMove(GameTestHelper helper) {
         var player = helper.makeMockServerPlayerInLevel();
@@ -4494,8 +4491,6 @@ public final class KHGameTests {
         }
     }
 
-<<<<<<< HEAD
-=======
     /** Асимметричный blueprint поворачивается вместе с состояниями блоков. */
     private static void testRuntimeStructureRotate(GameTestHelper helper) {
         var player = helper.makeMockServerPlayerInLevel();
@@ -4580,7 +4575,6 @@ public final class KHGameTests {
         }
     }
 
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
     /** Рисунок-линия проходит preview/confirmation/transaction и retained undo. */
     private static void testRuntimeMagicDrawing(GameTestHelper helper) {
         var player = helper.makeMockServerPlayerInLevel();
@@ -5045,8 +5039,4 @@ public final class KHGameTests {
             manul.discard();
         });
     }
-<<<<<<< HEAD
-=======
->>>>>>> Stashed changes
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
 }

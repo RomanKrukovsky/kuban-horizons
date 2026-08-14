@@ -1,7 +1,9 @@
 package dev.romankrukovsky.kubanhorizons.client.screen;
 
 import dev.romankrukovsky.kubanhorizons.genie.vessel.OwnerDeathProtocol.DeathChoice;
-import net.minecraft.client.gui.GuiGraphics;
+import dev.romankrukovsky.kubanhorizons.network.packet.c2s.C2SOwnerDeathChoice;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -50,18 +52,17 @@ public class OwnerDeathChoiceScreen extends Screen {
     }
 
     private void sendChoice(DeathChoice choice) {
-        dev.romankrukovsky.kubanhorizons.network.packet.c2s.C2SOwnerDeathChoice.send(choice);
+        C2SOwnerDeathChoice.send(choice);
         this.onClose();
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics);
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 40, 0xFFFFFF);
-        guiGraphics.drawCenteredString(this.font,
-                Component.translatable("screen.kubanhorizons.genie.owner_death.subtitle"),
-                this.width / 2, 60, 0xAAAAAA);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
+        var text = guiGraphics.textRenderer();
+        text.accept(TextAlignment.CENTER, this.width / 2, 40, this.title);
+        text.accept(TextAlignment.CENTER, this.width / 2, 60,
+                Component.translatable("screen.kubanhorizons.genie.owner_death.subtitle"));
     }
 
     @Override
@@ -69,4 +70,3 @@ public class OwnerDeathChoiceScreen extends Screen {
         return true;
     }
 }
-```

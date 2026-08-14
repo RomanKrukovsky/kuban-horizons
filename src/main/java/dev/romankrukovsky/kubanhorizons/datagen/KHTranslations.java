@@ -314,7 +314,6 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.law.use_forfeit",
                 "The vessel will not simply release you. Use /genie forfeit.",
                 "Сосуд не отпустит просто так. Используйте /genie forfeit.");
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
         add("message.kubanhorizons.genie.ai.mode", "New order: %s.", "Новый приказ: %s.");
         add("message.kubanhorizons.genie.ai.status",
                 "Mind: %s | rescues %s, threats repelled %s, projectiles stopped %s, wishes remembered %s. Sneak-use with an empty hand to change my order.",
@@ -504,7 +503,6 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.conditional.rule.night.soul_light",
                 "When night falls → kindle soul lights near the owner",
                 "Когда наступает ночь → зажигать огни душ рядом с хозяином");
->>>>>>> 6e2806cd7fd1eec95181e4e48e492da66ebf50a8
         add("message.kubanhorizons.genie.wish.omnipotence_warning",
                 "Genie: Omnipotent?.. That is a very careless word.",
                 "Джинния: «Всемогущим?.. Это очень неосторожное слово.»");

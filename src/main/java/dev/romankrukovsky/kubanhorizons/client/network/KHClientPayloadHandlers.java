@@ -2,9 +2,11 @@ package dev.romankrukovsky.kubanhorizons.client.network;
 
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
 import dev.romankrukovsky.kubanhorizons.client.screen.GenieDialogScreen;
+import dev.romankrukovsky.kubanhorizons.client.screen.OwnerDeathChoiceScreen;
 import dev.romankrukovsky.kubanhorizons.client.screen.PocketConfirmScreen;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2CGenieResponse;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2COpenGenieDialog;
+import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2COpenOwnerDeathScreen;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2CPocketPreview;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2CPocketResult;
 import net.minecraft.client.Minecraft;
@@ -26,6 +28,7 @@ public final class KHClientPayloadHandlers {
         event.register(S2COpenGenieDialog.TYPE, KHClientPayloadHandlers::handleOpenDialog);
         event.register(S2CPocketPreview.TYPE, KHClientPayloadHandlers::handlePocketPreview);
         event.register(S2CPocketResult.TYPE, KHClientPayloadHandlers::handlePocketResult);
+        event.register(S2COpenOwnerDeathScreen.TYPE, KHClientPayloadHandlers::handleOpenOwnerDeathScreen);
     }
 
     private static void handleOpenDialog(S2COpenGenieDialog packet, IPayloadContext context) {
@@ -54,5 +57,9 @@ public final class KHClientPayloadHandlers {
         if (player != null) {
             player.sendSystemMessage(packet.message());
         }
+    }
+
+    private static void handleOpenOwnerDeathScreen(S2COpenOwnerDeathScreen packet, IPayloadContext context) {
+        Minecraft.getInstance().gui.setScreen(new OwnerDeathChoiceScreen(packet.genieId()));
     }
 }
