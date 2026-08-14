@@ -1011,6 +1011,100 @@ final class KHTranslations {
         add("tooltip.kubanhorizons.manul_shelter",
                 "A manul may settle here — if it trusts you and likes the spot",
                 "Здесь может поселиться манул — если доверяет и место по нему");
+
+        // Смерть владельца / выбор судьбы
+        add("screen.kubanhorizons.genie.owner_death.title",
+                "Owner's Death — Choose Your Fate",
+                "Смерть владельца — Выберите судьбу");
+        add("screen.kubanhorizons.genie.owner_death.subtitle",
+                "The genie offers you a choice:",
+                "Джинния предлагает вам выбор:");
+        add("choice.kubanhorizons.genie.owner_death.resurrect",
+                "Resurrect owner",
+                "Воскресить владельца");
+        add("choice.kubanhorizons.genie.owner_death.save_soul",
+                "Preserve soul (60s)",
+                "Сохранить душу (60 сек)");
+        add("choice.kubanhorizons.genie.owner_death.rollback",
+                "Roll back last wish",
+                "Откатить последнее желание");
+        add("choice.kubanhorizons.genie.owner_death.respawn_free",
+                "Release genie and respawn",
+                "Освободить джиннию");
+        add("message.kubanhorizons.genie.rescue_success",
+                "You have been rescued at the place of death.",
+                "Вы воскрешены на месте смерти.");
+        add("message.kubanhorizons.genie.soul_saved",
+                "Your soul has been preserved for 60 seconds.",
+                "Ваша душа сохранена на 60 секунд.");
+        add("message.kubanhorizons.genie.rollback_success",
+                "Last wish has been rolled back.",
+                "Последнее желание откачено.");
+        add("message.kubanhorizons.genie.respawn_free",
+                "Genie is released. You are mortal again.",
+                "Джинния освобождена. Вы снова обычный человек.");
+        add("message.kubanhorizons.genie.lamp.no_sleep",
+                "You cannot sleep inside the genie palace.",
+                "Во дворце джиннии нельзя спать.");
+
+        // General wish executor keys
+        add("message.kubanhorizons.genie.wish.gave_diamonds",
+                "Here are your diamonds!",
+                "Вот твои алмазы!");
+        add("message.kubanhorizons.genie.wish.gave_gold",
+                "Pure Kuban gold for you!",
+                "Чистое кубанское золото!");
+        add("message.kubanhorizons.genie.wish.gave_food",
+                "A feast for the road!",
+                "Угощение в дорогу!");
+        add("message.kubanhorizons.genie.wish.gave_sword",
+                "A sharp diamond blade!",
+                "Острый алмазный клинок!");
+        add("message.kubanhorizons.genie.wish.gave_pickaxe",
+                "A sturdy pickaxe!",
+                "Крепкая кирка!");
+        add("message.kubanhorizons.genie.wish.spawned_chickens",
+                "Chickens gathered from all around!",
+                "Куры со всей округи сбежались!");
+        add("message.kubanhorizons.genie.wish.spawned_cows",
+                "Cows are now grazing nearby!",
+                "Коровы пасутся рядом!");
+        add("message.kubanhorizons.genie.wish.spawned_wolves",
+                "Steppe wolves heed your call!",
+                "Степные волки откликнулись!");
+        add("message.kubanhorizons.genie.wish.spawned_horses",
+                "Noble horses for your journey!",
+                "Благородные кони для пути!");
+        add("message.kubanhorizons.genie.wish.spawned_cats",
+                "Cats appeared to keep you company!",
+                "Коты пришли согреть теплом!");
+        add("message.kubanhorizons.genie.wish.rain_started",
+                "Rain clouds gather over the steppe!",
+                "Дождевые тучи сгущаются над степью!");
+        add("message.kubanhorizons.genie.wish.weather_cleared",
+                "The steppe sky is clear and sunny!",
+                "Небо над степью чистое и ясное!");
+        add("message.kubanhorizons.genie.wish.night_set",
+                "Steppe night blankets the world.",
+                "Степная ночь опустилась на мир.");
+        add("message.kubanhorizons.genie.wish.day_set",
+                "The warm Kuban sun rises.",
+                "Тёплое кубанское солнце взошло.");
+        add("message.kubanhorizons.genie.wish.placed_tree",
+                "A young oak springs forth from the soil!",
+                "Молодой дуб вырос из земли!");
+        add("message.kubanhorizons.genie.wish.placed_house",
+                "A humble cozy cottage has been built!",
+                "Уютная хата возведена!");
+        add("message.kubanhorizons.genie.wish.firework",
+                "Magic bursts across the sky!",
+                "Магический салют озарил небо!");
+        add("message.kubanhorizons.genie.wish.general_fulfilled",
+                "The genie weaved magic to fulfill your wish!",
+                "Джинния соткала магию и исполнила желание!");
+        add("message.kubanhorizons.genie.wish.failed",
+                "The wish could not take form.",
+                "Желание не смогло обрести форму.");
     }
 
     private KHTranslations() {
