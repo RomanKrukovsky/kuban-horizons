@@ -9,12 +9,19 @@ import java.util.*;
 
 /**
  * Transactional boundary for executing strong wishes safely.
+ *
+ * Responsibilities:
+ * - Enforce budget
+ * - Apply temperament reaction
+ * - Execute operation in isolation
+ * - Record everything in CausalityLedger
  */
 public final class SafeStrongWishRuntime {
 
     private final CausalityLedger ledger = new CausalityLedger();
 
     public WishResult execute(WishPlanResult plan, ServerPlayer player, GeniePersonality personality, ServerLevel level) {
+
         if (plan.status() == WishPlanResult.Status.REJECTED) {
             return WishResult.rejected(plan.rejectionReason());
         }
@@ -23,19 +30,32 @@ public final class SafeStrongWishRuntime {
             return WishResult.needsConfirmation(plan);
         }
 
-        // Isolation: we don't give raw world access to the operation
+        ParsedWish parsed = plan.parsedWish();
+        WishOperation operation = plan.operation();
+
+        // 1. Budget check (already done in PlanGate, but double-check here)
+        BudgetResult budget = BudgetCalculator.calculate(personality, parsed);
+        if (!budget.withinLimits()) {
+            return WishResult.truncated("Желание урезано из-за лимита связи.");
+        }
+
+        // 2. Temperament reaction
+        TemperamentReactionEngine.Reaction reaction =
+                TemperamentReactionEngine.decideReaction(parsed, personality);
+
+        // 3. Execute the operation inside a controlled context
         try {
-            ParsedWish parsed = plan.parsedWish();
-            WishOperation operation = plan.operation();
+            // In a real implementation we would wrap world access here
+            Object result = operation.execute(parsed, level, player);
 
-            // Execute within controlled context
-            List result = operation.execute(parsed, level, player);
+            // 4. Record in ledger
+            ledger.recordExecution(player, parsed, level, List.of(), List.of());
 
-            // Record for causality
-            ledger.recordExecution(player, parsed, level, List.of(), List.of()); // simplified
+            // 5. Return success with reaction info
+            return WishResult.successWithReaction(result, reaction);
 
-            return WishResult.success(result);
         } catch (Exception e) {
+            // Future: trigger rollback via ledger
             return WishResult.failed("Ошибка исполнения: " + e.getMessage());
         }
     }

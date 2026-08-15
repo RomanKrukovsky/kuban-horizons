@@ -32,36 +32,34 @@ public class KubanJugBlockEntity extends BlockEntity {
     }
 
     public KubanGenie getOrSummonGenie(ServerLevel level, Player player) {
-        if (genieId == null) {
-            // First time - create new genie and anchor it
-            KubanGenie genie = new KubanGenie(KHEntities.KUBAN_GENIE.get(), level);
-            genie.setPos(this.getBlockPos().getX() + 0.5, this.getBlockPos().getY() + 1.2, this.getBlockPos().getZ() + 0.5);
-            genie.setOwner(player.getUUID());
-            level.addFreshEntity(genie);
-            this.genieId = genie.getUUID();
-            GenieAnchor.admit(genie, level);
-            this.boundPersonality = genie.getPersonality();
+        // Always check the anchor first — this is the single source of truth
+        KubanGenie anchored = GenieAnchor.findAnchoredGenie(level);
+        if (anchored != null && anchored.isAlive()) {
+            // Teleport the real genie to the jug
+            anchored.teleportTo(this.getBlockPos().getX() + 0.5, this.getBlockPos().getY() + 1.2, this.getBlockPos().getZ() + 0.5);
+            this.genieId = anchored.getUUID();
             this.setChanged();
-            return genie;
-        } else {
-            // Try to find existing genie
-            KubanGenie existing = (KubanGenie) level.getEntity(genieId);
-            if (existing != null && existing.isAlive()) {
-                // Teleport to jug
-                existing.teleportTo(this.getBlockPos().getX() + 0.5, this.getBlockPos().getY() + 1.2, this.getBlockPos().getZ() + 0.5);
-                return existing;
-            } else {
-                // Genie lost - recreate (rare)
-                KubanGenie newGenie = new KubanGenie(KHEntities.KUBAN_GENIE.get(), level);
-                newGenie.setPos(this.getBlockPos().getX() + 0.5, this.getBlockPos().getY() + 1.2, this.getBlockPos().getZ() + 0.5);
-                newGenie.setOwner(player.getUUID());
-                level.addFreshEntity(newGenie);
-                this.genieId = newGenie.getUUID();
-                GenieAnchor.admit(newGenie, level);
-                this.setChanged();
-                return newGenie;
-            }
+            return anchored;
         }
+
+        // No anchored genie exists — safe to create one
+        KubanGenie genie = new KubanGenie(KHEntities.KUBAN_GENIE.get(), level);
+        genie.setPos(this.getBlockPos().getX() + 0.5, this.getBlockPos().getY() + 1.2, this.getBlockPos().getZ() + 0.5);
+        genie.setOwner(player.getUUID());
+        level.addFreshEntity(genie);
+
+        // This will set the anchor if none exists
+        boolean accepted = GenieAnchor.admit(genie, level);
+        if (!accepted) {
+            // Extremely rare race condition — remove the duplicate
+            genie.discard();
+            return null;
+        }
+
+        this.genieId = genie.getUUID();
+        this.boundPersonality = genie.getPersonality();
+        this.setChanged();
+        return genie;
     }
 
     public void onRemoved() {
