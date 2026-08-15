@@ -388,13 +388,16 @@ final class KHTranslations {
                 "Память %s: зачарований: %s, износ: %s.");
         add("message.kubanhorizons.genie.whisper.bell",
                 "Genie translates the bell's whispers: I remember 40 years of festivals and 3 raids...",
-                "Джинния переводит шёпот колокола: «Я помню 40 лет праздников и 3 набега...»");
+                "Джинния переводит шёпот колокола: я помню 40 лет праздников и 3 набега...");
         add("message.kubanhorizons.genie.whisper.portal",
                 "Genie whispers: This portal remembers a thousand travelers...",
                 "Джинния шепчет: «Этот портал помнит путешествия тысячи странников...»");
         add("message.kubanhorizons.genie.whisper.ancient",
                 "Genie reads the stones: These patterns were carved long before our time.",
                 "Джинния читает камни: «Эти узоры высечены старой цивилизацией задолго до нас.»");
+        add("wish.kubanhorizons.whisper.empty",
+                "Genie: this block keeps its silence.",
+                "Джинния: этот блок хранит молчание.");
         add("message.kubanhorizons.genie.flying_house",
                 "Genie: Your house now floats gently in the sky!",
                 "Джинния: «Твой дом теперь плавно парит в небесах!»");

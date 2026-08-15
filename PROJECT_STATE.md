@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **157 тестов проходят** (`All 157 required tests passed`).
+- Полный `runGameTestServer` мода: **158 тестов проходят** (`All 158 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -243,7 +243,11 @@
   из mobInteract при ПКМ с пустой рукой (доверенная джинния чинит грядку/камень
   по взгляду); добавлены setTrust/setAffection в GeniePersonality;
   тест genie_wordless_wish.
-- **157 GameTest проходят**: `All 157 required tests passed :)`.
+- **Шёпот блоков**: BlockWhispersEngine был orphan-движком; теперь доступен через
+  wish-таргет BLOCK_WHISPER («о чём говорит блок» / "whisper") — джинния читает
+  колокол/портал/древние блоки по взгляду; локализация whisper.empty;
+  тест genie_block_whisper.
+- **158 GameTest проходят**: `All 158 required tests passed :)`.
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая
   параллельные тесты (манул).
 

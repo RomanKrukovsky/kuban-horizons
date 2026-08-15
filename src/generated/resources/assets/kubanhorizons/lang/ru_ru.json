@@ -389,7 +389,7 @@
   "message.kubanhorizons.genie.vessel.warned": "Хозяин предупреждён о желании: %s",
   "message.kubanhorizons.genie.wealthy_village": "Джинния: «Деревня сияет новым богатством!»",
   "message.kubanhorizons.genie.whisper.ancient": "Джинния читает камни: «Эти узоры высечены старой цивилизацией задолго до нас.»",
-  "message.kubanhorizons.genie.whisper.bell": "Джинния переводит шёпот колокола: «Я помню 40 лет праздников и 3 набега...»",
+  "message.kubanhorizons.genie.whisper.bell": "Джинния переводит шёпот колокола: я помню 40 лет праздников и 3 набега...",
   "message.kubanhorizons.genie.whisper.portal": "Джинния шепчет: «Этот портал помнит путешествия тысячи странников...»",
   "message.kubanhorizons.genie.wish.big_bed": "Огромная кровать для десяти игроков появляется перед вами!",
   "message.kubanhorizons.genie.wish.big_chicken": "Курица высотой 30 блоков шагает в вашу реальность!",
@@ -571,6 +571,7 @@
   "wish.kubanhorizons.music.rain": "Звучит Песня дождя. Над степью сгущаются облака.",
   "wish.kubanhorizons.whatif.empty": "Джинния: нечего сравнивать. Реальность не помнит ни одного отменённого желания.",
   "wish.kubanhorizons.whatif.result": "Джинния: «%s» — %s. Останься это желание, мир отличался бы на %s блоков. %s",
+  "wish.kubanhorizons.whisper.empty": "Джинния: этот блок хранит молчание.",
   "wish.kubanhorizons.word.bad": "Джинния: назовите короткое слово для материализации (до 12 букв).",
   "wish.kubanhorizons.word.written": "Слово материализуется в воздухе, блок за блоком."
 }

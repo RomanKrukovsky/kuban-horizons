@@ -211,6 +211,7 @@ public final class KHGameTests {
         register("genie_runtime_magic_drawing", KHGameTests::testRuntimeMagicDrawing, 100);
         register("genie_wish_word_materialization", KHGameTests::testWishWordMaterialization, 100);
         register("genie_wordless_wish", KHGameTests::testWordlessWish, 100);
+        register("genie_block_whisper", KHGameTests::testBlockWhisper, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5152,6 +5153,30 @@ public final class KHGameTests {
                 .checkWordlessIntent(genie, helper.getLevel(), player);
         helper.assertTrue(applied,
                 "Доверенная джинния не распознала желание без слов по взгляду на грядку");
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Шёпот блоков: парсер распознаёт запрос, движок читает колокол. */
+    private static void testBlockWhisper(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("о чём говорит блок");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.BLOCK_WHISPER,
+                "Парсер не распознал запрос о шёпоте блока: " + intent.target());
+
+        // Колокол в поле зрения игрока -> джинния переводит его шёпот.
+        BlockPos bellRel = new BlockPos(4, 4, 4);
+        helper.setBlock(bellRel, Blocks.BELL);
+        BlockPos bell = helper.absolutePos(bellRel);
+        player.snapTo(bell.getX() + 0.5D, bell.getY() + 1.0D, bell.getZ() + 0.5D, 0.0F, 0.0F);
+        player.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,
+                net.minecraft.world.phys.Vec3.atBottomCenterOf(bell));
+
+        boolean heard = dev.romankrukovsky.kubanhorizons.genie.memory.BlockWhispersEngine
+                .listenToBlock(null, helper.getLevel(), player, bell);
+        helper.assertTrue(heard, "Джинния не услышала шёпот колокола");
+
         player.discard();
         helper.succeed();
     }

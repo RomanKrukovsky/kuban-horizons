@@ -44,7 +44,10 @@ public final class WishExecutor {
                 case BIOME_REWRITE -> executeBiomeRewrite(level, player);
                 default -> executeCivilizationWish(level, player, intent);
             };
-            case PROVENANCE -> executeProvenanceQuery(level, player, intent);
+            case PROVENANCE -> switch (intent.target()) {
+                case BLOCK_WHISPER -> executeBlockWhisper(level, player, intent);
+                default -> executeProvenanceQuery(level, player, intent);
+            };
             case HISTORY -> switch (intent.target()) {
                 case WHAT_IF -> executeWhatIf(level, player, intent);
                 case THEATER_REENACTMENT -> executeTheater(level, player);
@@ -168,6 +171,23 @@ public final class WishExecutor {
         player.sendSystemMessage(Component.translatable("wish.kubanhorizons.provenance.entry",
                 id, last.action(), last.wishText()));
         return new Result(true, "wish.kubanhorizons.provenance.entry");
+    }
+
+    /** Память блоков: джинния переводит шёпот блока, на который смотрит игрок. */
+    private static Result executeBlockWhisper(ServerLevel level, Player player, WishIntent intent) {
+        var hit = player.pick(8.0D, 0.0F, false);
+        if (hit.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK
+                || !(hit instanceof net.minecraft.world.phys.BlockHitResult blockHit)) {
+            player.sendSystemMessage(Component.translatable("wish.kubanhorizons.whisper.empty"));
+            return new Result(false, "wish.kubanhorizons.whisper.empty");
+        }
+        boolean heard = dev.romankrukovsky.kubanhorizons.genie.memory.BlockWhispersEngine
+                .listenToBlock(null, level, player, blockHit.getBlockPos());
+        if (heard) {
+            return new Result(true, "message.kubanhorizons.genie.whisper.bell");
+        }
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.whisper.empty"));
+        return new Result(false, "wish.kubanhorizons.whisper.empty");
     }
 
     /** История: «А что если?» — описательный отчёт об альтернативной версии мира. */

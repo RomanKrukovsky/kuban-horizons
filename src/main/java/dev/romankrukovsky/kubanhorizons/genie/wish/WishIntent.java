@@ -44,6 +44,7 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         WORD_MATERIALIZATION,
         DRAWING,
         BIOME_REWRITE,
+        BLOCK_WHISPER,
         MUSIC_SPELL,
         LLM_DELEGATED,
         UNKNOWN

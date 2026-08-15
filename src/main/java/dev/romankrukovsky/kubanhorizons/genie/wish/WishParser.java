@@ -138,6 +138,12 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9а. Память блоков: «О чём говорит блок?»
+        else if (containsAny(normalized, "о чём говорит блок", "что говорит блок", "шепни", "whisper", "о чём блок")) {
+            target = WishIntent.Target.BLOCK_WHISPER;
+            category = WishIntent.Category.PROVENANCE;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

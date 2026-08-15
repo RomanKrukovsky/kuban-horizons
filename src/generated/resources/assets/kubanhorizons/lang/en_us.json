@@ -571,6 +571,7 @@
   "wish.kubanhorizons.music.rain": "The Rain Song begins. Clouds gather over the steppe.",
   "wish.kubanhorizons.whatif.empty": "Genie: no undone wish to compare. Reality remembers nothing to replay.",
   "wish.kubanhorizons.whatif.result": "Genie: '%s' — %s. If the wish had stayed, the world would differ in %s blocks. %s",
+  "wish.kubanhorizons.whisper.empty": "Genie: this block keeps its silence.",
   "wish.kubanhorizons.word.bad": "Genie: say a short word to materialize (up to 12 letters).",
   "wish.kubanhorizons.word.written": "The word materializes in the air, block by block."
 }
