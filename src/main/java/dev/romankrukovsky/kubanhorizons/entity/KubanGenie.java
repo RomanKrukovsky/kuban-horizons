@@ -74,6 +74,10 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
     private final WishborneState wishborneState = new WishborneState();
     private UUID ownerId;
 
+    public WishborneState getWishborneState() {
+        return wishborneState;
+    }
+
     public KubanGenie(EntityType<? extends PathfinderMob> type, Level level) {
         super(type, level);
         setNoGravity(true);
@@ -321,6 +325,13 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         return WishborneDefenseHandler.handleHurt(this, level, source);
+    }
+
+    public void increaseRealityAnchoring(float amount) {
+        wishborneState.increaseAnchoring(amount);
+        if (wishborneState.isBanished()) {
+            this.discard();
+        }
     }
 
     @Override

@@ -1,6 +1,13 @@
 package dev.romankrukovsky.kubanhorizons.registry;
 
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
+import dev.romankrukovsky.kubanhorizons.genie.vessel.KubanJugBlockEntity;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import dev.romankrukovsky.kubanhorizons.KubanHorizons;
 import dev.romankrukovsky.kubanhorizons.blockentity.OilPressBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -43,6 +50,12 @@ public final class KHBlockEntities {
             BLOCK_ENTITIES.register("grape_press",
                     () -> new BlockEntityType<>(dev.romankrukovsky.kubanhorizons.blockentity.GrapePressBlockEntity::new,
                             KHBlocks.GRAPE_PRESS.get()));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<KubanJugBlockEntity>> KUBAN_JUG =
+            BLOCK_ENTITIES.register("kuban_jug",
+                    () -> BlockEntityType.Builder.of(KubanJugBlockEntity::new, KHBlocks.KUBAN_JUG.get())
+                            .build(null));
+
     private KHBlockEntities() {
     }
 

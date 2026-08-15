@@ -1,5 +1,7 @@
 package dev.romankrukovsky.kubanhorizons.client.screen;
 
+import dev.romankrukovsky.kubanhorizons.client.util.KHColors;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
@@ -34,13 +36,19 @@ public class PocketConfirmScreen extends Screen {
         this.addRenderableWidget(Button.builder(
                 Component.translatable("screen.kubanhorizons.pocket.confirm"),
                 btn -> confirmChanges()
-        ).bounds(centerX - 100, centerY + 40, 95, 20).build());
+        )
+        .bounds(centerX - 100, centerY + 40, 95, 20)
+        .narration(msg -> Component.translatable("narration.kubanhorizons.pocket.confirm", msg.get()))
+        .build());
 
         // Кнопка отката
         this.addRenderableWidget(Button.builder(
                 Component.translatable("screen.kubanhorizons.pocket.cancel"),
                 btn -> rollbackChanges()
-        ).bounds(centerX + 5, centerY + 40, 95, 20).build());
+        )
+        .bounds(centerX + 5, centerY + 40, 95, 20)
+        .narration(msg -> Component.translatable("narration.kubanhorizons.pocket.rollback", msg.get()))
+        .build());
     }
 
     private void confirmChanges() {
@@ -71,8 +79,44 @@ public class PocketConfirmScreen extends Screen {
                 Component.translatable("screen.kubanhorizons.pocket.blocks", changedBlocks));
         text.accept(TextAlignment.CENTER, centerX, centerY - 15,
                 Component.translatable("screen.kubanhorizons.pocket.duration", durationTicks / 20));
-        text.accept(TextAlignment.CENTER, centerX, centerY,
-                Component.translatable("screen.kubanhorizons.pocket.risk", risk));
+        Component riskText = Component.translatable("screen.kubanhorizons.pocket.risk", risk);
+        int riskColor = getRiskColor();
+        Font font = guiGraphics.font();
+        int textWidth = font.width(riskText);
+        int textX = centerX - textWidth / 2;
+        int textY = centerY;
+
+        // Draw small colored square indicator
+        int squareSize = 6;
+        int squarePadding = 4;
+        int squareX = textX - squareSize - squarePadding;
+        int squareY = textY + (font.lineHeight - squareSize) / 2;
+        guiGraphics.fill(squareX, squareY, squareX + squareSize, squareY + squareSize, riskColor);
+
+        // Draw risk text in color
+        guiGraphics.drawString(font, riskText, textX, textY, riskColor);
+
+        text.accept(TextAlignment.CENTER, centerX, centerY + 15,
+                Component.literal(getRiskDescription()));
+    }
+
+    private String getRiskDescription() {
+        return switch (risk == null ? "" : risk.toLowerCase()) {
+            case "low" -> "Low risk: minimal block changes, safe to confirm";
+            case "medium" -> "Medium risk: moderate changes, review before confirming";
+            case "high" -> "High risk: significant changes, proceed with caution";
+            default -> "";
+        };
+    }
+
+    private int getRiskColor() {
+        if (risk == null) return 0xFFFFFFFF;
+        return switch (risk.toUpperCase()) {
+            case "LOW" -> KHColors.RISK_LOW;
+            case "MEDIUM" -> KHColors.RISK_MEDIUM;
+            case "HIGH" -> KHColors.RISK_HIGH;
+            default -> 0xFFFFFFFF;
+        };
     }
 
     @Override

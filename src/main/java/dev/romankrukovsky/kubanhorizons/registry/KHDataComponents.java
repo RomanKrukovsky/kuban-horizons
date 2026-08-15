@@ -1,36 +1,46 @@
 package dev.romankrukovsky.kubanhorizons.registry;
 
+import com.mojang.serialization.Codec;
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
+import dev.romankrukovsky.kubanhorizons.vessel.VesselBond;
+import dev.romankrukovsky.kubanhorizons.vessel.VesselType;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.function.UnaryOperator;
+
 /**
- * Регистрация data components мода.
+ * Data Components для хранения состояния сосудов и других модовых данных.
  */
 public final class KHDataComponents {
-    private static final DeferredRegister<DataComponentType<?>> COMPONENTS =
-            DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, KubanHorizons.MOD_ID);
+    public static final DeferredRegister<DataComponentType<?>> REGISTRY =
+        DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, KubanHorizons.MOD_ID);
 
-    /**
-     * Захваченный регион мира внутри предмета (сжатие мира джиннией).
-     *
-     * <p>Хранит результат {@code RegionSnapshot.toTag()}: предмет физически
-     * несёт в себе состояние блоков, покинувших мир.</p>
-     */
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CompoundTag>> REGION_PAYLOAD =
-            COMPONENTS.register("region_payload",
-                    () -> DataComponentType.<CompoundTag>builder()
-                            .persistent(CompoundTag.CODEC)
-                            .build());
+    /** Привязка сосуда к владельцу */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<VesselBond>> VESSEL_BOND =
+        register("vessel_bond", builder -> builder
+            .persistent(VesselBond.CODEC)
+            .networkSynchronized(VesselBond.STREAM_CODEC)
+            .cacheEncoding()
+        );
 
-    private KHDataComponents() {
+    /** Тип сосуда */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<VesselType>> VESSEL_TYPE =
+        register("vessel_type", builder -> builder
+            .persistent(Codec.STRING.xmap(VesselType::fromId, VesselType::getId))
+            .networkSynchronized(Codec.STRING.xmap(VesselType::fromId, VesselType::getId))
+        );
+
+    private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> register(
+            String name,
+            UnaryOperator<DataComponentType.Builder<T>> builder) {
+        return REGISTRY.register(name, () -> builder.apply(DataComponentType.builder()).build());
     }
 
     public static void register(IEventBus modEventBus) {
-        COMPONENTS.register(modEventBus);
+        REGISTRY.register(modEventBus);
     }
 }

@@ -1,5 +1,6 @@
 package dev.romankrukovsky.kubanhorizons.client.screen;
 
+import dev.romankrukovsky.kubanhorizons.client.util.KHColors;
 import dev.romankrukovsky.kubanhorizons.genie.vessel.OwnerDeathProtocol.DeathChoice;
 import dev.romankrukovsky.kubanhorizons.network.packet.c2s.C2SOwnerDeathChoice;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -63,6 +64,33 @@ public class OwnerDeathChoiceScreen extends Screen {
         text.accept(TextAlignment.CENTER, this.width / 2, 40, this.title);
         text.accept(TextAlignment.CENTER, this.width / 2, 60,
                 Component.translatable("screen.kubanhorizons.genie.owner_death.subtitle"));
+
+        int centerX = this.width / 2;
+        int centerY = this.height / 2;
+
+        // Consequence descriptions below each button
+        text.accept(TextAlignment.LEFT, centerX - 200, centerY - 15,
+                Component.translatable("choice.kubanhorizons.genie.owner_death.resurrect.desc"));
+        text.accept(TextAlignment.LEFT, centerX + 20, centerY - 15,
+                Component.translatable("choice.kubanhorizons.genie.owner_death.save_soul.desc"));
+        text.accept(TextAlignment.LEFT, centerX - 200, centerY + 35,
+                Component.translatable("choice.kubanhorizons.genie.owner_death.rollback.desc"));
+        text.accept(TextAlignment.LEFT, centerX + 20, centerY + 35,
+                Component.translatable("choice.kubanhorizons.genie.owner_death.respawn_free.desc"));
+
+        // Subtle distinct borders for each choice button using KHColors
+        drawButtonBorder(guiGraphics, centerX - 200, centerY - 40, 180, 20, KHColors.DEATH_RESURRECT); // green
+        drawButtonBorder(guiGraphics, centerX + 20, centerY - 40, 180, 20, KHColors.DEATH_SAVE_SOUL);   // violet
+        drawButtonBorder(guiGraphics, centerX - 200, centerY + 10, 180, 20, KHColors.DEATH_ROLLBACK);   // amber
+        drawButtonBorder(guiGraphics, centerX + 20, centerY + 10, 180, 20, KHColors.DEATH_RESPAWN);     // teal
+    }
+
+    private void drawButtonBorder(GuiGraphicsExtractor g, int x, int y, int w, int h, int color) {
+        // 1px border using thin fill rects (top, bottom, left, right)
+        g.fill(x, y, x + w, y + 1, color);           // top
+        g.fill(x, y + h - 1, x + w, y + h, color);   // bottom
+        g.fill(x, y, x + 1, y + h, color);           // left
+        g.fill(x + w - 1, y, x + w, y + h, color);   // right
     }
 
     @Override
