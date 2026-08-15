@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **152 теста проходят** (`All 152 required tests passed`).
+- Полный `runGameTestServer` мода: **153 теста проходят** (`All 153 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -222,7 +222,12 @@
 - **Музыкальная шкатулка**: MusicBoxSchool (4 настроения-ауры: покой/радость/
   грусть/благоговение), регистрация 5 сосудов в KHItems (vessel_lamp/mirror/ring/
   jug/music_box) + текстуры, тест genie_music_box_school.
-- **152 GameTest проходят**: `All 152 required tests passed :)` (два прогона подряд).
+- **Полные сосуды (5 школ)**: WishExecutionSchool (лампа — желание с бумаги в
+  offhand), IllusionSchool (зеркало — мираж/невидимость/успокоение),
+  PersonalMagicSchool (кольцо — стойкость/стремительность/могущество),
+  CreatureCreationSchool (кувшин — волк/эллай/овца-спутник) поверх уже готовой
+  MusicBoxSchool; тест genie_vessel_schools.
+- **153 GameTest проходят**: `All 153 required tests passed :)`.
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая
   параллельные тесты (манул).
 

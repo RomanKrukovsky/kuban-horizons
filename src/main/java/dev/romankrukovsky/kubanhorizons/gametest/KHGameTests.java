@@ -266,6 +266,7 @@ public final class KHGameTests {
         register("genie_unfulfilled_wish_room", KHGameTests::testUnfulfilledWishRoom, 100);
         register("genie_music_rain_song", KHGameTests::testMusicRainSong, 100);
         register("genie_music_box_school", KHGameTests::testMusicBoxSchool, 100);
+        register("genie_vessel_schools", KHGameTests::testVesselSchools, 100);
         register("genie_alternative_causality", KHGameTests::testAlternativeCausality, 100);
     }
 
@@ -889,6 +890,41 @@ public final class KHGameTests {
                 helper.getLevel(), player, dev.romankrukovsky.kubanhorizons.vessel.music.MusicBoxSchool.Mood.CALM);
         helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION),
                 "Покой шкатулки должен дать регенерацию владельцу");
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Четыре школы сосудов применяют свои эффекты настоящему владельцу. */
+    private static void testVesselSchools(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+
+        // Кольцо — личная магия: первый круг даёт стремительность (SWIFTNESS),
+        // потому что nextBoon переключает вперёд от начальной стойкости.
+        var ring = new ItemStack(dev.romankrukovsky.kubanhorizons.registry.KHItems.VESSEL_RING.get());
+        new dev.romankrukovsky.kubanhorizons.vessel.schools.PersonalMagicSchool()
+                .cast(helper.getLevel(), player, ring);
+        helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.SPEED),
+                "Кольцо должно дать стремительность (SWIFTNESS)");
+
+        // Зеркало — иллюзии: первый круг — невидимость (следующее после
+        // начального миража), второй — успокоение.
+        var mirror = new ItemStack(dev.romankrukovsky.kubanhorizons.registry.KHItems.VESSEL_MIRROR.get());
+        var illusions = new dev.romankrukovsky.kubanhorizons.vessel.schools.IllusionSchool();
+        illusions.cast(helper.getLevel(), player, mirror);
+        helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.INVISIBILITY),
+                "Зеркало на первом круге должно дать невидимость");
+
+        // Кувшин — создание существа: первый круг призывает эллая
+        // (следующего после начального волка).
+        var jug = new ItemStack(dev.romankrukovsky.kubanhorizons.registry.KHItems.VESSEL_JUG.get());
+        new dev.romankrukovsky.kubanhorizons.vessel.schools.CreatureCreationSchool()
+                .cast(helper.getLevel(), player, jug);
+        boolean allaySpawned = !helper.getLevel().getEntitiesOfClass(
+                        net.minecraft.world.entity.animal.allay.Allay.class,
+                        player.getBoundingBox().inflate(8.0D))
+                .isEmpty();
+        helper.assertTrue(allaySpawned, "Кувшин должен призвать эллая на первом круге");
+
         player.discard();
         helper.succeed();
     }
