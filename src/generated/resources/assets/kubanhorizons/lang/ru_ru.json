@@ -562,11 +562,15 @@
   "tooltip.kubanhorizons.tea_leaves": "Перед заваркой сушат на сушильной раме",
   "tooltip.kubanhorizons.tea_sapling": "Многолетний куст: лист собирают рукой, куст остаётся",
   "tooltip.kubanhorizons.water_intake": "Ставят к воде — источник для сети желобов",
+  "wish.kubanhorizons.biome.rewritten": "Степь переписывает землю вокруг вас.",
   "wish.kubanhorizons.dance.triggered": "Ваш танец становится песней.",
+  "wish.kubanhorizons.drawing.drawn": "Рисунок вычерчивается по земле.",
   "wish.kubanhorizons.music.fire": "Танец Огня окутывает союзников огнеупорным светом.",
   "wish.kubanhorizons.music.growth": "Мелодия Роста торопит поля созреть.",
   "wish.kubanhorizons.music.peace": "Колыбельная Покоя гасит враждебность вокруг вас.",
   "wish.kubanhorizons.music.rain": "Звучит Песня дождя. Над степью сгущаются облака.",
   "wish.kubanhorizons.whatif.empty": "Джинния: нечего сравнивать. Реальность не помнит ни одного отменённого желания.",
-  "wish.kubanhorizons.whatif.result": "Джинния: «%s» — %s. Останься это желание, мир отличался бы на %s блоков. %s"
+  "wish.kubanhorizons.whatif.result": "Джинния: «%s» — %s. Останься это желание, мир отличался бы на %s блоков. %s",
+  "wish.kubanhorizons.word.bad": "Джинния: назовите короткое слово для материализации (до 12 букв).",
+  "wish.kubanhorizons.word.written": "Слово материализуется в воздухе, блок за блоком."
 }

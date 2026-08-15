@@ -209,6 +209,7 @@ public final class KHGameTests {
         register("genie_runtime_structure_moves_entities", KHGameTests::testRuntimeStructureMovesEntities, 100);
         register("genie_runtime_flying_structure", KHGameTests::testRuntimeFlyingStructure, 100);
         register("genie_runtime_magic_drawing", KHGameTests::testRuntimeMagicDrawing, 100);
+        register("genie_wish_word_materialization", KHGameTests::testWishWordMaterialization, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5107,6 +5108,27 @@ public final class KHGameTests {
         } catch (IOException | RuntimeException exception) {
             helper.fail("Runtime drawing failed: " + exception.getMessage());
         }
+    }
+
+    /** «Напиши слово» — парсер распознаёт и wish-рантайм материализует слово. */
+    private static void testWishWordMaterialization(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        BlockPos origin = helper.absolutePos(new BlockPos(2, 2, 2));
+        player.snapTo(origin.getX() + 0.5D, origin.getY(), origin.getZ() + 0.5D, 0.0F, 0.0F);
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(helper.getLevel().getServer());
+        if (!runtime.ready()) runtime.recover();
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("напиши слово КуБань");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.WORD_MATERIALIZATION,
+                "Парсер не распознал материализацию слова: " + intent.target());
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), player, intent);
+        helper.assertTrue(result.executed(),
+                "Слово не материализовано через wish-рантайм: " + result.messageKey());
+
+        player.discard();
+        helper.succeed();
     }
 
     /** Распознавание искажённого желания высшего порядка «Я хочу стать всемогущим». */

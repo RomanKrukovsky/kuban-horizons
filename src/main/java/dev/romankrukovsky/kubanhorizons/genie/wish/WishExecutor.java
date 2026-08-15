@@ -35,8 +35,15 @@ public final class WishExecutor {
         Result result = switch (intent.category()) {
             case META_RULE -> MetaRuleEngine.execute(level, player, intent);
             case GIGANTISM -> GigantismScaleEngine.execute(level, player, intent);
-            case MATERIAL -> executeMaterialWish(level, player, intent);
-            case CIVILIZATION -> executeCivilizationWish(level, player, intent);
+            case MATERIAL -> switch (intent.target()) {
+                case WORD_MATERIALIZATION -> executeWordMaterialization(level, player, intent);
+                case DRAWING -> executeDrawing(level, player);
+                default -> executeMaterialWish(level, player, intent);
+            };
+            case CIVILIZATION -> switch (intent.target()) {
+                case BIOME_REWRITE -> executeBiomeRewrite(level, player);
+                default -> executeCivilizationWish(level, player, intent);
+            };
             case PROVENANCE -> executeProvenanceQuery(level, player, intent);
             case HISTORY -> switch (intent.target()) {
                 case WHAT_IF -> executeWhatIf(level, player, intent);
@@ -184,6 +191,78 @@ public final class WishExecutor {
         return shown
                 ? new Result(true, "message.kubanhorizons.genie.theater_reenactment")
                 : new Result(false, "message.kubanhorizons.genie.theater_empty");
+    }
+
+    /** Материализация слова: «напиши слово Х» — блочный шрифт в воздухе. */
+    private static Result executeWordMaterialization(ServerLevel level, Player player, WishIntent intent) {
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            return new Result(false, "message.kubanhorizons.genie.wish.no_space");
+        }
+        String word = extractWord(intent.detailParam());
+        if (word.isBlank() || word.length() > 12) {
+            player.sendSystemMessage(Component.translatable("wish.kubanhorizons.word.bad"));
+            return new Result(false, "wish.kubanhorizons.word.bad");
+        }
+        try {
+            var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime.get(level.getServer());
+            if (!runtime.ready()) runtime.recover();
+            var preview = runtime.previewWord(serverPlayer, word);
+            var report = runtime.executeWord(serverPlayer,
+                    runtime.confirmWord(player.getUUID(), preview));
+            boolean ok = report.outcome()
+                    == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED;
+            return new Result(ok, ok ? "wish.kubanhorizons.word.written" : "message.kubanhorizons.genie.wish.no_space");
+        } catch (java.io.IOException | RuntimeException exception) {
+            return new Result(false, "message.kubanhorizons.genie.runtime.failed");
+        }
+    }
+
+    /** Рисунок-линия: «нарисуй» — линия блоков по выделению (или перед игроком). */
+    private static Result executeDrawing(ServerLevel level, Player player) {
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            return new Result(false, "message.kubanhorizons.genie.wish.no_space");
+        }
+        try {
+            var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime.get(level.getServer());
+            if (!runtime.ready()) runtime.recover();
+            var preview = runtime.previewSelectedDrawing(serverPlayer);
+            var report = runtime.executeDrawing(serverPlayer,
+                    runtime.confirmDrawing(player.getUUID(), preview));
+            boolean ok = report.outcome()
+                    == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED;
+            return new Result(ok, ok ? "wish.kubanhorizons.drawing.drawn" : "message.kubanhorizons.genie.wish.no_space");
+        } catch (java.io.IOException | RuntimeException exception) {
+            return new Result(false, "message.kubanhorizons.genie.runtime.failed");
+        }
+    }
+
+    /** Переписывание биома: область вокруг игрока становится кубанской степью. */
+    private static Result executeBiomeRewrite(ServerLevel level, Player player) {
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            return new Result(false, "message.kubanhorizons.genie.wish.no_space");
+        }
+        try {
+            var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime.get(level.getServer());
+            if (!runtime.ready()) runtime.recover();
+            var preview = runtime.previewBiomeRewrite(serverPlayer, player.blockPosition());
+            var report = runtime.executeBiomeRewrite(serverPlayer,
+                    runtime.confirmBiomeRewrite(player.getUUID(), preview));
+            boolean ok = report.outcome()
+                    == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED;
+            return new Result(ok, ok ? "wish.kubanhorizons.biome.rewritten" : "message.kubanhorizons.genie.wish.no_space");
+        } catch (java.io.IOException | RuntimeException exception) {
+            return new Result(false, "message.kubanhorizons.genie.runtime.failed");
+        }
+    }
+
+    /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */
+    private static String extractWord(String detailParam) {
+        String text = detailParam == null ? "" : detailParam.toLowerCase(java.util.Locale.ROOT);
+        int marker = text.indexOf("слово");
+        String after = marker >= 0 ? text.substring(marker + 5) : text;
+        java.util.regex.Matcher matcher = java.util.regex.Pattern
+                .compile("[а-яёa-z]{1,12}").matcher(after);
+        return matcher.find() ? matcher.group() : "";
     }
 
     private static boolean placeDiamondChest(ServerLevel level, Player player) {

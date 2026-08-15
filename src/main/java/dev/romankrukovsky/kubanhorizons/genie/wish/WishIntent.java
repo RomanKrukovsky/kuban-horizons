@@ -41,6 +41,9 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         PROVENANCE_QUERY,
         WHAT_IF,
         THEATER_REENACTMENT,
+        WORD_MATERIALIZATION,
+        DRAWING,
+        BIOME_REWRITE,
         MUSIC_SPELL,
         LLM_DELEGATED,
         UNKNOWN

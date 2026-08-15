@@ -562,11 +562,15 @@
   "tooltip.kubanhorizons.tea_leaves": "Dry on a drying rack before brewing",
   "tooltip.kubanhorizons.tea_sapling": "A perennial bush: pick leaves by hand, it keeps growing",
   "tooltip.kubanhorizons.water_intake": "Place against water: the source for a channel network",
+  "wish.kubanhorizons.biome.rewritten": "The steppe rewrites the land around you.",
   "wish.kubanhorizons.dance.triggered": "Your dance becomes a song.",
+  "wish.kubanhorizons.drawing.drawn": "The drawing traces itself across the ground.",
   "wish.kubanhorizons.music.fire": "The Dance of Fire wraps allies in fireproof light.",
   "wish.kubanhorizons.music.growth": "The Growth Melody makes the fields hurry to ripen.",
   "wish.kubanhorizons.music.peace": "The Peace Lullaby calms the hostility around you.",
   "wish.kubanhorizons.music.rain": "The Rain Song begins. Clouds gather over the steppe.",
   "wish.kubanhorizons.whatif.empty": "Genie: no undone wish to compare. Reality remembers nothing to replay.",
-  "wish.kubanhorizons.whatif.result": "Genie: '%s' — %s. If the wish had stayed, the world would differ in %s blocks. %s"
+  "wish.kubanhorizons.whatif.result": "Genie: '%s' — %s. If the wish had stayed, the world would differ in %s blocks. %s",
+  "wish.kubanhorizons.word.bad": "Genie: say a short word to materialize (up to 12 letters).",
+  "wish.kubanhorizons.word.written": "The word materializes in the air, block by block."
 }

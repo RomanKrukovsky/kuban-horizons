@@ -124,6 +124,20 @@ public final class WishParser {
             category = WishIntent.Category.HISTORY;
             detailParam = text;
         }
+        // 9. Материализация слов и рисунков, переписывание биома
+        else if (containsAny(normalized, "напиши слово", "написать слово", "материализ", "write the word", "materialize")) {
+            target = WishIntent.Target.WORD_MATERIALIZATION;
+            category = WishIntent.Category.MATERIAL;
+            detailParam = text;
+        } else if (containsAny(normalized, "нарисуй", "рисун", "нарисовать", "draw", "drawing")) {
+            target = WishIntent.Target.DRAWING;
+            category = WishIntent.Category.MATERIAL;
+            detailParam = text;
+        } else if (containsAny(normalized, "перепиши биом", "биом в", "сделай степь", "поменяй биом", "rewrite biome", "biome to")) {
+            target = WishIntent.Target.BIOME_REWRITE;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

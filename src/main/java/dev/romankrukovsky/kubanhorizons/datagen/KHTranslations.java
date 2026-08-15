@@ -1234,6 +1234,20 @@ final class KHTranslations {
                 "Genie: no undone wish to compare. Reality remembers nothing to replay.",
                 "Джинния: нечего сравнивать. Реальность не помнит ни одного отменённого желания.");
 
+        // --- Слова, рисунки и переписывание биома (GENIE_VISION) ---
+        add("wish.kubanhorizons.word.written",
+                "The word materializes in the air, block by block.",
+                "Слово материализуется в воздухе, блок за блоком.");
+        add("wish.kubanhorizons.word.bad",
+                "Genie: say a short word to materialize (up to 12 letters).",
+                "Джинния: назовите короткое слово для материализации (до 12 букв).");
+        add("wish.kubanhorizons.drawing.drawn",
+                "The drawing traces itself across the ground.",
+                "Рисунок вычерчивается по земле.");
+        add("wish.kubanhorizons.biome.rewritten",
+                "The steppe rewrites the land around you.",
+                "Степь переписывает землю вокруг вас.");
+
         // --- Магическая музыка и танец (GENIE_VISION) ---
         add("wish.kubanhorizons.music.rain",
                 "The Rain Song begins. Clouds gather over the steppe.",

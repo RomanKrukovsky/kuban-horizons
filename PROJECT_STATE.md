@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **155 тестов проходят** (`All 155 required tests passed`).
+- Полный `runGameTestServer` мода: **156 тестов проходят** (`All 156 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -234,7 +234,12 @@
 - **Сны джиннии**: GenieDreamEngine при пробуждении игрока (PlayerWakeUpEvent)
   напоминает о невыполненных желаниях из UnfulfilledWishRoom или делится тёплым
   видением; локализация dream.reminder ru/en; тест genie_dream_reminder.
-- **155 GameTest проходят**: `All 155 required tests passed :)`.
+- **Слова, рисунки и биом через wish**: WordMaterializer/MagicDrawingHandler/
+  BiomeRewriterEngine были подключены только к WishRuntime; теперь доступны
+  через диалог/бумагу — таргеты WORD_MATERIALIZATION («напиши слово X»),
+  DRAWING («нарисуй»), BIOME_REWRITE («перепиши биом в степь») в WishParser/
+  WishExecutor; локализация ru/en; тест genie_wish_word_materialization.
+- **156 GameTest проходят**: `All 156 required tests passed :)`.
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая
   параллельные тесты (манул).
 
