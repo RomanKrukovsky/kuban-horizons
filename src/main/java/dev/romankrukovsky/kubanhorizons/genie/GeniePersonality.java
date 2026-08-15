@@ -64,6 +64,16 @@ public final class GeniePersonality {
         return trust;
     }
 
+    /** Прямая установка доверия — для тестов и внешнего управления. */
+    public void setTrust(int value) {
+        trust = clamp(value);
+    }
+
+    /** Прямая установка привязанности — для тестов и внешнего управления. */
+    public void setAffection(int value) {
+        affection = clamp(value);
+    }
+
     public int respect() {
         return respect;
     }

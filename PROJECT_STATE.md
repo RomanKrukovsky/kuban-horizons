@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **156 тестов проходят** (`All 156 required tests passed`).
+- Полный `runGameTestServer` мода: **157 тестов проходят** (`All 157 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -239,7 +239,11 @@
   через диалог/бумагу — таргеты WORD_MATERIALIZATION («напиши слово X»),
   DRAWING («нарисуй»), BIOME_REWRITE («перепиши биом в степь») в WishParser/
   WishExecutor; локализация ru/en; тест genie_wish_word_materialization.
-- **156 GameTest проходят**: `All 156 required tests passed :)`.
+- **Желания без слов**: WordlessWishEngine был orphan-движком; теперь вызывается
+  из mobInteract при ПКМ с пустой рукой (доверенная джинния чинит грядку/камень
+  по взгляду); добавлены setTrust/setAffection в GeniePersonality;
+  тест genie_wordless_wish.
+- **157 GameTest проходят**: `All 157 required tests passed :)`.
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая
   параллельные тесты (манул).
 

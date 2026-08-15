@@ -210,6 +210,7 @@ public final class KHGameTests {
         register("genie_runtime_flying_structure", KHGameTests::testRuntimeFlyingStructure, 100);
         register("genie_runtime_magic_drawing", KHGameTests::testRuntimeMagicDrawing, 100);
         register("genie_wish_word_materialization", KHGameTests::testWishWordMaterialization, 100);
+        register("genie_wordless_wish", KHGameTests::testWordlessWish, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5127,6 +5128,30 @@ public final class KHGameTests {
         helper.assertTrue(result.executed(),
                 "Слово не материализовано через wish-рантайм: " + result.messageKey());
 
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Желание без слов: доверенная джинния чинит иссушенную грядку по взгляду. */
+    private static void testWordlessWish(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(2, 2, 2));
+        genie.mobInteract(player, net.minecraft.world.InteractionHand.MAIN_HAND);
+        genie.personality().setTrust(60);
+        genie.personality().setAffection(60);
+
+        // Грядка перед игроком -> джинния чинит её по взгляду.
+        BlockPos farmlandRel = new BlockPos(4, 4, 4);
+        helper.setBlock(farmlandRel, Blocks.DIRT.defaultBlockState());
+        BlockPos farmland = helper.absolutePos(farmlandRel);
+        player.snapTo(farmland.getX() + 0.5D, farmland.getY() + 1.0D, farmland.getZ() + 0.5D, 0.0F, 0.0F);
+        player.lookAt(net.minecraft.commands.arguments.EntityAnchorArgument.Anchor.EYES,
+                net.minecraft.world.phys.Vec3.atBottomCenterOf(farmland));
+
+        boolean applied = dev.romankrukovsky.kubanhorizons.genie.wish.WordlessWishEngine
+                .checkWordlessIntent(genie, helper.getLevel(), player);
+        helper.assertTrue(applied,
+                "Доверенная джинния не распознала желание без слов по взгляду на грядку");
         player.discard();
         helper.succeed();
     }

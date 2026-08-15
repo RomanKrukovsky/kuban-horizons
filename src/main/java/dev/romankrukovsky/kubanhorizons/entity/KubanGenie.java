@@ -439,7 +439,15 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
             }
         }
 
-        // 3. Открываем диалог с джиннией (ПКМ без бумаги и без шифта)
+        // 3. Желание без слов: игрок смотрит на знакомое джиннии место
+        if (!level().isClientSide() && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer
+                && dev.romankrukovsky.kubanhorizons.genie.wish.WordlessWishEngine
+                        .checkWordlessIntent(this, (ServerLevel) level(), serverPlayer)) {
+            playWish();
+            return InteractionResult.SUCCESS;
+        }
+
+        // 4. Открываем диалог с джиннией (ПКМ без бумаги и без шифта)
         if (!level().isClientSide() && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
             dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2COpenGenieDialog.send(serverPlayer, this);
         }
