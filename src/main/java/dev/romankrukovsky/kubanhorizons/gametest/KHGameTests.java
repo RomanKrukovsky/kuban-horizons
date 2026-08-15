@@ -264,6 +264,7 @@ public final class KHGameTests {
         // который намеренно включает и отменяет то же правило.
         register("genie_instant_smelt_policy", KHGameTests::testGenieInstantSmeltPolicy, 100);
         register("genie_unfulfilled_wish_room", KHGameTests::testUnfulfilledWishRoom, 100);
+        register("genie_dream_reminder", KHGameTests::testGenieDreamReminder, 100);
         register("genie_music_rain_song", KHGameTests::testMusicRainSong, 100);
         register("genie_music_box_school", KHGameTests::testMusicBoxSchool, 100);
         register("genie_vessel_schools", KHGameTests::testVesselSchools, 100);
@@ -1114,6 +1115,23 @@ public final class KHGameTests {
         helper.assertTrue(room.forOwner(owner).getFirst().resolved()
                         && !room.hasPending(owner),
                 "Разрешённое желание осталось в статусе ожидающего");
+        helper.succeed();
+    }
+
+    /** Сон джиннии: невыполненное желание приходит во сне как напоминание. */
+    private static void testGenieDreamReminder(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var player = helper.makeMockServerPlayerInLevel();
+        var genie = helper.spawn(KHEntities.KUBAN_GENIE.get(), new BlockPos(2, 2, 2));
+        genie.mobInteract(player, net.minecraft.world.InteractionHand.MAIN_HAND);
+
+        var room = dev.romankrukovsky.kubanhorizons.genie.memory.UnfulfilledWishRoom.get(level);
+        room.record(player.getUUID(), "Несбыточное", "refused", player.blockPosition());
+
+        dev.romankrukovsky.kubanhorizons.genie.dream.GenieDreamEngine.onWake(level, player);
+        helper.assertTrue(room.hasPending(player.getUUID()),
+                "Пробуждение не должно стирать невыполненное желание");
+        player.discard();
         helper.succeed();
     }
 

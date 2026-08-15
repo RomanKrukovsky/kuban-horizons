@@ -271,6 +271,7 @@
   "message.kubanhorizons.genie.conditional.rule.raining.grow_steppe": "Когда идёт дождь → усиливать рост растений на кубанской земле",
   "message.kubanhorizons.genie.contract_issued": "Выдан формальный Магический Контракт со всеми правилами и лазейками!",
   "message.kubanhorizons.genie.death_choice": "Джинния предлагает выбор: Мгновенное Воскрешение, Сохранение Души или Откат на 5 минут?",
+  "message.kubanhorizons.genie.dream.reminder": "Джинния шепчет во сне: ваше желание «%s» всё ещё не исполнено.",
   "message.kubanhorizons.genie.dream.vision": "Во сне вам открываются видения забытых древних храмов и сестёр-джинний...",
   "message.kubanhorizons.genie.ending.no_interface_needed": "Вам больше не требуется интерфейс, чтобы изменять реальность.",
   "message.kubanhorizons.genie.ending.supreme_djinni": "Вы стали Истинной Кубанской Джиннией высшего порядка.",

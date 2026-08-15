@@ -404,6 +404,9 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.dream.vision",
                 "In your sleep, you see visions of forgotten ancient temples and sister genies...",
                 "Во сне вам открываются видения забытых древних храмов и сестёр-джинний...");
+        add("message.kubanhorizons.genie.dream.reminder",
+                "The genie whispers in your dream: your wish «%s» is still unfulfilled.",
+                "Джинния шепчет во сне: ваше желание «%s» всё ещё не исполнено.");
         add("message.kubanhorizons.genie.pocket_scene",
                 "A temporary 1-minute %s scene materializes in a swirl of magic smoke!",
                 "В клубах магического дыма создана 1-минутная карманная сцена: %s!");

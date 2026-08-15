@@ -271,6 +271,7 @@
   "message.kubanhorizons.genie.conditional.rule.raining.grow_steppe": "When it rains → strengthen plant growth in the Kuban lands",
   "message.kubanhorizons.genie.contract_issued": "A formal Magical Contract with fine print and loopholes has been issued!",
   "message.kubanhorizons.genie.death_choice": "Genie offers a choice: Instant Revive, Soul Preservation, or 5-Minute Rollback?",
+  "message.kubanhorizons.genie.dream.reminder": "The genie whispers in your dream: your wish «%s» is still unfulfilled.",
   "message.kubanhorizons.genie.dream.vision": "In your sleep, you see visions of forgotten ancient temples and sister genies...",
   "message.kubanhorizons.genie.ending.no_interface_needed": "You no longer need an interface to change reality.",
   "message.kubanhorizons.genie.ending.supreme_djinni": "You are now a Supreme Order Kuban Genie.",

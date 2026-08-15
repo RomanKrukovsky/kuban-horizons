@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **154 теста проходят** (`All 154 required tests passed`).
+- Полный `runGameTestServer` мода: **155 тестов проходят** (`All 155 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -231,7 +231,10 @@
   воспроизводит ближайшее событие («покажи, что здесь было» / "theater") —
   частицы по типу события (wish/rescue/village), без изменения мира;
   wish-таргет THEATER_REENACTMENT + локализация ru/en; тест genie_theater_reenactment.
-- **154 GameTest проходят**: `All 154 required tests passed :)`.
+- **Сны джиннии**: GenieDreamEngine при пробуждении игрока (PlayerWakeUpEvent)
+  напоминает о невыполненных желаниях из UnfulfilledWishRoom или делится тёплым
+  видением; локализация dream.reminder ru/en; тест genie_dream_reminder.
+- **155 GameTest проходят**: `All 155 required tests passed :)`.
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая
   параллельные тесты (манул).
 

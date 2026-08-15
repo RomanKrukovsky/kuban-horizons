@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerWakeUpEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 /** Подписка на серверные события джиннии: единственность, поводок, защита, превращение игрока. */
@@ -29,6 +30,14 @@ public final class GenieEvents {
                 && event.getLevel() instanceof ServerLevel level
                 && !GenieAnchor.admit(genie, level)) {
             event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerWake(PlayerWakeUpEvent event) {
+        if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player
+                && player.level() instanceof ServerLevel level) {
+            dev.romankrukovsky.kubanhorizons.genie.dream.GenieDreamEngine.onWake(level, player);
         }
     }
 
