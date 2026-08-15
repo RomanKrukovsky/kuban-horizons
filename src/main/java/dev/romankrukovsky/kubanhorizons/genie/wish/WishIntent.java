@@ -40,6 +40,7 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         ABS_INTANGIBILITY,
         PROVENANCE_QUERY,
         WHAT_IF,
+        THEATER_REENACTMENT,
         MUSIC_SPELL,
         LLM_DELEGATED,
         UNKNOWN

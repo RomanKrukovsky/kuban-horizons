@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **153 теста проходят** (`All 153 required tests passed`).
+- Полный `runGameTestServer` мода: **154 теста проходят** (`All 154 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -227,7 +227,11 @@
   PersonalMagicSchool (кольцо — стойкость/стремительность/могущество),
   CreatureCreationSchool (кувшин — волк/эллай/овца-спутник) поверх уже готовой
   MusicBoxSchool; тест genie_vessel_schools.
-- **153 GameTest проходят**: `All 153 required tests passed :)`.
+- **Театр реальности**: VisualReenactmentEngine читает WorldGenieMemory и
+  воспроизводит ближайшее событие («покажи, что здесь было» / "theater") —
+  частицы по типу события (wish/rescue/village), без изменения мира;
+  wish-таргет THEATER_REENACTMENT + локализация ru/en; тест genie_theater_reenactment.
+- **154 GameTest проходят**: `All 154 required tests passed :)`.
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая
   параллельные тесты (манул).
 

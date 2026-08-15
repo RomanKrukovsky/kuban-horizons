@@ -38,7 +38,11 @@ public final class WishExecutor {
             case MATERIAL -> executeMaterialWish(level, player, intent);
             case CIVILIZATION -> executeCivilizationWish(level, player, intent);
             case PROVENANCE -> executeProvenanceQuery(level, player, intent);
-            case HISTORY -> executeWhatIf(level, player, intent);
+            case HISTORY -> switch (intent.target()) {
+                case WHAT_IF -> executeWhatIf(level, player, intent);
+                case THEATER_REENACTMENT -> executeTheater(level, player);
+                default -> executeWhatIf(level, player, intent);
+            };
             case MUSIC -> executeMusicSpell(level, player, intent);
             case DISTORTED_HIGHER_WISH -> (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)
                     ? DistortedWishEngine.execute(level, serverPlayer, intent)
@@ -172,6 +176,14 @@ public final class WishExecutor {
                 result.wishText(), result.actualOutcome(), result.changedBlocks(),
                 result.alternativeOutcome()));
         return new Result(true, "wish.kubanhorizons.whatif.result");
+    }
+
+    private static Result executeTheater(ServerLevel level, Player player) {
+        boolean shown = dev.romankrukovsky.kubanhorizons.genie.dimension.VisualReenactmentEngine
+                .reenactPastEvent(level, player.blockPosition(), player);
+        return shown
+                ? new Result(true, "message.kubanhorizons.genie.theater_reenactment")
+                : new Result(false, "message.kubanhorizons.genie.theater_empty");
     }
 
     private static boolean placeDiamondChest(ServerLevel level, Player player) {

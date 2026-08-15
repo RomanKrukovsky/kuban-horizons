@@ -268,6 +268,7 @@ public final class KHGameTests {
         register("genie_music_box_school", KHGameTests::testMusicBoxSchool, 100);
         register("genie_vessel_schools", KHGameTests::testVesselSchools, 100);
         register("genie_alternative_causality", KHGameTests::testAlternativeCausality, 100);
+        register("genie_theater_reenactment", KHGameTests::testTheaterReenactment, 100);
     }
 
     private KHGameTests() {
@@ -4469,6 +4470,23 @@ public final class KHGameTests {
         } catch (IOException | RuntimeException exception) {
             helper.fail("Alternative causality failed: " + exception.getMessage());
         }
+    }
+
+    /** Театр реальности воспроизводит ближайшее запомненное событие, не меняя мир. */
+    private static void testTheaterReenactment(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos eventPos = helper.absolutePos(new BlockPos(2, 2, 2));
+        var player = helper.makeMockServerPlayerInLevel();
+
+        dev.romankrukovsky.kubanhorizons.genie.memory.WorldGenieMemory
+                .get(level).recordEvent(eventPos, "wish", "театр-проверка", level.getGameTime());
+
+        boolean shown = dev.romankrukovsky.kubanhorizons.genie.dimension.VisualReenactmentEngine
+                .reenactPastEvent(level, eventPos, player);
+        helper.assertTrue(shown, "Театр должен найти запомненное событие рядом");
+
+        player.discard();
+        helper.succeed();
     }
 
     /** Сжатая область исчезает из мира и разворачивается блок-в-блок в другом месте. */

@@ -410,6 +410,18 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.theater_reenactment",
                 "Spectral phantoms begin reenacting the ancient history of this place...",
                 "Призрачные фантомы начинают разыгрывать историю этого места...");
+        add("message.kubanhorizons.genie.theater_empty",
+                "The theater is silent: nothing remembered happened here.",
+                "Театр молчит: здесь не запомнено ни одного события.");
+        add("message.kubanhorizons.genie.theater_wish",
+                "A past wish shimmers back into view, word by word.",
+                "Былое желание проявляется в воздухе слово за словом.");
+        add("message.kubanhorizons.genie.theater_rescue",
+                "The rescue replays: a life pulled from danger, once more.",
+                "Спасение разыгрывается вновь: жизнь, вырванная из беды.");
+        add("message.kubanhorizons.genie.theater_village",
+                "The village prosperity blooms again in ghostly color.",
+                "Процветание поселения расцветает призрачными красками.");
         add("message.kubanhorizons.genie.living_painting",
                 "You step through the canvas into a living painted dimension!",
                 "Вы шагаете через холст прямо в живое нарисованное измерение!");

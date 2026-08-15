@@ -118,6 +118,12 @@ public final class WishParser {
             category = WishIntent.Category.HISTORY;
             detailParam = text;
         }
+        // 8а. История: «Покажи, что здесь было» — театр реальности
+        else if (containsAny(normalized, "театр", "что здесь было", "что тут было", "reenact", "theater")) {
+            target = WishIntent.Target.THEATER_REENACTMENT;
+            category = WishIntent.Category.HISTORY;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);
