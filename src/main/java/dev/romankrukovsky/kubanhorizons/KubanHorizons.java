@@ -54,5 +54,11 @@ public final class KubanHorizons {
         dev.romankrukovsky.kubanhorizons.network.KHNetwork.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.SERVER, KHServerConfig.SPEC);
+
+        // Регистрация событий для карманного измерения (гравитация, смерть, полёт)
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                dev.romankrukovsky.kubanhorizons.genie.vessel.VesselTravelService::onPlayerTick);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                dev.romankrukovsky.kubanhorizons.genie.vessel.VesselTravelService::onPlayerDeath);
     }
 }
