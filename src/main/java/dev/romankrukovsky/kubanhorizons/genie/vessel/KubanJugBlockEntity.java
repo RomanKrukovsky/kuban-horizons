@@ -4,9 +4,9 @@ import dev.romankrukovsky.kubanhorizons.entity.KubanGenie;
 import dev.romankrukovsky.kubanhorizons.genie.GenieAnchor;
 import dev.romankrukovsky.kubanhorizons.genie.GeniePersonality;
 import dev.romankrukovsky.kubanhorizons.genie.WishborneState;
+import dev.romankrukovsky.kubanhorizons.registry.KHBlockEntities;
+import dev.romankrukovsky.kubanhorizons.registry.KHEntities;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -32,45 +32,39 @@ public class KubanJugBlockEntity extends BlockEntity {
     }
 
     public KubanGenie getOrSummonGenie(ServerLevel level, Player player) {
-        // Always check the anchor first — this is the single source of truth
-        KubanGenie anchored = GenieAnchor.findAnchoredGenie(level);
+        KubanGenie anchored = GenieAnchor.find(level.getServer());
         if (anchored != null && anchored.isAlive()) {
-            // Teleport the real genie to the jug
             anchored.teleportTo(this.getBlockPos().getX() + 0.5, this.getBlockPos().getY() + 1.2, this.getBlockPos().getZ() + 0.5);
             this.genieId = anchored.getUUID();
             this.setChanged();
             return anchored;
         }
 
-        // No anchored genie exists — safe to create one
         KubanGenie genie = new KubanGenie(KHEntities.KUBAN_GENIE.get(), level);
         genie.setPos(this.getBlockPos().getX() + 0.5, this.getBlockPos().getY() + 1.2, this.getBlockPos().getZ() + 0.5);
-        genie.setOwner(player.getUUID());
+        genie.setOwnerId(player.getUUID());
         level.addFreshEntity(genie);
 
-        // This will set the anchor if none exists
         boolean accepted = GenieAnchor.admit(genie, level);
         if (!accepted) {
-            // Extremely rare race condition — remove the duplicate
             genie.discard();
             return null;
         }
 
         this.genieId = genie.getUUID();
-        this.boundPersonality = genie.getPersonality();
+        this.boundPersonality = genie.personality();
         this.setChanged();
         return genie;
     }
 
     public void onRemoved() {
-        // Optional: release genie or keep anchored
     }
 
     @Override
     protected void saveAdditional(ValueOutput output) {
         output.putInt("SchemaVersion", SCHEMA_VERSION);
         if (genieId != null) {
-            output.putUUID("GenieId", genieId);
+            output.putString("GenieId", genieId.toString());
         }
         if (lastKnownGeniePos != null) {
             output.putInt("LastX", lastKnownGeniePos.getX());
@@ -83,7 +77,8 @@ public class KubanJugBlockEntity extends BlockEntity {
     protected void loadAdditional(ValueInput input) {
         int version = input.getIntOr("SchemaVersion", 0);
         if (version == SCHEMA_VERSION) {
-            genieId = input.getUUID("GenieId").orElse(null);
+            String id = input.getStringOr("GenieId", "");
+            genieId = id.isEmpty() ? null : UUID.fromString(id);
             int x = input.getIntOr("LastX", 0);
             int y = input.getIntOr("LastY", 0);
             int z = input.getIntOr("LastZ", 0);

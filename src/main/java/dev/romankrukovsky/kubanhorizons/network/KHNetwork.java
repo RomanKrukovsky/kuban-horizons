@@ -13,6 +13,7 @@ import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2COpenGenieDialog;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2COpenOwnerDeathScreen;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2CPocketPreview;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2CPocketResult;
+import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2CTransformationSync;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -53,7 +54,8 @@ public final class KHNetwork {
         registrar.playToClient(S2CPocketPreview.TYPE, S2CPocketPreview.CODEC);
         registrar.playToClient(S2CPocketResult.TYPE, S2CPocketResult.CODEC);
         registrar.playToClient(S2COpenOwnerDeathScreen.TYPE, S2COpenOwnerDeathScreen.CODEC);
+        registrar.playToClient(S2CTransformationSync.TYPE, S2CTransformationSync.CODEC);
 
-        KubanHorizons.LOGGER.info("KHNetwork: зарегистрировано 11 пакетов джиннии.");
+        KubanHorizons.LOGGER.info("KHNetwork: зарегистрировано 12 пакетов джиннии.");
     }
 }

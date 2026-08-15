@@ -41,4 +41,24 @@ public final class CartoonAnatomyEngine {
                 20, 0.4D, 0.6D, 0.4D, 0.05D);
         genie.playSpawn();
     }
+
+    /**
+     * Поза сегмента дымового хвоста: масштаб и качание зависят от
+     * интенсивности. Клиент применяет её к костям {@code tail1}–{@code tail7}.
+     */
+    public record TailPose(float scaleX, float scaleY, float scaleZ, float rotX, float rotZ) {
+
+        /** Вычисляет позу сегмента {@code segment} (0..6) по интенсивности. */
+        public static TailPose forSegment(int segment, float intensity, long gameTime) {
+            float flare = 0.55F + intensity * 0.9F;
+            float stretch = 0.9F + intensity * 0.6F;
+            float sway = (float) Math.sin(gameTime * 0.08D - segment * 0.5D) * intensity * 0.25F;
+            return new TailPose(flare, stretch, flare, sway, sway * 0.6F);
+        }
+
+        /** Целевой масштаб всего хвоста — для слоя без отдельных костей. */
+        public static float overallScale(float intensity) {
+            return 0.55F + intensity * 0.9F;
+        }
+    }
 }

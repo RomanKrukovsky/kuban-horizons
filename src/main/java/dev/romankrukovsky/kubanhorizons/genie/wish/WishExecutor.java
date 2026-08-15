@@ -1,6 +1,11 @@
 package dev.romankrukovsky.kubanhorizons.genie.wish;
 
+import dev.romankrukovsky.kubanhorizons.genie.memory.ProvenanceJournal;
+import dev.romankrukovsky.kubanhorizons.genie.memory.UnfulfilledWishRoom;
 import dev.romankrukovsky.kubanhorizons.genie.memory.WorldGenieMemory;
+import dev.romankrukovsky.kubanhorizons.genie.history.AlternativeCausalityEngine;
+import dev.romankrukovsky.kubanhorizons.genie.social.GenieMythSystem;
+import dev.romankrukovsky.kubanhorizons.genie.society.SocietySimulator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -12,6 +17,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+
+import java.util.List;
+import java.util.Optional;
 
 /** Единый серверный исполнитель всех категорий желаний. */
 public final class WishExecutor {
@@ -29,6 +37,9 @@ public final class WishExecutor {
             case GIGANTISM -> GigantismScaleEngine.execute(level, player, intent);
             case MATERIAL -> executeMaterialWish(level, player, intent);
             case CIVILIZATION -> executeCivilizationWish(level, player, intent);
+            case PROVENANCE -> executeProvenanceQuery(level, player, intent);
+            case HISTORY -> executeWhatIf(level, player, intent);
+            case MUSIC -> executeMusicSpell(level, player, intent);
             case DISTORTED_HIGHER_WISH -> (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)
                     ? DistortedWishEngine.execute(level, serverPlayer, intent)
                     : LLMWishExecutor.execute(level, player, intent.detailParam());
@@ -37,6 +48,7 @@ public final class WishExecutor {
         if (result.executed()) {
             WorldGenieMemory.get(level).recordWish(player.blockPosition(), intent.target().name(),
                     intent.precision(), level.getGameTime());
+            SocietySimulator.get().recordWish(level, player.getUUID(), intent.safe());
         }
         return result;
     }
@@ -68,6 +80,9 @@ public final class WishExecutor {
     }
 
     private static Result executeCivilizationWish(ServerLevel level, Player player, WishIntent intent) {
+        if (intent.target() == WishIntent.Target.GENIE_FESTIVAL) {
+            return executeSocietyWish(level, player, intent);
+        }
         BlockPos target = player.blockPosition().relative(player.getDirection(), 2);
         if (level.isEmptyBlock(target)) {
             level.setBlockAndUpdate(target, Blocks.CHEST.defaultBlockState());
@@ -88,6 +103,75 @@ public final class WishExecutor {
     private static void memoryRecordVillage(ServerLevel level, BlockPos pos) {
         WorldGenieMemory memory = WorldGenieMemory.get(level);
         memory.recordVillageSaved(pos, level.getGameTime());
+    }
+
+    /** Социум: ежегодный праздник джиннии прямо у игрока. */
+    private static Result executeSocietyWish(ServerLevel level, Player player, WishIntent intent) {
+        GenieMythSystem.celebrateAnnualFestival(level, player.blockPosition());
+        return new Result(true, "message.kubanhorizons.genie.wish.festival");
+    }
+
+    /**
+     * Магическая музыка: «сыграй песню» исполняется как танец-заклинание.
+     *
+     * <p>Без названной песни звучит Песня дождя — первая и самая простая;
+     * названные рост/покой/огонь дают свою песню. Каст идёт через
+     * {@link DanceEngine}, чтобы эффект продолжался всю длительность песни.</p>
+     */
+    private static Result executeMusicSpell(ServerLevel level, Player player, WishIntent intent) {
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            return new Result(false, "wish.kubanhorizons.music.rain");
+        }
+        dev.romankrukovsky.kubanhorizons.genie.music.MusicSpell spell = switch (intent.detailParam()) {
+            case "GROWTH" -> dev.romankrukovsky.kubanhorizons.genie.music.MusicSpell.GROWTH_MELODY;
+            case "PEACE" -> dev.romankrukovsky.kubanhorizons.genie.music.MusicSpell.PEACE_LULLABY;
+            case "FIRE" -> dev.romankrukovsky.kubanhorizons.genie.music.MusicSpell.DANCE_OF_FIRE;
+            default -> dev.romankrukovsky.kubanhorizons.genie.music.MusicSpell.RAIN_SONG;
+        };
+        dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.cast(level, serverPlayer, spell);
+        String messageKey = switch (spell) {
+            case RAIN_SONG -> "wish.kubanhorizons.music.rain";
+            case GROWTH_MELODY -> "wish.kubanhorizons.music.growth";
+            case PEACE_LULLABY -> "wish.kubanhorizons.music.peace";
+            case DANCE_OF_FIRE -> "wish.kubanhorizons.music.fire";
+        };
+        return new Result(true, messageKey);
+    }
+
+    private static Result executeProvenanceQuery(ServerLevel level, Player player, WishIntent intent) {
+        ItemStack held = player.getMainHandItem();
+        if (held.isEmpty()) {
+            player.sendSystemMessage(Component.translatable("wish.kubanhorizons.provenance.empty_hand"));
+            return new Result(false, "wish.kubanhorizons.provenance.empty_hand");
+        }
+        String id = held.getItem().builtInRegistryHolder().unwrapKey()
+                .map(key -> key.identifier().toString())
+                .orElse(held.getItem().toString());
+        ProvenanceJournal journal = ProvenanceJournal.get(level);
+        List<ProvenanceJournal.ProvenanceRecord> hits = journal.queryById(id);
+        if (hits.isEmpty()) {
+            player.sendSystemMessage(Component.translatable("wish.kubanhorizons.provenance.empty", id));
+            return new Result(false, "wish.kubanhorizons.provenance.empty");
+        }
+        ProvenanceJournal.ProvenanceRecord last = hits.get(hits.size() - 1);
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.provenance.entry",
+                id, last.action(), last.wishText()));
+        return new Result(true, "wish.kubanhorizons.provenance.entry");
+    }
+
+    /** История: «А что если?» — описательный отчёт об альтернативной версии мира. */
+    private static Result executeWhatIf(ServerLevel level, Player player, WishIntent intent) {
+        Optional<AlternativeCausalityEngine.WhatIfResult> alternative =
+                AlternativeCausalityEngine.whatIf(level, player.getUUID(), intent.detailParam());
+        if (alternative.isEmpty()) {
+            player.sendSystemMessage(Component.translatable("wish.kubanhorizons.whatif.empty"));
+            return new Result(false, "wish.kubanhorizons.whatif.empty");
+        }
+        AlternativeCausalityEngine.WhatIfResult result = alternative.get();
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.whatif.result",
+                result.wishText(), result.actualOutcome(), result.changedBlocks(),
+                result.alternativeOutcome()));
+        return new Result(true, "wish.kubanhorizons.whatif.result");
     }
 
     private static boolean placeDiamondChest(ServerLevel level, Player player) {

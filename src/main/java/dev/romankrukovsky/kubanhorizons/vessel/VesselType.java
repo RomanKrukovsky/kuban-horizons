@@ -1,6 +1,6 @@
 package dev.romankrukovsky.kubanhorizons.vessel;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import java.util.function.Supplier;
 
 /**
@@ -11,7 +11,7 @@ public enum VesselType {
     /** Лампа — исполнение желаний (wish execution) */
     LAMP(
         "lamp",
-        () -> ResourceLocation.fromNamespaceAndPath("kubanhorizons", "textures/item/vessel_lamp.png"),
+        () -> Identifier.fromNamespaceAndPath("kubanhorizons", "textures/item/vessel_lamp.png"),
         School.WISH_EXECUTION,
         "Лампа исполняет желания через зарегистрированные capability."
     ),
@@ -19,7 +19,7 @@ public enum VesselType {
     /** Зеркало — иллюзии и альтернативные миры */
     MIRROR(
         "mirror",
-        () -> ResourceLocation.fromNamespaceAndPath("kubanhorizons", "textures/item/vessel_mirror.png"),
+        () -> Identifier.fromNamespaceAndPath("kubanhorizons", "textures/item/vessel_mirror.png"),
         School.ILLUSION_ALTERNATE,
         "Зеркало открывает иллюзии и карманные измерения."
     ),
@@ -27,7 +27,7 @@ public enum VesselType {
     /** Кольцо — персональная магия (усиление владельца) */
     RING(
         "ring",
-        () -> ResourceLocation.fromNamespaceAndPath("kubanhorizons", "textures/item/vessel_ring.png"),
+        () -> Identifier.fromNamespaceAndPath("kubanhorizons", "textures/item/vessel_ring.png"),
         School.PERSONAL_MAGIC,
         "Кольцо усиливает личные способности владельца."
     ),
@@ -35,7 +35,7 @@ public enum VesselType {
     /** Кувшин — создание существ */
     JUG(
         "jug",
-        () -> ResourceLocation.fromNamespaceAndPath("kubanhorizons", "textures/item/vessel_jug.png"),
+        () -> Identifier.fromNamespaceAndPath("kubanhorizons", "textures/item/vessel_jug.png"),
         School.CREATURE_CREATION,
         "Кувшин порождает и связывает существ."
     ),
@@ -43,7 +43,7 @@ public enum VesselType {
     /** Музыкальная шкатулка — эмоции и атмосфера */
     MUSIC_BOX(
         "music_box",
-        () -> ResourceLocation.fromNamespaceAndPath("kubanhorizons", "textures/item/vessel_music_box.png"),
+        () -> Identifier.fromNamespaceAndPath("kubanhorizons", "textures/item/vessel_music_box.png"),
         School.EMOTION_ATMOSPHERE,
         "Шкатулка управляет эмоциональным состоянием и атмосферой."
     );
@@ -57,11 +57,11 @@ public enum VesselType {
     }
 
     private final String id;
-    private final Supplier<ResourceLocation> texture;
+    private final Supplier<Identifier> texture;
     private final School school;
     private final String description;
 
-    VesselType(String id, Supplier<ResourceLocation> texture, School school, String description) {
+    VesselType(String id, Supplier<Identifier> texture, School school, String description) {
         this.id = id;
         this.texture = texture;
         this.school = school;
@@ -69,7 +69,7 @@ public enum VesselType {
     }
 
     public String getId() { return id; }
-    public ResourceLocation getTexture() { return texture.get(); }
+    public Identifier getTexture() { return texture.get(); }
     public School getSchool() { return school; }
     public String getDescription() { return description; }
 

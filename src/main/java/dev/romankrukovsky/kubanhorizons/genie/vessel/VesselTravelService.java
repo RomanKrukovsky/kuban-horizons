@@ -16,6 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Relative;
 import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.block.Blocks;
 
 /** Безопасный визит хозяина в дворец внутри лампы с точным возвратом.
  *
@@ -196,7 +197,7 @@ public final class VesselTravelService {
                             (x == -5 || x == 5 || z == -5 || z == 5) ? Blocks.STONE_BRICKS.defaultBlockState() :
                                     Blocks.AIR.defaultBlockState();
                     level.setBlock(pos, state, 3);
-                    if (level.random.nextFloat() < 0.3f) {
+                    if (level.getRandom().nextFloat() < 0.3f) {
                         level.sendParticles(ParticleTypes.LARGE_SMOKE, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                                 3, 0.2, 0.2, 0.2, 0.01);
                     }

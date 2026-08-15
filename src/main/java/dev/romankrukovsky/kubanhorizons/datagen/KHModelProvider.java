@@ -171,6 +171,12 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.MINIATURE_WORLD.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.GENIE_LAMP.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.PLAYER_GENIE_LAMP.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.VESSEL_LAMP.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.VESSEL_MIRROR.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.VESSEL_RING.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.VESSEL_JUG.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.MUSIC_BOX.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.SOUL_SHARD.get(), ModelTemplates.FLAT_ITEM);
     }
 
     /**
@@ -190,6 +196,7 @@ public final class KHModelProvider extends ModelProvider {
         blockModels.family(KHBlocks.WHITEWASHED_PLASTER.get()).generateFor(KHBlockFamilies.WHITEWASHED_PLASTER);
         blockModels.family(KHBlocks.ROOF_TILES.get()).generateFor(KHBlockFamilies.ROOF_TILES);
         blockModels.createTrivialCube(KHBlocks.DECORATIVE_CERAMIC.get());
+        blockModels.createTrivialCube(KHBlocks.KUBAN_JUG.get());
         blockModels.familyWithExistingFullBlock(KHBlocks.WATTLE.get())
                 .generateFor(KHBlockFamilies.WATTLE);
     }

@@ -9,7 +9,6 @@ import dev.romankrukovsky.kubanhorizons.genie.aura.KubanSteppeResonance;
 import dev.romankrukovsky.kubanhorizons.genie.defense.WishborneDefenseHandler;
 import dev.romankrukovsky.kubanhorizons.genie.memory.WorldGenieMemory;
 import dev.romankrukovsky.kubanhorizons.genie.wish.MobWishHandler;
-import dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalWishEngine;
 import dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor;
 import dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent;
 import dev.romankrukovsky.kubanhorizons.genie.wish.WishParser;
@@ -74,8 +73,27 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
     private final WishborneState wishborneState = new WishborneState();
     private UUID ownerId;
 
+    /** Интенсивность дымового хвоста: 0 (рассеян) .. 1 (кастует/взволнован). */
+    private static final net.minecraft.network.syncher.EntityDataAccessor<Float> DATA_TAIL_INTENSITY =
+            net.minecraft.network.syncher.SynchedEntityData.defineId(KubanGenie.class,
+                    net.minecraft.network.syncher.EntityDataSerializers.FLOAT);
+
     public WishborneState getWishborneState() {
         return wishborneState;
+    }
+
+    public float getTailIntensity() {
+        return entityData.get(DATA_TAIL_INTENSITY);
+    }
+
+    public void setTailIntensity(float intensity) {
+        entityData.set(DATA_TAIL_INTENSITY, net.minecraft.util.Mth.clamp(intensity, 0.0F, 1.0F));
+    }
+
+    @Override
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_TAIL_INTENSITY, 0.3F);
     }
 
     public KubanGenie(EntityType<? extends PathfinderMob> type, Level level) {
@@ -144,11 +162,11 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
             KubanSteppeResonance.tickResonance(this, level);
             dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws.tickAuraOfLaws(this, level);
             dev.romankrukovsky.kubanhorizons.genie.visual.GenieTailEngine.tickTail(this, level);
-            ConditionalWishEngine.tickConditionalWishes(this, level);
             // Место запоминается, пока джинния прогружена: после выгрузки чанка
             // поводок ищет её именно по этой записи.
             dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.rememberLocation(this, level);
         }
+        updateTailIntensity();
 
         if (tickCount % 10 != 0) {
             return;
@@ -180,6 +198,30 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
                 nearestDistanceSquared(owner, armedCreepers));
         GenieDecision decision = brain.decide(situation);
         executeDecision(level, owner, decision, threats, projectiles, armedCreepers);
+    }
+
+    /**
+     * Хвост живёт состоянием: рассеянная джинния гасит дым, каст раздувает его.
+     *
+     * <p>Сервер считает целевое значение и плавно ведёт к нему, чтобы переход
+     * не дёргался. Клиент видит результат через {@link #getTailIntensity()}.</p>
+     */
+    private void updateTailIntensity() {
+        float target;
+        switch (wishborneState.presence()) {
+            case DISPERSED, SEALED, BANISHED -> target = 0.0F;
+            case MANIFESTED -> {
+                GenieDecision decision = brain.lastDecision();
+                target = switch (decision) {
+                    case RESCUE_OWNER, PREEMPT_EXPLOSION, INTERCEPT_PROJECTILE,
+                            REPEL_THREAT, RETURN_TO_OWNER -> 1.0F;
+                    default -> 0.3F;
+                };
+            }
+            default -> target = 0.3F;
+        }
+        float current = getTailIntensity();
+        setTailIntensity(current + (target - current) * 0.25F);
     }
 
     private void executeDecision(ServerLevel level, Player owner, GenieDecision decision,
@@ -328,8 +370,8 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
     }
 
     public void increaseRealityAnchoring(float amount) {
-        wishborneState.increaseAnchoring(amount);
-        if (wishborneState.isBanished()) {
+        boolean sealed = wishborneState.applyAnchoring((int) amount);
+        if (sealed || wishborneState.presence() == WishborneState.Presence.BANISHED) {
             this.discard();
         }
     }
@@ -345,6 +387,10 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
         if (ownerId == null) {
             ownerId = player.getUUID();
             playGreet();
+            if (held.getItem() instanceof dev.romankrukovsky.kubanhorizons.genie.vessel.GenieLampItem
+                    && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                dev.romankrukovsky.kubanhorizons.genie.vessel.GenieLampItem.bind(held, serverPlayer, this);
+            }
             player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.bound"));
             return InteractionResult.SUCCESS;
         }
@@ -406,6 +452,10 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
 
     public boolean isOwnedBy(Player player) {
         return ownerId != null && ownerId.equals(player.getUUID());
+    }
+
+    public void setOwnerId(UUID owner) {
+        this.ownerId = owner;
     }
 
     /** Освобождает социальную связь; истинная Wishborne-личность не меняется. */
@@ -480,28 +530,37 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
         return state.setAndContinue(state.isMoving() ? MOVE : IDLE);
     }
 
+    /** Безопасный запуск анимации: сбой отправки пакета (тестовый клиент,
+     * разрыв соединения) не должен ронять игровую логику — анимация косметика. */
+    private void safeTrigger(String animation) {
+        try {
+            triggerAnim("movement", animation);
+        } catch (RuntimeException ignored) {
+        }
+    }
+
     public void playGreet() {
-        triggerAnim("movement", "greet");
+        safeTrigger("greet");
     }
 
     public void playWish() {
-        triggerAnim("movement", "wish");
+        safeTrigger("wish");
     }
 
     public void playCast() {
-        triggerAnim("movement", "cast");
+        safeTrigger("cast");
     }
 
     public void playSpawn() {
-        triggerAnim("movement", "spawn");
+        safeTrigger("spawn");
     }
 
     public void playDespawn() {
-        triggerAnim("movement", "despawn");
+        safeTrigger("despawn");
     }
 
     public void playHurt() {
-        triggerAnim("movement", "hurt");
+        safeTrigger("hurt");
     }
 
     public dev.romankrukovsky.kubanhorizons.genie.GenieBehaviorMode getBehaviorMode() {

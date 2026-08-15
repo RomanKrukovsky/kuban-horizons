@@ -1,5 +1,6 @@
 package dev.romankrukovsky.kubanhorizons.genie;
 
+import dev.romankrukovsky.kubanhorizons.genie.state.ManifestationState;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -31,6 +32,32 @@ public final class WishborneState {
 
     public boolean canAct() {
         return presence == Presence.MANIFESTED;
+    }
+
+    public boolean isBanished() {
+        return presence == Presence.BANISHED;
+    }
+
+    public void setCurrentState(ManifestationState state) {
+        if (state == null) {
+            return;
+        }
+        this.presence = switch (state) {
+            case MANIFESTED -> Presence.MANIFESTED;
+            case DISPERSED -> Presence.DISPERSED;
+            case SEALED -> Presence.SEALED;
+            case BANISHED -> Presence.BANISHED;
+        };
+    }
+
+    public void increaseAnchoring(float amount) {
+        if (presence == Presence.BANISHED || amount <= 0.0f) {
+            return;
+        }
+        this.anchoring = Mth.clamp(this.anchoring + (int) Math.ceil(amount), 0, 100);
+        if (this.anchoring >= 100) {
+            this.presence = Presence.SEALED;
+        }
     }
 
     public boolean applyAnchoring(int strength) {

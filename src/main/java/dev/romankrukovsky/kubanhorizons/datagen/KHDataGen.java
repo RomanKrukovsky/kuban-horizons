@@ -37,10 +37,14 @@ public final class KHDataGen {
                     // Измерение лампы: тип и уровень. Регистрируются обычным
                     // datapack-JSON, поэтому «Вечная Кубань» существует в любом
                     // мире, а не только в opt-in пресете мода.
-                    .add(net.minecraft.core.registries.Registries.DIMENSION_TYPE,
-                            dev.romankrukovsky.kubanhorizons.worldgen.dimension.KHDimensions::bootstrapType)
-                    .add(net.minecraft.core.registries.Registries.LEVEL_STEM,
-                            dev.romankrukovsky.kubanhorizons.worldgen.dimension.KHDimensions::bootstrapStem)
+                    .add(net.minecraft.core.registries.Registries.DIMENSION_TYPE, context -> {
+                        dev.romankrukovsky.kubanhorizons.worldgen.dimension.KHDimensions.bootstrapType(context);
+                        dev.romankrukovsky.kubanhorizons.genie.dimension.PocketDimension.bootstrapType(context);
+                    })
+                    .add(net.minecraft.core.registries.Registries.LEVEL_STEM, context -> {
+                        dev.romankrukovsky.kubanhorizons.worldgen.dimension.KHDimensions.bootstrapStem(context);
+                        dev.romankrukovsky.kubanhorizons.genie.dimension.PocketDimension.bootstrapStem(context);
+                    })
                     .add(net.minecraft.core.registries.Registries.VILLAGER_TRADE,
                             dev.romankrukovsky.kubanhorizons.trade.KHTrades::bootstrapTrades)
                     .add(net.minecraft.core.registries.Registries.TRADE_SET,

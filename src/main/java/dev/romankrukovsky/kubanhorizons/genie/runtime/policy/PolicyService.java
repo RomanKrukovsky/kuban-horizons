@@ -156,7 +156,7 @@ public final class PolicyService {
                     server.overworld().getThunderLevel(1.0F));
             case OVERWORLD_CLOCK_RATE -> Float.toString(server.clockManager().getRate(
                     server.registryAccess().getOrThrow(WorldClocks.OVERWORLD)));
-            case INSTANT_SMELT -> "false";
+            case INSTANT_SMELT -> Boolean.toString(instantSmeltEnabled);
             default -> throw new IllegalArgumentException("unknown policy " + ruleId);
         };
     }
@@ -177,7 +177,17 @@ public final class PolicyService {
             }
             case OVERWORLD_CLOCK_RATE -> server.clockManager().setRate(
                     server.registryAccess().getOrThrow(WorldClocks.OVERWORLD), Float.parseFloat(value));
-            case INSTANT_SMELT -> instantSmeltEnabled = Boolean.parseBoolean(value);
+            case INSTANT_SMELT -> {
+                instantSmeltEnabled = Boolean.parseBoolean(value);
+                if (instantSmeltEnabled) {
+                    for (var level : server.getAllLevels()) {
+                        if (level instanceof net.minecraft.server.level.ServerLevel serverLevel) {
+                            dev.romankrukovsky.kubanhorizons.genie.runtime.policy.InstantSmeltService
+                                    .prepareLoadedFurnaces(serverLevel);
+                        }
+                    }
+                }
+            }
             default -> throw new IllegalArgumentException("unknown policy " + ruleId);
         }
     }

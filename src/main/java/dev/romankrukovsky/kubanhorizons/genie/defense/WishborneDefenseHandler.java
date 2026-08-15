@@ -90,7 +90,34 @@ public final class WishborneDefenseHandler {
             return false;
         }
 
-        // 5. Попытка административного /kill или падения в Безъязыкую Бездну
+        // 5. Лава и огонь
+        if (source.is(DamageTypes.LAVA) || source.is(DamageTypes.ON_FIRE) || source.is(DamageTypes.IN_FIRE)) {
+            level.sendParticles(ParticleTypes.FLAME, genie.getX(), genie.getY() + 1.5D, genie.getZ(), 40, 0.4D, 0.6D, 0.4D, 0.03D);
+            level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, genie.getX(), genie.getY() + 2.0D, genie.getZ(), 20, 0.3D, 0.5D, 0.3D, 0.02D);
+            tellAttacker(attacker, "message.kubanhorizons.genie.irony.fire");
+            genie.playHurt();
+            return false;
+        }
+
+        // 6. Молния
+        if (source.is(DamageTypes.LIGHTNING_BOLT)) {
+            level.sendParticles(ParticleTypes.ELECTRIC_SPARK, genie.getX(), genie.getY() + 1.8D, genie.getZ(), 60, 0.5D, 0.8D, 0.5D, 0.04D);
+            level.sendParticles(ParticleTypes.ENCHANT, genie.getX(), genie.getY() + 2.2D, genie.getZ(), 30, 0.4D, 0.6D, 0.4D, 0.02D);
+            tellAttacker(attacker, "message.kubanhorizons.genie.irony.lightning");
+            genie.playCast();
+            return false;
+        }
+
+        // 7. Дыхание дракона / дракон
+        if (source.is(DamageTypes.DRAGON_BREATH) || source.getEntity() instanceof net.minecraft.world.entity.boss.enderdragon.EnderDragon) {
+            level.sendParticles(ParticleTypes.END_ROD, genie.getX(), genie.getY() + 1.5D, genie.getZ(), 50, 0.5D, 0.7D, 0.5D, 0.03D);
+            level.sendParticles(ParticleTypes.PORTAL, genie.getX(), genie.getY() + 2.0D, genie.getZ(), 35, 0.4D, 0.6D, 0.4D, 0.02D);
+            tellAttacker(attacker, "message.kubanhorizons.genie.irony.dragon");
+            genie.playHurt();
+            return false;
+        }
+
+        // 8. Попытка административного /kill или падения в Безъязыкую Бездну
         if (source.is(DamageTypes.FELL_OUT_OF_WORLD)) {
             level.sendParticles(ParticleTypes.WITCH, genie.getX(), genie.getY() + 1.2D, genie.getZ(),
                     50, 0.6D, 0.8D, 0.6D, 0.1D);
@@ -105,7 +132,7 @@ public final class WishborneDefenseHandler {
             return false;
         }
 
-        // 6. Любой другой урон: короткая реакция без исчезновения.
+        // 9. Любой другой урон: короткая реакция без исчезновения.
         //
         // Ложной смерти здесь нет намеренно. Она сжимала модель до нуля,
         // убирала джиннию из мира на две секунды и телепортировала за спину

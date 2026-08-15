@@ -2,18 +2,28 @@ package dev.romankrukovsky.kubanhorizons.genie.society;
 
 import dev.romankrukovsky.kubanhorizons.entity.KubanGenie;
 import dev.romankrukovsky.kubanhorizons.genie.GeniePersonality;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
 
 /**
- * SocietySimulator — симуляция общества NPC-джинний.
+ * SocietySimulator — симуляция общества вокруг джиннии.
  *
- * <p>Отслеживает репутацию, альянсы, конфликты и коллективные желания между NPC-джинниями.
- * Работает детерминировано для мультиплеера. Персистентность через WorldGenieMemory.</p>
+ * <p>С одной стороны — репутация и альянсы между NPC-джинниями, с другой —
+ * репутация владельцев в глазах магии (0..100, персистентно в {@link SocietyData})
+ * и расползающиеся по миру слухи, порождённые этой репутацией.</p>
  */
 public final class SocietySimulator {
+
+    private static final int REP_GOOD_DELTA = 5;
+    private static final int REP_BAD_DELTA = -10;
+    private static final int REP_MAX = 100;
+
+    /** Как часто тик реально разносит слух (иначе он только обновляет активный мир). */
+    private static final float RUMOR_CHANCE = 0.2F;
 
     private final Map<UUID, Map<UUID, Integer>> reputation = new HashMap<>(); // genie -> (otherGenie -> rep)
     private final Map<UUID, Set<UUID>> alliances = new HashMap<>();
@@ -23,8 +33,106 @@ public final class SocietySimulator {
 
     private static final SocietySimulator INSTANCE = new SocietySimulator();
 
+    /** Активный мир для методов без параметра уровня; выставляется в {@link #tick}. */
+    private ServerLevel activeLevel;
+
+    /** Запасная репутация без загруженного мира (тесты, headless). */
+    private final Map<UUID, Integer> ownerReputationFallback = new HashMap<>();
+
     public static SocietySimulator get() {
         return INSTANCE;
+    }
+
+    /**
+     * Тикает социум: запоминает активный мир и иногда разносит слух случайному игроку.
+     *
+     * <p>Вызывается из {@code GenieEvents.onLevelTick} раз в 600 тиков (30 секунд),
+     * поэтому здесь не требуется собственный счётчик: «иногда» решает случайность.</p>
+     */
+    public void tick(ServerLevel level) {
+        this.activeLevel = level;
+        if (level.getRandom().nextFloat() >= RUMOR_CHANCE) {
+            return;
+        }
+        List<UUID> known = SocietyData.get(level).knownOwners();
+        List<ServerPlayer> online = level.players();
+        if (known.isEmpty() || online.isEmpty()) {
+            return;
+        }
+        UUID subject = known.get(level.getRandom().nextInt(known.size()));
+        rumorFor(subject).ifPresent(rumor -> {
+            ServerPlayer listener = online.get(level.getRandom().nextInt(online.size()));
+            listener.sendSystemMessage(Component.literal(rumor));
+        });
+    }
+
+    /** Записывает исполненное желание владельца: +5 за безопасное, −10 за безрассудное. */
+    public void recordWish(ServerLevel level, UUID owner, boolean wellReceived) {
+        SocietyData.get(level).recordWish(owner, wellReceived);
+    }
+
+    /** Записывает желание в активном мире (см. {@link #tick}); без мира — в запасную карту. */
+    public void recordWish(UUID owner, boolean wellReceived) {
+        if (activeLevel != null) {
+            recordWish(activeLevel, owner, wellReceived);
+            return;
+        }
+        int next = Math.max(0, Math.min(REP_MAX,
+                ownerReputationFallback.getOrDefault(owner, 0)
+                        + (wellReceived ? REP_GOOD_DELTA : REP_BAD_DELTA)));
+        ownerReputationFallback.put(owner, next);
+    }
+
+    /** Репутация владельца в активном мире (0..100). */
+    public int reputation(ServerLevel level, UUID owner) {
+        return SocietyData.get(level).reputation(owner);
+    }
+
+    /** Репутация владельца в активном мире; без мира — из запасной карты. */
+    public int reputation(UUID owner) {
+        if (activeLevel != null) {
+            return reputation(activeLevel, owner);
+        }
+        return ownerReputationFallback.getOrDefault(owner, 0);
+    }
+
+    /**
+     * Слух об игроке, порождённый его репутацией.
+     *
+     * <p>Пустой Optional — у магии ещё нет мнения (владелец ни разу не желал).
+     * Высокая репутация — «у X сбываются желания», низкая — «X опасен для магии».</p>
+     */
+    public Optional<String> rumorFor(UUID owner) {
+        if (activeLevel == null) {
+            if (!ownerReputationFallback.containsKey(owner)) {
+                return Optional.empty();
+            }
+        } else if (!SocietyData.get(activeLevel).knownOwners().contains(owner)) {
+            return Optional.empty();
+        }
+        int rep = reputation(owner);
+        String name = ownerName(owner);
+        if (rep >= 70) {
+            return Optional.of("Говорят, у " + name + " сбываются желания — и степь это подтверждает.");
+        }
+        if (rep >= 35) {
+            return Optional.of("Поговаривают, что " + name + " в ладу с магией джиннии.");
+        }
+        if (rep > 0) {
+            return Optional.of("В деревне шепчутся, что " + name + " что-то получил от джиннии.");
+        }
+        return Optional.of("Ходят слухи, что " + name + " опасен для магии.");
+    }
+
+    private String ownerName(UUID owner) {
+        if (activeLevel != null) {
+            Player player = activeLevel.getPlayerByUUID(owner);
+            if (player != null) {
+                return player.getName().getString();
+            }
+        }
+        String shortId = owner.toString().substring(0, 8);
+        return "незнакомец " + shortId;
     }
 
     /**

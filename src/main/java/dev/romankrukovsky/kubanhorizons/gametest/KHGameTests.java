@@ -170,6 +170,7 @@ public final class KHGameTests {
         register("genie_lamp_binds_and_summons", KHGameTests::testGenieLampBindsAndSummons, 100);
         register("genie_conditional_rules_persist", KHGameTests::testConditionalRulesPersist, 100);
         register("genie_conditional_wish_runtime", KHGameTests::testConditionalWishRuntime, 100);
+        register("genie_conditional_rule_store", KHGameTests::testConditionalRuleStore, 100);
         register("genie_living_painting_enters_other_level",
                 KHGameTests::testGenieLivingPaintingEntersOtherLevel, 100);
         register("genie_predictive_planning", KHGameTests::testGeniePredictivePlanning, 100);
@@ -180,7 +181,10 @@ public final class KHGameTests {
         register("genie_weather_policy", KHGameTests::testGenieWeatherPolicy, 100);
         register("genie_clock_policy", KHGameTests::testGenieClockPolicy, 100);
         register("genie_gigantism_engine", KHGameTests::testGenieGigantismEngine, 100);
+        register("genie_gigantism_pie", KHGameTests::testGigantismPie, 100);
         register("genie_world_memory", KHGameTests::testGenieWorldMemory, 100);
+        register("genie_society_reputation", KHGameTests::testSocietyReputation, 100);
+        register("genie_mob_wish_memory", KHGameTests::testMobWishMemory, 100);
         register("genie_inviolability", KHGameTests::testGenieInviolabilityAndKillIntercept, 100);
         register("genie_aura_of_laws", KHGameTests::testGenieAuraOfLaws, 100);
         register("genie_aura_dissolves_fireballs", KHGameTests::testGenieAuraDissolvesFireballs, 100);
@@ -191,6 +195,7 @@ public final class KHGameTests {
         register("genie_miniaturization_round_trip", KHGameTests::testGenieMiniaturizationRoundTrip, 100);
         register("genie_materialized_word_has_letters", KHGameTests::testGenieMaterializedWord, 100);
         register("genie_hybrid_has_real_traits", KHGameTests::testGenieHybridTraits, 100);
+        register("genie_ecology_genome_inheritance", KHGameTests::testEcologyGenomeInheritance, 100);
         register("genie_contract_has_terms", KHGameTests::testGenieContractTerms, 100);
         register("genie_biome_rewrite_changes_world", KHGameTests::testGenieBiomeRewrite, 100);
         register("genie_role_swap_changes_roles", KHGameTests::testGenieRoleSwap, 100);
@@ -200,7 +205,9 @@ public final class KHGameTests {
         register("genie_dialog_pocket_scene_cycle", KHGameTests::testDialogPocketSceneCycle, 100);
         register("genie_runtime_structure_move", KHGameTests::testRuntimeStructureMove, 100);
         register("genie_runtime_structure_rotate", KHGameTests::testRuntimeStructureRotate, 100);
+        register("genie_runtime_region_rotate", KHGameTests::testRuntimeRegionRotate, 100);
         register("genie_runtime_structure_moves_entities", KHGameTests::testRuntimeStructureMovesEntities, 100);
+        register("genie_runtime_flying_structure", KHGameTests::testRuntimeFlyingStructure, 100);
         register("genie_runtime_magic_drawing", KHGameTests::testRuntimeMagicDrawing, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
@@ -256,6 +263,10 @@ public final class KHGameTests {
         // Глобальная policy не должна выполняться параллельно с тестом диалога,
         // который намеренно включает и отменяет то же правило.
         register("genie_instant_smelt_policy", KHGameTests::testGenieInstantSmeltPolicy, 100);
+        register("genie_unfulfilled_wish_room", KHGameTests::testUnfulfilledWishRoom, 100);
+        register("genie_music_rain_song", KHGameTests::testMusicRainSong, 100);
+        register("genie_music_box_school", KHGameTests::testMusicBoxSchool, 100);
+        register("genie_alternative_causality", KHGameTests::testAlternativeCausality, 100);
     }
 
     private KHGameTests() {
@@ -525,6 +536,49 @@ public final class KHGameTests {
         helper.succeed();
     }
 
+    /**
+     * Условное правило из персистентного хранилища срабатывает один раз:
+     * ночь наступает, правило отключается, а действие выполняется.
+     */
+    private static void testConditionalRuleStore(GameTestHelper helper) {
+        var store = dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalRuleStore
+                .get(helper.getLevel());
+        var player = helper.makeMockServerPlayerInLevel();
+        var rule = new dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalRule(
+                UUID.randomUUID(), player.getUUID(),
+                dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalRule.TriggerType.TIME_NIGHT,
+                "", "дай мне алмазы", true, helper.getLevel().getGameTime());
+        store.add(rule);
+
+        int wishesBefore = dev.romankrukovsky.kubanhorizons.genie.memory.WorldGenieMemory
+                .get(helper.getLevel()).totalWishesGranted();
+        var server = helper.getLevel().getServer();
+        var clock = server.registryAccess().getOrThrow(net.minecraft.world.clock.WorldClocks.OVERWORLD);
+        // Время мира — глобальное для всех параллельных тестов. Сохраняем
+        // исходное значение и возвращаем его в конце, иначе ночь из этого теста
+        // ломает соседние (например, дневной сон манула).
+        long previousTicks = server.clockManager().getTotalTicks(clock);
+        server.clockManager().setTotalTicks(clock, 13000L);
+        try {
+            for (int i = 0; i < 25; i++) {
+                store.tick(helper.getLevel());
+            }
+
+            var stored = store.all().stream().filter(r -> r.id().equals(rule.id())).findFirst();
+            helper.assertTrue(stored.isPresent() && !stored.get().enabled(),
+                    "Сработавшее правило должно отключиться, а не остаться включённым");
+            int wishesAfter = dev.romankrukovsky.kubanhorizons.genie.memory.WorldGenieMemory
+                    .get(helper.getLevel()).totalWishesGranted();
+            helper.assertTrue(wishesAfter == wishesBefore + 1,
+                    "Действие условного правила должно выполниться (" + wishesBefore + " -> " + wishesAfter + ")");
+        } finally {
+            server.clockManager().setTotalTicks(clock, previousTicks);
+            store.remove(rule.id());
+        }
+        player.discard();
+        helper.succeed();
+    }
+
     /** Живая картина обязана перенести игрока в другой ServerLevel, а не показать реплику. */
     private static void testGenieLivingPaintingEntersOtherLevel(GameTestHelper helper) {
         ServerLevel original = helper.getLevel();
@@ -784,6 +838,61 @@ public final class KHGameTests {
                 .thenSucceed();
     }
 
+    /**
+     * Танец «красться-прыжок-красться-прыжок» звучит как Песня дождя.
+     *
+     * <p>Проверяется весь путь «музыка и танец как язык изменения мира»:
+     * фигура из четырёх движений распознаётся {@code DanceEngine.detect},
+     * а мировой эффект песни включает настоящий дождь.</p>
+     */
+    private static void testMusicRainSong(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.record(
+                player, dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.Movement.SNEAK);
+        dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.record(
+                player, dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.Movement.JUMP);
+        dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.record(
+                player, dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.Movement.SNEAK);
+        dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.record(
+                player, dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.Movement.JUMP);
+
+        var detected = dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.detect(player);
+        helper.assertTrue(detected.isPresent()
+                        && detected.get() == dev.romankrukovsky.kubanhorizons.genie.music.MusicSpell.RAIN_SONG,
+                "Фигура красться-прыжок-красться-прыжок должна распознаться как Песня дождя");
+
+        helper.getLevel().setRainLevel(0.0F);
+        dev.romankrukovsky.kubanhorizons.genie.music.MusicSpell.RAIN_SONG
+                .apply(helper.getLevel(), player.blockPosition(), player);
+        helper.assertTrue(helper.getLevel().isRaining(),
+                "Песня дождя должна включить дождь");
+
+        dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.reset(player.getUUID());
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Шкатулка циклически переключает настроения и применяет ауру CALM. */
+    private static void testMusicBoxSchool(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        var stack = new ItemStack(dev.romankrukovsky.kubanhorizons.registry.KHItems.MUSIC_BOX.get());
+        // На свежей шкатулке текущее настроение CALM, nextMood отдаёт следующее — JOY.
+        var initial = dev.romankrukovsky.kubanhorizons.vessel.music.MusicBoxSchool.currentMood(stack);
+        var first = dev.romankrukovsky.kubanhorizons.vessel.music.MusicBoxSchool.nextMood(stack);
+        dev.romankrukovsky.kubanhorizons.vessel.music.MusicBoxSchool.storeMood(stack, first);
+        var second = dev.romankrukovsky.kubanhorizons.vessel.music.MusicBoxSchool.nextMood(stack);
+        helper.assertTrue(initial == dev.romankrukovsky.kubanhorizons.vessel.music.MusicBoxSchool.Mood.CALM
+                        && first == dev.romankrukovsky.kubanhorizons.vessel.music.MusicBoxSchool.Mood.JOY
+                        && second == dev.romankrukovsky.kubanhorizons.vessel.music.MusicBoxSchool.Mood.SADNESS,
+                "Настроения шкатулки должны переключаться по кругу: CALM → JOY → SADNESS");
+        dev.romankrukovsky.kubanhorizons.vessel.music.MusicBoxSchool.play(
+                helper.getLevel(), player, dev.romankrukovsky.kubanhorizons.vessel.music.MusicBoxSchool.Mood.CALM);
+        helper.assertTrue(player.hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION),
+                "Покой шкатулки должен дать регенерацию владельцу");
+        player.discard();
+        helper.succeed();
+    }
+
     /** Экран не может командовать чужой джиннией и меняет режим только связанной сущности. */
     private static void testGenieDialogServerActions(GameTestHelper helper) {
         dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.releaseFor(helper.getLevel());
@@ -852,6 +961,25 @@ public final class KHGameTests {
         helper.succeed();
     }
 
+    /** Гигантский пирог строится из блоков по известной схеме: блюдо, начинка, корочка, торт. */
+    private static void testGigantismPie(GameTestHelper helper) {
+        BlockPos origin = helper.absolutePos(new BlockPos(1, 2, 1));
+        boolean built = dev.romankrukovsky.kubanhorizons.genie.gigantism.GiantPieBuilder
+                .buildGiantPie(helper.getLevel(), origin);
+        helper.assertTrue(built, "Гигантский пирог должен построиться на пустой площадке");
+        helper.assertTrue(helper.getLevel().getBlockState(origin).is(Blocks.SANDSTONE),
+                "Основание пирога должно быть из песчаника");
+        helper.assertTrue(helper.getLevel().getBlockState(origin.offset(2, 0, 2)).is(Blocks.SANDSTONE),
+                "Центр основания пирога должен быть из песчаника");
+        helper.assertTrue(helper.getLevel().getBlockState(origin.offset(1, 1, 1)).is(Blocks.DYED_TERRACOTTA.orange()),
+                "Начинка пирога должна быть оранжевой");
+        helper.assertTrue(helper.getLevel().getBlockState(origin.offset(2, 1, 2)).is(Blocks.CAKE),
+                "В центре пирога должен стоять торт");
+        helper.assertTrue(helper.getLevel().getBlockState(origin.offset(0, 1, 0)).is(Blocks.DYED_TERRACOTTA.white()),
+                "Корочка пирога должна быть белой терракотой");
+        helper.succeed();
+    }
+
     /** Долговременная память фиксирует желания и спасения. */
     private static void testGenieWorldMemory(GameTestHelper helper) {
         var memory = dev.romankrukovsky.kubanhorizons.genie.memory.WorldGenieMemory.get(helper.getLevel());
@@ -859,6 +987,96 @@ public final class KHGameTests {
         memory.recordWish(new BlockPos(1, 1, 1), "DIAMONDS", 100, helper.getLevel().getGameTime());
         helper.assertTrue(memory.totalWishesGranted() == before + 1,
                 "Память должна учесть исполненное желание");
+        helper.succeed();
+    }
+
+    /**
+     * Репутация владельца растёт от удачных желаний, падает от безрассудных,
+     * держится в 0..100 и порождает непустой слух.
+     */
+    private static void testSocietyReputation(GameTestHelper helper) {
+        var sim = dev.romankrukovsky.kubanhorizons.genie.society.SocietySimulator.get();
+        sim.tick(helper.getLevel());
+        UUID owner = UUID.randomUUID();
+
+        int initial = sim.reputation(owner);
+        helper.assertTrue(initial >= 0 && initial <= 100,
+                "Новая репутация должна быть в диапазоне 0..100, а не " + initial);
+
+        sim.recordWish(owner, true);
+        int afterGood = sim.reputation(owner);
+        helper.assertTrue(afterGood == Math.min(100, initial + 5),
+                "Успешное желание должно дать +5 к репутации: " + initial + " -> " + afterGood);
+
+        sim.recordWish(owner, false);
+        int afterReckless = sim.reputation(owner);
+        helper.assertTrue(afterReckless == Math.max(0, afterGood - 10),
+                "Безрассудное желание должно отнять 10: " + afterGood + " -> " + afterReckless);
+
+        // Потолок: сколько ни желай удачно, репутация не пробьёт 100.
+        for (int i = 0; i < 30; i++) {
+            sim.recordWish(owner, true);
+        }
+        helper.assertTrue(sim.reputation(owner) == 100,
+                "Репутация должна упереться в 100, а не " + sim.reputation(owner));
+
+        // У магии есть мнение о владельце, и оно выражается непустым слухом.
+        var rumor = sim.rumorFor(owner);
+        helper.assertTrue(rumor.isPresent() && !rumor.get().isBlank(),
+                "У владельца с историей должен быть непустой слух");
+        helper.succeed();
+    }
+
+    /** Исполненное желание моба сохраняется и порождает следующий, отличный квест. */
+    private static void testMobWishMemory(GameTestHelper helper) {
+        var memory = dev.romankrukovsky.kubanhorizons.genie.entity.MobWishMemory.get(helper.getLevel());
+        var owner = helper.makeMockServerPlayerInLevel();
+        var cow = helper.spawn(EntityTypes.COW, new BlockPos(1, 2, 1));
+
+        boolean first = dev.romankrukovsky.kubanhorizons.genie.wish.MobWishHandler.handleMobWish(
+                helper.getLevel(), owner, cow);
+        helper.assertTrue(first, "Первое желание коровы не исполнено");
+        helper.assertTrue(memory.fulfilledCountFor(cow.getUUID()) == 1,
+                "Исполненное желание не записано в устойчивую память");
+        helper.assertTrue(memory.pendingFor(cow.getUUID()).isEmpty(),
+                "Исполненное желание не должно остаться в статусе pending");
+        helper.assertTrue(memory.history(owner.getUUID()).size() == 1,
+                "В истории владельца не появилась запись о желании коровы");
+
+        boolean second = dev.romankrukovsky.kubanhorizons.genie.wish.MobWishHandler.handleMobWish(
+                helper.getLevel(), owner, cow);
+        helper.assertTrue(second, "Следующее желание коровы не исполнено");
+        helper.assertTrue(memory.fulfilledCountFor(cow.getUUID()) == 2,
+                "Следующий квест не записан в память");
+        var records = memory.history(owner.getUUID());
+        helper.assertTrue(records.size() == 2, "История должна содержать два исполненных желания");
+        helper.assertTrue(!records.get(0).rewardKey().equals(records.get(1).rewardKey()),
+                "Следующее желание должно отличаться от предыдущего (эскалация квеста)");
+
+        owner.discard();
+        cow.discard();
+        helper.succeed();
+    }
+
+    /** Комната невыполненных желаний: отказ оседает в памяти и исполняется позже. */
+    private static void testUnfulfilledWishRoom(GameTestHelper helper) {
+        var room = dev.romankrukovsky.kubanhorizons.genie.memory.UnfulfilledWishRoom.get(helper.getLevel());
+        UUID owner = UUID.randomUUID();
+        BlockPos pos = helper.absolutePos(new BlockPos(1, 2, 1));
+
+        room.record(owner, "Котёл с золотом", "no_space", pos);
+        helper.assertTrue(room.count() == 1
+                        && room.forOwner(owner).size() == 1
+                        && room.forOwner(owner).getFirst().wishText().equals("Котёл с золотом")
+                        && !room.forOwner(owner).getFirst().resolved(),
+                "Невыполненное желание не осело в комнате");
+        helper.assertTrue(room.hasPending(owner),
+                "Запись невыполненного желания должна считаться ожидающей");
+
+        room.resolve(room.forOwner(owner).getFirst().id());
+        helper.assertTrue(room.forOwner(owner).getFirst().resolved()
+                        && !room.hasPending(owner),
+                "Разрешённое желание осталось в статусе ожидающего");
         helper.succeed();
     }
 
@@ -4163,6 +4381,60 @@ public final class KHGameTests {
         }
     }
 
+    /** Способность «А что если?» видит мир после отменённого желания, не меняя его. */
+    private static void testAlternativeCausality(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos first = helper.absolutePos(new BlockPos(1, 2, 1));
+        BlockPos second = helper.absolutePos(new BlockPos(2, 2, 1));
+        level.setBlock(first, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+        level.setBlock(second, Blocks.CHEST.defaultBlockState(), 3);
+
+        UUID owner = UUID.randomUUID();
+        String name = "gametest_" + owner.toString().replace("-", "");
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(level.getServer());
+        if (!runtime.ready()) {
+            runtime.recover();
+        }
+        try {
+            var selection = new dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection(
+                    level.dimension().identifier().toString(), first, second);
+            runtime.createSnapshot(level, owner, name, selection);
+
+            level.setBlock(first, Blocks.DIRT.defaultBlockState(), 3);
+            level.setBlock(second, Blocks.AIR.defaultBlockState(), 3);
+            var preview = runtime.previewRestore(level, owner, name);
+            var confirmation = runtime.confirm(owner, preview);
+            var report = runtime.restore(level, owner, confirmation);
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED,
+                    "Транзакция восстановления не завершилась: " + report);
+            var undo = runtime.undo(level, owner, report.transactionId());
+            helper.assertTrue(undo.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED,
+                    "Retained undo не завершился: " + undo);
+
+            var alternative = dev.romankrukovsky.kubanhorizons.genie.history.AlternativeCausalityEngine
+                    .whatIf(level, owner, "что если бы я не отменил желание");
+            helper.assertTrue(alternative.isPresent(),
+                    "whatIf не нашёл отменённую транзакцию владельца");
+            helper.assertTrue(alternative.get().changedBlocks() >= 0,
+                    "whatIf вернул отрицательное число изменённых блоков: " + alternative.get());
+            helper.assertTrue(alternative.get().changedBlocks() > 0,
+                    "whatIf не увидел разницы между миром и отменённым желанием: " + alternative.get());
+            helper.assertTrue(!alternative.get().wishText().isBlank(),
+                    "whatIf не описал, о каком желании идёт речь");
+            helper.assertTrue(!alternative.get().alternativeOutcome().isBlank(),
+                    "whatIf не описал альтернативную версию мира");
+            helper.assertTrue(level.getBlockState(first).is(Blocks.DIRT)
+                            && level.getBlockState(second).isAir(),
+                    "whatIf не должен изменять текущий мир");
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Alternative causality failed: " + exception.getMessage());
+        }
+    }
+
     /** Сжатая область исчезает из мира и разворачивается блок-в-блок в другом месте. */
     private static void testGenieMiniaturizationRoundTrip(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -4244,6 +4516,80 @@ public final class KHGameTests {
                 "Гибрид не получил заявленные свойства полёта и свечения");
         helper.assertTrue(hybrid.getPersistentData().getBooleanOr("KubanHybrid", false),
                 "Признаки гибрида не помечены как персистентные");
+        helper.succeed();
+    }
+
+    /**
+     * Менделевское наследование и эволюция поколений: геном потомка — это
+     * признаки родителей с мутациями, а поколение строго на единицу больше.
+     *
+     * <p>Размножение вероятностное, поэтому свойство проверяется на серии
+     * скрещиваний: поколение обязано расти всегда, а наследование признака
+     * родителя — хотя бы раз за серию. Заодно проверяется round-trip генома
+     * через NBT сущности (тот же путь, которым сущность переживает сохранение).</p>
+     */
+    private static void testEcologyGenomeInheritance(GameTestHelper helper) {
+        var genomeA = dev.romankrukovsky.kubanhorizons.genie.ecology.Genome.of(
+                dev.romankrukovsky.kubanhorizons.genie.ecology.Trait.FLIGHT,
+                dev.romankrukovsky.kubanhorizons.genie.ecology.Trait.GLOWING);
+        var genomeB = dev.romankrukovsky.kubanhorizons.genie.ecology.Genome.of(
+                dev.romankrukovsky.kubanhorizons.genie.ecology.Trait.FLIGHT,
+                dev.romankrukovsky.kubanhorizons.genie.ecology.Trait.FAST);
+        helper.assertTrue(genomeA.generation() == 0 && genomeB.generation() == 0,
+                "Геном первого поколения обязан начинаться с нуля");
+
+        var random = helper.getLevel().getRandom();
+        boolean inherited = false;
+        for (int i = 0; i < 200; i++) {
+            var child = dev.romankrukovsky.kubanhorizons.genie.ecology.Genome.combine(
+                    genomeA, genomeB, random);
+            helper.assertTrue(child.generation() == 1,
+                    "Поколение потомка должно быть max(родители)+1, а не " + child.generation());
+            if (child.has(dev.romankrukovsky.kubanhorizons.genie.ecology.Trait.FLIGHT)
+                    || child.has(dev.romankrukovsky.kubanhorizons.genie.ecology.Trait.GLOWING)
+                    || child.has(dev.romankrukovsky.kubanhorizons.genie.ecology.Trait.FAST)) {
+                inherited = true;
+            }
+        }
+        helper.assertTrue(inherited,
+                "За 200 скрещиваний потомок ни разу не унаследовал признак родителя");
+
+        // Round-trip через NBT сущности: геном, положенный setGenome, читается обратно.
+        var parent = helper.spawn(EntityTypes.FOX, new BlockPos(1, 2, 1));
+        dev.romankrukovsky.kubanhorizons.genie.entity.HybridSpeciesEngine.setGenome(parent, genomeA);
+        var restored = dev.romankrukovsky.kubanhorizons.genie.entity.HybridSpeciesEngine.getGenome(parent);
+        helper.assertTrue(restored != null && restored.has(dev.romankrukovsky.kubanhorizons.genie.ecology.Trait.GLOWING)
+                        && restored.generation() == 0,
+                "Геном не пережил сохранение в NBT сущности");
+
+        // Интеграция: размножение двух гибридов даёт потомка с геномом следующего поколения.
+        var parentB = helper.spawn(EntityTypes.FOX, new BlockPos(3, 2, 3));
+        dev.romankrukovsky.kubanhorizons.genie.entity.HybridSpeciesEngine.setGenome(parentB, genomeB);
+        var offspring = dev.romankrukovsky.kubanhorizons.genie.entity.HybridSpeciesEngine
+                .tryReproduce(helper.getLevel(), parent, parentB);
+        helper.assertTrue(offspring != null, "Размножение двух гибридов не дало потомка");
+        var childGenome = dev.romankrukovsky.kubanhorizons.genie.entity.HybridSpeciesEngine.getGenome(offspring);
+        helper.assertTrue(childGenome != null && childGenome.generation() == 1,
+                "Потомок не получил геном поколения родителей+1");
+        helper.assertTrue(offspring.getPersistentData().getBooleanOr("KubanHybrid", false),
+                "Потомок не помечен как гибрид");
+
+        // Популяционный контроль: появление регистрируется, смерть списывает счётчик.
+        // Отдельный пробный чанк: у чанка размножения счётчик уже поднят потомком.
+        var population = dev.romankrukovsky.kubanhorizons.genie.ecology.PopulationControl.get(helper.getLevel());
+        var probe = new net.minecraft.world.level.ChunkPos(100000, 100000);
+        helper.assertTrue(population.canSpawn(probe, 16) && population.count(probe) < 16,
+                "Популяционный контроль не разрешил спавн в свободном чанке");
+        population.registerSpawn(probe);
+        helper.assertTrue(population.count(probe) == 1,
+                "Популяционный контроль не учёл появление гибрида");
+        population.registerDeath(probe);
+        helper.assertTrue(population.count(probe) == 0,
+                "Популяционный контроль не списал смерть гибрида");
+
+        offspring.discard();
+        parent.discard();
+        parentB.discard();
         helper.succeed();
     }
 
@@ -4529,6 +4875,51 @@ public final class KHGameTests {
         }
     }
 
+    /** Асимметричный квадрат 3×3 поворачивается на 90° вокруг центра со своими блоками. */
+    private static void testRuntimeRegionRotate(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        ServerLevel level = helper.getLevel();
+        BlockPos origin = helper.absolutePos(new BlockPos(3, 2, 3));
+        level.setBlock(origin, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+        level.setBlock(origin.east(2), Blocks.EMERALD_BLOCK.defaultBlockState(), 3);
+        level.setBlock(origin.east().south(2), Blocks.OAK_PLANKS.defaultBlockState(), 3);
+        var runtime = dev.romankrukovsky.kubanhorizons.genie.runtime.WishRuntime
+                .get(level.getServer());
+        if (!runtime.ready()) runtime.recover();
+        runtime.setSelection(player.getUUID(),
+                new dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection(
+                        level.dimension().identifier().toString(), origin, origin.east(2).south(2)));
+        try {
+            var preview = runtime.previewSelectedStructureRotate(player,
+                    net.minecraft.world.level.block.Rotation.CLOCKWISE_90);
+            helper.assertTrue(level.getBlockState(origin).is(Blocks.GOLD_BLOCK)
+                            && level.getBlockState(origin.east(2)).is(Blocks.EMERALD_BLOCK),
+                    "Preview поворота изменил исходный регион");
+            var report = runtime.executeStructureRotate(player,
+                    runtime.confirmStructureRotate(player.getUUID(), preview));
+            helper.assertTrue(report.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED,
+                    "Поворот региона не завершился: " + report);
+            helper.assertTrue(level.getBlockState(origin).isAir()
+                            && level.getBlockState(origin.east(2)).is(Blocks.GOLD_BLOCK)
+                            && level.getBlockState(origin.east(2).south(2)).is(Blocks.EMERALD_BLOCK)
+                            && level.getBlockState(origin.south()).is(Blocks.OAK_PLANKS),
+                    "Регион не повернулся на 90° вокруг центра");
+            var undo = runtime.undo(level, player.getUUID(), report.transactionId());
+            helper.assertTrue(undo.outcome()
+                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
+                            && level.getBlockState(origin).is(Blocks.GOLD_BLOCK)
+                            && level.getBlockState(origin.east(2)).is(Blocks.EMERALD_BLOCK)
+                            && level.getBlockState(origin.east().south(2)).is(Blocks.OAK_PLANKS),
+                    "Undo не вернул повёрнутый регион");
+            runtime.retireUndo(player.getUUID(), undo.transactionId());
+            player.discard();
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Runtime region rotation failed: " + exception.getMessage());
+        }
+    }
+
     /** Обычная сущность внутри дома перемещается вместе с ним и возвращается через undo. */
     private static void testRuntimeStructureMovesEntities(GameTestHelper helper) {
         var player = helper.makeMockServerPlayerInLevel();
@@ -4549,26 +4940,63 @@ public final class KHGameTests {
                         level.dimension().identifier().toString(), origin, origin.offset(0, 2, 0)));
         BlockPos offset = new BlockPos(6, 0, 0);
         try {
+            // GENIE_VISION §Пространственные операции: живые существа в
+            // переносимой структуре ещё не поддерживаются — движок обязан
+            // вежливо отказаться, а не переместить их по ошибке или потерять.
             var preview = runtime.previewSelectedStructureMove(player, offset);
-            var report = runtime.executeStructureMove(player,
-                    runtime.confirmStructureMove(player.getUUID(), preview));
-            var moved = level.getEntity(sheepId);
-            helper.assertTrue(report.outcome()
-                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
-                            && moved != null
-                            && moved.blockPosition().closerThan(origin.offset(offset), 2.0D),
-                    "Сущность не переместилась вместе со структурой: " + report);
-            var undo = runtime.undo(level, player.getUUID(), report.transactionId());
-            var restored = level.getEntity(sheepId);
-            helper.assertTrue(undo.outcome()
-                            == dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.TransactionOutcome.COMPLETED
-                            && restored != null && restored.blockPosition().closerThan(origin, 2.0D),
-                    "Undo не вернул сущность в исходную структуру");
-            runtime.retireUndo(player.getUUID(), undo.transactionId());
+            helper.fail("Перенос структуры с живым существом не отклонён: " + preview);
+        } catch (IllegalArgumentException expected) {
+            helper.assertTrue(expected.getMessage() != null
+                            && expected.getMessage().contains("living entities"),
+                    "Движок должен объяснить, что живые существа нужно увести: " + expected.getMessage());
+            helper.assertTrue(level.getEntity(sheepId) != null,
+                    "Отказ переноса не должен уничтожать существо");
+            helper.assertTrue(level.getBlockState(origin).is(Blocks.OAK_PLANKS),
+                    "Отказ переноса не должен трогать блоки");
             player.discard();
             helper.succeed();
         } catch (IOException | RuntimeException exception) {
             helper.fail("Runtime entity move failed: " + exception.getMessage());
+        }
+    }
+
+    /** Небольшая структура взлетает: снимок продвигается на вектор скорости и очищает старое место. */
+    private static void testRuntimeFlyingStructure(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos origin = helper.absolutePos(new BlockPos(1, 2, 1));
+        level.setBlock(origin, Blocks.GOLD_BLOCK.defaultBlockState(), 3);
+        level.setBlock(origin.east(), Blocks.EMERALD_BLOCK.defaultBlockState(), 3);
+        var selection = new dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection(
+                level.dimension().identifier().toString(), origin, origin.east());
+        UUID ownerId = UUID.randomUUID();
+        try {
+            var state = dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotService
+                    .captureState(level, selection);
+            var snapshot = new dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.RegionSnapshot(
+                    dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.RegionSnapshot.CURRENT_SCHEMA_VERSION,
+                    new dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotId(
+                            UUID.randomUUID(), "flight_test"), ownerId, java.time.Instant.now(),
+                    selection, state.blocks(), state.blockTicks(), state.fluidTicks(),
+                    state.entities(), state.biomes(),
+                    dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotService.digest(state));
+            var controller = dev.romankrukovsky.kubanhorizons.genie.runtime.transform
+                    .FlyingStructureController.get(level);
+            controller.start(level, snapshot, new net.minecraft.world.phys.Vec3(0.0D, 0.5D, 0.0D), 200L);
+            helper.assertTrue(controller.isActive(level, ownerId),
+                    "Полёт не зарегистрирован как активный");
+            controller.tick(level);
+            controller.tick(level);
+            helper.assertTrue(level.getBlockState(origin).isAir()
+                            && level.getBlockState(origin.east()).isAir(),
+                    "Исходная позиция не очищена после взлёта");
+            helper.assertTrue(level.getBlockState(origin.above(1)).is(Blocks.GOLD_BLOCK)
+                            && level.getBlockState(origin.east().above(1)).is(Blocks.EMERALD_BLOCK),
+                    "Структура не поднялась на вектор скорости за два тика");
+            helper.assertTrue(controller.isActive(level, ownerId),
+                    "Полёт завершился раньше срока");
+            helper.succeed();
+        } catch (IOException | RuntimeException exception) {
+            helper.fail("Flying structure failed: " + exception.getMessage());
         }
     }
 

@@ -145,6 +145,36 @@ public final class KHServerConfig {
                     "Максимальное число блоков, которое джинния может захватить или перенести за одну операцию.")
             .defineInRange("genie.maxRegionVolume", 32768, 64, 1048576);
 
+    private static final ModConfigSpec.IntValue POCKET_SCENE_MAX_DURATION_TICKS = BUILDER
+            .comment("Maximum lifetime of a pocket scene in ticks before automatic exit.",
+                    "Максимальное время жизни карманной сцены в тиках до автоматического возврата.",
+                    "12000 = 10 минут. Переживает перезапуск сервера: таймер хранится в SavedData.")
+            .defineInRange("genie.pocketSceneMaxDurationTicks", 12000, 20, 720000);
+
+    private static final ModConfigSpec.IntValue GENIE_LITERAL_MAX_ENTITIES = BUILDER
+            .comment("Maximum entities a single `literal:` wish may spawn (Закон буквальности).",
+                    "Максимальное число существ, которое одно `literal:` желание может породить (Закон буквальности).",
+                    "Защищает сервер от лагов при буквальных «40 000 куриц».")
+            .defineInRange("genie.literalMaxEntities", 40000, 0, 200000);
+
+    private static final ModConfigSpec.IntValue GENIE_LITERAL_MAX_ENTITIES_PER_CHUNK = BUILDER
+            .comment("Maximum entities of one wish that may occupy a single chunk after a `literal:` spawn.",
+                    "Максимальное число существ одного желания в одном чанке после `literal:` спавна.",
+                    "Предотвращает концентрацию существ в одной точке.")
+            .defineInRange("genie.literalMaxEntitiesPerChunk", 200, 0, 10000);
+
+    private static final ModConfigSpec.IntValue GENIE_FLYING_HOUSE_DURATION_TICKS = BUILDER
+            .comment("Duration of a flying house flight in ticks before it lands (1200 = 1 minute).",
+                    "Длительность полёта летающего дома в тиках до посадки (1200 = 1 минута).")
+            .defineInRange("genie.flyingHouseDurationTicks", 1200, 40, 720000);
+
+    // --- Гибриды и эволюция ---
+
+    private static final ModConfigSpec.IntValue HYBRID_POPULATION_CAP_PER_CHUNK = BUILDER
+            .comment("Maximum number of hybrids that may live in a single chunk before reproduction is refused.",
+                    "Максимальное число гибридов в одном чанке, после которого размножение запрещается.")
+            .defineInRange("genie.hybridPopulationCapPerChunk", 16, 1, 1000);
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 
     private KHServerConfig() {
@@ -227,5 +257,30 @@ public final class KHServerConfig {
     /** Лимит объёма региона для операций джиннии (Закон сохранности). */
     public static int genieMaxRegionVolume() {
         return GENIE_MAX_REGION_VOLUME.get();
+    }
+
+    /** Максимальная длительность карманной сцены в тиках. */
+    public static int pocketSceneMaxDurationTicks() {
+        return POCKET_SCENE_MAX_DURATION_TICKS.get();
+    }
+
+    /** Максимальное число существ на одно `literal:` желание (Закон буквальности). */
+    public static int genieLiteralMaxEntities() {
+        return GENIE_LITERAL_MAX_ENTITIES.get();
+    }
+
+    /** Максимальное число существ одного желания в одном чанке после `literal:` спавна. */
+    public static int genieLiteralMaxEntitiesPerChunk() {
+        return GENIE_LITERAL_MAX_ENTITIES_PER_CHUNK.get();
+    }
+
+    /** Длительность полёта летающего дома в тиках. */
+    public static int genieFlyingHouseDurationTicks() {
+        return GENIE_FLYING_HOUSE_DURATION_TICKS.get();
+    }
+
+    /** Лимит гибридов на один чанк до запрета размножения (Wishborne Ecology). */
+    public static int hybridPopulationCapPerChunk() {
+        return HYBRID_POPULATION_CAP_PER_CHUNK.get();
     }
 }

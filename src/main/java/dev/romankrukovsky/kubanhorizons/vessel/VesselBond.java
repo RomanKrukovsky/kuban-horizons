@@ -96,7 +96,7 @@ public final class VesselBond {
 
     public CompoundTag save(CompoundTag tag) {
         tag.putInt("SchemaVersion", SCHEMA_VERSION);
-        if (ownerId != null) tag.putUUID("OwnerId", ownerId);
+        if (ownerId != null) tag.putString("OwnerId", ownerId.toString());
         if (ownerName != null) tag.putString("OwnerName", ownerName);
         tag.putLong("BondedAt", bondedAt);
         tag.putInt("RejectionCount", rejectionCount);
@@ -107,16 +107,15 @@ public final class VesselBond {
 
     public static VesselBond load(CompoundTag tag) {
         VesselBond bond = new VesselBond();
-        if (tag.hasUUID("OwnerId")) {
-            bond.ownerId = tag.getUUID("OwnerId");
+        String owner = tag.getStringOr("OwnerId", "");
+        if (!owner.isEmpty()) {
+            bond.ownerId = UUID.fromString(owner);
         }
-        if (tag.contains("OwnerName")) {
-            bond.ownerName = tag.getString("OwnerName");
-        }
-        bond.bondedAt = tag.getLong("BondedAt");
-        bond.rejectionCount = tag.getInt("RejectionCount");
-        bond.isUnliftable = tag.getBoolean("IsUnliftable");
-        bond.loyaltyLevel = tag.getInt("LoyaltyLevel");
+        bond.ownerName = tag.getStringOr("OwnerName", null);
+        bond.bondedAt = tag.getLongOr("BondedAt", 0L);
+        bond.rejectionCount = tag.getIntOr("RejectionCount", 0);
+        bond.isUnliftable = tag.getBooleanOr("IsUnliftable", false);
+        bond.loyaltyLevel = tag.getIntOr("LoyaltyLevel", 0);
         return bond;
     }
 

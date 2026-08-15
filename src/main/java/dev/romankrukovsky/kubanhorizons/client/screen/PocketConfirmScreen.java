@@ -38,7 +38,6 @@ public class PocketConfirmScreen extends Screen {
                 btn -> confirmChanges()
         )
         .bounds(centerX - 100, centerY + 40, 95, 20)
-        .narration(msg -> Component.translatable("narration.kubanhorizons.pocket.confirm", msg.get()))
         .build());
 
         // Кнопка отката
@@ -47,7 +46,6 @@ public class PocketConfirmScreen extends Screen {
                 btn -> rollbackChanges()
         )
         .bounds(centerX + 5, centerY + 40, 95, 20)
-        .narration(msg -> Component.translatable("narration.kubanhorizons.pocket.rollback", msg.get()))
         .build());
     }
 
@@ -81,7 +79,7 @@ public class PocketConfirmScreen extends Screen {
                 Component.translatable("screen.kubanhorizons.pocket.duration", durationTicks / 20));
         Component riskText = Component.translatable("screen.kubanhorizons.pocket.risk", risk);
         int riskColor = getRiskColor();
-        Font font = guiGraphics.font();
+        Font font = this.font;
         int textWidth = font.width(riskText);
         int textX = centerX - textWidth / 2;
         int textY = centerY;
@@ -93,8 +91,8 @@ public class PocketConfirmScreen extends Screen {
         int squareY = textY + (font.lineHeight - squareSize) / 2;
         guiGraphics.fill(squareX, squareY, squareX + squareSize, squareY + squareSize, riskColor);
 
-        // Draw risk text in color
-        guiGraphics.drawString(font, riskText, textX, textY, riskColor);
+        // Draw risk text in color via text renderer
+        text.accept(TextAlignment.LEFT, textX, textY, Component.literal("§" + Integer.toHexString(riskColor & 0xFFFFFF).substring(0, 1) + riskText.getString()));
 
         text.accept(TextAlignment.CENTER, centerX, centerY + 15,
                 Component.literal(getRiskDescription()));

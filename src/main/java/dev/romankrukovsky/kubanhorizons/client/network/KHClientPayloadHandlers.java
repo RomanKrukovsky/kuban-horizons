@@ -4,11 +4,13 @@ import dev.romankrukovsky.kubanhorizons.KubanHorizons;
 import dev.romankrukovsky.kubanhorizons.client.screen.GenieDialogScreen;
 import dev.romankrukovsky.kubanhorizons.client.screen.OwnerDeathChoiceScreen;
 import dev.romankrukovsky.kubanhorizons.client.screen.PocketConfirmScreen;
+import dev.romankrukovsky.kubanhorizons.client.screen.TransformationClientState;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2CGenieResponse;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2COpenGenieDialog;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2COpenOwnerDeathScreen;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2CPocketPreview;
 import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2CPocketResult;
+import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2CTransformationSync;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -29,6 +31,7 @@ public final class KHClientPayloadHandlers {
         event.register(S2CPocketPreview.TYPE, KHClientPayloadHandlers::handlePocketPreview);
         event.register(S2CPocketResult.TYPE, KHClientPayloadHandlers::handlePocketResult);
         event.register(S2COpenOwnerDeathScreen.TYPE, KHClientPayloadHandlers::handleOpenOwnerDeathScreen);
+        event.register(S2CTransformationSync.TYPE, KHClientPayloadHandlers::handleTransformationSync);
     }
 
     private static void handleOpenDialog(S2COpenGenieDialog packet, IPayloadContext context) {
@@ -61,5 +64,9 @@ public final class KHClientPayloadHandlers {
 
     private static void handleOpenOwnerDeathScreen(S2COpenOwnerDeathScreen packet, IPayloadContext context) {
         Minecraft.getInstance().gui.setScreen(new OwnerDeathChoiceScreen(packet.genieId()));
+    }
+
+    private static void handleTransformationSync(S2CTransformationSync packet, IPayloadContext context) {
+        TransformationClientState.update(packet.stageIndex(), packet.progress());
     }
 }

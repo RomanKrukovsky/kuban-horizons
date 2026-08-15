@@ -10,7 +10,10 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         META_RULE,
         MOB_WISH,
         CIVILIZATION,
+        MUSIC,
         DISTORTED_HIGHER_WISH,
+        PROVENANCE,
+        HISTORY,
         UNKNOWN
     }
 
@@ -27,6 +30,7 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         MOB_WISH_CREEPER,
         MOB_WISH_GOLEM,
         VILLAGE_WEALTH,
+        GENIE_FESTIVAL,
         FLYING_HOUSE,
         OMNIPOTENCE,
         ETERNITY,
@@ -34,6 +38,9 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         MIRROR_TRANSFORMATION,
         POWER_TRANSFER,
         ABS_INTANGIBILITY,
+        PROVENANCE_QUERY,
+        WHAT_IF,
+        MUSIC_SPELL,
         LLM_DELEGATED,
         UNKNOWN
     }

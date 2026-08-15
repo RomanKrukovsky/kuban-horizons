@@ -614,6 +614,24 @@ def decorative_ceramic():
     return im
 
 
+def kuban_jug():
+    """Кубанский кувшин-сосуд: тёмная глиняная форма с синим орнаментом."""
+    im = img()
+    rect(im, 0, 0, 15, 15, (120, 82, 58, 255))
+    hline(im, 0, 0, 15, (150, 108, 78, 255))
+    hline(im, 15, 0, 15, (88, 58, 40, 255))
+    # Кувшинная «шейка» в верхней трети.
+    hline(im, 3, 3, 12, (96, 64, 44, 255))
+    hline(im, 3, 4, 12, (104, 70, 48, 255))
+    # Синий кубанский орнамент по «брюшку».
+    for x, y in ((2, 8), (7, 8), (12, 8), (4, 11), (9, 11)):
+        px(im, x, y, CERAMIC_BLUE)
+        px(im, x, y + 1, CERAMIC_BLUE)
+    for x, y in ((1, 6), (6, 6), (11, 6), (13, 10), (3, 13), (8, 13)):
+        px(im, x, y, CERAMIC_BLUE_DARK)
+    return im
+
+
 def carved_window_casing():
     """Резной наличник: белая основа с кубанским сине-голубым орнаментом."""
     im = whitewashed_plaster()
@@ -722,6 +740,7 @@ def main():
     save(whitewashed_plaster(), "whitewashed_plaster")
     save(roof_tiles(), "roof_tiles")
     save(decorative_ceramic(), "decorative_ceramic")
+    save(kuban_jug(), "kuban_jug")
     save(carved_window_casing(), "carved_window_casing")
     save(wattle(), "wattle")
     save(wattle_particle(), "wattle_particle")

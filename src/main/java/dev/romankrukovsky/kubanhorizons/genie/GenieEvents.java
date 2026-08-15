@@ -3,6 +3,7 @@ package dev.romankrukovsky.kubanhorizons.genie;
 import dev.romankrukovsky.kubanhorizons.KubanHorizons;
 import dev.romankrukovsky.kubanhorizons.entity.KubanGenie;
 import dev.romankrukovsky.kubanhorizons.genie.defense.WishborneDefenseHandler;
+import java.io.IOException;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -39,11 +40,34 @@ public final class GenieEvents {
             // и остановленные снаряды рассыпались бы с заметной задержкой.
             dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws.tickHeldProjectiles(level);
             GenieLeash.tickServer(level);
+            if (dev.romankrukovsky.kubanhorizons.genie.runtime.policy.PolicyService.isInstantSmeltEnabled()) {
+                dev.romankrukovsky.kubanhorizons.genie.runtime.policy.InstantSmeltService
+                        .prepareLoadedFurnaces(level);
+            }
             for (var player : level.players()) {
                 dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieTransformationController
                         .tickTransformation(level, player);
             }
+            dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.tick(level);
+            recordDanceMovements(level);
+            // Социум тикает раз в 30 секунд: слухи не должны спамить чат.
+            if (level.getGameTime() % 600L == 0L) {
+                dev.romankrukovsky.kubanhorizons.genie.society.SocietySimulator.get().tick(level);
+            }
             tickVesselLeash(level);
+            // Условные желания проверяются каждый тик; хранилище само-троттлится.
+            dev.romankrukovsky.kubanhorizons.genie.wish.ConditionalRuleStore
+                    .get(level).tick(level);
+            // Полёт структур — редкая операция: перенос снимка дороже остальных
+            // обработчиков, поэтому каждый пятый тик, а не каждый.
+            if (level.getGameTime() % 5L == 0L) {
+                try {
+                    dev.romankrukovsky.kubanhorizons.genie.runtime.transform
+                            .FlyingStructureController.get(level).tick(level);
+                } catch (IOException exception) {
+                    KubanHorizons.LOGGER.error("Не удалось продвинуть летающие структуры", exception);
+                }
+            }
         }
     }
 
@@ -120,6 +144,53 @@ public final class GenieEvents {
     /** Последняя показанная стадия натяжения на игрока. */
     private static final java.util.Map<java.util.UUID,
             dev.romankrukovsky.kubanhorizons.genie.vessel.VesselLeash.Tension> LAST_TENSION =
+            new java.util.concurrent.ConcurrentHashMap<>();
+
+    @SubscribeEvent
+    public static void onLivingJump(
+            net.neoforged.neoforge.event.entity.living.LivingEvent.LivingJumpEvent event) {
+        if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player) {
+            dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.record(
+                    player, dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.Movement.JUMP);
+        }
+    }
+
+    /**
+     * Записывает крадущийся шаг и спринт по переходам состояния и кастует
+     * распознанные танцы.
+     *
+     * <p>Переходы, а не удержание: движение записывается один раз за нажатие.
+     * Прыжки приходят из {@link #onLivingJump}; здесь остаются только крадущийся
+     * шаг и спринт, которые состояниями до уровня тика не отличить.</p>
+     */
+    private static void recordDanceMovements(ServerLevel level) {
+        for (var player : level.players()) {
+            MovementFlags previous = LAST_MOVEMENT_FLAGS.get(player.getUUID());
+            boolean sneaking = player.isShiftKeyDown();
+            boolean sprinting = player.isSprinting();
+            if (sneaking && (previous == null || !previous.sneaking())) {
+                dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.record(
+                        player, dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.Movement.SNEAK);
+            }
+            if (sprinting && (previous == null || !previous.sprinting())) {
+                dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.record(
+                        player, dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.Movement.SPRINT);
+            }
+            if (sneaking || sprinting) {
+                LAST_MOVEMENT_FLAGS.put(player.getUUID(), new MovementFlags(sneaking, sprinting));
+            } else {
+                LAST_MOVEMENT_FLAGS.remove(player.getUUID());
+            }
+            dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.detect(player).ifPresent(
+                    spell -> dev.romankrukovsky.kubanhorizons.genie.music.DanceEngine.cast(level, player, spell));
+        }
+    }
+
+    /** Последнее состояние крадущегося шага и спринта игрока. */
+    private record MovementFlags(boolean sneaking, boolean sprinting) {
+    }
+
+    private static final java.util.Map<java.util.UUID, MovementFlags> LAST_MOVEMENT_FLAGS =
             new java.util.concurrent.ConcurrentHashMap<>();
 
     @SubscribeEvent

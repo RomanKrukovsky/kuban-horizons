@@ -249,6 +249,9 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.wish.no_space",
                 "Reality found no safe place for the chest. Precision: %s.",
                 "Реальность не нашла безопасного места для сундука. Точность: %s.");
+        add("message.kubanhorizons.genie.wish.festival",
+                "The village celebrates the Annual Genie Festival!",
+                "Деревня празднует Ежегодный праздник Джиннии!");
         add("genie.kubanhorizons.temperament.kind", "kind", "добрая");
         add("genie.kubanhorizons.temperament.sardonic", "sardonic", "ехидная");
         add("genie.kubanhorizons.temperament.proud", "proud", "гордая");
@@ -562,6 +565,41 @@ final class KHTranslations {
                 "Spatial shell lost. Creating new presence point...",
                 "Пространственная оболочка потеряна. Создание новой точки присутствия...");
 
+        // --- Клиентский UX трансформации игрока ---
+        add("screen.kubanhorizons.transformation.title",
+                "Transformation of the Player",
+                "Трансформация игрока");
+        add("stage.kubanhorizons.transformation.human",
+                "Human",
+                "Человек");
+        add("stage.kubanhorizons.transformation.human.desc",
+                "You are still mortal. The wish has not yet touched your nature.",
+                "Вы ещё смертны. Желание ещё не коснулось вашей природы.");
+        add("stage.kubanhorizons.transformation.awakening",
+                "Awakening",
+                "Пробуждение");
+        add("stage.kubanhorizons.transformation.awakening.desc",
+                "Mortality is removed. The body is being rewritten; flight is becoming natural.",
+                "Смертность снята. Тело переписывается; полёт становится естественным.");
+        add("stage.kubanhorizons.transformation.half_genie",
+                "Half-Genie",
+                "Полуджинния");
+        add("stage.kubanhorizons.transformation.half_genie.desc",
+                "The avatar takes shape. Physical damage is ignored, but the form is not yet complete.",
+                "Аватар обретает форму. Физический урон игнорируется, но форма ещё не завершена.");
+        add("stage.kubanhorizons.transformation.genie",
+                "Genie",
+                "Джинния");
+        add("stage.kubanhorizons.transformation.genie.desc",
+                "Transformation complete. The vessel lamp is materialized; omnipotence has its price.",
+                "Трансформация завершена. Лампа-сосуд материализована; всемогущество имеет свою цену.");
+        add("screen.kubanhorizons.transformation.progress",
+                "Progress: %s%%",
+                "Прогресс: %s%%");
+        add("screen.kubanhorizons.transformation.close",
+                "Close",
+                "Закрыть");
+
         add("message.kubanhorizons.genie.vessel.summon_countdown",
                 "SOMEONE IS SUMMONING YOU (3... 2... 1...)",
                 "КТО-ТО ВЫЗЫВАЕТ ВАС (3... 2... 1...)");
@@ -651,6 +689,38 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.mob_wish.creeper",
                 "The creeper sparkles with harmless fireworks instead of exploding.",
                 "Крипер рассыпается безопасными салютами вместо взрыва.");
+
+        // --- Квестовые ступени желаний мобов (снег → золотое яблоко → загон и т.д.) ---
+        add("message.kubanhorizons.genie.mob_wish.cow.golden_apple",
+                "The cow lows in delight as a golden apple materializes before her.",
+                "Корова радостно мычит: перед ней материализуется золотое яблоко.");
+        add("message.kubanhorizons.genie.mob_wish.cow.pen",
+                "A sturdy oak pen rises around the cow — now she has a home.",
+                "Вокруг коровы вырастает крепкий дубовый загон — теперь у неё есть дом.");
+        add("message.kubanhorizons.genie.mob_wish.wolf.bone",
+                "The wolf takes the bone gratefully and looks at you with devotion.",
+                "Волк с благодарностью принимает кость и преданно глядит на вас.");
+        add("message.kubanhorizons.genie.mob_wish.wolf.guard",
+                "The wolf straightens up — blessed by the genie, it will guard its master.",
+                "Волк выпрямляется — с благословением джиннии он станет верным стражем хозяина.");
+        add("message.kubanhorizons.genie.mob_wish.golem.iron",
+                "The iron golem accepts a fresh ingot and nods in thanks.",
+                "Железный голем принимает свежий слиток и благодарно кивает.");
+        add("message.kubanhorizons.genie.mob_wish.golem.heal",
+                "The iron golem's cracks mend as the genie's warmth flows through it.",
+                "Трещины железного голема затягиваются — тёплый свет джиннии течёт сквозь него.");
+        add("message.kubanhorizons.genie.mob_wish.creeper.firework",
+                "The creeper bursts into bright fireworks instead of exploding.",
+                "Крипер рассыпается яркими салютами вместо взрыва.");
+        add("message.kubanhorizons.genie.mob_wish.creeper.gift",
+                "The creeper accepts the golden apple and bows, promising peace.",
+                "Крипер принимает золотое яблоко и кланяется, обещая мир.");
+        add("message.kubanhorizons.genie.mob_wish.pending",
+                "This creature's wish is already being fulfilled. Be patient.",
+                "Желание этого существа уже принято. Наберитесь терпения.");
+        add("message.kubanhorizons.genie.mob_wish.follow_up",
+                "The genie recalls: this one was already granted \"%s\".",
+                "Джинния вспоминает: этому уже исполнялось \"%s\".");
 
         // --- Результаты желаний гигантизма, мета-правил и деревень ---
         add("message.kubanhorizons.genie.wish.big_chicken",
@@ -1047,6 +1117,41 @@ final class KHTranslations {
                 "You cannot sleep inside the genie palace.",
                 "Во дворце джиннии нельзя спать.");
 
+        // --- Экран состояния Wishborne ---
+        add("screen.kubanhorizons.genie.wishborne.title",
+                "Wishborne State",
+                "Состояние Wishborne");
+        add("screen.kubanhorizons.genie.wishborne.close",
+                "Close",
+                "Закрыть");
+        add("screen.kubanhorizons.genie.wishborne.anchoring",
+                "Reality anchoring: %s/100",
+                "Якорение реальности: %s/100");
+        add("state.kubanhorizons.genie.wishborne.manifested",
+                "Manifested",
+                "Проявлена");
+        add("state.kubanhorizons.genie.wishborne.manifested.desc",
+                "The avatar is fully present and free to act.",
+                "Аватар полностью присутствует и свободно действует.");
+        add("state.kubanhorizons.genie.wishborne.dispersed",
+                "Dispersed",
+                "Рассеяна");
+        add("state.kubanhorizons.genie.wishborne.dispersed.desc",
+                "The physical form is dispersed but can reform.",
+                "Физическая форма рассеяна, но может восстановиться.");
+        add("state.kubanhorizons.genie.wishborne.sealed",
+                "Sealed",
+                "Запечатана");
+        add("state.kubanhorizons.genie.wishborne.sealed.desc",
+                "Trapped by seals; anchoring has reached its limit.",
+                "Запечатана рунами; якорение достигло предела.");
+        add("state.kubanhorizons.genie.wishborne.banished",
+                "Banished",
+                "Изгнана");
+        add("state.kubanhorizons.genie.wishborne.banished.desc",
+                "Exiled from this realm of reality.",
+                "Изгнана из этого слоя реальности.");
+
         // General wish executor keys
         add("message.kubanhorizons.genie.wish.gave_diamonds",
                 "Here are your diamonds!",
@@ -1105,6 +1210,46 @@ final class KHTranslations {
         add("message.kubanhorizons.genie.wish.failed",
                 "The wish could not take form.",
                 "Желание не смогло обрести форму.");
+
+        // --- История: «А что если?» — альтернативные версии мира ---
+        add("wish.kubanhorizons.whatif.result",
+                "Genie: '%s' — %s. If the wish had stayed, the world would differ in %s blocks. %s",
+                "Джинния: «%s» — %s. Останься это желание, мир отличался бы на %s блоков. %s");
+        add("wish.kubanhorizons.whatif.empty",
+                "Genie: no undone wish to compare. Reality remembers nothing to replay.",
+                "Джинния: нечего сравнивать. Реальность не помнит ни одного отменённого желания.");
+
+        // --- Магическая музыка и танец (GENIE_VISION) ---
+        add("wish.kubanhorizons.music.rain",
+                "The Rain Song begins. Clouds gather over the steppe.",
+                "Звучит Песня дождя. Над степью сгущаются облака.");
+        add("wish.kubanhorizons.music.growth",
+                "The Growth Melody makes the fields hurry to ripen.",
+                "Мелодия Роста торопит поля созреть.");
+        add("wish.kubanhorizons.music.peace",
+                "The Peace Lullaby calms the hostility around you.",
+                "Колыбельная Покоя гасит враждебность вокруг вас.");
+        add("wish.kubanhorizons.music.fire",
+                "The Dance of Fire wraps allies in fireproof light.",
+                "Танец Огня окутывает союзников огнеупорным светом.");
+        add("wish.kubanhorizons.dance.triggered",
+                "Your dance becomes a song.",
+                "Ваш танец становится песней.");
+        add("message.kubanhorizons.music_box.mood",
+                "The music box plays: %s",
+                "Шкатулка играет: %s");
+        add("mood.kubanhorizons.music.calm",
+                "Calm",
+                "Покой");
+        add("mood.kubanhorizons.music.joy",
+                "Joy",
+                "Радость");
+        add("mood.kubanhorizons.music.sadness",
+                "Sadness",
+                "Грусть");
+        add("mood.kubanhorizons.music.awe",
+                "Awe",
+                "Благоговение");
     }
 
     private KHTranslations() {

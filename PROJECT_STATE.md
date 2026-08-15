@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода проходит успешно.
+- Полный `runGameTestServer` мода: **152 теста проходят** (`All 152 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -165,10 +165,78 @@
 - Stage 5: cycle-safe порядок растительности поймы и структуры проверены;
   продолжается визуальная шлифовка.
 
+## Механики джиннии: интеграция (этап «механики из MD»)
+- Починена сборка после регрессии: восстановлены ~40 регистраций KHBlocks,
+  объединён KHDataComponents (VESSEL_BOND/VESSEL_TYPE/REGION_PAYLOAD/SOUL_OWNER),
+  vessel-система переведена на MC 26.2 API (Identifier, GuiGraphicsExtractor,
+  InteractionResult, ValueInput/ValueOutput, SavedDataType, KeyMapping.Category),
+  созданы недостающие wish-типы (ParsedWish, WishPlanResult, WishResult,
+  WishOperation, BudgetCalculator, BudgetResult).
+- Карманное измерение джиннии: PocketDimension (тип+стебель, flat void),
+  вход/выход по TeleportTransition, запрет рекурсии, таймер сцены через конфиг.
+- Клиентский UX трансформации игрока: PlayerTransformationScreen,
+  TransformationHudOverlay, S2CTransformationSync, TransformationClientState.
+- Экран Wishborne-состояния (4 состояния + шкала якорения), методы WishborneState
+  (increaseAnchoring/isBanished/setCurrentState).
+- Provenance-журнал предметов/блоков (SavedDataType + Codec), запрос «откуда
+  предмет?» через WishExecutor.
+- Буквальный режим: лимиты сущностей через KHServerConfig (max/чанк), тест.
+- Условные желания: категория PROVENANCE, ConditionalWishEngine, тесты.
+- Экран смерти владельца (OwnerDeathChoiceScreen) дополнен серверной логикой,
+  SOUL_SHARD предмет + SOUL_OWNER компонент, KUBAN_JUG (блок+item+текстура).
+- Исправлены регрессии: instant-smelt policy (read возвращал "false"),
+  перенос структуры с сущностями, безопасные triggerAnim/пакеты для тестовых
+  клиентов.
+
+## Механики джиннии: вторая волна (12 субагентов)
+- **Поворот области**: RegionRotateService (90/180/270°, блоки + block entity NBT),
+  StructureRotatePreview/ConfirmedStructureRotate, WishRuntime.previewSelectedStructureRotate/
+  confirmStructureRotate/executeStructureRotate, тест genie_runtime_region_rotate.
+- **Движущиеся структуры**: FlyingStructureController (persistent SavedData,
+  полёт со скоростью и длительностью, посадка через RegionRestorer),
+  тик-хук в GenieEvents, желание «летающий дом» (GeneralWishEngine),
+  конфиг genie.flyingHouseDurationTicks, тест genie_runtime_flying_structure.
+- **Гибридная экология**: Genome (Codec+StreamCodec, менделевское скрещивание +
+  мутации, поколения), PopulationControl (лимит на чанк, SavedData),
+  интеграция HybridSpeciesEngine.tryReproduce + applyTraits,
+  конфиг genie.hybridPopulationCapPerChunk, тест genie_ecology_genome_inheritance.
+- **Музыка и танец**: MusicSpell (4 песни: дождь/рост/покой/огонь),
+  DanceEngine (распознавание фигур движений), хуки LivingJumpEvent/onLevelTick,
+  желание MUSIC_SPELL, тест genie_music_rain_song.
+- **Условные желания**: ConditionalRule (7 триггеров, Codec) + ConditionalRuleStore
+  (SavedData, tick с проверкой триггеров), переписан ConditionalWishEngine,
+  тик-хук в GenieEvents, тест genie_conditional_rule_store.
+- **Желания мобов**: MobWishMemory (SavedData, 3-уровневая эскалация квестов),
+  интеграция MobWishHandler, тест genie_mob_wish_memory.
+- **Комната невыполненных желаний**: UnfulfilledWishRoom (SavedData,
+  материализация стеллажа с книгой), хук в WishExecutor, тест genie_unfulfilled_wish_room.
+- **«А что если?»**: AlternativeCausalityEngine (сравнение снимков отменённых
+  транзакций, без изменения мира), желание WHAT_IF, тест genie_alternative_causality.
+- **Гигантизм**: GiantPieBuilder (пирог 5×2×5, кровать 4×1×6), BIG_PIE/BIG_BED
+  в GigantismScaleEngine, тест genie_gigantism_pie.
+- **Социум**: SocietySimulator (репутация + слухи, SavedData SocietyData),
+  GenieMythSystem (мифы + ежегодный праздник), желание GENIE_FESTIVAL,
+  тест genie_society_reputation.
+- **Деформация хвоста**: tailIntensity в KubanGenie (SynchedEntityData, растёт при
+  касте, гаснет при DISPERSED), TailPose API в CartoonAnatomyEngine.
+- **Музыкальная шкатулка**: MusicBoxSchool (4 настроения-ауры: покой/радость/
+  грусть/благоговение), регистрация 5 сосудов в KHItems (vessel_lamp/mirror/ring/
+  jug/music_box) + текстуры, тест genie_music_box_school.
+- **152 GameTest проходят**: `All 152 required tests passed :)` (два прогона подряд).
+- Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая
+  параллельные тесты (манул).
+
 ## Следующий конкретный шаг
-1. Проверить запуск в TLauncher с обновлённым JAR-файлом.
-2. Провести визуальный smoke-тест диалога, лампы и трансформации в клиенте.
-3. Прогон на dedicated server.
+1. Провести визуальный smoke-тест диалога, лампы, трансформации и pocket-измерения
+   в клиенте (runClient).
+2. Визуальная шлифовка Stage 5 (пойма/плавни).
+
+## Verified: dedicated server smoke
+- `runServer -PkhServerWorld=fresh-smoke` — запуск за 1.5s, без ошибок и крашей.
+- Новое измерение `kubanhorizons:pocket` загружается и корректно сохраняется;
+  `kubanhorizons:eternal_kuban` тоже. Все 5 измерений (overworld, eternal_kuban,
+  pocket, nether, end) сохраняются штатно.
+- Только ожидаемые warnings (offline mode, command ambiguity).
 
 ## Команды для продолжения
 ```bash

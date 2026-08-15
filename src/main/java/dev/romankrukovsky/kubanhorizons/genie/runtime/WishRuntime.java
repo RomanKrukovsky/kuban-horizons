@@ -7,6 +7,7 @@ import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedRest
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedMiniaturize;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedPocketScene;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedStructureMove;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedStructureRotate;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedBiomeRewrite;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedDrawing;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.confirmation.ConfirmedWord;
@@ -17,6 +18,7 @@ import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.RestorePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.MiniaturizePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.PocketScenePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.StructureMovePreview;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.StructureRotatePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.BiomeRewritePreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.DrawingPreview;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.preview.WordPreview;
@@ -30,7 +32,9 @@ import dev.romankrukovsky.kubanhorizons.genie.runtime.selection.SelectionService
 import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.RegionSnapshot;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotService;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotStore;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.transform.RegionRotateService;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.CausalLedger;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.CausalLedgerEntry;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.RecoveryService;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.RegionLockManager;
 import dev.romankrukovsky.kubanhorizons.genie.runtime.transaction.RestoreTransactionService;
@@ -45,6 +49,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.List;
 import java.util.Map;
@@ -72,17 +77,21 @@ public final class WishRuntime {
     private final ConfirmationAuthority confirmations = new ConfirmationAuthority();
     private final RecoveryJournal recoveryJournal;
     private final TransactionManifestStore manifests;
+    private final CausalLedger ledger;
     private final RecoveryService recoveryService;
     private final RestoreTransactionService restoreService;
     private final PolicyService policyService;
     private final Set<UUID> issuedMiniaturizeConfirmations = new HashSet<>();
     private final Set<UUID> issuedPocketSceneConfirmations = new HashSet<>();
     private final Set<UUID> issuedStructureMoveConfirmations = new HashSet<>();
+    private final Set<UUID> issuedStructureRotateConfirmations = new HashSet<>();
     private final Set<UUID> issuedBiomeRewriteConfirmations = new HashSet<>();
     private final Set<UUID> issuedDrawingConfirmations = new HashSet<>();
     private final Set<UUID> issuedWordConfirmations = new HashSet<>();
     private final Map<UUID, dev.romankrukovsky.kubanhorizons.genie.dimension.FlyingStructureEngine.MovePlan>
             pendingStructureMoves = new ConcurrentHashMap<>();
+    private final Map<UUID, RegionRotateService.RotatePlan>
+            pendingStructureRotates = new ConcurrentHashMap<>();
     private final Map<UUID, dev.romankrukovsky.kubanhorizons.genie.expression.BiomeRewriterEngine.BiomePlan>
             pendingBiomeRewrites = new ConcurrentHashMap<>();
     private final Map<UUID, dev.romankrukovsky.kubanhorizons.genie.expression.MagicDrawingHandler.DrawingPlan>
@@ -100,7 +109,7 @@ public final class WishRuntime {
         snapshotService = new SnapshotService(snapshotStore);
         recoveryJournal = new RecoveryJournal(root.resolve("recovery.journal"));
         manifests = new TransactionManifestStore(root.resolve("transactions"));
-        CausalLedger ledger = new CausalLedger(root.resolve("causal-ledger.tsv"));
+        this.ledger = new CausalLedger(root.resolve("causal-ledger.tsv"));
         RegionLockManager locks = new RegionLockManager();
         recoveryService = new RecoveryService(recoveryJournal, snapshotStore, manifests);
         restoreService = new RestoreTransactionService(confirmations, previewService, snapshotStore,
@@ -366,6 +375,72 @@ public final class WishRuntime {
                 plan.current(), plan.target(), confirmed.preview().previewDigest(), Instant.now());
     }
 
+    public StructureRotatePreview previewSelectedStructureRotate(ServerPlayer player,
+                                                                 net.minecraft.world.level.block.Rotation rotation) throws IOException {
+        requireServerThread();
+        RegionSelection selection = selections.requireCompleted(player.getUUID());
+        ensureReady(selection);
+        SnapshotService.SnapshotState current = SnapshotService.captureState(player.level(), selection);
+        SnapshotService.SnapshotState target = RegionRotateService.buildRotatedTarget(current, selection, rotation);
+        int changed = 0;
+        for (int index = 0; index < current.blocks().size(); index++) {
+            if (!current.blocks().get(index).blockState().equals(target.blocks().get(index).blockState())
+                    || !Objects.equals(current.blocks().get(index).blockEntity(),
+                    target.blocks().get(index).blockEntity())) {
+                changed++;
+            }
+        }
+        String currentDigest = SnapshotService.digest(current);
+        String targetDigest = SnapshotService.digest(target);
+        UUID previewId = UUID.randomUUID();
+        Instant expiresAt = Instant.now().plus(Duration.ofMinutes(2));
+        String previewDigest = digest(previewId + "|" + player.getUUID() + "|" + currentDigest
+                + "|" + targetDigest + "|" + rotation + "|" + expiresAt);
+        RegionSnapshot currentSnapshot = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
+                new dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotId(
+                        UUID.randomUUID(), "rotate_before"), player.getUUID(), Instant.now(), selection,
+                current.blocks(), current.blockTicks(), current.fluidTicks(), current.entities(),
+                current.biomes(), currentDigest);
+        RegionSnapshot targetSnapshot = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
+                new dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotId(
+                        UUID.randomUUID(), "rotate_target"), player.getUUID(), Instant.now(), selection,
+                target.blocks(), target.blockTicks(), target.fluidTicks(), target.entities(),
+                target.biomes(), targetDigest);
+        pendingStructureRotates.put(previewId, new RegionRotateService.RotatePlan(currentSnapshot, targetSnapshot));
+        selections.clear(player.getUUID());
+        return new StructureRotatePreview(previewId, player.getUUID(), selection, rotation, changed,
+                currentDigest, targetDigest, previewDigest, expiresAt);
+    }
+
+    public synchronized ConfirmedStructureRotate confirmStructureRotate(UUID actor,
+                                                                         StructureRotatePreview preview) {
+        if (!preview.actorId().equals(actor) || !preview.expiresAt().isAfter(Instant.now())
+                || !pendingStructureRotates.containsKey(preview.previewId())) {
+            throw new IllegalArgumentException("structure rotate preview is stale or unavailable");
+        }
+        UUID id = UUID.randomUUID();
+        issuedStructureRotateConfirmations.add(id);
+        return new ConfirmedStructureRotate(id, preview, Instant.now());
+    }
+
+    public TransactionReport executeStructureRotate(ServerPlayer player,
+                                                    ConfirmedStructureRotate confirmed) throws IOException {
+        requireServerThread();
+        synchronized (this) {
+            if (!confirmed.preview().actorId().equals(player.getUUID())
+                    || !confirmed.preview().expiresAt().isAfter(Instant.now())
+                    || !issuedStructureRotateConfirmations.remove(confirmed.confirmationId())) {
+                throw new IllegalArgumentException("structure rotate confirmation is invalid or already used");
+            }
+        }
+        var plan = pendingStructureRotates.remove(confirmed.preview().previewId());
+        if (plan == null) {
+            throw new IllegalStateException("structure rotate plan expired");
+        }
+        return restoreService.applyPreparedTarget(player.level(), player.getUUID(),
+                plan.current(), plan.target(), confirmed.preview().previewDigest(), Instant.now());
+    }
+
     public BiomeRewritePreview previewBiomeRewrite(ServerPlayer player, BlockPos center)
             throws IOException {
         requireServerThread();
@@ -613,6 +688,17 @@ public final class WishRuntime {
     public void retireUndo(UUID actor, UUID transactionId) throws IOException {
         requireServerThread();
         restoreService.retireUndo(transactionId, actor, Instant.now());
+    }
+
+    /** Долговечный причинный индекс завершённых транзакций для способности «А что если?». */
+    public List<CausalLedgerEntry> causalIndex() throws IOException {
+        return ledger.readAll();
+    }
+
+    /** Загружает целевой снимок по UUID для сравнения альтернативной версии мира. */
+    public Optional<RegionSnapshot> findSnapshot(UUID snapshotId) throws IOException {
+        requireServerThread();
+        return snapshotStore.load(Objects.requireNonNull(snapshotId, "snapshotId"));
     }
 
     public CapabilityRegistry capabilities() {

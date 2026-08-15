@@ -1,7 +1,6 @@
 package dev.romankrukovsky.kubanhorizons.genie.defense;
 
 import dev.romankrukovsky.kubanhorizons.entity.KubanGenie;
-import dev.romankrukovsky.kubanhorizons.genie.state.ManifestationState;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 
@@ -16,8 +15,7 @@ public final class PhantomDeathController {
     private PhantomDeathController() {}
 
     public static void triggerPhantomDispersion(KubanGenie genie, ServerLevel level, Player attacker) {
-        // Change state to DISPERSED instead of fake death
-        genie.getWishborneState().setCurrentState(ManifestationState.DISPERSED);
+        genie.getWishborneState().disperseAvatar();
 
         // Play a dispersion effect (smoke/particles) instead of scale-to-zero animation
         // TODO: Trigger GeckoLib animation "disperse" instead of "despawn"

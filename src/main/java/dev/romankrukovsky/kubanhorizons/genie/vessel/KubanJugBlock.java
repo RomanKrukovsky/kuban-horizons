@@ -32,9 +32,8 @@ public class KubanJugBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
-                                 InteractionHand hand, BlockHitResult hit) {
-        if (level.isClientSide) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
 
@@ -44,17 +43,13 @@ public class KubanJugBlock extends Block implements EntityBlock {
             return InteractionResult.PASS;
         }
 
-        if (hand == InteractionHand.MAIN_HAND) {
-            // Left click simulation via use (in real implementation we would use attack block)
-            // For now treat main hand as summon/teleport
+        if (player.getUsedItemHand() == InteractionHand.MAIN_HAND) {
             KubanGenie genie = jug.getOrSummonGenie(serverLevel, player);
             if (genie != null) {
                 level.playSound(null, pos, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 0.8f, 1.2f);
-                // TODO: play spawn animation via GeckoLib
             }
             return InteractionResult.CONSUME;
         } else {
-            // Right click - look inside
             if (jug.hasGenie()) {
                 player.sendSystemMessage(net.minecraft.network.chat.Component.literal("Джинния недовольно бормочет внутри кувшина..."));
             } else {
@@ -62,16 +57,5 @@ public class KubanJugBlock extends Block implements EntityBlock {
             }
             return InteractionResult.CONSUME;
         }
-    }
-
-    @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
-        if (!state.is(newState.getBlock())) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof KubanJugBlockEntity jug) {
-                jug.onRemoved();
-            }
-        }
-        super.onRemove(state, level, pos, newState, isMoving);
     }
 }

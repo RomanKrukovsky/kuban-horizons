@@ -1,15 +1,19 @@
 package dev.romankrukovsky.kubanhorizons.genie.runtime;
 
+import dev.romankrukovsky.kubanhorizons.KubanHorizons;
 import dev.romankrukovsky.kubanhorizons.genie.wish.ParsedWish;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.saveddata.SavedData;
-import java.util.*;
+import net.minecraft.world.level.saveddata.SavedDataType;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Persistent ledger of all executed wishes.
@@ -17,15 +21,47 @@ import java.util.*;
  */
 public final class CausalityLedger extends SavedData {
 
-    private static final String DATA_NAME = "kubanhorizons_causality_ledger";
+    public static final Codec<WishExecutionRecord> RECORD_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.LONG.fieldOf("time").forGetter(WishExecutionRecord::timestamp),
+            Codec.STRING.fieldOf("initiator").forGetter(r -> r.initiator.toString()),
+            Codec.STRING.fieldOf("raw").forGetter(WishExecutionRecord::rawWish),
+            Codec.STRING.fieldOf("op").forGetter(WishExecutionRecord::operation),
+            Codec.list(Codec.STRING).fieldOf("entities").forGetter(r -> r.affectedEntities.stream().map(UUID::toString).toList()),
+            Codec.list(Codec.STRING).fieldOf("blocks").forGetter(r -> r.affectedBlocks.stream().map(b -> b.getX() + "," + b.getY() + "," + b.getZ()).toList())
+    ).apply(instance, (time, initiator, raw, op, entities, blocks) -> new WishExecutionRecord(
+            time,
+            UUID.fromString(initiator),
+            raw,
+            op,
+            entities.stream().map(UUID::fromString).toList(),
+            blocks.stream().map(s -> {
+                String[] p = s.split(",");
+                return new BlockPos(Integer.parseInt(p[0]), Integer.parseInt(p[1]), Integer.parseInt(p[2]));
+            }).toList()
+    )));
 
-    private final List<WishExecutionRecord> records = new ArrayList<>();
+    public static final Codec<CausalityLedger> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.list(RECORD_CODEC).fieldOf("records").forGetter(l -> l.records)
+    ).apply(instance, CausalityLedger::new));
+
+    public static final SavedDataType<CausalityLedger> TYPE = new SavedDataType<>(
+            Identifier.fromNamespaceAndPath(KubanHorizons.MOD_ID, "causality_ledger"),
+            CausalityLedger::new,
+            CODEC
+    );
+
+    private final List<WishExecutionRecord> records;
+
+    public CausalityLedger() {
+        this(new ArrayList<>());
+    }
+
+    public CausalityLedger(List<WishExecutionRecord> records) {
+        this.records = new ArrayList<>(records);
+    }
 
     public static CausalityLedger get(ServerLevel level) {
-        return level.getDataStorage().computeIfAbsent(
-                new Factory<>(CausalityLedger::new, CausalityLedger::load),
-                DATA_NAME
-        );
+        return level.getDataStorage().computeIfAbsent(TYPE);
     }
 
     public void recordExecution(Player initiator, ParsedWish wish, ServerLevel level,
@@ -46,70 +82,6 @@ public final class CausalityLedger extends SavedData {
     public Optional<WishExecutionRecord> getLastRecord() {
         if (records.isEmpty()) return Optional.empty();
         return Optional.of(records.get(records.size() - 1));
-    }
-
-    // === Persistence ===
-
-    @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider provider) {
-        ListTag list = new ListTag();
-        for (WishExecutionRecord r : records) {
-            CompoundTag t = new CompoundTag();
-            t.putLong("time", r.timestamp);
-            t.putUUID("initiator", r.initiator);
-            t.putString("raw", r.rawWish);
-            t.putString("op", r.operation);
-
-            ListTag entities = new ListTag();
-            for (UUID uuid : r.affectedEntities) {
-                CompoundTag e = new CompoundTag();
-                e.putUUID("uuid", uuid);
-                entities.add(e);
-            }
-            t.put("entities", entities);
-
-            ListTag blocks = new ListTag();
-            for (BlockPos pos : r.affectedBlocks) {
-                CompoundTag b = new CompoundTag();
-                b.putInt("x", pos.getX());
-                b.putInt("y", pos.getY());
-                b.putInt("z", pos.getZ());
-                blocks.add(b);
-            }
-            t.put("blocks", blocks);
-
-            list.add(t);
-        }
-        tag.put("records", list);
-        return tag;
-    }
-
-    public static CausalityLedger load(CompoundTag tag, HolderLookup.Provider provider) {
-        CausalityLedger ledger = new CausalityLedger();
-        ListTag list = tag.getList("records", Tag.TAG_COMPOUND);
-        for (int i = 0; i < list.size(); i++) {
-            CompoundTag t = list.getCompound(i);
-            long time = t.getLong("time");
-            UUID initiator = t.getUUID("initiator");
-            String raw = t.getString("raw");
-            String op = t.getString("op");
-
-            List<UUID> entities = new ArrayList<>();
-            ListTag el = t.getList("entities", Tag.TAG_COMPOUND);
-            for (int j = 0; j < el.size(); j++) {
-                entities.add(el.getCompound(j).getUUID("uuid"));
-            }
-
-            List<BlockPos> blocks = new ArrayList<>();
-            ListTag bl = t.getList("blocks", Tag.TAG_COMPOUND);
-            for (int j = 0; j < bl.size(); j++) {
-                CompoundTag b = bl.getCompound(j);
-                blocks.add(new BlockPos(b.getInt("x"), b.getInt("y"), b.getInt("z")));
-            }
-
-            ledger.records.add(new WishExecutionRecord(time, initiator, raw, op, entities, blocks));
-        }
-        return ledger;
     }
 
     public record WishExecutionRecord(

@@ -824,6 +824,88 @@ def main():
     save(magic_mirror_item(), "magic_mirror")
     save(miniature_world_item(), "miniature_world")
     save(sonic_boom_item(), "sonic_boom_item")
+    save(soul_shard_item(), "soul_shard")
+    save(bottle((212, 172, 60, 255), (255, 220, 100, 255)), "vessel_lamp")
+    save(magic_mirror_item(), "vessel_mirror")
+    save(vessel_ring_item(), "vessel_ring")
+    save(vessel_jug_item(), "vessel_jug")
+    save(vessel_music_box_item(), "vessel_music_box")
+
+def soul_shard_item():
+    """Осколок души: фиолетовый кристалл с магической подписью джиннии."""
+    im = img()
+    SHARD_DARK = (86, 52, 128, 255)
+    SHARD_MID = (128, 82, 178, 255)
+    SHARD_HI = (178, 134, 222, 255)
+    # Ромбический осколок: тёмная обводка, светлая грань слева.
+    for dy, row in enumerate((8, 7, 6, 7, 6, 7, 8)):
+        start = (15 - row) // 2
+        for dx in range(row):
+            px(im, start + dx, 3 + dy, SHARD_DARK)
+    for dx, dy in ((6, 3), (7, 3), (8, 3), (9, 3), (5, 4), (10, 4),
+                   (6, 4), (9, 4), (7, 5), (8, 5), (6, 6), (9, 6),
+                   (7, 7), (8, 7)):
+        px(im, dx, dy, SHARD_MID)
+    for dx, dy in ((6, 3), (7, 3), (5, 4), (6, 4), (6, 5), (7, 5), (7, 7)):
+        px(im, dx, dy, SHARD_HI)
+    outline_soft(im, SHARD_DARK)
+    return im
+
+
+def vessel_ring_item():
+    """Кольцо-сосуд: золотой обод с лиловым камнем магии."""
+    im = img()
+    gold = (222, 176, 60, 255)
+    gold_hi = (245, 214, 118, 255)
+    gold_dark = (156, 116, 34, 255)
+    gem = (138, 96, 186, 255)
+    gem_hi = (196, 158, 236, 255)
+    rect(im, 3, 9, 12, 12, gold)
+    rect(im, 5, 8, 10, 13, gold)
+    px(im, 4, 9, gold_hi)
+    px(im, 11, 9, gold_hi)
+    for y, x0, x1 in ((4, 5, 10), (5, 4, 11), (6, 4, 11), (7, 5, 10)):
+        rect(im, x0, y, x1, y, gold)
+    px(im, 6, 3, gem_hi)
+    px(im, 7, 4, gem)
+    px(im, 8, 4, gem)
+    px(im, 9, 5, gold_dark)
+    px(im, 7, 5, gem_hi)
+    return im
+
+
+def vessel_jug_item():
+    """Кувшин-сосуд (предмет): глиняная форма с синим орнаментом."""
+    im = img()
+    clay = (140, 98, 66, 255)
+    clay_dark = (96, 64, 44, 255)
+    blue = (66, 111, 151, 255)
+    rect(im, 7, 2, 8, 4, clay_dark)
+    rect(im, 5, 5, 10, 12, clay)
+    rect(im, 6, 6, 9, 11, clay_dark)
+    for x, y in ((5, 8), (6, 8), (9, 8), (10, 8), (5, 10), (10, 10)):
+        px(im, x, y, blue)
+    px(im, 7, 3, (196, 150, 110, 255))
+    return im
+
+
+def vessel_music_box_item():
+    """Музыкальная шкатулка: тёмное дерево с золотой инкрустацией."""
+    im = img()
+    wood = (120, 82, 58, 255)
+    wood_dark = (78, 50, 34, 255)
+    gold = (222, 176, 60, 255)
+    rect(im, 3, 6, 12, 12, wood)
+    rect(im, 4, 5, 11, 6, wood_dark)
+    for x, y in ((4, 9), (5, 9), (6, 9), (9, 9), (10, 9), (11, 9),
+                 (5, 11), (6, 11), (9, 11), (10, 11)):
+        px(im, x, y, gold)
+    px(im, 7, 9, gold)
+    px(im, 8, 9, gold)
+    px(im, 7, 8, gold)
+    px(im, 8, 8, gold)
+    return im
+
 
 if __name__ == "__main__":
     main()

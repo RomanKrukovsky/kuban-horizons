@@ -2,6 +2,7 @@ package dev.romankrukovsky.kubanhorizons.genie.player;
 
 import dev.romankrukovsky.kubanhorizons.genie.aura.MagicalSignature;
 import dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent;
+import dev.romankrukovsky.kubanhorizons.network.packet.s2c.S2CTransformationSync;
 import dev.romankrukovsky.kubanhorizons.registry.KHAttachments;
 import dev.romankrukovsky.kubanhorizons.registry.KHItems;
 
@@ -42,6 +43,7 @@ public final class PlayerGenieTransformationController {
         MagicalSignature.cast(level, player.position());
         level.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, player.getX(), player.getY() + 1.0, player.getZ(), 50, 0.5, 1.0, 0.5, 0.05);
 
+        syncTransformationToClient(player, attachment);
     }
 
     /** Продвигает кинематографичную сцену по сохранённому серверному времени. */
@@ -75,6 +77,7 @@ public final class PlayerGenieTransformationController {
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.stage2_anatomical"));
         level.sendParticles(ParticleTypes.PORTAL, player.getX(), player.getY(), player.getZ(), 80, 0.4, 0.6, 0.4, 0.02);
         attachment.setNextTransformationTick(level.getGameTime() + 40L);
+        syncTransformationToClient(player, attachment);
     }
 
     private static void advanceToStage3(ServerLevel level, ServerPlayer player, PlayerGenieAttachment attachment) {
@@ -82,6 +85,7 @@ public final class PlayerGenieTransformationController {
         attachment.setAvatarStyle("KUBAN_DJINNIA_AVATAR");
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.stage3_form_dialogue"));
         attachment.setNextTransformationTick(level.getGameTime() + 60L);
+        syncTransformationToClient(player, attachment);
     }
 
     private static void advanceToStage4(ServerLevel level, ServerPlayer player, PlayerGenieAttachment attachment) {
@@ -109,6 +113,7 @@ public final class PlayerGenieTransformationController {
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.stage4_damage_ignored"));
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.stage4_genie_quote"));
         attachment.setNextTransformationTick(level.getGameTime() + 60L);
+        syncTransformationToClient(player, attachment);
     }
 
     public static void finalizeTransformation(ServerLevel level, ServerPlayer player, PlayerGenieAttachment attachment) {
@@ -133,6 +138,24 @@ public final class PlayerGenieTransformationController {
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.vessel_created"));
         player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.transformation.price_dialogue"));
         MagicalSignature.cast(level, player.position());
+        syncTransformationToClient(player, attachment);
+    }
+
+    /**
+     * Шлёт клиенту упрощённую стадию (0..3) и прогресс для HUD и экрана.
+     *
+     * <p>6 серверных стадий схлопываются в 4 клиентские: HUMAN, AWAKENING,
+     * HALF_GENIE, GENIE. Прогресс берётся из attachment — это то, чего нет в
+     * синхронизируемом кодеке, поэтому едет отдельным пакетом.</p>
+     */
+    private static void syncTransformationToClient(ServerPlayer player, PlayerGenieAttachment attachment) {
+        int clientStage = switch (attachment.getStage()) {
+            case HUMAN -> 0;
+            case BODY_REWRITE, TAIL_FORMATION -> 1;
+            case AVATAR_CUSTOMIZATION, INVULNERABILITY_TEST -> 2;
+            case FULL_GENIE -> 3;
+        };
+        S2CTransformationSync.send(player, clientStage, attachment.getWishProgressPercent());
     }
 
     /**

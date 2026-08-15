@@ -1,5 +1,14 @@
 package dev.romankrukovsky.kubanhorizons.genie.wish;
 
+import dev.romankrukovsky.kubanhorizons.config.KHServerConfig;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.selection.RegionSelection;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.RegionSnapshot;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotId;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.snapshot.SnapshotService;
+import dev.romankrukovsky.kubanhorizons.genie.runtime.transform.FlyingStructureController;
+import java.io.IOException;
+import java.time.Instant;
+import java.util.UUID;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -12,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import java.util.Locale;
 
 /**
@@ -104,6 +114,10 @@ public final class GeneralWishEngine {
             level.setBlock(base.offset(0, 3, 0), Blocks.OAK_PLANKS.defaultBlockState(), 3); // крыша
             return new WishExecutor.Result(true, "message.kubanhorizons.genie.wish.placed_house");
         }
+        if (text.contains("летающ") && text.contains("дом")
+                || text.contains("flying") && text.contains("house")) {
+            return flyingHouse(level, player);
+        }
 
         // === МАГИЧЕСКИЕ ЭФФЕКТЫ ===
         if (text.contains("взрыв") || text.contains("explosion") || text.contains("фейерверк")) {
@@ -137,5 +151,27 @@ public final class GeneralWishEngine {
         }
         level.sendParticles(ParticleTypes.POOF, player.getX(), player.getY() + 1, player.getZ(), 50, 1.8, 0.8, 1.8, 0.02);
         return new WishExecutor.Result(true, key);
+    }
+
+    /** Поднимает выбранную область вокруг игрока в воздух через движок летающих структур. */
+    private static WishExecutor.Result flyingHouse(ServerLevel level, Player player) {
+        BlockPos center = player.blockPosition();
+        RegionSelection selection = new RegionSelection(level.dimension().identifier().toString(),
+                center.offset(-3, 0, -3), center.offset(3, 4, 3));
+        if (selection.volume() > KHServerConfig.genieMaxRegionVolume()) {
+            return new WishExecutor.Result(false, "message.kubanhorizons.genie.wish.failed");
+        }
+        try {
+            SnapshotService.SnapshotState state = SnapshotService.captureState(level, selection);
+            RegionSnapshot snapshot = new RegionSnapshot(RegionSnapshot.CURRENT_SCHEMA_VERSION,
+                    new SnapshotId(UUID.randomUUID(), "flying_house"), player.getUUID(), Instant.now(),
+                    selection, state.blocks(), state.blockTicks(), state.fluidTicks(),
+                    state.entities(), state.biomes(), SnapshotService.digest(state));
+            FlyingStructureController.get(level).start(level, snapshot,
+                    new Vec3(0.0D, 0.5D, 0.0D), KHServerConfig.genieFlyingHouseDurationTicks());
+            return new WishExecutor.Result(true, "message.kubanhorizons.genie.flying_house");
+        } catch (IOException | RuntimeException exception) {
+            return new WishExecutor.Result(false, "message.kubanhorizons.genie.wish.failed");
+        }
     }
 }

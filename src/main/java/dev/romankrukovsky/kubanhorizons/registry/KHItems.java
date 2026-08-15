@@ -504,6 +504,41 @@ public final class KHItems {
                     p -> new dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieLampItem(p),
                     p -> p.stacksTo(1));
 
+    /** Кубанский кувшин-сосуд (предмет). */
+    public static final DeferredItem<BlockItem> KUBAN_JUG =
+            ITEMS.registerSimpleBlockItem("kuban_jug", KHBlocks.KUBAN_JUG);
+
+    /** Живые сосуды пяти школ (Vessel System): лампа, зеркало, кольцо, кувшин, шкатулка. */
+    public static final DeferredItem<Item> VESSEL_LAMP =
+            ITEMS.registerItem("vessel_lamp",
+                    dev.romankrukovsky.kubanhorizons.vessel.items.LampVesselItem::new,
+                    p -> p.stacksTo(1));
+    public static final DeferredItem<Item> VESSEL_MIRROR =
+            ITEMS.registerItem("vessel_mirror",
+                    dev.romankrukovsky.kubanhorizons.vessel.items.MirrorVesselItem::new,
+                    p -> p.stacksTo(1));
+    public static final DeferredItem<Item> VESSEL_RING =
+            ITEMS.registerItem("vessel_ring",
+                    dev.romankrukovsky.kubanhorizons.vessel.items.RingVesselItem::new,
+                    p -> p.stacksTo(1));
+    public static final DeferredItem<Item> VESSEL_JUG =
+            ITEMS.registerItem("vessel_jug",
+                    dev.romankrukovsky.kubanhorizons.vessel.items.JugVesselItem::new,
+                    p -> p.stacksTo(1));
+    public static final DeferredItem<Item> MUSIC_BOX =
+            ITEMS.registerItem("music_box",
+                    dev.romankrukovsky.kubanhorizons.vessel.items.MusicBoxVesselItem::new,
+                    p -> p.stacksTo(1));
+
+    /**
+     * Осколок души владельца — материализованная связь, оставленная вариантом
+     * «Сохранить душу» протокола смерти владельца. Хранит UUID владельца в
+     * компоненте {@code SOUL_OWNER}, пока тот не вернётся в мир.
+     */
+    public static final DeferredItem<Item> SOUL_SHARD =
+            ITEMS.registerSimpleItem("soul_shard",
+                    p -> p.stacksTo(1));
+
     private KHItems() {
     }
 

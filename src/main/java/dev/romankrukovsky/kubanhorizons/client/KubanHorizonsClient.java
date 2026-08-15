@@ -1,19 +1,30 @@
 package dev.romankrukovsky.kubanhorizons.client;
 
-import dev.romankrukovsky.kubanhorizons.KubanHorizons;
-import dev.romankrukovsky.kubanhorizons.config.KHClientConfig;
+import dev.romankrukovsky.kubanhorizons.client.input.GenieKeyBindings;
+import dev.romankrukovsky.kubanhorizons.client.screen.RealityMenuScreen;
+import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.ModContainer;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
 
 /**
- * Клиентская входная точка мода. Загружается ТОЛЬКО на клиенте —
- * dedicated server этот класс не видит.
+ * Client-side initialization for Kuban Horizons.
  */
-@Mod(value = KubanHorizons.MOD_ID, dist = Dist.CLIENT)
-public final class KubanHorizonsClient {
-    public KubanHorizonsClient(ModContainer container) {
-        container.registerConfig(ModConfig.Type.CLIENT, KHClientConfig.SPEC);
+@EventBusSubscriber(modid = "kubanhorizons", value = Dist.CLIENT)
+public class KubanHorizonsClient {
+
+    @SubscribeEvent
+    public static void onRegisterKeyMappings(RegisterKeyMappingsEvent event) {
+        event.register(GenieKeyBindings.SNAP);
+    }
+
+    @SubscribeEvent
+    public static void onClientTick(ClientTickEvent.Post event) {
+        if (GenieKeyBindings.SNAP.consumeClick()) {
+            Minecraft.getInstance().setScreenAndShow(new RealityMenuScreen());
+        }
     }
 }

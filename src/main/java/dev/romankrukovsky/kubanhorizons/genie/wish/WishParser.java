@@ -82,10 +82,41 @@ public final class WishParser {
             target = WishIntent.Target.VILLAGE_WEALTH;
             category = WishIntent.Category.CIVILIZATION;
         }
-        // 5. Стандартный материальный алмазный срез
+        // 4.5 Магическая музыка: песня как язык изменения мира
+        else if (containsAny(normalized, "песн", "спой", "сыграй", "музык", "мелоди", "song", "sing", "music", "melody")) {
+            target = WishIntent.Target.MUSIC_SPELL;
+            category = WishIntent.Category.MUSIC;
+            if (containsAny(normalized, "дождь", "дождя", "rain")) {
+                detailParam = "RAIN";
+            } else if (containsAny(normalized, "рост", "урожай", "crop", "grow", "growth")) {
+                detailParam = "GROWTH";
+            } else if (containsAny(normalized, "покой", "спокойств", "колыбел", "peace", "calm", "lullaby")) {
+                detailParam = "PEACE";
+            } else if (containsAny(normalized, "огонь", "огн", "пожар", "fire")) {
+                detailParam = "FIRE";
+            }
+        }
+        // 5. Социум: ежегодный праздник джиннии
+        else if (containsAny(normalized, "праздник", "фестиваль", "торжество", "festival")) {
+            target = WishIntent.Target.GENIE_FESTIVAL;
+            category = WishIntent.Category.CIVILIZATION;
+        }
+        // 6. Стандартный материальный алмазный срез
         else if (containsAny(normalized, "алмаз", "diamond")) {
             target = WishIntent.Target.DIAMONDS;
             category = WishIntent.Category.MATERIAL;
+        }
+        // 7. Provenance-запрос: «откуда этот предмет?» / «where did this come from?»
+        else if (containsAny(normalized, "откуда этот предмет", "откуда этот блок", "откуда взялся",
+                "where did this come from", "where is this from", "provenance")) {
+            target = WishIntent.Target.PROVENANCE_QUERY;
+            category = WishIntent.Category.PROVENANCE;
+        }
+        // 8. История: «А что если?» — альтернативные версии мира
+        else if (containsAny(normalized, "что если", "а что если", "what if")) {
+            target = WishIntent.Target.WHAT_IF;
+            category = WishIntent.Category.HISTORY;
+            detailParam = text;
         }
 
         WishIntent.Amount amount = amount(normalized, category);

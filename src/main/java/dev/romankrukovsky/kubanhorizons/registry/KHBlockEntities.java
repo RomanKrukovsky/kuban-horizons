@@ -53,8 +53,7 @@ public final class KHBlockEntities {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<KubanJugBlockEntity>> KUBAN_JUG =
             BLOCK_ENTITIES.register("kuban_jug",
-                    () -> BlockEntityType.Builder.of(KubanJugBlockEntity::new, KHBlocks.KUBAN_JUG.get())
-                            .build(null));
+                    () -> new BlockEntityType<>(KubanJugBlockEntity::new, KHBlocks.KUBAN_JUG.get()));
 
     private KHBlockEntities() {
     }
