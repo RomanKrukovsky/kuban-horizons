@@ -579,6 +579,8 @@
   "wish.kubanhorizons.painting.entered": "You step through the canvas into the mirror world.",
   "wish.kubanhorizons.painting.missing": "Genie: the mirror world is not available here.",
   "wish.kubanhorizons.photo.captured": "The scene freezes into a magical photograph.",
+  "wish.kubanhorizons.scale.giant": "The world shrinks beneath your feet.",
+  "wish.kubanhorizons.scale.small": "The world suddenly seems huge around you.",
   "wish.kubanhorizons.whatif.empty": "Genie: no undone wish to compare. Reality remembers nothing to replay.",
   "wish.kubanhorizons.whatif.result": "Genie: '%s' — %s. If the wish had stayed, the world would differ in %s blocks. %s",
   "wish.kubanhorizons.whisper.empty": "Genie: this block keeps its silence.",

@@ -50,6 +50,20 @@ public final class GigantismScaleEngine {
                 }
                 return new WishExecutor.Result(false, "message.kubanhorizons.genie.wish.no_space");
             }
+            case SCALE_SHIFT -> {
+                if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+                    return new WishExecutor.Result(false, "message.kubanhorizons.genie.wish.failed");
+                }
+                String text = intent.detailParam() == null ? "" : intent.detailParam().toLowerCase(java.util.Locale.ROOT);
+                boolean small = text.contains("маленьк") || text.contains("крошечн") || text.contains("small")
+                        || text.contains("tiny");
+                boolean shifted = dev.romankrukovsky.kubanhorizons.genie.spatial.ScaleShiftEngine
+                        .shift(level, serverPlayer, small);
+                return shifted
+                        ? new WishExecutor.Result(true, small
+                                ? "wish.kubanhorizons.scale.small" : "wish.kubanhorizons.scale.giant")
+                        : new WishExecutor.Result(false, "message.kubanhorizons.genie.wish.failed");
+            }
             default -> {
                 // Delegate unhandled gigantism targets to LLM for graceful handling
                 return LLMWishExecutor.execute(level, player, intent.detailParam());

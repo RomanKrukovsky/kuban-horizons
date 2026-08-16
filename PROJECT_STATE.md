@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **167 тестов проходят** (`All 167 required tests passed`).
+- Полный `runGameTestServer` мода: **168 тестов проходят** (`All 168 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -280,7 +280,9 @@
   желание OMNIPOTENCE («стать всемогущим») даёт +40% прогресса джинна, и
   несколько таких желаний открывают True Omnipotence Ending; тест
   genie_omnipotence_progress.
-- **167 GameTest проходят**: `All 167 required tests passed :)`.
+- **Смена масштаба**: ScaleShiftEngine («сделай меня маленьким/гигантским»)
+  меняет SCALE/STEP_HEIGHT игрока через атрибуты; тест genie_scale_shift.
+- **168 GameTest проходят**: `All 168 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

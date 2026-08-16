@@ -579,6 +579,8 @@
   "wish.kubanhorizons.painting.entered": "Вы шагаете через холст в зеркальный мир.",
   "wish.kubanhorizons.painting.missing": "Джинния: зеркальный мир сейчас недоступен.",
   "wish.kubanhorizons.photo.captured": "Сцена застывает в магической фотографии.",
+  "wish.kubanhorizons.scale.giant": "Мир сжимается под вашими ногами.",
+  "wish.kubanhorizons.scale.small": "Мир вокруг вдруг кажется огромным.",
   "wish.kubanhorizons.whatif.empty": "Джинния: нечего сравнивать. Реальность не помнит ни одного отменённого желания.",
   "wish.kubanhorizons.whatif.result": "Джинния: «%s» — %s. Останься это желание, мир отличался бы на %s блоков. %s",
   "wish.kubanhorizons.whisper.empty": "Джинния: этот блок хранит молчание.",

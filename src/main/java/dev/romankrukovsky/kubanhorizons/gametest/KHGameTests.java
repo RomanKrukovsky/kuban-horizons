@@ -221,6 +221,7 @@ public final class KHGameTests {
         register("genie_bridge_wish", KHGameTests::testBridgeWish, 100);
         register("genie_raise_ground_wish", KHGameTests::testRaiseGroundWish, 100);
         register("genie_omnipotence_progress", KHGameTests::testOmnipotenceProgress, 100);
+        register("genie_scale_shift", KHGameTests::testScaleShift, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5369,6 +5370,28 @@ public final class KHGameTests {
         helper.assertTrue(result.executed(), "Желание всемогущества не выполнено: " + result.messageKey());
         helper.assertTrue(attachment.getWishProgressPercent() > before,
                 "Прогресс джинна не вырос после всемогущества: " + before + " -> " + attachment.getWishProgressPercent());
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Смена масштаба: парсер распознаёт, движок меняет размер игрока. */
+    private static void testScaleShift(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            player.discard();
+            helper.succeed();
+            return;
+        }
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("сделай меня маленьким");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.SCALE_SHIFT,
+                "Парсер не распознал смену масштаба: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), serverPlayer, intent);
+        helper.assertTrue(result.executed(),
+                "Смена масштаба не выполнена: " + result.messageKey());
 
         player.discard();
         helper.succeed();

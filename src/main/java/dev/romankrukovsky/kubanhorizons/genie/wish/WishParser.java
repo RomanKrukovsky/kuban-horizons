@@ -200,6 +200,14 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9к. Смена масштаба: «Сделай меня маленьким/гигантским»
+        else if (containsAny(normalized, "сделай меня маленьким", "сделай маленьким", "сделай меня крошечным",
+                "сделай меня гигантским", "сделай меня огромным", "make me small", "make me tiny",
+                "make me giant", "make me huge")) {
+            target = WishIntent.Target.SCALE_SHIFT;
+            category = WishIntent.Category.GIGANTISM;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

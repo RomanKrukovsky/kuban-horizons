@@ -1271,6 +1271,12 @@ final class KHTranslations {
         add("wish.kubanhorizons.ground.none",
                 "Genie: there is nowhere to raise the ground.",
                 "Джинния: землю здесь некуда поднимать.");
+        add("wish.kubanhorizons.scale.small",
+                "The world suddenly seems huge around you.",
+                "Мир вокруг вдруг кажется огромным.");
+        add("wish.kubanhorizons.scale.giant",
+                "The world shrinks beneath your feet.",
+                "Мир сжимается под вашими ногами.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");
