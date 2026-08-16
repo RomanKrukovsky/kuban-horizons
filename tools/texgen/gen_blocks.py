@@ -614,6 +614,26 @@ def decorative_ceramic():
     return im
 
 
+def contextual_door():
+    """Дверь с контекстным выходом: дощатое полотно со светящимся швом."""
+    im = img()
+    rect(im, 0, 0, 15, 15, (150, 120, 84, 255))
+    hline(im, 0, 0, 15, (176, 146, 106, 255))
+    hline(im, 15, 0, 15, (112, 86, 58, 255))
+    # Вертикальные доски.
+    for x in (1, 6, 11):
+        vline(im, x, 0, 15, (128, 100, 68, 255))
+    # Светящийся магический шов по центру.
+    for y in range(1, 15):
+        px(im, 7, y, (120, 170, 255, 255))
+        px(im, 8, y, (80, 140, 240, 255))
+    # Ручка-кольцо.
+    px(im, 12, 7, (210, 190, 130, 255))
+    px(im, 12, 8, (210, 190, 130, 255))
+    px(im, 13, 7, (230, 210, 150, 255))
+    return im
+
+
 def kuban_jug():
     """Кубанский кувшин-сосуд: тёмная глиняная форма с синим орнаментом."""
     im = img()
@@ -741,6 +761,7 @@ def main():
     save(roof_tiles(), "roof_tiles")
     save(decorative_ceramic(), "decorative_ceramic")
     save(kuban_jug(), "kuban_jug")
+    save(contextual_door(), "contextual_door")
     save(carved_window_casing(), "carved_window_casing")
     save(wattle(), "wattle")
     save(wattle_particle(), "wattle_particle")

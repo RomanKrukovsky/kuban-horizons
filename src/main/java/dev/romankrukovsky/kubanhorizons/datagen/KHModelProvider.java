@@ -198,6 +198,7 @@ public final class KHModelProvider extends ModelProvider {
         blockModels.family(KHBlocks.ROOF_TILES.get()).generateFor(KHBlockFamilies.ROOF_TILES);
         blockModels.createTrivialCube(KHBlocks.DECORATIVE_CERAMIC.get());
         blockModels.createTrivialCube(KHBlocks.KUBAN_JUG.get());
+        blockModels.createTrivialCube(KHBlocks.CONTEXTUAL_DOOR.get());
         blockModels.familyWithExistingFullBlock(KHBlocks.WATTLE.get())
                 .generateFor(KHBlockFamilies.WATTLE);
     }

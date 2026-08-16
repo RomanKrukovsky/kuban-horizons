@@ -61,6 +61,7 @@ public final class KHLootTableProvider extends LootTableProvider {
             dropSelf(KHBlocks.MANUL_SHELTER.get());
             // Кубанский кувшин-сосуд разбирается целиком.
             dropSelf(KHBlocks.KUBAN_JUG.get());
+            dropSelf(KHBlocks.CONTEXTUAL_DOOR.get());
 
             // Чернозём. Выпадает собой без всяких условий: весь смысл яруса —
             // что найденную почву можно вывезти на свою ферму. Требование

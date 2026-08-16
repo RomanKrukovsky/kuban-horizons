@@ -224,6 +224,7 @@ public final class KHGameTests {
         register("genie_scale_shift", KHGameTests::testScaleShift, 100);
         register("genie_temp_army", KHGameTests::testTempArmy, 100);
         register("genie_reality_error", KHGameTests::testRealityError, 100);
+        register("genie_contextual_door", KHGameTests::testContextualDoor, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5432,6 +5433,34 @@ public final class KHGameTests {
                 "Ошибка Реальности погибла от урона — парадокс нельзя победить мечом");
 
         error.discard();
+        helper.succeed();
+    }
+
+    /** Дверь с контекстным выходом: wish ставит блок, вход ведёт в покет. */
+    private static void testContextualDoor(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            player.discard();
+            helper.succeed();
+            return;
+        }
+        BlockPos start = helper.absolutePos(new BlockPos(2, 2, 2));
+        serverPlayer.snapTo(start.getX() + 0.5D, start.getY(), start.getZ() + 0.5D, 0.0F, 0.0F);
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("создай дверь");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.CONTEXTUAL_DOOR,
+                "Парсер не распознал запрос двери: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), serverPlayer, intent);
+        helper.assertTrue(result.executed(),
+                "Дверь не создана: " + result.messageKey());
+        BlockPos doorPos = start.relative(net.minecraft.core.Direction.SOUTH, 3);
+        helper.assertTrue(helper.getLevel().getBlockState(doorPos)
+                        .is(dev.romankrukovsky.kubanhorizons.registry.KHBlocks.CONTEXTUAL_DOOR.get()),
+                "Дверь-блок не установлен");
+
+        player.discard();
         helper.succeed();
     }
 

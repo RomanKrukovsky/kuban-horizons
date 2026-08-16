@@ -221,6 +221,13 @@ public final class WishParser {
             category = WishIntent.Category.DISTORTED_HIGHER_WISH;
             detailParam = text;
         }
+        // 9н. Дверь с контекстным выходом: «Создай дверь»
+        else if (containsAny(normalized, "создай дверь", "поставь дверь", "дверь в другой мир",
+                "contextual door", "make a door")) {
+            target = WishIntent.Target.CONTEXTUAL_DOOR;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

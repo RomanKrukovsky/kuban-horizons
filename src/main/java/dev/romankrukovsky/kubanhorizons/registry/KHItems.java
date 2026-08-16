@@ -508,6 +508,10 @@ public final class KHItems {
     public static final DeferredItem<BlockItem> KUBAN_JUG =
             ITEMS.registerSimpleBlockItem("kuban_jug", KHBlocks.KUBAN_JUG);
 
+    /** Дверь с контекстным выходом (предмет). */
+    public static final DeferredItem<BlockItem> CONTEXTUAL_DOOR =
+            ITEMS.registerSimpleBlockItem("contextual_door", KHBlocks.CONTEXTUAL_DOOR);
+
     /** Живые сосуды пяти школ (Vessel System): лампа, зеркало, кольцо, кувшин, шкатулка. */
     public static final DeferredItem<Item> VESSEL_LAMP =
             ITEMS.registerItem("vessel_lamp",

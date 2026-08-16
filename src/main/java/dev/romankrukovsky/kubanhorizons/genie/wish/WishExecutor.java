@@ -50,6 +50,7 @@ public final class WishExecutor {
                 case MATERIALIZE_BRIDGE -> executeBridge(level, player);
                 case RAISE_GROUND -> executeRaiseGround(level, player);
                 case TEMP_ARMY -> executeTempArmy(level, player);
+                case CONTEXTUAL_DOOR -> executeContextualDoor(level, player);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -430,6 +431,22 @@ public final class WishExecutor {
                 60, 1.0D, 2.0D, 1.0D, 0.15D);
         player.sendSystemMessage(Component.translatable("wish.kubanhorizons.reality_error.summoned"));
         return new Result(true, "wish.kubanhorizons.reality_error.summoned");
+    }
+
+    /** Дверь с контекстным выходом: джинния ставит дверь-портал перед игроком. */
+    private static Result executeContextualDoor(ServerLevel level, Player player) {
+        BlockPos pos = player.blockPosition().relative(player.getDirection(), 3);
+        if (!level.isEmptyBlock(pos)) {
+            player.sendSystemMessage(Component.translatable("message.kubanhorizons.genie.wish.no_space"));
+            return new Result(false, "message.kubanhorizons.genie.wish.no_space");
+        }
+        level.setBlockAndUpdate(pos, dev.romankrukovsky.kubanhorizons.registry.KHBlocks.CONTEXTUAL_DOOR
+                .get().defaultBlockState());
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.PORTAL,
+                pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D,
+                40, 0.4D, 0.8D, 0.4D, 0.1D);
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.door.created"));
+        return new Result(true, "wish.kubanhorizons.door.created");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */

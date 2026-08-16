@@ -437,6 +437,15 @@ public final class KHBlocks {
                             .strength(2.0F, 6.0F)
                             .noOcclusion());
 
+    /** Дверь с контекстным выходом — ведёт в покет-измерение и обратно. */
+    public static final DeferredBlock<dev.romankrukovsky.kubanhorizons.genie.spatial.ContextualDoorBlock> CONTEXTUAL_DOOR =
+            BLOCKS.registerBlock("contextual_door",
+                    dev.romankrukovsky.kubanhorizons.genie.spatial.ContextualDoorBlock::new,
+                    p -> p.mapColor(MapColor.WOOD)
+                            .strength(2.0F)
+                            .sound(SoundType.WOOD)
+                            .noOcclusion());
+
     /** Свойства самана — по образцу ванильного грязевого кирпича. */
     private static java.util.function.UnaryOperator<BlockBehaviour.Properties> adobeProperties() {
         return p -> p.mapColor(MapColor.TERRACOTTA_YELLOW)

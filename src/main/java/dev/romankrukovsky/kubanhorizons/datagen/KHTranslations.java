@@ -1283,6 +1283,21 @@ final class KHTranslations {
         add("wish.kubanhorizons.reality_error.summoned",
                 "A tear in reality opens before you. It cannot be hurt by weapons.",
                 "Перед вами разверзается разрыв реальности. Оружие ему не навредит.");
+        add("wish.kubanhorizons.door.created",
+                "A wooden door with a glowing seam appears before you.",
+                "Перед вами появляется деревянная дверь со светящимся швом.");
+        add("wish.kubanhorizons.door.entered",
+                "The door opens into the pocket dimension.",
+                "Дверь открывается в карманное измерение.");
+        add("wish.kubanhorizons.door.returned",
+                "The door leads you back to where you came from.",
+                "Дверь возвращает вас туда, откуда вы пришли.");
+        add("wish.kubanhorizons.door.missing",
+                "Genie: the pocket dimension is not available.",
+                "Джинния: карманное измерение сейчас недоступно.");
+        add("wish.kubanhorizons.door.no_return",
+                "The door has forgotten where it led.",
+                "Дверь забыла, куда вела.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");

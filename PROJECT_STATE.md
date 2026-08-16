@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **170 тестов проходят** (`All 170 required tests passed`).
+- Полный `runGameTestServer` мода: **171 тест проходят** (`All 171 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -288,7 +288,10 @@
 - **Ошибка Реальности**: RealityErrorEntity — концептуальная сущность,
   неуязвимая к урону (Закон равновесия: парадокс нельзя победить мечом);
   wish-таргет REALITY_ERROR («ошибка реальности»); тест genie_reality_error.
-- **170 GameTest проходят**: `All 170 required tests passed :)`.
+- **Дверь с контекстным выходом**: ContextualDoorBlock + ContextualDoorMemory —
+  дверь ведёт в покет-измерение и обратно, запоминая исходную точку;
+  wish-таргет CONTEXTUAL_DOOR («создай дверь»); тест genie_contextual_door.
+- **171 GameTest проходят**: `All 171 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

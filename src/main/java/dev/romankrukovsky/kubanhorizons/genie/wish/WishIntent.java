@@ -55,6 +55,7 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         SCALE_SHIFT,
         TEMP_ARMY,
         REALITY_ERROR,
+        CONTEXTUAL_DOOR,
         MUSIC_SPELL,
         LLM_DELEGATED,
         UNKNOWN
