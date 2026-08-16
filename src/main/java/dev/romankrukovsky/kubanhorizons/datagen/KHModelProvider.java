@@ -177,6 +177,7 @@ public final class KHModelProvider extends ModelProvider {
         itemModels.generateFlatItem(KHItems.VESSEL_JUG.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.MUSIC_BOX.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(KHItems.SOUL_SHARD.get(), ModelTemplates.FLAT_ITEM);
+        itemModels.generateFlatItem(KHItems.MAGIC_PHOTO.get(), ModelTemplates.FLAT_ITEM);
     }
 
     /**

@@ -158,6 +158,12 @@ public final class WishParser {
             category = WishIntent.Category.PROVENANCE;
             detailParam = text;
         }
+        // 9г. Магическая фотография: «Сфотографируй это»
+        else if (containsAny(normalized, "сфотограф", "фотограф", "сделай фото", "снимок", "photo", "photograph", "snapshot")) {
+            target = WishIntent.Target.MAGIC_PHOTO;
+            category = WishIntent.Category.MATERIAL;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

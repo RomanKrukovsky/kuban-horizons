@@ -539,6 +539,11 @@ public final class KHItems {
             ITEMS.registerSimpleItem("soul_shard",
                     p -> p.stacksTo(1));
 
+    /** Магическая фотография — застывший вид сцены, которую можно вернуть. */
+    public static final DeferredItem<Item> MAGIC_PHOTO =
+            ITEMS.registerSimpleItem("magic_photo",
+                    p -> p.stacksTo(16));
+
     private KHItems() {
     }
 

@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **160 тестов проходят** (`All 160 required tests passed`).
+- Полный `runGameTestServer` мода: **161 тест проходят** (`All 161 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -257,7 +257,10 @@
 - **Память предмета**: ItemMemoryReader был orphan-движком; теперь доступен через
   wish-таргет ITEM_MEMORY («что помнит предмет») — джинния читает чары/повреждение
   предмета в руке; тест genie_item_memory.
-- **160 GameTest проходят**: `All 160 required tests passed :)`.
+- **Магическая фотография**: MagicPhotoEngine («сфотографируй это») сохраняет
+  вид сцены (блоки+существа) в предмет MAGIC_PHOTO с описанием; предмет
+  зарегистрирован + текстура + item model; тест genie_magic_photo.
+- **161 GameTest проходят**: `All 161 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

@@ -825,6 +825,7 @@ def main():
     save(miniature_world_item(), "miniature_world")
     save(sonic_boom_item(), "sonic_boom_item")
     save(soul_shard_item(), "soul_shard")
+    save(magic_photo_item(), "magic_photo")
     save(bottle((212, 172, 60, 255), (255, 220, 100, 255)), "vessel_lamp")
     save(magic_mirror_item(), "vessel_mirror")
     save(vessel_ring_item(), "vessel_ring")
@@ -904,6 +905,24 @@ def vessel_music_box_item():
     px(im, 8, 9, gold)
     px(im, 7, 8, gold)
     px(im, 8, 8, gold)
+    return im
+
+
+def magic_photo_item():
+    """Магическая фотография: лиловая рамка с сине-голубым снимком сцены."""
+    im = img()
+    frame = (88, 58, 120, 255)
+    frame_hi = (150, 112, 180, 255)
+    sky = (120, 176, 220, 255)
+    land = (90, 130, 90, 255)
+    rect(im, 2, 3, 13, 12, frame)
+    rect(im, 3, 4, 12, 11, sky)
+    rect(im, 3, 9, 12, 11, land)
+    for x, y in ((4, 6), (5, 6), (8, 5), (9, 5), (6, 7), (7, 7), (11, 6), (4, 8), (11, 8)):
+        px(im, x, y, (240, 244, 250, 255))
+    px(im, 2, 3, frame_hi)
+    px(im, 3, 3, frame_hi)
+    px(im, 2, 4, frame_hi)
     return im
 
 

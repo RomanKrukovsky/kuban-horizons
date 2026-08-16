@@ -214,6 +214,7 @@ public final class KHGameTests {
         register("genie_block_whisper", KHGameTests::testBlockWhisper, 100);
         register("genie_npc_personality", KHGameTests::testNpcPersonality, 100);
         register("genie_item_memory", KHGameTests::testItemMemory, 100);
+        register("genie_magic_photo", KHGameTests::testMagicPhoto, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5216,6 +5217,29 @@ public final class KHGameTests {
                 .execute(helper.getLevel(), player, intent);
         helper.assertTrue(result.executed(),
                 "Память предмета не прочитана: " + result.messageKey());
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Магическая фотография: парсер распознаёт запрос, сцена застывает в предмет. */
+    private static void testMagicPhoto(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        helper.setBlock(new BlockPos(2, 1, 2), Blocks.DIAMOND_BLOCK);
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("сфотографируй это");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.MAGIC_PHOTO,
+                "Парсер не распознал запрос фотографии: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), player, intent);
+        helper.assertTrue(result.executed(),
+                "Фото не сделано: " + result.messageKey());
+        ItemStack held = player.getMainHandItem();
+        helper.assertTrue(held.is(dev.romankrukovsky.kubanhorizons.registry.KHItems.MAGIC_PHOTO.get())
+                        && dev.romankrukovsky.kubanhorizons.genie.memory.MagicPhotoEngine
+                                .sceneOf(held) != null,
+                "Фото в руке должно нести описание сцены: " + held);
         player.discard();
         helper.succeed();
     }

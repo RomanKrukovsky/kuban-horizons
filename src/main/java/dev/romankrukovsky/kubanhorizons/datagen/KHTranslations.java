@@ -1247,6 +1247,9 @@ final class KHTranslations {
         add("wish.kubanhorizons.drawing.drawn",
                 "The drawing traces itself across the ground.",
                 "Рисунок вычерчивается по земле.");
+        add("wish.kubanhorizons.photo.captured",
+                "The scene freezes into a magical photograph.",
+                "Сцена застывает в магической фотографии.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");

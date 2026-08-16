@@ -47,6 +47,7 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         BLOCK_WHISPER,
         NPC_PERSONALITY,
         ITEM_MEMORY,
+        MAGIC_PHOTO,
         MUSIC_SPELL,
         LLM_DELEGATED,
         UNKNOWN

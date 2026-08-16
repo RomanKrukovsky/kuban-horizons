@@ -38,6 +38,7 @@ public final class WishExecutor {
             case MATERIAL -> switch (intent.target()) {
                 case WORD_MATERIALIZATION -> executeWordMaterialization(level, player, intent);
                 case DRAWING -> executeDrawing(level, player);
+                case MAGIC_PHOTO -> executeMagicPhoto(level, player);
                 default -> executeMaterialWish(level, player, intent);
             };
             case CIVILIZATION -> switch (intent.target()) {
@@ -271,6 +272,25 @@ public final class WishExecutor {
         } catch (java.io.IOException | RuntimeException exception) {
             return new Result(false, "message.kubanhorizons.genie.runtime.failed");
         }
+    }
+
+    /** Магическая фотография: джинния сохраняет вид сцены в фото-предмет. */
+    private static Result executeMagicPhoto(ServerLevel level, Player player) {
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            return new Result(false, "message.kubanhorizons.genie.wish.no_space");
+        }
+        ItemStack photo = dev.romankrukovsky.kubanhorizons.genie.memory.MagicPhotoEngine
+                .capture(level, serverPlayer);
+        ItemStack main = player.getMainHandItem();
+        if (main.isEmpty()) {
+            player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, photo);
+        } else {
+            if (!player.getInventory().add(photo)) {
+                player.drop(photo, false);
+            }
+        }
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.photo.captured"));
+        return new Result(true, "wish.kubanhorizons.photo.captured");
     }
 
     /** Переписывание биома: область вокруг игрока становится кубанской степью. */
