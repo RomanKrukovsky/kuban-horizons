@@ -227,6 +227,7 @@ public final class KHGameTests {
         register("genie_contextual_door", KHGameTests::testContextualDoor, 100);
         register("genie_unspoken_wish", KHGameTests::testUnspokenWish, 100);
         register("genie_contract_wish", KHGameTests::testContractWish, 100);
+        register("genie_wish_creature", KHGameTests::testWishCreature, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5509,6 +5510,28 @@ public final class KHGameTests {
                 .execute(helper.getLevel(), serverPlayer, intent);
         helper.assertTrue(result.executed(),
                 "Контракт не заключён: " + result.messageKey());
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Желание, ставшее существом: парсер распознаёт, спутник материализуется. */
+    private static void testWishCreature(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            player.discard();
+            helper.succeed();
+            return;
+        }
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("преврати желание в существо");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.WISH_CREATURE,
+                "Парсер не распознал превращение желания в существо: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), serverPlayer, intent);
+        helper.assertTrue(result.executed(),
+                "Существо из желания не создано: " + result.messageKey());
 
         player.discard();
         helper.succeed();

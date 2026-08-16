@@ -568,6 +568,7 @@
   "wish.kubanhorizons.bridge.none": "Genie: there is no gap to bridge here.",
   "wish.kubanhorizons.contract.failed": "Genie: the contract could not be sealed.",
   "wish.kubanhorizons.contract.made": "A contract with the genie is sealed. Reference: %s.",
+  "wish.kubanhorizons.creature.made": "Your wish takes the form of a glowing creature: «%s».",
   "wish.kubanhorizons.dance.triggered": "Your dance becomes a song.",
   "wish.kubanhorizons.door.created": "A wooden door with a glowing seam appears before you.",
   "wish.kubanhorizons.door.entered": "The door opens into the pocket dimension.",
