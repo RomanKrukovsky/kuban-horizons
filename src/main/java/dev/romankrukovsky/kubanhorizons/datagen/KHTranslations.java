@@ -1250,6 +1250,12 @@ final class KHTranslations {
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");
+        add("wish.kubanhorizons.npc.modified",
+                "Genie: the nearby creature now feels %s.",
+                "Джинния: ближайшее существо теперь чувствует себя %s.");
+        add("wish.kubanhorizons.npc.none",
+                "Genie: no creature nearby to influence.",
+                "Джинния: рядом нет существа, на которое можно повлиять.");
 
         // --- Магическая музыка и танец (GENIE_VISION) ---
         add("wish.kubanhorizons.music.rain",

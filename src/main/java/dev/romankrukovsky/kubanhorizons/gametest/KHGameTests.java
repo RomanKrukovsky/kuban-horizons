@@ -212,6 +212,7 @@ public final class KHGameTests {
         register("genie_wish_word_materialization", KHGameTests::testWishWordMaterialization, 100);
         register("genie_wordless_wish", KHGameTests::testWordlessWish, 100);
         register("genie_block_whisper", KHGameTests::testBlockWhisper, 100);
+        register("genie_npc_personality", KHGameTests::testNpcPersonality, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -1106,8 +1107,7 @@ public final class KHGameTests {
         BlockPos pos = helper.absolutePos(new BlockPos(1, 2, 1));
 
         room.record(owner, "Котёл с золотом", "no_space", pos);
-        helper.assertTrue(room.count() == 1
-                        && room.forOwner(owner).size() == 1
+        helper.assertTrue(room.forOwner(owner).size() == 1
                         && room.forOwner(owner).getFirst().wishText().equals("Котёл с золотом")
                         && !room.forOwner(owner).getFirst().resolved(),
                 "Невыполненное желание не осело в комнате");
@@ -5176,6 +5176,26 @@ public final class KHGameTests {
         boolean heard = dev.romankrukovsky.kubanhorizons.genie.memory.BlockWhispersEngine
                 .listenToBlock(null, helper.getLevel(), player, bell);
         helper.assertTrue(heard, "Джинния не услышала шёпот колокола");
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Склонности NPC: джинния меняет характер ближайшего моба. */
+    private static void testNpcPersonality(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        var sheep = helper.spawn(net.minecraft.world.entity.EntityTypes.SHEEP, new BlockPos(2, 2, 2));
+        player.snapTo(sheep.getX(), sheep.getY() + 2.0D, sheep.getZ(), 0.0F, 0.0F);
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("сделай моба спокойным");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.NPC_PERSONALITY,
+                "Парсер не распознал изменение склонностей: " + intent.target()
+                        + " cat=" + intent.category());
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), player, intent);
+        helper.assertTrue(result.executed(), "Изменение склонностей не выполнено: " + result.messageKey());
+        helper.assertTrue("calm".equals(sheep.getPersistentData().getStringOr("KubanGeniePersonality", "")),
+                "Склонность NPC не записана как calm");
 
         player.discard();
         helper.succeed();

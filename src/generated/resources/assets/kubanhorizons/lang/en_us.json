@@ -569,6 +569,8 @@
   "wish.kubanhorizons.music.growth": "The Growth Melody makes the fields hurry to ripen.",
   "wish.kubanhorizons.music.peace": "The Peace Lullaby calms the hostility around you.",
   "wish.kubanhorizons.music.rain": "The Rain Song begins. Clouds gather over the steppe.",
+  "wish.kubanhorizons.npc.modified": "Genie: the nearby creature now feels %s.",
+  "wish.kubanhorizons.npc.none": "Genie: no creature nearby to influence.",
   "wish.kubanhorizons.whatif.empty": "Genie: no undone wish to compare. Reality remembers nothing to replay.",
   "wish.kubanhorizons.whatif.result": "Genie: '%s' — %s. If the wish had stayed, the world would differ in %s blocks. %s",
   "wish.kubanhorizons.whisper.empty": "Genie: this block keeps its silence.",

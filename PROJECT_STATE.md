@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **158 тестов проходят** (`All 158 required tests passed`).
+- Полный `runGameTestServer` мода: **159 тестов проходят** (`All 159 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -247,7 +247,13 @@
   wish-таргет BLOCK_WHISPER («о чём говорит блок» / "whisper") — джинния читает
   колокол/портал/древние блоки по взгляду; локализация whisper.empty;
   тест genie_block_whisper.
-- **158 GameTest проходят**: `All 158 required tests passed :)`.
+- **Склонности NPC**: NPCPersonalityEngine был orphan-движком; теперь доступен
+  через wish-таргет NPC_PERSONALITY («сделай моба спокойным/деятельным») —
+  джинния меняет скорость/агрессию ближайшего моба; локализация npc.modified/
+  npc.none; тест genie_npc_personality.
+- **159 GameTest проходят**: `All 159 required tests passed :)`.
+- Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
+  SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая
   параллельные тесты (манул).
 

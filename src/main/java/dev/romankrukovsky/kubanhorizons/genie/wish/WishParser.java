@@ -144,6 +144,13 @@ public final class WishParser {
             category = WishIntent.Category.PROVENANCE;
             detailParam = text;
         }
+        // 9б. Склонности NPC: «сделай моба спокойным/деятельным»
+        else if (containsAny(normalized, "сделай спокойным", "сделай мирным", "моба спокойным", "моба спокойн",
+                "успокой моба", "сделай деятельным", "calm the mob", "make peaceful", "make active")) {
+            target = WishIntent.Target.NPC_PERSONALITY;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

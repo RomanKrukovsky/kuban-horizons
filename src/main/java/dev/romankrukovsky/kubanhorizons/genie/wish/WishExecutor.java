@@ -42,6 +42,7 @@ public final class WishExecutor {
             };
             case CIVILIZATION -> switch (intent.target()) {
                 case BIOME_REWRITE -> executeBiomeRewrite(level, player);
+                case NPC_PERSONALITY -> executeNpcPersonality(level, player, intent);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -273,6 +274,25 @@ public final class WishExecutor {
         } catch (java.io.IOException | RuntimeException exception) {
             return new Result(false, "message.kubanhorizons.genie.runtime.failed");
         }
+    }
+
+    /** Склонности NPC: джинния меняет характер ближайшего моба. */
+    private static Result executeNpcPersonality(ServerLevel level, Player player, WishIntent intent) {
+        var mobs = level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class,
+                player.getBoundingBox().inflate(8.0D),
+                e -> e != player && e.isAlive());
+        if (mobs.isEmpty()) {
+            player.sendSystemMessage(Component.translatable("wish.kubanhorizons.npc.none"));
+            return new Result(false, "wish.kubanhorizons.npc.none");
+        }
+        String text = intent.detailParam() == null ? "" : intent.detailParam().toLowerCase(java.util.Locale.ROOT);
+        String trait = text.contains("спокой") || text.contains("мирн") || text.contains("peace") || text.contains("calm")
+                ? "calm" : "active";
+        net.minecraft.world.entity.LivingEntity target = mobs.getFirst();
+        dev.romankrukovsky.kubanhorizons.genie.entity.NPCPersonalityEngine
+                .modifyPersonality(level, target, trait);
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.npc.modified", trait));
+        return new Result(true, "wish.kubanhorizons.npc.modified");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */
