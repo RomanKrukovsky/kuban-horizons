@@ -215,6 +215,7 @@ public final class KHGameTests {
         register("genie_npc_personality", KHGameTests::testNpcPersonality, 100);
         register("genie_item_memory", KHGameTests::testItemMemory, 100);
         register("genie_magic_photo", KHGameTests::testMagicPhoto, 100);
+        register("genie_living_painting_wish", KHGameTests::testLivingPaintingWish, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5240,6 +5241,31 @@ public final class KHGameTests {
                         && dev.romankrukovsky.kubanhorizons.genie.memory.MagicPhotoEngine
                                 .sceneOf(held) != null,
                 "Фото в руке должно нести описание сцены: " + held);
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Живые картины: парсер распознаёт запрос, движок переводит игрока. */
+    private static void testLivingPaintingWish(GameTestHelper helper) {
+        ServerLevel original = helper.getLevel();
+        var player = helper.makeMockServerPlayerInLevel();
+        var origin = helper.absoluteVec(new net.minecraft.world.phys.Vec3(1.5D, 2.0D, 1.5D));
+        player.setPos(origin);
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("войди в живую картину");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.LIVING_PAINTING,
+                "Парсер не распознал запрос живой картины: " + intent.target());
+
+        boolean entered = dev.romankrukovsky.kubanhorizons.genie.dimension.LivingPaintingEngine
+                .enterDimension(original, player.blockPosition(), player,
+                        net.minecraft.world.level.Level.NETHER,
+                        new net.minecraft.world.phys.Vec3(0.5D, 80.0D, 0.5D));
+        helper.assertTrue(entered && player.level() != original,
+                "Живая картина не перевела игрока в зеркальный мир");
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.dimension.LivingPaintingEngine
+                        .leave(player) && player.level() == original,
+                "Обратный выход из живой картины не вернул игрока");
+
         player.discard();
         helper.succeed();
     }

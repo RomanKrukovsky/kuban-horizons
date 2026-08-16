@@ -571,6 +571,8 @@
   "wish.kubanhorizons.music.rain": "The Rain Song begins. Clouds gather over the steppe.",
   "wish.kubanhorizons.npc.modified": "Genie: the nearby creature now feels %s.",
   "wish.kubanhorizons.npc.none": "Genie: no creature nearby to influence.",
+  "wish.kubanhorizons.painting.entered": "You step through the canvas into the mirror world.",
+  "wish.kubanhorizons.painting.missing": "Genie: the mirror world is not available here.",
   "wish.kubanhorizons.photo.captured": "The scene freezes into a magical photograph.",
   "wish.kubanhorizons.whatif.empty": "Genie: no undone wish to compare. Reality remembers nothing to replay.",
   "wish.kubanhorizons.whatif.result": "Genie: '%s' — %s. If the wish had stayed, the world would differ in %s blocks. %s",

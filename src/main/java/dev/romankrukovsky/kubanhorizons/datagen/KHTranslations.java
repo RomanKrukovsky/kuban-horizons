@@ -1250,6 +1250,12 @@ final class KHTranslations {
         add("wish.kubanhorizons.photo.captured",
                 "The scene freezes into a magical photograph.",
                 "Сцена застывает в магической фотографии.");
+        add("wish.kubanhorizons.painting.entered",
+                "You step through the canvas into the mirror world.",
+                "Вы шагаете через холст в зеркальный мир.");
+        add("wish.kubanhorizons.painting.missing",
+                "Genie: the mirror world is not available here.",
+                "Джинния: зеркальный мир сейчас недоступен.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");

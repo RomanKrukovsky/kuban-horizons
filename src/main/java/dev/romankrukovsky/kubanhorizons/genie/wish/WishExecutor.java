@@ -44,6 +44,7 @@ public final class WishExecutor {
             case CIVILIZATION -> switch (intent.target()) {
                 case BIOME_REWRITE -> executeBiomeRewrite(level, player);
                 case NPC_PERSONALITY -> executeNpcPersonality(level, player, intent);
+                case LIVING_PAINTING -> executeLivingPainting(level, player);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -329,6 +330,26 @@ public final class WishExecutor {
                 .modifyPersonality(level, target, trait);
         player.sendSystemMessage(Component.translatable("wish.kubanhorizons.npc.modified", trait));
         return new Result(true, "wish.kubanhorizons.npc.modified");
+    }
+
+    /** Живая картина: вход в зеркальный мир (MIRROR_WORLD). */
+    private static Result executeLivingPainting(ServerLevel level, Player player) {
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            return new Result(false, "message.kubanhorizons.genie.wish.no_space");
+        }
+        var mirror = serverPlayer.level().getServer()
+                .getLevel(dev.romankrukovsky.kubanhorizons.worldgen.dimension.KHMagicDimensions.MIRROR_WORLD);
+        if (mirror == null) {
+            player.sendSystemMessage(Component.translatable("wish.kubanhorizons.painting.missing"));
+            return new Result(false, "wish.kubanhorizons.painting.missing");
+        }
+        boolean entered = dev.romankrukovsky.kubanhorizons.genie.dimension.LivingPaintingEngine
+                .enterDimension(level, player.blockPosition(), serverPlayer,
+                        dev.romankrukovsky.kubanhorizons.worldgen.dimension.KHMagicDimensions.MIRROR_WORLD,
+                        new net.minecraft.world.phys.Vec3(0.5D, 64.0D, 0.5D));
+        return entered
+                ? new Result(true, "wish.kubanhorizons.painting.entered")
+                : new Result(false, "wish.kubanhorizons.painting.missing");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */

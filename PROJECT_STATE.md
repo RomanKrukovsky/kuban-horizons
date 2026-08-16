@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **161 тест проходят** (`All 161 required tests passed`).
+- Полный `runGameTestServer` мода: **162 теста проходят** (`All 162 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -260,7 +260,11 @@
 - **Магическая фотография**: MagicPhotoEngine («сфотографируй это») сохраняет
   вид сцены (блоки+существа) в предмет MAGIC_PHOTO с описанием; предмет
   зарегистрирован + текстура + item model; тест genie_magic_photo.
-- **161 GameTest проходят**: `All 161 required tests passed :)`.
+- **Живые картины**: LivingPaintingEngine был доступен только в тесте; теперь
+  wish-таргет LIVING_PAINTING («войди в живую картину» / "living painting")
+  переводит игрока в зеркальный мир и обратно; локализация painting.entered/
+  painting.missing; тест genie_living_painting_wish.
+- **162 GameTest проходят**: `All 162 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

@@ -571,6 +571,8 @@
   "wish.kubanhorizons.music.rain": "Звучит Песня дождя. Над степью сгущаются облака.",
   "wish.kubanhorizons.npc.modified": "Джинния: ближайшее существо теперь чувствует себя %s.",
   "wish.kubanhorizons.npc.none": "Джинния: рядом нет существа, на которое можно повлиять.",
+  "wish.kubanhorizons.painting.entered": "Вы шагаете через холст в зеркальный мир.",
+  "wish.kubanhorizons.painting.missing": "Джинния: зеркальный мир сейчас недоступен.",
   "wish.kubanhorizons.photo.captured": "Сцена застывает в магической фотографии.",
   "wish.kubanhorizons.whatif.empty": "Джинния: нечего сравнивать. Реальность не помнит ни одного отменённого желания.",
   "wish.kubanhorizons.whatif.result": "Джинния: «%s» — %s. Останься это желание, мир отличался бы на %s блоков. %s",

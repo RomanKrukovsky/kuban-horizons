@@ -164,6 +164,13 @@ public final class WishParser {
             category = WishIntent.Category.MATERIAL;
             detailParam = text;
         }
+        // 9д. Живые картины и зеркальный мир: «Войди в картину»
+        else if (containsAny(normalized, "войди в картину", "живая картина", "живую картину", "в картину",
+                "войди в зеркальный мир", "зеркальный мир", "enter the painting", "living painting", "mirror world")) {
+            target = WishIntent.Target.LIVING_PAINTING;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);
