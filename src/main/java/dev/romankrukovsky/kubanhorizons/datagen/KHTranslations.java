@@ -1298,6 +1298,21 @@ final class KHTranslations {
         add("wish.kubanhorizons.door.no_return",
                 "The door has forgotten where it led.",
                 "Дверь забыла, куда вела.");
+        add("wish.kubanhorizons.unspoken.guessed",
+                "Genie: I read your intention before you spoke.",
+                "Джинния: я прочла ваше намерение прежде, чем вы заговорили.");
+        add("wish.kubanhorizons.unspoken.none",
+                "Genie: I cannot guess what you want from this silence.",
+                "Джинния: я не могу угадать по этому молчанию, чего вы хотите.");
+        add("wish.kubanhorizons.unspoken.repair",
+                "The damaged blade hums back into wholeness.",
+                "Повреждённый клинок наполняется силой и становится целым.");
+        add("wish.kubanhorizons.unspoken.ore",
+                "The ore you gaze upon yields its bounty.",
+                "Руда, на которую вы смотрите, отдаёт свою добычу.");
+        add("wish.kubanhorizons.unspoken.seeds",
+                "Seeds for the tilled soil appear in your hand.",
+                "В руке появляются семена для вспаханной земли.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");

@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **171 тест проходят** (`All 171 required tests passed`).
+- Полный `runGameTestServer` мода: **172 теста проходят** (`All 172 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -291,7 +291,10 @@
 - **Дверь с контекстным выходом**: ContextualDoorBlock + ContextualDoorMemory —
   дверь ведёт в покет-измерение и обратно, запоминая исходную точку;
   wish-таргет CONTEXTUAL_DOOR («создай дверь»); тест genie_contextual_door.
-- **171 GameTest проходят**: `All 171 required tests passed :)`.
+- **Невысказанное желание**: UnspokenWishEngine («угадай, чего я хочу») читает
+  намерение по контексту — чинит повреждённый меч, добывает руду под прицелом,
+  даёт семена для грядки; тест genie_unspoken_wish.
+- **172 GameTest проходят**: `All 172 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

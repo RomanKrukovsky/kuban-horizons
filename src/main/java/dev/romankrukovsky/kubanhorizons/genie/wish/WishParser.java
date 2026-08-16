@@ -228,6 +228,13 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9о. Невысказанное желание: «Угадай, чего я хочу»
+        else if (containsAny(normalized, "угадай", "невысказанн", "о чём я думаю", "чего я хочу",
+                "guess my wish", "unspoken wish")) {
+            target = WishIntent.Target.UNSPOKEN_WISH;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

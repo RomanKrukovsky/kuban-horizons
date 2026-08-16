@@ -225,6 +225,7 @@ public final class KHGameTests {
         register("genie_temp_army", KHGameTests::testTempArmy, 100);
         register("genie_reality_error", KHGameTests::testRealityError, 100);
         register("genie_contextual_door", KHGameTests::testContextualDoor, 100);
+        register("genie_unspoken_wish", KHGameTests::testUnspokenWish, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5464,7 +5465,31 @@ public final class KHGameTests {
         helper.succeed();
     }
 
-    /** Распознавание искажённого желания высшего порядка «Я хочу стать всемогущим». */
+    /** Невысказанное желание: парсер распознаёт, движок чинит меч по контексту. */
+    private static void testUnspokenWish(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            player.discard();
+            helper.succeed();
+            return;
+        }
+        ItemStack sword = new ItemStack(Items.IRON_SWORD);
+        sword.setDamageValue(50);
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, sword);
+        int before = sword.getDamageValue();
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("угадай, чего я хочу");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.UNSPOKEN_WISH,
+                "Парсер не распознал невысказанное желание: " + intent.target());
+
+        boolean guessed = dev.romankrukovsky.kubanhorizons.genie.wish.UnspokenWishEngine
+                .guess(helper.getLevel(), serverPlayer);
+        helper.assertTrue(guessed && sword.getDamageValue() < before,
+                "Джинния не починила повреждённый меч по контексту: " + before + " -> " + sword.getDamageValue());
+
+        player.discard();
+        helper.succeed();
+    }
     private static void testPlayerGenieDistortedWishParse(GameTestHelper helper) {
         var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("Я хочу стать всемогущим.");
         helper.assertTrue(intent.category() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Category.DISTORTED_HIGHER_WISH,

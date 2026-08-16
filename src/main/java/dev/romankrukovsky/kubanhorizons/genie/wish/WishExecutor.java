@@ -51,6 +51,7 @@ public final class WishExecutor {
                 case RAISE_GROUND -> executeRaiseGround(level, player);
                 case TEMP_ARMY -> executeTempArmy(level, player);
                 case CONTEXTUAL_DOOR -> executeContextualDoor(level, player);
+                case UNSPOKEN_WISH -> executeUnspokenWish(level, player);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -447,6 +448,20 @@ public final class WishExecutor {
                 40, 0.4D, 0.8D, 0.4D, 0.1D);
         player.sendSystemMessage(Component.translatable("wish.kubanhorizons.door.created"));
         return new Result(true, "wish.kubanhorizons.door.created");
+    }
+
+    /** Невысказанное желание: джинния угадывает намерение по контексту. */
+    private static Result executeUnspokenWish(ServerLevel level, Player player) {
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            return new Result(false, "wish.kubanhorizons.unspoken.none");
+        }
+        boolean guessed = dev.romankrukovsky.kubanhorizons.genie.wish.UnspokenWishEngine
+                .guess(level, serverPlayer);
+        if (!guessed) {
+            player.sendSystemMessage(Component.translatable("wish.kubanhorizons.unspoken.none"));
+            return new Result(false, "wish.kubanhorizons.unspoken.none");
+        }
+        return new Result(true, "wish.kubanhorizons.unspoken.guessed");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */
