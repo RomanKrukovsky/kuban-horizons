@@ -1259,6 +1259,12 @@ final class KHTranslations {
         add("wish.kubanhorizons.doppelganger.created",
                 "A magical double of you steps out of the smoke.",
                 "Из дыма выходит ваш магический двойник.");
+        add("wish.kubanhorizons.bridge.built",
+                "A wooden bridge of %s blocks rises across the gap.",
+                "Деревянный мост из %s блоков поднимается над пропастью.");
+        add("wish.kubanhorizons.bridge.none",
+                "Genie: there is no gap to bridge here.",
+                "Джинния: здесь нечего перекрывать мостом.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");

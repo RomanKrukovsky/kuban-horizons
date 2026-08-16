@@ -218,6 +218,7 @@ public final class KHGameTests {
         register("genie_living_painting_wish", KHGameTests::testLivingPaintingWish, 100);
         register("genie_flying_house_wish", KHGameTests::testFlyingHouseWish, 100);
         register("genie_doppelganger_wish", KHGameTests::testDoppelgangerWish, 100);
+        register("genie_bridge_wish", KHGameTests::testBridgeWish, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5301,6 +5302,27 @@ public final class KHGameTests {
                 .execute(helper.getLevel(), player, intent);
         helper.assertTrue(result.executed(),
                 "Двойник не создан: " + result.messageKey());
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Мост: парсер распознаёт, движок строит доски над пропастью. */
+    private static void testBridgeWish(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        BlockPos start = helper.absolutePos(new BlockPos(1, 2, 1));
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("построй мост");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.MATERIALIZE_BRIDGE,
+                "Парсер не распознал запрос моста: " + intent.target());
+
+        // Строим над воздухом вперёд (на юг) — доски должны появиться.
+        int built = dev.romankrukovsky.kubanhorizons.genie.spatial.BridgeMaterializerEngine
+                .buildBridge(helper.getLevel(), start, net.minecraft.core.Direction.SOUTH);
+        helper.assertTrue(built > 0,
+                "Мост не построен над пропастью: built=" + built);
+        helper.assertTrue(helper.getLevel().getBlockState(start.south()).is(Blocks.OAK_PLANKS),
+                "Первый блок моста не доска: " + helper.getLevel().getBlockState(start.south()));
 
         player.discard();
         helper.succeed();

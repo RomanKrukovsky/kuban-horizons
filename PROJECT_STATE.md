@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **164 теста проходят** (`All 164 required tests passed`).
+- Полный `runGameTestServer` мода: **165 тестов проходят** (`All 165 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -270,7 +270,10 @@
 - **Магический двойник**: MagicDoppelgangerEntity был зарегистрирован, но не
   вызывался; wish-таргет MAGIC_DOPPELGANGER («создай моего двойника») спавнит
   копию игрока; локализация doppelganger.created; тест genie_doppelganger_wish.
-- **164 GameTest проходят**: `All 164 required tests passed :)`.
+- **Материализация намерения «мост»**: BridgeMaterializerEngine («построй мост»)
+  поднимает дощатый мост над пропастью в направлении взгляда (до 16 блоков);
+  локализация bridge.built/none; тест genie_bridge_wish.
+- **165 GameTest проходят**: `All 165 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

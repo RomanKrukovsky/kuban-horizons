@@ -186,6 +186,13 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9з. Материализация намерения: «Построй мост»
+        else if (containsAny(normalized, "построй мост", "сделай мост", "мост через", "мост над",
+                "build a bridge", "make a bridge", "bridge over")) {
+            target = WishIntent.Target.MATERIALIZE_BRIDGE;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);
