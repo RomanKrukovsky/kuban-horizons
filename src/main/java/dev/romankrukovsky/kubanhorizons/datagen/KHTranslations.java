@@ -1265,6 +1265,12 @@ final class KHTranslations {
         add("wish.kubanhorizons.bridge.none",
                 "Genie: there is no gap to bridge here.",
                 "Джинния: здесь нечего перекрывать мостом.");
+        add("wish.kubanhorizons.ground.raised",
+                "The earth rises %s blocks before you.",
+                "Земля поднимается на %s блоков перед вами.");
+        add("wish.kubanhorizons.ground.none",
+                "Genie: there is nowhere to raise the ground.",
+                "Джинния: землю здесь некуда поднимать.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");

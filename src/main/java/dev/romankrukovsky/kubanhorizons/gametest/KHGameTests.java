@@ -219,6 +219,7 @@ public final class KHGameTests {
         register("genie_flying_house_wish", KHGameTests::testFlyingHouseWish, 100);
         register("genie_doppelganger_wish", KHGameTests::testDoppelgangerWish, 100);
         register("genie_bridge_wish", KHGameTests::testBridgeWish, 100);
+        register("genie_raise_ground_wish", KHGameTests::testRaiseGroundWish, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5323,6 +5324,25 @@ public final class KHGameTests {
                 "Мост не построен над пропастью: built=" + built);
         helper.assertTrue(helper.getLevel().getBlockState(start.south()).is(Blocks.OAK_PLANKS),
                 "Первый блок моста не доска: " + helper.getLevel().getBlockState(start.south()));
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Подъём земли: парсер распознаёт, колонна появляется. */
+    private static void testRaiseGroundWish(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        BlockPos start = helper.absolutePos(new BlockPos(2, 2, 2));
+        helper.setBlock(new BlockPos(2, 1, 3), Blocks.STONE);
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("подними землю");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.RAISE_GROUND,
+                "Парсер не распознал запрос подъёма земли: " + intent.target());
+
+        int raised = dev.romankrukovsky.kubanhorizons.genie.spatial.BridgeMaterializerEngine
+                .raiseGround(helper.getLevel(), start, net.minecraft.core.Direction.SOUTH);
+        helper.assertTrue(raised > 0,
+                "Колонна земли не поднята: raised=" + raised);
 
         player.discard();
         helper.succeed();

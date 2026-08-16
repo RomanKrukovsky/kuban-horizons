@@ -58,4 +58,30 @@ public final class BridgeMaterializerEngine {
     private static boolean isSolidSupport(ServerLevel level, BlockPos below) {
         return level.getBlockState(below).isSolid();
     }
+
+    /**
+     * Поднимает земляную колонну в направлении взгляда (материализация
+     * намерения «подъём земли»). Позволяет быстро забраться наверх.
+     *
+     * @return высота колонны в блоках, 0 если подняться некуда
+     */
+    public static int raiseGround(ServerLevel level, BlockPos start, Direction facing) {
+        BlockPos base = start.relative(facing).below();
+        if (!level.getBlockState(base).isSolid()) {
+            return 0;
+        }
+        int raised = 0;
+        BlockPos cursor = start.relative(facing);
+        while (raised < 8 && level.isEmptyBlock(cursor) && level.isEmptyBlock(cursor.above())) {
+            level.setBlock(cursor, Blocks.DIRT.defaultBlockState(), 3);
+            level.setBlock(cursor.above(), Blocks.DIRT.defaultBlockState(), 3);
+            cursor = cursor.above(2);
+            raised += 2;
+        }
+        if (raised > 0) {
+            MagicalSignature.cast(level,
+                    net.minecraft.world.phys.Vec3.atBottomCenterOf(start));
+        }
+        return raised;
+    }
 }

@@ -568,6 +568,8 @@
   "wish.kubanhorizons.dance.triggered": "Your dance becomes a song.",
   "wish.kubanhorizons.doppelganger.created": "A magical double of you steps out of the smoke.",
   "wish.kubanhorizons.drawing.drawn": "The drawing traces itself across the ground.",
+  "wish.kubanhorizons.ground.none": "Genie: there is nowhere to raise the ground.",
+  "wish.kubanhorizons.ground.raised": "The earth rises %s blocks before you.",
   "wish.kubanhorizons.music.fire": "The Dance of Fire wraps allies in fireproof light.",
   "wish.kubanhorizons.music.growth": "The Growth Melody makes the fields hurry to ripen.",
   "wish.kubanhorizons.music.peace": "The Peace Lullaby calms the hostility around you.",

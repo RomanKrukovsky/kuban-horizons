@@ -568,6 +568,8 @@
   "wish.kubanhorizons.dance.triggered": "Ваш танец становится песней.",
   "wish.kubanhorizons.doppelganger.created": "Из дыма выходит ваш магический двойник.",
   "wish.kubanhorizons.drawing.drawn": "Рисунок вычерчивается по земле.",
+  "wish.kubanhorizons.ground.none": "Джинния: землю здесь некуда поднимать.",
+  "wish.kubanhorizons.ground.raised": "Земля поднимается на %s блоков перед вами.",
   "wish.kubanhorizons.music.fire": "Танец Огня окутывает союзников огнеупорным светом.",
   "wish.kubanhorizons.music.growth": "Мелодия Роста торопит поля созреть.",
   "wish.kubanhorizons.music.peace": "Колыбельная Покоя гасит враждебность вокруг вас.",

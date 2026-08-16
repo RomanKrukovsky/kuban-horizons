@@ -48,6 +48,7 @@ public final class WishExecutor {
                 case FLYING_HOUSE -> GeneralWishEngine.execute(level, player, intent.detailParam());
                 case MAGIC_DOPPELGANGER -> executeDoppelganger(level, player);
                 case MATERIALIZE_BRIDGE -> executeBridge(level, player);
+                case RAISE_GROUND -> executeRaiseGround(level, player);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -382,6 +383,18 @@ public final class WishExecutor {
         }
         player.sendSystemMessage(Component.translatable("wish.kubanhorizons.bridge.built", built));
         return new Result(true, "wish.kubanhorizons.bridge.built");
+    }
+
+    /** Материализация намерения: джинния поднимает земляную колонну. */
+    private static Result executeRaiseGround(ServerLevel level, Player player) {
+        int raised = dev.romankrukovsky.kubanhorizons.genie.spatial.BridgeMaterializerEngine
+                .raiseGround(level, player.blockPosition(), player.getDirection());
+        if (raised == 0) {
+            player.sendSystemMessage(Component.translatable("wish.kubanhorizons.ground.none"));
+            return new Result(false, "wish.kubanhorizons.ground.none");
+        }
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.ground.raised", raised));
+        return new Result(true, "wish.kubanhorizons.ground.raised");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */

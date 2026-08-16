@@ -193,6 +193,13 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9и. Материализация намерения: «Подними землю»
+        else if (containsAny(normalized, "подними землю", "подними земл", "подъём земли", "подними почву",
+                "raise the ground", "raise the earth")) {
+            target = WishIntent.Target.RAISE_GROUND;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

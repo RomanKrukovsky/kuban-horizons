@@ -51,6 +51,7 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         LIVING_PAINTING,
         MAGIC_DOPPELGANGER,
         MATERIALIZE_BRIDGE,
+        RAISE_GROUND,
         MUSIC_SPELL,
         LLM_DELEGATED,
         UNKNOWN

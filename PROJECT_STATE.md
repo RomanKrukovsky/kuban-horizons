@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **165 тестов проходят** (`All 165 required tests passed`).
+- Полный `runGameTestServer` мода: **166 тестов проходят** (`All 166 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -273,7 +273,10 @@
 - **Материализация намерения «мост»**: BridgeMaterializerEngine («построй мост»)
   поднимает дощатый мост над пропастью в направлении взгляда (до 16 блоков);
   локализация bridge.built/none; тест genie_bridge_wish.
-- **165 GameTest проходят**: `All 165 required tests passed :)`.
+- **Материализация намерения «подъём земли»**: тот же движок («подними землю»)
+  поднимает земляную колонну перед игроком; локализация ground.raised/none;
+  тест genie_raise_ground_wish.
+- **166 GameTest проходят**: `All 166 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая
