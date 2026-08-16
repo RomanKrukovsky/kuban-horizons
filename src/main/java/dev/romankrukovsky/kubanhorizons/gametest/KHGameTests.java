@@ -216,6 +216,7 @@ public final class KHGameTests {
         register("genie_item_memory", KHGameTests::testItemMemory, 100);
         register("genie_magic_photo", KHGameTests::testMagicPhoto, 100);
         register("genie_living_painting_wish", KHGameTests::testLivingPaintingWish, 100);
+        register("genie_flying_house_wish", KHGameTests::testFlyingHouseWish, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5265,6 +5266,23 @@ public final class KHGameTests {
         helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.dimension.LivingPaintingEngine
                         .leave(player) && player.level() == original,
                 "Обратный выход из живой картины не вернул игрока");
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Летающий дом: парсер распознаёт запрос, движок поднимает область. */
+    private static void testFlyingHouseWish(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("подними мой дом в небо");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.FLYING_HOUSE,
+                "Парсер не распознал запрос летающего дома: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), player, intent);
+        helper.assertTrue(result.executed(),
+                "Летающий дом не поднят: " + result.messageKey());
 
         player.discard();
         helper.succeed();

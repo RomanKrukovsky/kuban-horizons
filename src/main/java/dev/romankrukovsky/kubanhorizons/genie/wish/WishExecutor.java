@@ -45,6 +45,7 @@ public final class WishExecutor {
                 case BIOME_REWRITE -> executeBiomeRewrite(level, player);
                 case NPC_PERSONALITY -> executeNpcPersonality(level, player, intent);
                 case LIVING_PAINTING -> executeLivingPainting(level, player);
+                case FLYING_HOUSE -> GeneralWishEngine.execute(level, player, intent.detailParam());
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {

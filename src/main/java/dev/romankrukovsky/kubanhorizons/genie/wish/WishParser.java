@@ -171,6 +171,14 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9е. Летающий дом: «Подними мой дом в небо»
+        else if ((containsAny(normalized, "летающ") && containsAny(normalized, "дом"))
+                || (containsAny(normalized, "flying") && containsAny(normalized, "house"))
+                || (containsAny(normalized, "подними") && containsAny(normalized, "дом"))) {
+            target = WishIntent.Target.FLYING_HOUSE;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

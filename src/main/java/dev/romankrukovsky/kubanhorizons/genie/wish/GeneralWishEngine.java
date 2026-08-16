@@ -115,7 +115,8 @@ public final class GeneralWishEngine {
             return new WishExecutor.Result(true, "message.kubanhorizons.genie.wish.placed_house");
         }
         if (text.contains("летающ") && text.contains("дом")
-                || text.contains("flying") && text.contains("house")) {
+                || text.contains("flying") && text.contains("house")
+                || text.contains("подними") && text.contains("дом")) {
             return flyingHouse(level, player);
         }
 

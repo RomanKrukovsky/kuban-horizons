@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **162 теста проходят** (`All 162 required tests passed`).
+- Полный `runGameTestServer` мода: **163 теста проходят** (`All 163 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -264,7 +264,10 @@
   wish-таргет LIVING_PAINTING («войди в живую картину» / "living painting")
   переводит игрока в зеркальный мир и обратно; локализация painting.entered/
   painting.missing; тест genie_living_painting_wish.
-- **162 GameTest проходят**: `All 162 required tests passed :)`.
+- **Летающий дом**: GeneralWishEngine.flyingHouse существовал, но wish-таргет
+  FLYING_HOUSE не создавался парсером; теперь «подними мой дом в небо» /
+  «летающий дом» доступны через wish; тест genie_flying_house_wish.
+- **163 GameTest проходят**: `All 163 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая
