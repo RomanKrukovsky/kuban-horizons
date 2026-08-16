@@ -46,6 +46,7 @@ public final class WishExecutor {
                 case NPC_PERSONALITY -> executeNpcPersonality(level, player, intent);
                 case LIVING_PAINTING -> executeLivingPainting(level, player);
                 case FLYING_HOUSE -> GeneralWishEngine.execute(level, player, intent.detailParam());
+                case MAGIC_DOPPELGANGER -> executeDoppelganger(level, player);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -351,6 +352,23 @@ public final class WishExecutor {
         return entered
                 ? new Result(true, "wish.kubanhorizons.painting.entered")
                 : new Result(false, "wish.kubanhorizons.painting.missing");
+    }
+
+    /** Магический двойник: джинния создаёт копию игрока рядом. */
+    private static Result executeDoppelganger(ServerLevel level, Player player) {
+        var doppelganger = dev.romankrukovsky.kubanhorizons.registry.KHEntities.MAGIC_DOPPELGANGER
+                .get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        if (doppelganger == null) {
+            return new Result(false, "message.kubanhorizons.genie.wish.no_space");
+        }
+        BlockPos pos = player.blockPosition().relative(player.getDirection(), 3);
+        doppelganger.setPos(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D);
+        level.addFreshEntity(doppelganger);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.PORTAL,
+                pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D,
+                40, 0.5D, 1.0D, 0.5D, 0.1D);
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.doppelganger.created"));
+        return new Result(true, "wish.kubanhorizons.doppelganger.created");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */

@@ -49,6 +49,7 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         ITEM_MEMORY,
         MAGIC_PHOTO,
         LIVING_PAINTING,
+        MAGIC_DOPPELGANGER,
         MUSIC_SPELL,
         LLM_DELEGATED,
         UNKNOWN

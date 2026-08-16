@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **163 теста проходят** (`All 163 required tests passed`).
+- Полный `runGameTestServer` мода: **164 теста проходят** (`All 164 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -267,7 +267,10 @@
 - **Летающий дом**: GeneralWishEngine.flyingHouse существовал, но wish-таргет
   FLYING_HOUSE не создавался парсером; теперь «подними мой дом в небо» /
   «летающий дом» доступны через wish; тест genie_flying_house_wish.
-- **163 GameTest проходят**: `All 163 required tests passed :)`.
+- **Магический двойник**: MagicDoppelgangerEntity был зарегистрирован, но не
+  вызывался; wish-таргет MAGIC_DOPPELGANGER («создай моего двойника») спавнит
+  копию игрока; локализация doppelganger.created; тест genie_doppelganger_wish.
+- **164 GameTest проходят**: `All 164 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

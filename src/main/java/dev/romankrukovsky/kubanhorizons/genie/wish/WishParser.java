@@ -179,6 +179,13 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9ж. Магический двойник: «Создай моего двойника»
+        else if (containsAny(normalized, "двойник", "клона", "клон", "копия меня", "двойника",
+                "doppelganger", "clone me", "copy of me")) {
+            target = WishIntent.Target.MAGIC_DOPPELGANGER;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

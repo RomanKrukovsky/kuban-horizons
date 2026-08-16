@@ -217,6 +217,7 @@ public final class KHGameTests {
         register("genie_magic_photo", KHGameTests::testMagicPhoto, 100);
         register("genie_living_painting_wish", KHGameTests::testLivingPaintingWish, 100);
         register("genie_flying_house_wish", KHGameTests::testFlyingHouseWish, 100);
+        register("genie_doppelganger_wish", KHGameTests::testDoppelgangerWish, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5283,6 +5284,23 @@ public final class KHGameTests {
                 .execute(helper.getLevel(), player, intent);
         helper.assertTrue(result.executed(),
                 "Летающий дом не поднят: " + result.messageKey());
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Магический двойник: парсер распознаёт, исполнение создаёт сущность. */
+    private static void testDoppelgangerWish(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("создай моего двойника");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.MAGIC_DOPPELGANGER,
+                "Парсер не распознал запрос двойника: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), player, intent);
+        helper.assertTrue(result.executed(),
+                "Двойник не создан: " + result.messageKey());
 
         player.discard();
         helper.succeed();

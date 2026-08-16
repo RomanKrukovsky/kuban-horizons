@@ -1256,6 +1256,9 @@ final class KHTranslations {
         add("wish.kubanhorizons.painting.missing",
                 "Genie: the mirror world is not available here.",
                 "Джинния: зеркальный мир сейчас недоступен.");
+        add("wish.kubanhorizons.doppelganger.created",
+                "A magical double of you steps out of the smoke.",
+                "Из дыма выходит ваш магический двойник.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");
