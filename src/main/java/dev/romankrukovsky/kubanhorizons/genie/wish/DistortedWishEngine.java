@@ -33,6 +33,13 @@ public final class DistortedWishEngine {
         // Запуск кинематографической трансформации игрока в джиннию
         PlayerGenieTransformationController.startTransformation(level, player, intent.target());
 
+        // «Всемогущество» ощутимо приближает концовку: прогресс джинна растёт,
+        // и несколько таких желаний в сумме открывают True Omnipotence Ending.
+        if (intent.target() == WishIntent.Target.OMNIPOTENCE) {
+            dev.romankrukovsky.kubanhorizons.genie.player.PlayerGenieProgression
+                    .advanceProgress(player, 40);
+        }
+
         return new WishExecutor.Result(true, "message.kubanhorizons.genie.wish.transformation_started");
     }
 }

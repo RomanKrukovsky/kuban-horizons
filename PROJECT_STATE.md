@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **166 тестов проходят** (`All 166 required tests passed`).
+- Полный `runGameTestServer` мода: **167 тестов проходят** (`All 167 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -276,7 +276,11 @@
 - **Материализация намерения «подъём земли»**: тот же движок («подними землю»)
   поднимает земляную колонну перед игроком; локализация ground.raised/none;
   тест genie_raise_ground_wish.
-- **166 GameTest проходят**: `All 166 required tests passed :)`.
+- **Путь к концовке**: TrueOmnipotenceEnding вызывался только из тестов; теперь
+  желание OMNIPOTENCE («стать всемогущим») даёт +40% прогресса джинна, и
+  несколько таких желаний открывают True Omnipotence Ending; тест
+  genie_omnipotence_progress.
+- **167 GameTest проходят**: `All 167 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая
