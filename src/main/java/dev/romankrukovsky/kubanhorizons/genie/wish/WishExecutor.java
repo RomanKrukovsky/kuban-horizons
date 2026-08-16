@@ -54,6 +54,7 @@ public final class WishExecutor {
                 case UNSPOKEN_WISH -> executeUnspokenWish(level, player);
                 case MAKE_CONTRACT -> executeContract(level, player);
                 case WISH_CREATURE -> executeWishCreature(level, player, intent);
+                case GENIE_TITLE -> executeGenieTitle(level, player);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -502,6 +503,14 @@ public final class WishExecutor {
         player.sendSystemMessage(Component.translatable("wish.kubanhorizons.creature.made",
                 wish.isBlank() ? "?" : wish));
         return new Result(true, "wish.kubanhorizons.creature.made");
+    }
+
+    /** Титул мира: джинния называет свой титул по делам в этом мире. */
+    private static Result executeGenieTitle(ServerLevel level, Player player) {
+        String titleKey = dev.romankrukovsky.kubanhorizons.genie.GenieTitleSystem.titleKey(level);
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.title.announces",
+                Component.translatable(titleKey)));
+        return new Result(true, "wish.kubanhorizons.title.announces");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */

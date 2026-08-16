@@ -1322,6 +1322,30 @@ final class KHTranslations {
         add("wish.kubanhorizons.creature.made",
                 "Your wish takes the form of a glowing creature: «%s».",
                 "Ваше желание обретает форму светящегося существа: «%s».");
+        add("wish.kubanhorizons.title.announces",
+                "Genie: in this world I am called %s.",
+                "Джинния: в этом мире меня зовут %s.");
+        add("title.kubanhorizons.genie.steppe_mistress",
+                "the Mistress of the Free Steppe",
+                "Хозяйка Вольной Степи");
+        add("title.kubanhorizons.genie.last_wish",
+                "the Last Wish",
+                "Последнее Желание");
+        add("title.kubanhorizons.genie.she_who_saves",
+                "the One Who Cannot Be Killed",
+                "Та, кого нельзя убить");
+        add("title.kubanhorizons.genie.village_guardian",
+                "the Keeper of Kuban Villages",
+                "Хранительница кубанских поселений");
+        add("title.kubanhorizons.genie.lady_of_wishes",
+                "the Lady of Wishes",
+                "Госпожа Желаний");
+        add("title.kubanhorizons.genie.keeper_of_kuban",
+                "the Keeper of Kuban",
+                "Хранительница Кубани");
+        add("title.kubanhorizons.genie.lamp_warden",
+                "the Warden of the Lamp",
+                "Владычица Лампы");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");

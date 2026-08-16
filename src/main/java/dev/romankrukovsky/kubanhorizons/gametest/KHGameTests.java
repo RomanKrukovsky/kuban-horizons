@@ -228,6 +228,7 @@ public final class KHGameTests {
         register("genie_unspoken_wish", KHGameTests::testUnspokenWish, 100);
         register("genie_contract_wish", KHGameTests::testContractWish, 100);
         register("genie_wish_creature", KHGameTests::testWishCreature, 100);
+        register("genie_genie_title", KHGameTests::testGenieTitle, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5532,6 +5533,31 @@ public final class KHGameTests {
                 .execute(helper.getLevel(), serverPlayer, intent);
         helper.assertTrue(result.executed(),
                 "Существо из желания не создано: " + result.messageKey());
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Титул мира: парсер распознаёт, титул растёт с прогрессом. */
+    private static void testGenieTitle(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            player.discard();
+            helper.succeed();
+            return;
+        }
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("какой у тебя титул");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.GENIE_TITLE,
+                "Парсер не распознал запрос титула: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), serverPlayer, intent);
+        helper.assertTrue(result.executed(),
+                "Титул не назван: " + result.messageKey());
+        helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.GenieTitleSystem
+                        .titleKey(helper.getLevel()).startsWith("title."),
+                "Титул не локализован");
 
         player.discard();
         helper.succeed();

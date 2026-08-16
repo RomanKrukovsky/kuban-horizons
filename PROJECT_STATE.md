@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **174 теста проходят** (`All 174 required tests passed`).
+- Полный `runGameTestServer` мода: **175 тестов проходят** (`All 175 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -300,7 +300,10 @@
 - **Желание, ставшее существом**: WishCreatureEntity («преврати желание в
   существо») — светящийся спутник, хранящий суть желания и неуязвимый к урону;
   тест genie_wish_creature.
-- **174 GameTest проходят**: `All 174 required tests passed :)`.
+- **Титулы мира**: GenieTitleSystem («какой у тебя титул») — титул растёт с
+  делами джиннии (исполненные желания, спасения, спасённые поселения):
+  от Владычицы Лампы до Хозяйки Вольной Степи; тест genie_genie_title.
+- **175 GameTest проходят**: `All 175 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

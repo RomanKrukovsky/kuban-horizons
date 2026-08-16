@@ -249,6 +249,13 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9с. Титул мира: «Какой у тебя титул?»
+        else if (containsAny(normalized, "какой у тебя титул", "твой титул", "титул джиннии",
+                "what is your title", "your title")) {
+            target = WishIntent.Target.GENIE_TITLE;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);
