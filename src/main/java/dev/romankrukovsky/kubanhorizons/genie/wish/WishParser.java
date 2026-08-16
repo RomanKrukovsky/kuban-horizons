@@ -235,6 +235,13 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9п. Контракт: «Заключи со мной контракт»
+        else if (containsAny(normalized, "заключи контракт", "со мной контракт", "заключи со мной",
+                "контракт с тобой", "договор с тобой", "make a contract", "sign a contract")) {
+            target = WishIntent.Target.MAKE_CONTRACT;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

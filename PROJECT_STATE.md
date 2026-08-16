@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **172 теста проходят** (`All 172 required tests passed`).
+- Полный `runGameTestServer` мода: **173 теста проходят** (`All 173 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -294,7 +294,10 @@
 - **Невысказанное желание**: UnspokenWishEngine («угадай, чего я хочу») читает
   намерение по контексту — чинит повреждённый меч, добывает руду под прицелом,
   даёт семена для грядки; тест genie_unspoken_wish.
-- **172 GameTest проходят**: `All 172 required tests passed :)`.
+- **Контракты через wish**: ContractEngine был доступен только в тесте; теперь
+  wish-таргет MAKE_CONTRACT («заключи со мной контракт») заключает договор
+  игрока с джиннией (условия + срок); тест genie_contract_wish.
+- **173 GameTest проходят**: `All 173 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

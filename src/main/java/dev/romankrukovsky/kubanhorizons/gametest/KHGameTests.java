@@ -226,6 +226,7 @@ public final class KHGameTests {
         register("genie_reality_error", KHGameTests::testRealityError, 100);
         register("genie_contextual_door", KHGameTests::testContextualDoor, 100);
         register("genie_unspoken_wish", KHGameTests::testUnspokenWish, 100);
+        register("genie_contract_wish", KHGameTests::testContractWish, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5486,6 +5487,28 @@ public final class KHGameTests {
                 .guess(helper.getLevel(), serverPlayer);
         helper.assertTrue(guessed && sword.getDamageValue() < before,
                 "Джинния не починила повреждённый меч по контексту: " + before + " -> " + sword.getDamageValue());
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Контракт: парсер распознаёт, движок заключает договор. */
+    private static void testContractWish(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            player.discard();
+            helper.succeed();
+            return;
+        }
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("заключи со мной контракт");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.MAKE_CONTRACT,
+                "Парсер не распознал запрос контракта: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), serverPlayer, intent);
+        helper.assertTrue(result.executed(),
+                "Контракт не заключён: " + result.messageKey());
 
         player.discard();
         helper.succeed();

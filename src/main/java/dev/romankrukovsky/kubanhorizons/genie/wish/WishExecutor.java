@@ -52,6 +52,7 @@ public final class WishExecutor {
                 case TEMP_ARMY -> executeTempArmy(level, player);
                 case CONTEXTUAL_DOOR -> executeContextualDoor(level, player);
                 case UNSPOKEN_WISH -> executeUnspokenWish(level, player);
+                case MAKE_CONTRACT -> executeContract(level, player);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -462,6 +463,24 @@ public final class WishExecutor {
             return new Result(false, "wish.kubanhorizons.unspoken.none");
         }
         return new Result(true, "wish.kubanhorizons.unspoken.guessed");
+    }
+
+    /** Контракт: джинния предлагает договор между игроком и собой. */
+    private static Result executeContract(ServerLevel level, Player player) {
+        var engine = dev.romankrukovsky.kubanhorizons.genie.memory.ContractEngine.get(level);
+        try {
+            java.util.Set<java.util.UUID> parties = java.util.Set.of(
+                    player.getUUID(),
+                    java.util.UUID.nameUUIDFromBytes("kuban_genie".getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+            var contract = engine.proposeContract(parties,
+                    java.util.List.of("играть честно", "не злоупотреблять желаниями"), 12000L);
+            engine.acceptContract(contract.contractId(), player.getUUID());
+            player.sendSystemMessage(Component.translatable("wish.kubanhorizons.contract.made",
+                    contract.contractId().toString().substring(0, 8)));
+            return new Result(true, "wish.kubanhorizons.contract.made");
+        } catch (RuntimeException exception) {
+            return new Result(false, "wish.kubanhorizons.contract.failed");
+        }
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */

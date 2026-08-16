@@ -566,6 +566,8 @@
   "wish.kubanhorizons.biome.rewritten": "Степь переписывает землю вокруг вас.",
   "wish.kubanhorizons.bridge.built": "Деревянный мост из %s блоков поднимается над пропастью.",
   "wish.kubanhorizons.bridge.none": "Джинния: здесь нечего перекрывать мостом.",
+  "wish.kubanhorizons.contract.failed": "Джинния: контракт не удалось заключить.",
+  "wish.kubanhorizons.contract.made": "Контракт с джиннией заключён. Реестр: %s.",
   "wish.kubanhorizons.dance.triggered": "Ваш танец становится песней.",
   "wish.kubanhorizons.door.created": "Перед вами появляется деревянная дверь со светящимся швом.",
   "wish.kubanhorizons.door.entered": "Дверь открывается в карманное измерение.",

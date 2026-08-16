@@ -1313,6 +1313,12 @@ final class KHTranslations {
         add("wish.kubanhorizons.unspoken.seeds",
                 "Seeds for the tilled soil appear in your hand.",
                 "В руке появляются семена для вспаханной земли.");
+        add("wish.kubanhorizons.contract.made",
+                "A contract with the genie is sealed. Reference: %s.",
+                "Контракт с джиннией заключён. Реестр: %s.");
+        add("wish.kubanhorizons.contract.failed",
+                "Genie: the contract could not be sealed.",
+                "Джинния: контракт не удалось заключить.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");
