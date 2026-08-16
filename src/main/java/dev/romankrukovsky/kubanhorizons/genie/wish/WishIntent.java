@@ -53,6 +53,7 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         MATERIALIZE_BRIDGE,
         RAISE_GROUND,
         SCALE_SHIFT,
+        TEMP_ARMY,
         MUSIC_SPELL,
         LLM_DELEGATED,
         UNKNOWN

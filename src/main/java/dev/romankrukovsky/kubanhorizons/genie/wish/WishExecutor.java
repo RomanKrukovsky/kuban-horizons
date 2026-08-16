@@ -49,6 +49,7 @@ public final class WishExecutor {
                 case MAGIC_DOPPELGANGER -> executeDoppelganger(level, player);
                 case MATERIALIZE_BRIDGE -> executeBridge(level, player);
                 case RAISE_GROUND -> executeRaiseGround(level, player);
+                case TEMP_ARMY -> executeTempArmy(level, player);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -395,6 +396,20 @@ public final class WishExecutor {
         }
         player.sendSystemMessage(Component.translatable("wish.kubanhorizons.ground.raised", raised));
         return new Result(true, "wish.kubanhorizons.ground.raised");
+    }
+
+    /** Временная армия: джинния призывает големов-защитников. */
+    private static Result executeTempArmy(ServerLevel level, Player player) {
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            return new Result(false, "message.kubanhorizons.genie.wish.no_space");
+        }
+        int count = dev.romankrukovsky.kubanhorizons.genie.entity.TemporaryArmyEngine
+                .summonArmy(level, serverPlayer);
+        if (count == 0) {
+            return new Result(false, "message.kubanhorizons.genie.wish.no_space");
+        }
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.army.summoned", count));
+        return new Result(true, "wish.kubanhorizons.army.summoned");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */

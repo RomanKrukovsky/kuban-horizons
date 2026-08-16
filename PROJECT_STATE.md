@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **168 тестов проходят** (`All 168 required tests passed`).
+- Полный `runGameTestServer` мода: **169 тестов проходят** (`All 169 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -282,7 +282,10 @@
   genie_omnipotence_progress.
 - **Смена масштаба**: ScaleShiftEngine («сделай меня маленьким/гигантским»)
   меняет SCALE/STEP_HEIGHT игрока через атрибуты; тест genie_scale_shift.
-- **168 GameTest проходят**: `All 168 required tests passed :)`.
+- **Временная армия**: TemporaryArmyEngine («создай мне армию») призывает
+  железных големов-защитников вокруг игрока; локализация army.summoned;
+  тест genie_temp_army.
+- **169 GameTest проходят**: `All 169 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

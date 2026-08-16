@@ -222,6 +222,7 @@ public final class KHGameTests {
         register("genie_raise_ground_wish", KHGameTests::testRaiseGroundWish, 100);
         register("genie_omnipotence_progress", KHGameTests::testOmnipotenceProgress, 100);
         register("genie_scale_shift", KHGameTests::testScaleShift, 100);
+        register("genie_temp_army", KHGameTests::testTempArmy, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5392,6 +5393,28 @@ public final class KHGameTests {
                 .execute(helper.getLevel(), serverPlayer, intent);
         helper.assertTrue(result.executed(),
                 "Смена масштаба не выполнена: " + result.messageKey());
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Временная армия: парсер распознаёт, големы появляются. */
+    private static void testTempArmy(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            player.discard();
+            helper.succeed();
+            return;
+        }
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("создай мне армию");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.TEMP_ARMY,
+                "Парсер не распознал запрос армии: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), serverPlayer, intent);
+        helper.assertTrue(result.executed(),
+                "Армия не призвана: " + result.messageKey());
 
         player.discard();
         helper.succeed();

@@ -208,6 +208,13 @@ public final class WishParser {
             category = WishIntent.Category.GIGANTISM;
             detailParam = text;
         }
+        // 9л. Временная армия: «Создай мне армию»
+        else if (containsAny(normalized, "создай армию", "создай мне армию", "армия защитников",
+                "временные люди", "make an army", "summon army", "army of")) {
+            target = WishIntent.Target.TEMP_ARMY;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

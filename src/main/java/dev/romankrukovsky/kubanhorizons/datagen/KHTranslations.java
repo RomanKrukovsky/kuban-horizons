@@ -1277,6 +1277,9 @@ final class KHTranslations {
         add("wish.kubanhorizons.scale.giant",
                 "The world shrinks beneath your feet.",
                 "Мир сжимается под вашими ногами.");
+        add("wish.kubanhorizons.army.summoned",
+                "%s iron guardians step out to protect you.",
+                "%s железных стражей выступают вас защищать.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");
