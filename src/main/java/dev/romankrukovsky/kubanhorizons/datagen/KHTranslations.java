@@ -1280,6 +1280,9 @@ final class KHTranslations {
         add("wish.kubanhorizons.army.summoned",
                 "%s iron guardians step out to protect you.",
                 "%s железных стражей выступают вас защищать.");
+        add("wish.kubanhorizons.reality_error.summoned",
+                "A tear in reality opens before you. It cannot be hurt by weapons.",
+                "Перед вами разверзается разрыв реальности. Оружие ему не навредит.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");

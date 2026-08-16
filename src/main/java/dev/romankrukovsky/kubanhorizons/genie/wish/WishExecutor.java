@@ -64,7 +64,10 @@ public final class WishExecutor {
             };
             case MUSIC -> executeMusicSpell(level, player, intent);
             case DISTORTED_HIGHER_WISH -> (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)
-                    ? DistortedWishEngine.execute(level, serverPlayer, intent)
+                    ? switch (intent.target()) {
+                        case REALITY_ERROR -> executeRealityError(level, serverPlayer);
+                        default -> DistortedWishEngine.execute(level, serverPlayer, intent);
+                    }
                     : LLMWishExecutor.execute(level, player, intent.detailParam());
             default -> GeneralWishEngine.execute(level, player, intent.detailParam().isBlank() ? "general wish" : intent.detailParam());
         };
@@ -410,6 +413,23 @@ public final class WishExecutor {
         }
         player.sendSystemMessage(Component.translatable("wish.kubanhorizons.army.summoned", count));
         return new Result(true, "wish.kubanhorizons.army.summoned");
+    }
+
+    /** Ошибка Реальности: опасное желание призывает неуязвимый парадокс. */
+    private static Result executeRealityError(ServerLevel level, net.minecraft.server.level.ServerPlayer player) {
+        var error = dev.romankrukovsky.kubanhorizons.registry.KHEntities.REALITY_ERROR
+                .get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        if (error == null) {
+            return new Result(false, "message.kubanhorizons.genie.wish.no_space");
+        }
+        BlockPos pos = player.blockPosition().relative(player.getDirection(), 5);
+        error.setPos(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D);
+        level.addFreshEntity(error);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.END_ROD,
+                pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D,
+                60, 1.0D, 2.0D, 1.0D, 0.15D);
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.reality_error.summoned"));
+        return new Result(true, "wish.kubanhorizons.reality_error.summoned");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */

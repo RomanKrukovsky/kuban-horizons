@@ -33,6 +33,7 @@ public final class KHEntityEvents {
         event.put(KHEntities.MANUL.get(), Manul.createAttributes().build());
         event.put(KHEntities.KUBAN_GENIE.get(), KubanGenie.createAttributes().build());
         event.put(KHEntities.MAGIC_DOPPELGANGER.get(), MagicDoppelgangerEntity.createAttributes().build());
+        event.put(KHEntities.REALITY_ERROR.get(), RealityErrorEntity.createAttributes().build());
     }
 
     @SubscribeEvent

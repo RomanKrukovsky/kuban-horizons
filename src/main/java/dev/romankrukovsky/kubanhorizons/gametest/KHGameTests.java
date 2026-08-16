@@ -223,6 +223,7 @@ public final class KHGameTests {
         register("genie_omnipotence_progress", KHGameTests::testOmnipotenceProgress, 100);
         register("genie_scale_shift", KHGameTests::testScaleShift, 100);
         register("genie_temp_army", KHGameTests::testTempArmy, 100);
+        register("genie_reality_error", KHGameTests::testRealityError, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5417,6 +5418,20 @@ public final class KHGameTests {
                 "Армия не призвана: " + result.messageKey());
 
         player.discard();
+        helper.succeed();
+    }
+
+    /** Ошибка Реальности: парадокс нельзя победить уроном (Закон равновесия). */
+    private static void testRealityError(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var error = helper.spawn(KHEntities.REALITY_ERROR.get(), new BlockPos(2, 2, 2));
+        helper.assertTrue(error != null, "Ошибка Реальности не создалась");
+
+        error.hurtServer(level, level.damageSources().generic(), 1000.0F);
+        helper.assertTrue(error.isAlive(),
+                "Ошибка Реальности погибла от урона — парадокс нельзя победить мечом");
+
+        error.discard();
         helper.succeed();
     }
 

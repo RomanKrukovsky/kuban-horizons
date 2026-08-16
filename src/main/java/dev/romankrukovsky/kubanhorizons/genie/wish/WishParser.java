@@ -215,6 +215,12 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9м. Ошибка Реальности: опасное желание призывает парадокс
+        else if (containsAny(normalized, "ошибка реальности", "вызови ошибку", "парадокс", "reality error")) {
+            target = WishIntent.Target.REALITY_ERROR;
+            category = WishIntent.Category.DISTORTED_HIGHER_WISH;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

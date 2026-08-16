@@ -140,6 +140,15 @@ public final class KHEntities {
                     .clientTrackingRange(10)
                     .build(key("magic_doppelganger")));
 
+    /** Ошибка Реальности: концептуальная сущность, неуязвимая к урону. */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.RealityErrorEntity>> REALITY_ERROR =
+            ENTITIES.register("reality_error", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.RealityErrorEntity::new, MobCategory.MISC)
+                    .sized(0.9F, 2.4F)
+                    .eyeHeight(2.2F)
+                    .clientTrackingRange(10)
+                    .build(key("reality_error")));
+
     /**
      * Кубанский манул: талисман мода.
      *
