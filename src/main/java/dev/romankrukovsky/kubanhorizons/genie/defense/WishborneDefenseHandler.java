@@ -64,6 +64,9 @@ public final class WishborneDefenseHandler {
             projectile.discard();
             tellAttacker(attacker, "message.kubanhorizons.genie.irony.arrow");
             genie.playCast();
+            // Мультяшная анатомия: рука джиннии тянется за стрелой на всю длину.
+            dev.romankrukovsky.kubanhorizons.genie.visual.CartoonAnatomyEngine
+                    .stretchArmToItem(genie, level, net.minecraft.world.phys.Vec3.atCenterOf(projectile.blockPosition()));
             return false;
         }
 
@@ -87,6 +90,9 @@ public final class WishborneDefenseHandler {
                     15, 0.2D, 0.3D, 0.2D, 0.02D);
             tellAttacker(attacker, "message.kubanhorizons.genie.irony.tnt");
             genie.playHurt();
+            // Мультяшная анатомия: джинния на миг сплющивается в блин от взрыва.
+            dev.romankrukovsky.kubanhorizons.genie.visual.CartoonAnatomyEngine
+                    .triggerFlatten(genie, level);
             return false;
         }
 

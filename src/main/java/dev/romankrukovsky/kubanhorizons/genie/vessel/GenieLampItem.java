@@ -102,6 +102,9 @@ public final class GenieLampItem extends Item {
         }
         genie.getNavigation().stop();
         genie.playCast();
+        // Мультяшная анатомия: джинния выныривает из лампы в клубах дыма.
+        dev.romankrukovsky.kubanhorizons.genie.visual.CartoonAnatomyEngine
+                .emergeFromVessel(genie, destination, player.position());
         player.sendSystemMessage(Component.translatable(
                 "message.kubanhorizons.genie.lamp.summoned"));
         return true;
