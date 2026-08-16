@@ -251,6 +251,9 @@
   через wish-таргет NPC_PERSONALITY («сделай моба спокойным/деятельным») —
   джинния меняет скорость/агрессию ближайшего моба; локализация npc.modified/
   npc.none; тест genie_npc_personality.
+- **Эффекты манифестации**: GenieManifestationEffects переведён на
+  WishborneState.Presence и подключён в тик джиннии — рассеянная/запечатанная/
+  изгнанная джинния окружена характерными частицами.
 - **159 GameTest проходят**: `All 159 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).

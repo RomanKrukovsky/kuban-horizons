@@ -162,6 +162,8 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
             KubanSteppeResonance.tickResonance(this, level);
             dev.romankrukovsky.kubanhorizons.genie.aura.GenieAuraOfLaws.tickAuraOfLaws(this, level);
             dev.romankrukovsky.kubanhorizons.genie.visual.GenieTailEngine.tickTail(this, level);
+            dev.romankrukovsky.kubanhorizons.genie.visual.GenieManifestationEffects
+                    .tickStateEffects(this, level);
             // Место запоминается, пока джинния прогружена: после выгрузки чанка
             // поводок ищет её именно по этой записи.
             dev.romankrukovsky.kubanhorizons.genie.GenieAnchor.rememberLocation(this, level);
