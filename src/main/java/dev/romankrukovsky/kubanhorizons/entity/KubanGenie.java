@@ -425,6 +425,11 @@ public final class KubanGenie extends PathfinderMob implements GeoEntity {
                 playWish();
                 brain.recordWish();
                 held.consume(1, player);
+                // Реакция джиннии на полученное желание — по характеру.
+                if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                    dev.romankrukovsky.kubanhorizons.genie.entity.NPCGenieDialogue
+                            .onWishReceived(this, serverPlayer, intent);
+                }
             }
             player.sendSystemMessage(result.message(intent.precision()));
             return InteractionResult.SUCCESS;
