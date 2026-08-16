@@ -1349,6 +1349,12 @@ final class KHTranslations {
         add("wish.kubanhorizons.genie_own.gift",
                 "The genie makes her own choice and grants you a small gift.",
                 "Джинния по собственному выбору дарит вам маленький подарок.");
+        add("wish.kubanhorizons.chain.done",
+                "The wish echoes %s times, each repeating its gift.",
+                "Желание повторяется %s раз, каждый раз повторяя дар.");
+        add("wish.kubanhorizons.chain.none",
+                "Genie: there is no room for the repeated wish.",
+                "Джинния: нет места для повторного желания.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");

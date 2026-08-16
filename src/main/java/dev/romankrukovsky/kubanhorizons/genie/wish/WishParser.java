@@ -263,6 +263,13 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9у. Цепное желание: «Повтори желание N раз»
+        else if (containsAny(normalized, "повтори желание", "повтори", "несколько раз", "5 раз", "три раза",
+                "repeat the wish", "chain")) {
+            target = WishIntent.Target.WISH_CHAIN;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

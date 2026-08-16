@@ -61,6 +61,7 @@ public record WishIntent(Target target, Amount amount, Placement placement, Cate
         WISH_CREATURE,
         GENIE_TITLE,
         GENIE_OWN_WISH,
+        WISH_CHAIN,
         MUSIC_SPELL,
         LLM_DELEGATED,
         UNKNOWN

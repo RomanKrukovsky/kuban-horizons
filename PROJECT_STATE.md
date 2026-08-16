@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **176 тестов проходят** (`All 176 required tests passed`).
+- Полный `runGameTestServer` мода: **177 тестов проходят** (`All 177 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -306,9 +306,12 @@
 - **Самостоятельное желание джиннии**: GENIE_OWN_WISH («сделай что-нибудь
   хорошее») — джинния сама выбирает маленький подарок по своему характеру;
   тест genie_own_wish.
-- Фикс стабильности: testVesselSchools якорно телепортирует mock-игрока
-  (эллай кувшина спавнился вне его bounding box).
-- **176 GameTest проходят**: `All 176 required tests passed :)`.
+- **Цепное желание**: WISH_CHAIN («повтори желание N раз») — исполняет одно
+  желание несколько раз подряд (до 10); тест genie_wish_chain.
+- Фиксы стабильности: testVesselSchools якорно телепортирует mock-игрока,
+  testRuntimeStructureRotate очищает область назначения перед поворотом
+  (параллельные тесты делят мир).
+- **177 GameTest проходят**: `All 177 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

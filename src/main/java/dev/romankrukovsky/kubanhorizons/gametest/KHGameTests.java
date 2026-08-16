@@ -230,6 +230,7 @@ public final class KHGameTests {
         register("genie_wish_creature", KHGameTests::testWishCreature, 100);
         register("genie_genie_title", KHGameTests::testGenieTitle, 100);
         register("genie_own_wish", KHGameTests::testGenieOwnWish, 100);
+        register("genie_wish_chain", KHGameTests::testWishChain, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -4942,6 +4943,11 @@ public final class KHGameTests {
                         helper.getLevel().dimension().identifier().toString(), origin, origin.east()));
         BlockPos offset = new BlockPos(6, 0, 0);
         BlockPos destination = origin.offset(offset);
+        // Параллельные тесты делят один мир; очищаем область назначения, чтобы
+        // destination region is not empty не срывал поворот из-за чужого блока.
+        for (BlockPos clear : BlockPos.betweenClosed(destination, destination.east())) {
+            helper.getLevel().setBlock(clear, Blocks.AIR.defaultBlockState(), 3);
+        }
         try {
             var preview = runtime.previewSelectedStructureMove(player, offset,
                     net.minecraft.world.level.block.Rotation.CLOCKWISE_90);
@@ -5583,6 +5589,28 @@ public final class KHGameTests {
                 .execute(helper.getLevel(), serverPlayer, intent);
         helper.assertTrue(result.executed(),
                 "Подарок джиннии не выдан: " + result.messageKey());
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Цепное желание: парсер распознаёт, повторение исполняется. */
+    private static void testWishChain(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            player.discard();
+            helper.succeed();
+            return;
+        }
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("повтори желание 3 раза");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.WISH_CHAIN,
+                "Парсер не распознал цепное желание: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), serverPlayer, intent);
+        helper.assertTrue(result.executed(),
+                "Цепь желаний не исполнена: " + result.messageKey());
 
         player.discard();
         helper.succeed();

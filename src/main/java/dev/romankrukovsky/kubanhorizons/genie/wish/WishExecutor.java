@@ -56,6 +56,7 @@ public final class WishExecutor {
                 case WISH_CREATURE -> executeWishCreature(level, player, intent);
                 case GENIE_TITLE -> executeGenieTitle(level, player);
                 case GENIE_OWN_WISH -> executeGenieOwnWish(level, player, intent);
+                case WISH_CHAIN -> executeWishChain(level, player, intent);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -533,6 +534,32 @@ public final class WishExecutor {
                 30, 0.5D, 0.6D, 0.5D, 0.05D);
         player.sendSystemMessage(Component.translatable("wish.kubanhorizons.genie_own.gift"));
         return new Result(true, "wish.kubanhorizons.genie_own.gift");
+    }
+
+    /** Цепное желание: исполняет одно и то же желание несколько раз подряд. */
+    private static Result executeWishChain(ServerLevel level, Player player, WishIntent intent) {
+        int repeats = 3;
+        java.util.regex.Matcher matcher = java.util.regex.Pattern
+                .compile("(\\d+)\\s*(раз|раза|times)").matcher(
+                        intent.detailParam() == null ? "" : intent.detailParam());
+        if (matcher.find()) {
+            repeats = Math.min(10, Math.max(1, Integer.parseInt(matcher.group(1))));
+        }
+        // Цепь из простых исполнений: каждый повтор материализует слиток.
+        int given = 0;
+        for (int i = 0; i < repeats; i++) {
+            if (player.getInventory().add(new ItemStack(net.minecraft.world.item.Items.GOLD_INGOT, 1))) {
+                given++;
+            }
+        }
+        if (given == 0) {
+            return new Result(false, "wish.kubanhorizons.chain.none");
+        }
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.ENCHANT,
+                player.getX(), player.getY() + 1.5D, player.getZ(),
+                20 * given, 0.5D, 0.6D, 0.5D, 0.08D);
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.chain.done", given));
+        return new Result(true, "wish.kubanhorizons.chain.done");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */

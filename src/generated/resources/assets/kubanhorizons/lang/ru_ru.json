@@ -573,6 +573,8 @@
   "wish.kubanhorizons.biome.rewritten": "Степь переписывает землю вокруг вас.",
   "wish.kubanhorizons.bridge.built": "Деревянный мост из %s блоков поднимается над пропастью.",
   "wish.kubanhorizons.bridge.none": "Джинния: здесь нечего перекрывать мостом.",
+  "wish.kubanhorizons.chain.done": "Желание повторяется %s раз, каждый раз повторяя дар.",
+  "wish.kubanhorizons.chain.none": "Джинния: нет места для повторного желания.",
   "wish.kubanhorizons.contract.failed": "Джинния: контракт не удалось заключить.",
   "wish.kubanhorizons.contract.made": "Контракт с джиннией заключён. Реестр: %s.",
   "wish.kubanhorizons.creature.made": "Ваше желание обретает форму светящегося существа: «%s».",
