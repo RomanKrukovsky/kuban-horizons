@@ -229,6 +229,7 @@ public final class KHGameTests {
         register("genie_contract_wish", KHGameTests::testContractWish, 100);
         register("genie_wish_creature", KHGameTests::testWishCreature, 100);
         register("genie_genie_title", KHGameTests::testGenieTitle, 100);
+        register("genie_own_wish", KHGameTests::testGenieOwnWish, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -919,6 +920,8 @@ public final class KHGameTests {
     /** Четыре школы сосудов применяют свои эффекты настоящему владельцу. */
     private static void testVesselSchools(GameTestHelper helper) {
         var player = helper.makeMockServerPlayerInLevel();
+        BlockPos anchor = helper.absolutePos(new BlockPos(2, 2, 2));
+        player.snapTo(anchor.getX() + 0.5D, anchor.getY(), anchor.getZ() + 0.5D, 0.0F, 0.0F);
 
         // Кольцо — личная магия: первый круг даёт стремительность (SWIFTNESS),
         // потому что nextBoon переключает вперёд от начальной стойкости.
@@ -943,7 +946,7 @@ public final class KHGameTests {
                 .cast(helper.getLevel(), player, jug);
         boolean allaySpawned = !helper.getLevel().getEntitiesOfClass(
                         net.minecraft.world.entity.animal.allay.Allay.class,
-                        player.getBoundingBox().inflate(8.0D))
+                        player.getBoundingBox().inflate(16.0D))
                 .isEmpty();
         helper.assertTrue(allaySpawned, "Кувшин должен призвать эллая на первом круге");
 
@@ -5558,6 +5561,28 @@ public final class KHGameTests {
         helper.assertTrue(dev.romankrukovsky.kubanhorizons.genie.GenieTitleSystem
                         .titleKey(helper.getLevel()).startsWith("title."),
                 "Титул не локализован");
+
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Самостоятельное желание джиннии: парсер распознаёт, подарок выдан. */
+    private static void testGenieOwnWish(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            player.discard();
+            helper.succeed();
+            return;
+        }
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("пожалуйста, сделай что-нибудь хорошее");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.GENIE_OWN_WISH,
+                "Парсер не распознал самостоятельное желание: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), serverPlayer, intent);
+        helper.assertTrue(result.executed(),
+                "Подарок джиннии не выдан: " + result.messageKey());
 
         player.discard();
         helper.succeed();

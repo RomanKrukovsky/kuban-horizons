@@ -1346,6 +1346,9 @@ final class KHTranslations {
         add("title.kubanhorizons.genie.lamp_warden",
                 "the Warden of the Lamp",
                 "Владычица Лампы");
+        add("wish.kubanhorizons.genie_own.gift",
+                "The genie makes her own choice and grants you a small gift.",
+                "Джинния по собственному выбору дарит вам маленький подарок.");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");

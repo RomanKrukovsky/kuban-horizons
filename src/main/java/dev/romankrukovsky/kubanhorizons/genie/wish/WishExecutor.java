@@ -55,6 +55,7 @@ public final class WishExecutor {
                 case MAKE_CONTRACT -> executeContract(level, player);
                 case WISH_CREATURE -> executeWishCreature(level, player, intent);
                 case GENIE_TITLE -> executeGenieTitle(level, player);
+                case GENIE_OWN_WISH -> executeGenieOwnWish(level, player, intent);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -511,6 +512,27 @@ public final class WishExecutor {
         player.sendSystemMessage(Component.translatable("wish.kubanhorizons.title.announces",
                 Component.translatable(titleKey)));
         return new Result(true, "wish.kubanhorizons.title.announces");
+    }
+
+    /** Самостоятельное желание джиннии: она дарит маленький подарок по своему выбору. */
+    private static Result executeGenieOwnWish(ServerLevel level, Player player, WishIntent intent) {
+        boolean polite = intent.polite();
+        ItemStack gift;
+        if (polite) {
+            gift = new ItemStack(net.minecraft.world.item.Items.GOLDEN_CARROT, 4);
+        } else if (level.getRandom().nextBoolean()) {
+            gift = new ItemStack(net.minecraft.world.item.Items.ENCHANTED_GOLDEN_APPLE, 1);
+        } else {
+            gift = new ItemStack(net.minecraft.world.item.Items.EMERALD, 8);
+        }
+        if (!player.getInventory().add(gift)) {
+            player.drop(gift, false);
+        }
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.HAPPY_VILLAGER,
+                player.getX(), player.getY() + 1.5D, player.getZ(),
+                30, 0.5D, 0.6D, 0.5D, 0.05D);
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.genie_own.gift"));
+        return new Result(true, "wish.kubanhorizons.genie_own.gift");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */

@@ -256,6 +256,13 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9т. Самостоятельное желание джиннии: «Сделай что-нибудь хорошее»
+        else if (containsAny(normalized, "сделай что-нибудь хорошее", "сделай что-нибудь приятное",
+                "самостоятельное желание", "do something nice", "do something good")) {
+            target = WishIntent.Target.GENIE_OWN_WISH;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);
