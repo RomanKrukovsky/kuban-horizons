@@ -151,6 +151,13 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9в. Память предмета: «Что помнит этот предмет?»
+        else if (containsAny(normalized, "что помнит предмет", "что помнит этот предмет", "память предмета",
+                "item memory", "what does this item remember")) {
+            target = WishIntent.Target.ITEM_MEMORY;
+            category = WishIntent.Category.PROVENANCE;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

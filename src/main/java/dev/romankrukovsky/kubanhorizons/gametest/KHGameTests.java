@@ -213,6 +213,7 @@ public final class KHGameTests {
         register("genie_wordless_wish", KHGameTests::testWordlessWish, 100);
         register("genie_block_whisper", KHGameTests::testBlockWhisper, 100);
         register("genie_npc_personality", KHGameTests::testNpcPersonality, 100);
+        register("genie_item_memory", KHGameTests::testItemMemory, 100);
         register("player_genie_distorted_wish_parse", KHGameTests::testPlayerGenieDistortedWishParse, 100);
         register("player_genie_attachment_persistence", KHGameTests::testPlayerGenieAttachmentPersistence, 100);
         register("player_genie_transformation_controller", KHGameTests::testPlayerGenieTransformationController, 100);
@@ -5197,6 +5198,24 @@ public final class KHGameTests {
         helper.assertTrue("calm".equals(sheep.getPersistentData().getStringOr("KubanGeniePersonality", "")),
                 "Склонность NPC не записана как calm");
 
+        player.discard();
+        helper.succeed();
+    }
+
+    /** Память предмета: парсер распознаёт запрос, джинния читает предмет в руке. */
+    private static void testItemMemory(GameTestHelper helper) {
+        var player = helper.makeMockServerPlayerInLevel();
+        player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND,
+                new ItemStack(Items.IRON_SWORD));
+
+        var intent = dev.romankrukovsky.kubanhorizons.genie.wish.WishParser.parse("что помнит предмет");
+        helper.assertTrue(intent.target() == dev.romankrukovsky.kubanhorizons.genie.wish.WishIntent.Target.ITEM_MEMORY,
+                "Парсер не распознал запрос о памяти предмета: " + intent.target());
+
+        var result = dev.romankrukovsky.kubanhorizons.genie.wish.WishExecutor
+                .execute(helper.getLevel(), player, intent);
+        helper.assertTrue(result.executed(),
+                "Память предмета не прочитана: " + result.messageKey());
         player.discard();
         helper.succeed();
     }

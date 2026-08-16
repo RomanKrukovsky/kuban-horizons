@@ -151,7 +151,7 @@
 
 ## Выполненные тесты
 - `./gradlew compileJava`, `runData`, `build` — успешно.
-- Полный `runGameTestServer` мода: **159 тестов проходят** (`All 159 required tests passed`).
+- Полный `runGameTestServer` мода: **160 тестов проходят** (`All 160 required tests passed`).
 - Все JSON-ресурсы сгенерированы через datagen (AD-005).
 
 ## Известные ошибки
@@ -254,7 +254,10 @@
 - **Эффекты манифестации**: GenieManifestationEffects переведён на
   WishborneState.Presence и подключён в тик джиннии — рассеянная/запечатанная/
   изгнанная джинния окружена характерными частицами.
-- **159 GameTest проходят**: `All 159 required tests passed :)`.
+- **Память предмета**: ItemMemoryReader был orphan-движком; теперь доступен через
+  wish-таргет ITEM_MEMORY («что помнит предмет») — джинния читает чары/повреждение
+  предмета в руке; тест genie_item_memory.
+- **160 GameTest проходят**: `All 160 required tests passed :)`.
 - Фикс стабильности: testUnfulfilledWishRoom больше не ждёт count()==1 (общий
   SavedData с параллельными тестами).
 - Исправлен флак: ConditionalRuleStore-тест возвращал время мира, ломая

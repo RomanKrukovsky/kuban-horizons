@@ -47,6 +47,7 @@ public final class WishExecutor {
             };
             case PROVENANCE -> switch (intent.target()) {
                 case BLOCK_WHISPER -> executeBlockWhisper(level, player, intent);
+                case ITEM_MEMORY -> executeItemMemory(level, player, intent);
                 default -> executeProvenanceQuery(level, player, intent);
             };
             case HISTORY -> switch (intent.target()) {
@@ -189,6 +190,21 @@ public final class WishExecutor {
         }
         player.sendSystemMessage(Component.translatable("wish.kubanhorizons.whisper.empty"));
         return new Result(false, "wish.kubanhorizons.whisper.empty");
+    }
+
+    /** Память предмета: джинния читает накопленные воспоминания предмета в руке. */
+    private static Result executeItemMemory(ServerLevel level, Player player, WishIntent intent) {
+        ItemStack held = player.getMainHandItem();
+        if (held.isEmpty()) {
+            player.sendSystemMessage(Component.translatable("wish.kubanhorizons.provenance.empty_hand"));
+            return new Result(false, "wish.kubanhorizons.provenance.empty_hand");
+        }
+        if (!(player instanceof net.minecraft.server.level.ServerPlayer serverPlayer)) {
+            return new Result(false, "wish.kubanhorizons.provenance.empty_hand");
+        }
+        dev.romankrukovsky.kubanhorizons.genie.memory.ItemMemoryReader
+                .readItemMemory(null, serverPlayer, held);
+        return new Result(true, "message.kubanhorizons.genie.memory.item_read");
     }
 
     /** История: «А что если?» — описательный отчёт об альтернативной версии мира. */
