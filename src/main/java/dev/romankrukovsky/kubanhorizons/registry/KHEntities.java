@@ -149,6 +149,15 @@ public final class KHEntities {
                     .clientTrackingRange(10)
                     .build(key("reality_error")));
 
+    /** Желание, ставшее существом: светящийся спутник с сутью желания. */
+    public static final DeferredHolder<EntityType<?>, EntityType<dev.romankrukovsky.kubanhorizons.entity.WishCreatureEntity>> WISH_CREATURE =
+            ENTITIES.register("wish_creature", () -> EntityType.Builder
+                    .of(dev.romankrukovsky.kubanhorizons.entity.WishCreatureEntity::new, MobCategory.CREATURE)
+                    .sized(0.4F, 0.6F)
+                    .eyeHeight(0.5F)
+                    .clientTrackingRange(10)
+                    .build(key("wish_creature")));
+
     /**
      * Кубанский манул: талисман мода.
      *

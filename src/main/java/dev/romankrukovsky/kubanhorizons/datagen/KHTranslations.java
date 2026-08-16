@@ -1319,6 +1319,9 @@ final class KHTranslations {
         add("wish.kubanhorizons.contract.failed",
                 "Genie: the contract could not be sealed.",
                 "Джинния: контракт не удалось заключить.");
+        add("wish.kubanhorizons.creature.made",
+                "Your wish takes the form of a glowing creature: «%s».",
+                "Ваше желание обретает форму светящегося существа: «%s».");
         add("wish.kubanhorizons.biome.rewritten",
                 "The steppe rewrites the land around you.",
                 "Степь переписывает землю вокруг вас.");

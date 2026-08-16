@@ -242,6 +242,13 @@ public final class WishParser {
             category = WishIntent.Category.CIVILIZATION;
             detailParam = text;
         }
+        // 9р. Желание, ставшее существом: «Преврати желание в существо»
+        else if (containsAny(normalized, "желание в существо", "стань существом", "существо из желания",
+                "wish creature", "wish become a creature")) {
+            target = WishIntent.Target.WISH_CREATURE;
+            category = WishIntent.Category.CIVILIZATION;
+            detailParam = text;
+        }
 
         WishIntent.Amount amount = amount(normalized, category);
         WishIntent.Placement placement = placement(normalized);

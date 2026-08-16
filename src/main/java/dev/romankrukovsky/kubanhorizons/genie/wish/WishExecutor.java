@@ -53,6 +53,7 @@ public final class WishExecutor {
                 case CONTEXTUAL_DOOR -> executeContextualDoor(level, player);
                 case UNSPOKEN_WISH -> executeUnspokenWish(level, player);
                 case MAKE_CONTRACT -> executeContract(level, player);
+                case WISH_CREATURE -> executeWishCreature(level, player, intent);
                 default -> executeCivilizationWish(level, player, intent);
             };
             case PROVENANCE -> switch (intent.target()) {
@@ -481,6 +482,26 @@ public final class WishExecutor {
         } catch (RuntimeException exception) {
             return new Result(false, "wish.kubanhorizons.contract.failed");
         }
+    }
+
+    /** Желание, ставшее существом: материализация сути желания в спутника. */
+    private static Result executeWishCreature(ServerLevel level, Player player, WishIntent intent) {
+        var creature = dev.romankrukovsky.kubanhorizons.registry.KHEntities.WISH_CREATURE
+                .get().create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+        if (creature == null) {
+            return new Result(false, "message.kubanhorizons.genie.wish.no_space");
+        }
+        String wish = intent.detailParam() == null ? "" : intent.detailParam().trim();
+        BlockPos pos = player.blockPosition().relative(player.getDirection(), 2);
+        creature.setPos(pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D);
+        creature.setWish(wish, player.getUUID());
+        level.addFreshEntity(creature);
+        level.sendParticles(net.minecraft.core.particles.ParticleTypes.ENCHANT,
+                pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D,
+                40, 0.5D, 0.8D, 0.5D, 0.1D);
+        player.sendSystemMessage(Component.translatable("wish.kubanhorizons.creature.made",
+                wish.isBlank() ? "?" : wish));
+        return new Result(true, "wish.kubanhorizons.creature.made");
     }
 
     /** Достаёт слово из «напиши слово X»: берёт первый подряд латиницей/кириллицей токен после «слово». */
